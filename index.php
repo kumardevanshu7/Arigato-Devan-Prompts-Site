@@ -47,6 +47,15 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
     <title>Arigato Devan - PromptVerse</title>
     <link rel="stylesheet" href="style.css?v=1777723415">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Preload first 3 prompt images for faster perceived loading -->
+    <?php
+    if (isset($prompts) && is_array($prompts)) {
+        for ($i = 0; $i < min(3, count($prompts)); $i++) {
+            echo '<link rel="preload" as="image" href="' . htmlspecialchars($prompts[$i]['image_path']) . '">' . "\n";
+        }
+    }
+    ?>
 </head>
 <body>
 
@@ -295,7 +304,7 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
                          data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
                          data-unlocked="<?= $p['is_unlocked'] ? 'true' : 'false' ?>"
                          <?= $p['is_unlocked'] ? 'data-prompt-text="'.htmlspecialchars($p['prompt_text']).'"' : '' ?>>
-                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="Prompt Image" loading="lazy">
+                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="Prompt Image" <?= $index < 3 ? '' : 'loading="lazy"' ?>>
                         
                         <?php if(!$p['is_unlocked']): ?>
                             <div class="card-lock-icon">
