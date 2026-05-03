@@ -1,0 +1,719 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.card');
+    const modalOverlay = document.getElementById('unlock-modal');
+    const closeModalBtn = document.querySelector('.close-modal');
+    const submitCodeBtn = document.getElementById('submit-code');
+    const codeInput = document.getElementById('unlock-code-input');
+    
+    let currentPromptId = null;
+    let currentCardElement = null;
+    
+    // Custom Alert System — only shows errors, not success/debug toasts
+    function showComicAlert(message, type = 'error') {
+        // Disabled per user request
+        return;
+    }
+
+    // --- Swipe Stack Logic ---
+    const cardStack = document.getElementById('card-stack');
+    const prevBtn = document.getElementById('swipe-left-btn');
+    const nextBtn = document.getElementById('swipe-right-btn');
+    
+    let allCards = document.querySelectorAll('.card');
+    let currentIndex = 0;
+    window.isSwiping = false;
+    
+    // Only apply stack logic if this is a card-stack swiper page (not gallery grid)
+    const isGalleryGrid = document.body.classList.contains('page-gallery');
+
+    function updateCardStack() {
+        if (isGalleryGrid) return; // Gallery uses grid, not stack
+        allCards.forEach((card, index) => {
+            card.classList.remove('card-active', 'card-next', 'card-prev');
+            if (index === currentIndex) {
+                card.classList.add('card-active');
+            } else if (index > currentIndex) {
+                card.classList.add('card-next');
+            } else {
+                card.classList.add('card-prev');
+            }
+        });
+    }
+
+    function swipeNext() {
+        if (window.innerWidth > 900) return;
+        if (currentIndex < allCards.length - 1) {
+            currentIndex++;
+            updateCardStack();
+        }
+    }
+
+    function swipePrev() {
+        if (window.innerWidth > 900) return;
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateCardStack();
+        }
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', swipePrev);
+    if (nextBtn) nextBtn.addEventListener('click', swipeNext);
+
+    if (cardStack && !isGalleryGrid) {
+        let startX = 0;
+        let isDragging = false;
+        
+        cardStack.addEventListener('touchstart', (e) => {
+            if (window.innerWidth > 900) return;
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            window.isSwiping = false;
+        }, {passive: true});
+
+        cardStack.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            if (Math.abs(e.touches[0].clientX - startX) > 10) window.isSwiping = true;
+        }, {passive: true});
+
+        cardStack.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            let endX = e.changedTouches[0].clientX;
+            handleSwipe(startX, endX);
+            isDragging = false;
+            setTimeout(() => window.isSwiping = false, 50);
+        });
+
+        cardStack.addEventListener('mousedown', (e) => {
+            if (window.innerWidth > 900) return;
+            if (e.target.closest('.like-btn')) return;
+            startX = e.clientX;
+            isDragging = true;
+            window.isSwiping = false;
+        });
+
+        cardStack.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            if (Math.abs(e.clientX - startX) > 10) window.isSwiping = true;
+        });
+        
+        cardStack.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            let endX = e.clientX;
+            if (window.isSwiping) {
+                handleSwipe(startX, endX);
+            }
+            isDragging = false;
+            setTimeout(() => window.isSwiping = false, 50);
+        });
+
+        cardStack.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        function handleSwipe(start, end) {
+            const threshold = 40;
+            if (start - end > threshold) {
+                swipeNext(); // Swipe left -> Next
+            } else if (end - start > threshold) {
+                swipePrev(); // Swipe right -> Prev
+            }
+        }
+    }
+    // --- End Swipe Stack Logic ---
+
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (window.isSwiping) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            // Prevent opening modal when clicking like button or category pill
+            if (e.target.closest('.like-btn') || e.target.closest('.card-category-pill')) {
+                return;
+            }
+
+            currentPromptId = card.dataset.id;
+            currentCardElement = card;
+
+            // Populate Modal Info
+            const modalImage    = document.getElementById('modal-image');
+            const modalTitle    = document.getElementById('modal-title');
+            const modalReelLink = document.getElementById('modal-reel-link');
+            const wantCodeSection = document.getElementById('modal-want-code');
+            const unlockArea    = document.getElementById('modal-unlock-area');
+            const unlockedArea  = document.getElementById('modal-unlocked-area');
+            const unlockedText  = document.getElementById('modal-unlocked-text');
+            const saveBtn       = document.getElementById('modal-save-btn');
+
+            if(modalImage) modalImage.src = card.dataset.image;
+            if(modalTitle) modalTitle.textContent = card.dataset.title;
+            if(saveBtn) {
+                saveBtn.dataset.promptId = card.dataset.id;
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
+                saveBtn.style.background = '';
+            }
+
+            const pType = (card.dataset.promptType || '').trim();
+
+            // --- Pre-unlocked check ---
+            if (card.dataset.unlocked === 'true') {
+                if(wantCodeSection) wantCodeSection.style.display = 'none';
+                if(unlockArea)      unlockArea.style.display = 'none';
+                if(unlockedArea) {
+                    unlockedArea.style.display = 'flex';
+                    if(unlockedText) unlockedText.textContent = card.dataset.promptText || '';
+                }
+            } else {
+                // Hide reel link by default; show for SCP only
+                if(wantCodeSection) wantCodeSection.style.display = 'none';
+                if(unlockedArea)    unlockedArea.style.display = 'none';
+                if(unlockArea)      unlockArea.style.display = 'block';
+
+                // ══════════════════════════════════════════
+                // IVP — Insta Viral: 7-number math challenge
+                // ══════════════════════════════════════════
+                if (pType === 'insta_viral') {
+                    // Simple addition: two 4-digit numbers
+                    const num1 = Math.floor(Math.random() * 9000) + 1000;
+                    const num2 = Math.floor(Math.random() * 9000) + 1000;
+                    const ans  = num1 + num2;
+
+                    // 4 MCQ options — all unique, answer always included
+                    let opts = new Set([ans]);
+                    while (opts.size < 4) {
+                        const decoy = ans + (Math.floor(Math.random() * 200) - 100);
+                        if (decoy !== ans && decoy > 0) opts.add(decoy);
+                    }
+                    const options = [...opts].sort(() => Math.random() - 0.5);
+
+                    let html = `<p style="font-weight:900;font-size:1.1rem;margin-bottom:12px;color:#d03030;">🧮 MATH CHALLENGE!</p>`;
+                    html += `<p style="font-weight:700;font-size:1.6rem;margin-bottom:18px;letter-spacing:1px;">${num1} + ${num2} = ?</p>`;
+                    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
+                    options.forEach(opt => {
+                        html += `<button class="math-opt comic-btn-small" data-ans="${ans}" data-val="${opt}" style="background:var(--secondary-color);color:var(--text-color);font-size:1.1rem;padding:14px 8px;font-weight:900;">${opt}</button>`;
+                    });
+                    html += `</div>`;
+                    html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Chalo Chalo School jao 😏</div>`;
+
+                    unlockArea.innerHTML = html;
+
+                    setTimeout(() => {
+                        document.querySelectorAll('.math-opt').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                if (parseInt(this.dataset.val) === parseInt(this.dataset.ans)) {
+                                    this.style.background = '#2ecc71';
+                                    this.style.color = '#fff';
+                                    unlockInstaViral(currentPromptId);
+                                } else {
+                                    this.style.background = '#e74c3c';
+                                    this.style.color = '#fff';
+                                    document.getElementById('math-error').style.display = 'block';
+                                    triggerEmojiRain('😂', 15);
+                                    // Regenerate after 1.5s on wrong answer
+                                    setTimeout(() => {
+                                        const newNum1 = Math.floor(Math.random() * 9000) + 1000;
+                                        const newNum2 = Math.floor(Math.random() * 9000) + 1000;
+                                        const card = currentCardElement;
+                                        if (card) {
+                                            // Re-open with fresh numbers
+                                            card.click();
+                                        }
+                                    }, 1500);
+                                }
+                            });
+                        });
+                    }, 50);
+
+                // ══════════════════════════════════════════
+                // URP — Unreleased: Love Bar inside modal
+                // ══════════════════════════════════════════
+                } else if (pType === 'unreleased') {
+                    const LOVE_THRESHOLD = (typeof isLoggedIn !== 'undefined' && isLoggedIn) ? 20 : 120;
+                    let taps = 0;
+
+                    unlockArea.innerHTML = `
+                        <p style="font-weight:900;font-size:1rem;margin-bottom:14px;color:#d03030;">
+                            ❤️ Show Some Love to Unlock!
+                        </p>
+                        <p style="font-weight:600;font-size:0.85rem;color:#888;margin-bottom:14px;">
+                            ${LOVE_THRESHOLD === 120 ? '⚠️ Login to unlock with just 20 taps!' : `Tap ${LOVE_THRESHOLD} times to reveal this prompt`}
+                        </p>
+                        <div style="background:#f0f0f0;border:2px solid var(--text-color);border-radius:20px;overflow:hidden;height:16px;margin-bottom:12px;box-shadow:2px 2px 0 var(--text-color);">
+                            <div id="urp-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#ff6b9d,#ff3b6e);transition:width 0.2s;border-radius:20px;"></div>
+                        </div>
+                        <div style="text-align:center;font-weight:800;font-size:0.9rem;margin-bottom:14px;">
+                            <span id="urp-tap-count">0</span> / ${LOVE_THRESHOLD} taps
+                        </div>
+                        <button id="urp-tap-btn" style="width:100%;padding:16px;background:var(--secondary-color);border:var(--border-width) solid var(--text-color);border-radius:16px;font-family:var(--font-main);font-weight:900;font-size:1.2rem;cursor:pointer;box-shadow:var(--shadow-comic);transition:transform 0.1s;">
+                            ❤️ TAP TO LOVE
+                        </button>
+                    `;
+
+                    setTimeout(() => {
+                        const tapBtn  = document.getElementById('urp-tap-btn');
+                        const fill    = document.getElementById('urp-bar-fill');
+                        const counter = document.getElementById('urp-tap-count');
+                        if (!tapBtn) return;
+
+                        tapBtn.addEventListener('click', () => {
+                            if (taps >= LOVE_THRESHOLD) return;
+                            taps++;
+                            const pct = (taps / LOVE_THRESHOLD) * 100;
+                            fill.style.width = pct + '%';
+                            counter.textContent = taps;
+
+                            // Heartbeat bounce
+                            tapBtn.style.transform = 'scale(0.94)';
+                            setTimeout(() => tapBtn.style.transform = '', 100);
+
+                            // Floating heart
+                            const h = document.createElement('span');
+                            h.textContent = '❤️';
+                            h.style.cssText = `position:fixed;pointer-events:none;font-size:1.4rem;animation:floatHeart 1s ease-out forwards;left:${40+Math.random()*20}%;top:60%;z-index:9999;`;
+                            document.body.appendChild(h);
+                            setTimeout(() => h.remove(), 1000);
+
+                            if (taps >= LOVE_THRESHOLD) {
+                                tapBtn.textContent = '🔓 Unlocking...';
+                                tapBtn.disabled = true;
+                                unlockUnreleased(currentPromptId);
+                            }
+                        });
+                    }, 50);
+
+                // ══════════════════════════════════════════
+                // SCP — Secret Code: Code input
+                // ══════════════════════════════════════════
+                } else {
+                    if(card.dataset.reel) {
+                        if(modalReelLink) modalReelLink.href = card.dataset.reel;
+                        if(wantCodeSection) wantCodeSection.style.display = 'block';
+                    }
+                    unlockArea.innerHTML = `
+                        <p style="font-weight:700;margin-bottom:16px;color:#555;">Enter the secret code to reveal this prompt.</p>
+                        <input type="text" id="unlock-code-input" placeholder="6-Letter Code" maxlength="6">
+                        <button id="submit-code"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt</button>
+                    `;
+                    const ci  = document.getElementById('unlock-code-input');
+                    const scb = document.getElementById('submit-code');
+                    if (ci)  { ci.value = ''; ci.focus(); ci.addEventListener('input', e => e.target.value = e.target.value.toUpperCase()); ci.addEventListener('keypress', e => { if(e.key === 'Enter') verifyCode(); }); }
+                    if (scb) scb.addEventListener('click', verifyCode);
+                }
+            }
+
+            // Show modal smoothly
+            if(modalOverlay) {
+                modalOverlay.style.display = 'flex';
+                setTimeout(() => modalOverlay.classList.add('show'), 10);
+            }
+
+            document.dispatchEvent(new CustomEvent('modalOpened', { detail: { promptId: card.dataset.id } }));
+        });
+    });
+
+
+    if(closeModalBtn && modalOverlay) {
+        function hideModal() {
+            modalOverlay.classList.remove('show');
+            setTimeout(() => modalOverlay.style.display = 'none', 300);
+        }
+
+        closeModalBtn.addEventListener('click', hideModal);
+        
+        modalOverlay.addEventListener('click', (e) => {
+            if(e.target === modalOverlay) hideModal();
+        });
+    }
+
+    function verifyCode() {
+        const codeInput = document.getElementById('unlock-code-input');
+        const submitCodeBtn = document.getElementById('submit-code');
+        if (!codeInput) return;
+        const code = codeInput.value.trim();
+        if(!code) {
+            showComicAlert('Please enter a code!', 'error');
+            return;
+        }
+
+        if (submitCodeBtn) {
+            submitCodeBtn.style.transform = 'translate(4px, 4px)';
+            setTimeout(() => submitCodeBtn.style.transform = '', 100);
+        }
+
+        const formData = new FormData();
+        formData.append('action', 'verify');
+        formData.append('prompt_id', currentPromptId);
+        formData.append('code', code);
+
+        fetch('unlock.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Update Modal UI
+                const unlockArea = document.getElementById('modal-unlock-area');
+                const unlockedArea = document.getElementById('modal-unlocked-area');
+                const unlockedText = document.getElementById('modal-unlocked-text');
+                const wantCode = document.getElementById('modal-want-code');
+                const saveBtn = document.getElementById('modal-save-btn');
+
+                if(unlockArea) unlockArea.style.display = 'none';
+                if(wantCode) wantCode.style.display = 'none';
+                if(unlockedArea) {
+                    unlockedArea.style.display = 'flex';
+                    if(unlockedText) unlockedText.textContent = data.prompt_text;
+                }
+                // Set save button promptId
+                if(saveBtn) {
+                    saveBtn.dataset.promptId = currentPromptId;
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
+                    saveBtn.style.background = '';
+                }
+
+                // Update card lock icon
+                if (currentCardElement) {
+                    const lockIcon = currentCardElement.querySelector('.card-lock-icon');
+                    if(lockIcon) {
+                        lockIcon.style.background = 'var(--primary-color)';
+                        lockIcon.innerHTML = '<i class="fa-solid fa-check" style="font-size:14px;"></i>';
+                    }
+                    currentCardElement.classList.add('glow-flash');
+                    setTimeout(() => currentCardElement.classList.remove('glow-flash'), 500);
+                }
+
+            } else {
+                showComicAlert('Invalid Code! Try again.', 'error');
+                codeInput.value = '';
+                codeInput.focus();
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showComicAlert('Something went wrong!', 'error');
+        });
+    }
+
+
+    // Handle Copy buttons using event delegation
+    document.addEventListener('click', (e) => {
+        // Copy Button Logic
+        if(e.target.closest('.copy-btn')) {
+            const btn = e.target.closest('.copy-btn');
+            // Try modal first, then closest unlocked-state
+            let textToCopy = '';
+            const modalText = document.getElementById('modal-unlocked-text');
+            if (modalText && modalText.textContent) {
+                textToCopy = modalText.textContent;
+            } else {
+                const unlockedState = btn.closest('.unlocked-state');
+                if (unlockedState) textToCopy = unlockedState.querySelector('.unlocked-text')?.textContent || '';
+            }
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
+                btn.style.backgroundColor = '#00ff66';
+                btn.style.color = '#000';
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            });
+        }
+        
+        // Like Button Logic
+        const likeBtn = e.target.closest('.like-btn');
+        if(likeBtn) {
+            const promptId = likeBtn.dataset.promptId;
+            if(!promptId) return;
+            
+            // Visual feedback
+            likeBtn.classList.add('popped');
+            setTimeout(() => {
+                likeBtn.classList.remove('popped');
+            }, 300);
+
+            // AJAX request to like.php
+            const formData = new FormData();
+            formData.append('prompt_id', promptId);
+
+            fetch('like.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    const countSpan = likeBtn.querySelector('.like-count');
+                    if(countSpan) {
+                        countSpan.textContent = data.likes_count;
+                    }
+                    if(data.action === 'liked') {
+                        likeBtn.classList.add('liked-active');
+                    } else {
+                        likeBtn.classList.remove('liked-active');
+                    }
+                }
+            })
+            .catch(err => console.error('Error liking prompt', err));
+        }
+    });
+
+    function unlockInstaViral(promptId) {
+        const formData = new FormData();
+        formData.append('action', 'insta_viral');
+        formData.append('prompt_id', promptId);
+
+        fetch('unlock.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                const unlockArea = document.getElementById('modal-unlock-area');
+                const unlockedArea = document.getElementById('modal-unlocked-area');
+                const unlockedText = document.getElementById('modal-unlocked-text');
+                const wantCode = document.getElementById('modal-want-code');
+                const saveBtn = document.getElementById('modal-save-btn');
+
+                if(unlockArea) unlockArea.style.display = 'none';
+                if(wantCode) wantCode.style.display = 'none';
+                if(unlockedArea) {
+                    unlockedArea.style.display = 'flex';
+                    if(unlockedText) unlockedText.textContent = data.prompt_text;
+                }
+                if(saveBtn) {
+                    saveBtn.dataset.promptId = promptId;
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
+                    saveBtn.style.background = '';
+                }
+
+                if (currentCardElement) {
+                    const lockIcon = currentCardElement.querySelector('.card-lock-icon');
+                    if(lockIcon) {
+                        lockIcon.style.background = 'var(--primary-color)';
+                        lockIcon.innerHTML = '<i class="fa-solid fa-check" style="font-size:14px;"></i>';
+                    }
+                    currentCardElement.classList.add('glow-flash');
+                    setTimeout(() => currentCardElement.classList.remove('glow-flash'), 500);
+                    currentCardElement.dataset.unlocked = 'true';
+                    currentCardElement.dataset.promptText = data.prompt_text;
+                }
+            } else {
+                showComicAlert('Failed to unlock!', 'error');
+            }
+        });
+    }
+
+    function triggerEmojiRain(emoji, count = 15) {
+        for(let i = 0; i < count; i++) {
+            const h = document.createElement('span');
+            h.textContent = emoji;
+            h.style.cssText = `position:fixed; z-index:9999; pointer-events:none; font-size:${20+Math.random()*20}px; animation: floatHeart ${0.8+Math.random()*0.8}s ease-out forwards; left:${Math.random()*100}vw; top:100vh;`;
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 2000);
+        }
+    }
+
+    function unlockUnreleased(promptId) {
+        const formData = new FormData();
+        formData.append('action', 'unreleased');
+        formData.append('prompt_id', promptId);
+
+        fetch('unlock.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const unlockArea  = document.getElementById('modal-unlock-area');
+                const unlockedArea = document.getElementById('modal-unlocked-area');
+                const unlockedText = document.getElementById('modal-unlocked-text');
+                const wantCode    = document.getElementById('modal-want-code');
+                const saveBtn     = document.getElementById('modal-save-btn');
+
+                if(unlockArea)  unlockArea.style.display  = 'none';
+                if(wantCode)    wantCode.style.display    = 'none';
+                if(unlockedArea) {
+                    unlockedArea.style.display = 'flex';
+                    if(unlockedText) unlockedText.textContent = data.prompt_text;
+                }
+                if(saveBtn) {
+                    saveBtn.dataset.promptId = promptId;
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
+                    saveBtn.style.background = '';
+                }
+                if (currentCardElement) {
+                    const lockIcon = currentCardElement.querySelector('.card-lock-icon');
+                    if(lockIcon) { lockIcon.style.background = 'var(--primary-color)'; lockIcon.innerHTML = '<i class="fa-solid fa-check" style="font-size:14px;"></i>'; }
+                    currentCardElement.classList.add('glow-flash');
+                    setTimeout(() => currentCardElement.classList.remove('glow-flash'), 500);
+                    currentCardElement.dataset.unlocked = 'true';
+                    currentCardElement.dataset.promptText = data.prompt_text;
+                }
+                triggerEmojiRain('❤️', 10);
+            } else {
+                showComicAlert('Failed to unlock! Try again.', 'error');
+            }
+        })
+        .catch(() => showComicAlert('Something went wrong!', 'error'));
+    }
+
+    // Logo Triple Tap Logic
+    const logoContainer = document.getElementById('logo-container');
+    let tapCount = 0;
+    let tapTimeout = null;
+
+    if(logoContainer) {
+        logoContainer.addEventListener('click', (e) => {
+            // Only trigger custom logic on smaller screens (mobile)
+            if(window.innerWidth > 768) return; 
+            
+            tapCount++;
+            
+            if(tapCount === 3) {
+                // Triple tap detected!
+                tapCount = 0;
+                clearTimeout(tapTimeout);
+                
+                logoContainer.classList.add('triple-tapped');
+                
+                // Spawn floating hearts
+                for(let i=0; i<5; i++) {
+                    createFloatingHeart(logoContainer);
+                }
+                
+                setTimeout(() => {
+                    logoContainer.classList.remove('triple-tapped');
+                }, 3000); // Revert after 3s
+            }
+            
+            clearTimeout(tapTimeout);
+            tapTimeout = setTimeout(() => {
+                tapCount = 0;
+            }, 600); // Max 600ms between taps
+        });
+    }
+
+    function createFloatingHeart(container) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.className = 'floating-heart';
+        
+        // Randomize position
+        const xOffset = (Math.random() - 0.5) * 50;
+        heart.style.left = `calc(50% + ${xOffset}px)`;
+        
+        container.appendChild(heart);
+        
+        setTimeout(() => {
+            heart.remove();
+        }, 1500);
+    }
+
+    // --- Love Bar Logic (Unreleased Prompts) ---
+
+    document.querySelectorAll('.unreleased-card').forEach(card => {
+        const LOVE_THRESHOLD = parseInt(card.dataset.threshold || 20);
+        const tapBtn   = card.querySelector('.love-tap-btn');
+        const fill     = card.querySelector('.love-bar-fill');
+        const label    = card.querySelector('.tap-count');
+        const reveal   = card.querySelector('.unreleased-prompt-reveal');
+        const loveWrap = card.querySelector('.love-bar-wrap');
+        const promptText = card.querySelector('.unreleased-prompt-text');
+        const copyBtn  = card.querySelector('.unreleased-copy-btn');
+        const img      = card.querySelector('.unreleased-img');
+
+        if (!tapBtn) return;
+
+        let taps = 0;
+
+        tapBtn.addEventListener('click', () => {
+            if (taps >= LOVE_THRESHOLD) return; // Already unlocked
+
+            taps++;
+            const pct = (taps / LOVE_THRESHOLD) * 100;
+
+            // Update bar
+            fill.style.width = pct + '%';
+            label.textContent = taps;
+
+            // Heartbeat animation
+            tapBtn.classList.remove('tapped');
+            void tapBtn.offsetWidth; // reflow trick
+            tapBtn.classList.add('tapped');
+
+            // Spawn floating heart emoji
+            const h = document.createElement('span');
+            h.textContent = '❤️';
+            h.style.cssText = `position:absolute; pointer-events:none; font-size:1.6rem; animation: floatHeart 1s ease-out forwards; left:${40 + Math.random()*20}%; top:60%;`;
+            card.style.position = 'relative';
+            card.appendChild(h);
+            setTimeout(() => h.remove(), 1000);
+
+            if (taps >= LOVE_THRESHOLD) {
+                // Unlock!
+                setTimeout(() => {
+                    card.classList.add('unlocked');
+                    loveWrap.style.display = 'none';
+                    promptText.textContent = card.dataset.prompt || '';
+                    reveal.style.display = 'flex';
+                    tapBtn.textContent = '🔓 UNLOCKED!';
+                    fill.style.width = '100%';
+                }, 200);
+            }
+        });
+
+        // Copy button
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const text = promptText.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    const orig = copyBtn.textContent;
+                    copyBtn.textContent = 'COPIED! ✅';
+                    setTimeout(() => copyBtn.textContent = orig, 2000);
+                });
+            });
+        }
+    });
+    // --- End Love Bar Logic ---
+
+    // --- Logo Desktop Hover Flip ---
+    const logoFlipper = document.querySelector('.logo-flipper');
+    if (logoFlipper && window.innerWidth > 768) {
+        const logoArea = document.getElementById('logo-container');
+        if (logoArea) {
+            logoArea.addEventListener('mouseenter', () => logoFlipper.classList.add('flipped'));
+            logoArea.addEventListener('mouseleave', () => logoFlipper.classList.remove('flipped'));
+        }
+    }
+    // --- End Logo Flip ---
+
+    // --- Nav Dropdown Click Toggle ---
+    document.querySelectorAll('.nav-dropdown-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = btn.closest('.nav-dropdown');
+            const isOpen = dropdown.classList.contains('open');
+            // Close all dropdowns first
+            document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+            // Toggle current
+            if (!isOpen) dropdown.classList.add('open');
+        });
+    });
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+    });
+    // --- End Nav Dropdown ---
+});
