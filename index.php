@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once 'db.php';
-require_once 'google_config.php';
-
 // Guard: if logged in but onboarding not done, force setup
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php");
@@ -26,18 +24,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Generate state token for CSRF if not exists
-if (empty($_SESSION['oauth_state'])) {
-    $_SESSION['oauth_state'] = bin2hex(random_bytes(16));
-}
-
-$google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
-    'client_id' => $google_client_id,
-    'redirect_uri' => $google_redirect_uri,
-    'response_type' => 'code',
-    'scope' => 'email profile',
-    'state' => $_SESSION['oauth_state'],
-    'access_type' => 'online'
-]);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,15 +96,13 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
                 <?php if($_SESSION['role'] === 'admin'): ?>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <a href="profile.php" title="Edit Profile">
-                            <?php $hdr_av = !empty($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin'; ?>
-                            <img src="<?= htmlspecialchars($hdr_av) ?>" class="admin-avatar" alt="Admin" style="transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                            <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                         </a>
                         <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
-                        <?php $hdr_av = !empty($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($_SESSION['username'] ?? 'user'); ?>
-                        <img src="<?= htmlspecialchars($hdr_av) ?>" class="admin-avatar" alt="Profile" style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                        <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile', 'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                     </a>
                 <?php endif; ?>
                 <a href="login.php?logout=1" class="logout">
@@ -141,29 +125,32 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
                 <div class="filmstrip-track">
                     <?php
                     $strip_imgs = [
-                        'landingpics/lan1.png',
-                        'landingpics/lan2.png',
-                        'landingpics/lan3.png',
-                        'landingpics/lan4.png',
-                        'landingpics/lan5.png',
-                        'landingpics/lan6.png',
-                        'landingpics/lan7.png',
-                        'landingpics/lan8.png',
-                        'landingpics/lan9.png',
-                        'landingpics/lan10.png',
-                        'landingpics/lan11.png',
-                        'landingpics/lan12.png',
-                        'landingpics/lan13.png',
-                        'landingpics/lan14.png',
-                        'landingpics/lan15.png',
-                        'landingpics/lan16.png',
-                        'landingpics/lan17.png',
+                        'landingpics/lan1.webp',
+                        'landingpics/lan2.webp',
+                        'landingpics/lan3.webp',
+                        'landingpics/lan4.webp',
+                        'landingpics/lan5.webp',
+                        'landingpics/lan6.webp',
+                        'landingpics/lan7.webp',
+                        'landingpics/lan8.webp',
+                        'landingpics/lan9.webp',
+                        'landingpics/lan10.webp',
+                        'landingpics/lan11.webp',
+                        'landingpics/lan12.webp',
+                        'landingpics/lan13.webp',
+                        'landingpics/lan14.webp',
+                        'landingpics/lan15.webp',
+                        'landingpics/lan16.webp',
+                        'landingpics/lan17.webp',
                     ];
                     // Duplicate for seamless loop
                     $all = array_merge($strip_imgs, $strip_imgs);
                     foreach($all as $img): ?>
                     <div class="filmstrip-frame">
-                        <img src="<?= $img ?>" alt="" loading="lazy" width="200" height="356">
+                        <picture>
+                            <source srcset="<?= $img ?>" type="image/webp">
+                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy" width="200" height="356">
+                        </picture>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -173,8 +160,11 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
                 <div class="filmstrip-track track-reverse">
                     <?php foreach(array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
                     <div class="filmstrip-frame">
-                        <img src="<?= $img ?>" alt="" loading="lazy">
-                    </div>
+                            <picture>
+                                <source srcset="<?= $img ?>" type="image/webp">
+                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            </picture>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -206,7 +196,7 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
 
             <!-- CTA Buttons -->
             <div class="landing-comic-cta">
-                <a href="<?= htmlspecialchars($google_auth_url) ?>" class="cta-btn cta-primary" id="hero-login-btn">
+                <a href="login.php" class="cta-btn cta-primary" id="hero-login-btn">
                     <img src="https://developers.google.com/identity/images/g-logo.png" alt="G">
                     Login with Google
                 </a>
@@ -408,7 +398,7 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
             <p style="font-weight:600;color:#555;margin-bottom:24px;">Login is mandatory to save your prompt.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;">
                 <button onclick="document.getElementById('login-save-popup').style.display='none'" style="flex:1;padding:14px;background:var(--bg-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);">Cancel</button>
-                <a href="<?= htmlspecialchars($google_auth_url) ?>" style="flex:1;padding:14px;background:var(--primary-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-color);font-family:var(--font-main);">
+                <a href="login.php" style="flex:1;padding:14px;background:var(--primary-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-color);font-family:var(--font-main);">
                     <i class="fa-brands fa-google" style="margin-right:8px;"></i> Login with Google
                 </a>
             </div>

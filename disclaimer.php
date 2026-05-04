@@ -28,17 +28,27 @@
             <div class="filmstrip-track">
                 <?php
                 $strip_imgs = [];
-                for($i=1; $i<=17; $i++) $strip_imgs[] = "landingpics/lan$i.png";
+                for($i=1; $i<=17; $i++) $strip_imgs[] = "landingpics/lan$i.webp";
                 $all = array_merge($strip_imgs, $strip_imgs);
                 foreach($all as $img): ?>
-                <div class="filmstrip-frame"><img src="<?= $img ?>" alt="" loading="lazy"></div>
+                <div class="filmstrip-frame">
+                            <picture>
+                                <source srcset="<?= $img ?>" type="image/webp">
+                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            </picture>
+                        </div>
                 <?php endforeach; ?>
             </div>
         </div>
         <div class="filmstrip-row row-2">
             <div class="filmstrip-track track-reverse">
                 <?php foreach(array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
-                <div class="filmstrip-frame"><img src="<?= $img ?>" alt="" loading="lazy"></div>
+                <div class="filmstrip-frame">
+                            <picture>
+                                <source srcset="<?= $img ?>" type="image/webp">
+                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            </picture>
+                        </div>
                 <?php endforeach; ?>
             </div>
         </div>

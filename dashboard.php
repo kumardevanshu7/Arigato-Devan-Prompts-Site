@@ -393,12 +393,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
             <div class="header-divider"></div>
             <div style="display:flex;align-items:center;gap:8px;">
                 <a href="profile.php" title="Edit Profile">
-                    <?php
-                    $admin_avatar_src = !empty($_SESSION['profile_image'])
-                        ? $_SESSION['profile_image']
-                        : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin';
-                    ?>
-                    <img src="<?= htmlspecialchars($admin_avatar_src) ?>" class="admin-avatar" alt="Admin" style="transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                    <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                 </a>
                 <a href="dashboard.php" style="color:var(--text-color);font-weight:800;" class="active">ADMIN</a>
             </div>

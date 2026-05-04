@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
@@ -90,7 +90,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
   <nav class="nav-links"><a href="index.php">HOME</a><a href="dashboard.php">DASHBOARD</a><a href="blog_admin.php" style="background:var(--primary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-pencil"></i> BLOGS</a></nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
     <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
   </div>
 </header>

@@ -1,7 +1,5 @@
 <?php
 session_start();
-require_once 'google_config.php';
-
 // Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -14,42 +12,27 @@ if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
-
-// CSRF state
-if (empty($_SESSION['oauth_state'])) {
-    $_SESSION['oauth_state'] = bin2hex(random_bytes(16));
-}
-
-$google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
-    'client_id' => $google_client_id,
-    'redirect_uri' => $google_redirect_uri,
-    'response_type' => 'code',
-    'scope' => 'email profile',
-    'state' => $_SESSION['oauth_state'],
-    'access_type' => 'online'
-], '', '&', PHP_QUERY_RFC3986);
-
 $error = $_SESSION['error_msg'] ?? '';
 unset($_SESSION['error_msg']);
 
 $strip_imgs = [
-    'landingpics/lan1.png',
-    'landingpics/lan2.png',
-    'landingpics/lan3.png',
-    'landingpics/lan4.png',
-    'landingpics/lan5.png',
-    'landingpics/lan6.png',
-    'landingpics/lan7.png',
-    'landingpics/lan8.png',
-    'landingpics/lan9.png',
-    'landingpics/lan10.png',
-    'landingpics/lan11.png',
-    'landingpics/lan12.png',
-    'landingpics/lan13.png',
-    'landingpics/lan14.png',
-    'landingpics/lan15.png',
-    'landingpics/lan16.png',
-    'landingpics/lan17.png',
+    'landingpics/lan1.webp',
+    'landingpics/lan2.webp',
+    'landingpics/lan3.webp',
+    'landingpics/lan4.webp',
+    'landingpics/lan5.webp',
+    'landingpics/lan6.webp',
+    'landingpics/lan7.webp',
+    'landingpics/lan8.webp',
+    'landingpics/lan9.webp',
+    'landingpics/lan10.webp',
+    'landingpics/lan11.webp',
+    'landingpics/lan12.webp',
+    'landingpics/lan13.webp',
+    'landingpics/lan14.webp',
+    'landingpics/lan15.webp',
+    'landingpics/lan16.webp',
+    'landingpics/lan17.webp',
 ];
 ?>
 <!DOCTYPE html>
@@ -433,14 +416,24 @@ $strip_imgs = [
             <div class="filmstrip-row row-1">
                 <div class="filmstrip-track">
                     <?php foreach (array_merge($strip_imgs, $strip_imgs) as $img): ?>
-                        <div class="filmstrip-frame"><img src="<?= $img ?>" alt="" loading="lazy"></div>
+                        <div class="filmstrip-frame">
+                            <picture>
+                                <source srcset="<?= $img ?>" type="image/webp">
+                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            </picture>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
             <div class="filmstrip-row row-2">
                 <div class="filmstrip-track track-reverse">
                     <?php foreach (array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
-                        <div class="filmstrip-frame"><img src="<?= $img ?>" alt="" loading="lazy"></div>
+                        <div class="filmstrip-frame">
+                            <picture>
+                                <source srcset="<?= $img ?>" type="image/webp">
+                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            </picture>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -484,10 +477,10 @@ $strip_imgs = [
                 <?php endif; ?>
 
                 <!-- Google Sign-In -->
-                <a href="<?= htmlspecialchars($google_auth_url) ?>" class="google-btn" id="google-login-btn">
+                <button class="google-btn" id="google-login-btn">
                     <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
                     Continue with Google
-                </a>
+                </button>
 
                 <!-- Or divider -->
                 <div class="card-divider">or</div>
@@ -526,11 +519,72 @@ $strip_imgs = [
         // Press effect on Google btn
         const btn = document.getElementById('google-login-btn');
         if (btn) {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('mousedown', () => {
                 btn.style.transform = 'translate(4px,4px)';
                 btn.style.boxShadow = '1px 1px 0px var(--text-color)';
             });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
+            });
         }
+    </script>
+    
+    <!-- Firebase Authentication SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAzDxElpLX--lJ8xnvCrQBP-zYFMW_QLQ",
+            authDomain: "arigato-devan-prompts.firebaseapp.com",
+            projectId: "arigato-devan-prompts",
+            storageBucket: "arigato-devan-prompts.firebasestorage.app",
+            messagingSenderId: "770814780270",
+            appId: "1:770814780270:web:03e1cd5de780452217d77f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        const loginBtn = document.getElementById('google-login-btn');
+        
+        loginBtn.addEventListener('click', () => {
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            loginBtn.disabled = true;
+            
+            signInWithPopup(auth, provider)
+                .then(async (result) => {
+                    // Get the secure ID token
+                    const idToken = await result.user.getIdToken();
+                    
+                    // Send to our PHP backend to start the session
+                    const response = await fetch('firebase_auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken: idToken })
+                    });
+                    
+                    const data = await response.json();
+                    if(data.success) {
+                        window.location.href = 'index.php'; // PHP session created, go to home
+                    } else {
+                        alert("Login error: " + data.error);
+                        loginBtn.innerHTML = '<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
+                        loginBtn.disabled = false;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Firebase Auth Error:", error);
+                    loginBtn.innerHTML = '<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
+                    loginBtn.disabled = false;
+                    if(error.code !== 'auth/popup-closed-by-user') {
+                        alert("Authentication failed. Please try again.");
+                    }
+                });
+        });
     </script>
 </body>
 

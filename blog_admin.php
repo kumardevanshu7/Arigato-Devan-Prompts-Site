@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
 
@@ -310,7 +310,7 @@ body { background: var(--bg-color); }
         <div class="header-divider"></div>
             <div style="display:flex; align-items:center; gap:8px;">
                 <a href="profile.php" title="Edit Profile">
-                    <img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                    <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                 </a>
                 <a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a>
             </div>
@@ -386,7 +386,7 @@ body { background: var(--bg-color); }
                     </span>
                 </div>
                 <div class="blog-item-meta">
-                    <img src="<?=htmlspecialchars($authorAv)?>" class="author-av" alt="">
+                    <?= renderAvatar($authorAv, 'author-av', '') ?>
                     <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($bl['author_name']??'Admin')?></span>
                     <span>·</span>
                     <span><i class="fa-solid fa-heart"></i> <?=(int)$bl['likes_count']?></span>

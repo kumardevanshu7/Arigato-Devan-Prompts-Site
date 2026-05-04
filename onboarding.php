@@ -16,23 +16,23 @@ if (!empty($_SESSION['onboarding_complete'])) {
 
 // --- Avatar Pool ---
 $male_avatars = [
-    'profiledp/b1.png',
-    'profiledp/b2.png',
-    'profiledp/b3.png',
-    'profiledp/b4.png',
-    'profiledp/b5.png',
-    'profiledp/b6.png',
-    'profiledp/b7.png',
+    'profiledp/b1.webp',
+    'profiledp/b2.webp',
+    'profiledp/b3.webp',
+    'profiledp/b4.webp',
+    'profiledp/b5.webp',
+    'profiledp/b6.webp',
+    'profiledp/b7.webp',
 ];
 
 $female_avatars = [
-    'profiledp/g1.png',
-    'profiledp/g2.png',
-    'profiledp/g3.png',
-    'profiledp/g4.png',
-    'profiledp/g5.png',
-    'profiledp/g6.png',
-    'profiledp/g7.png',
+    'profiledp/g1.webp',
+    'profiledp/g2.webp',
+    'profiledp/g3.webp',
+    'profiledp/g4.webp',
+    'profiledp/g5.webp',
+    'profiledp/g6.webp',
+    'profiledp/g7.webp',
 ];
 
 $errors = [];
@@ -437,7 +437,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
                                 <?= (($_POST['avatar'] ?? '') === $av) ? 'checked' : '' ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars($av) ?>" alt="Male Avatar <?= $i+1 ?>" loading="lazy">
+                                <picture>
+                                    <source srcset="<?= htmlspecialchars($av) ?>" type="image/webp">
+                                    <img src="<?= htmlspecialchars(str_replace('.webp', '.png', $av)) ?>" alt="Male Avatar <?= $i+1 ?>" loading="lazy">
+                                </picture>
                             </div>
                         </label>
                         <?php endforeach; ?>
@@ -450,7 +453,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
                                 <?= (($_POST['avatar'] ?? '') === $av) ? 'checked' : '' ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars($av) ?>" alt="Female Avatar <?= $i+1 ?>" loading="lazy">
+                                <picture>
+                                    <source srcset="<?= htmlspecialchars($av) ?>" type="image/webp">
+                                    <img src="<?= htmlspecialchars(str_replace('.webp', '.png', $av)) ?>" alt="Female Avatar <?= $i+1 ?>" loading="lazy">
+                                </picture>
                             </div>
                         </label>
                         <?php endforeach; ?>

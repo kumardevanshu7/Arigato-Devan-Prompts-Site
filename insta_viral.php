@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once 'db.php';
-require_once 'google_config.php';
-
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
@@ -10,9 +8,6 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 // Fetch Insta Viral prompts by prompt_type
 $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 
-if (empty($_SESSION['oauth_state'])) {
-    $_SESSION['oauth_state'] = bin2hex(random_bytes(16));
-}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,9 +146,9 @@ if (empty($_SESSION['oauth_state'])) {
         <div class="header-divider"></div>
         <?php if(isset($_SESSION['user_id'])): ?>
             <?php if($_SESSION['role']==='admin'): ?>
-                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?=htmlspecialchars($_SESSION['profile_image']??'')?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=admin'"></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
+                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Admin') ?></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
             <?php else: ?>
-                <a href="profile.php" style="color:var(--text-color)"><img src="<?=htmlspecialchars($_SESSION['profile_image']??'')?>" class="admin-avatar" alt="Profile" referrerpolicy="no-referrer" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=user'"></a>
+                <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Profile') ?></a>
             <?php endif; ?>
             <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
         <?php else: ?>

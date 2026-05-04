@@ -1,8 +1,6 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
-require_once 'google_config.php';
-
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
@@ -28,14 +26,6 @@ foreach ($blogs as $b) {
 arsort($all_tags);
 
 // Google auth url for login button
-$google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
-    'client_id'     => $google_client_id,
-    'redirect_uri'  => $google_redirect_uri,
-    'response_type' => 'code',
-    'scope'         => 'email profile',
-    'state'         => $_SESSION['oauth_state'] ?? '',
-    'access_type'   => 'online'
-]);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -373,13 +363,13 @@ $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_
     <div class="header-divider"></div>
     <?php if(isset($_SESSION['user_id'])): ?>
       <?php if($_SESSION['role']==='admin'): ?>
-        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
       <?php else: ?>
-        <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><img src="<?=htmlspecialchars($_SESSION['profile_image']??'https://api.dicebear.com/7.x/avataaars/svg?seed=default')?>" class="admin-avatar" alt="Profile" referrerpolicy="no-referrer"></a>
+        <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile') ?></a>
       <?php endif; ?>
       <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
     <?php else: ?>
-      <a href="<?=htmlspecialchars($google_auth_url)?>" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
+      <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
     <?php endif; ?>
   </div>
 </header>

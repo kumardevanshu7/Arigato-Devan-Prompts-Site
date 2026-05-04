@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once 'db.php';
-require_once 'google_config.php';
-
 // Guard: if logged in but onboarding not done, force setup
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php");
@@ -23,19 +21,6 @@ if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts ORDER BY created_at DESC");
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-// Google auth URL
-if (empty($_SESSION['oauth_state'])) {
-    $_SESSION['oauth_state'] = bin2hex(random_bytes(16));
-}
-$google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
-    'client_id'     => $google_client_id,
-    'redirect_uri'  => $google_redirect_uri,
-    'response_type' => 'code',
-    'scope'         => 'email profile',
-    'state'         => $_SESSION['oauth_state'],
-    'access_type'   => 'online'
-]);
 
 // Avatar helper
 function getAvatar($user) {
@@ -127,18 +112,18 @@ function sessionAvatar() {
                 <?php if($_SESSION['role'] === 'admin'): ?>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <a href="profile.php" title="Edit Profile">
-                            <img src="<?= htmlspecialchars(sessionAvatar()) ?>" class="admin-avatar" alt="Admin" style="transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                            <?= renderAvatar(sessionAvatar(), 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                         </a>
                         <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
-                        <img src="<?= htmlspecialchars(sessionAvatar()) ?>" class="admin-avatar" alt="Profile" style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+                        <?= renderAvatar(sessionAvatar(), 'admin-avatar', 'Profile', 'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                     </a>
                 <?php endif; ?>
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
-                <a href="<?= htmlspecialchars($google_auth_url) ?>" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
+                <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
                     <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
                     Login
                 </a>
@@ -283,7 +268,7 @@ function sessionAvatar() {
             <p style="font-weight:600;color:#555;margin-bottom:24px;">Login is mandatory to save your prompt.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;">
                 <button onclick="document.getElementById('login-save-popup').style.display='none'" style="flex:1;padding:14px;background:var(--bg-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);">Cancel</button>
-                <a id="login-save-url" href="<?= htmlspecialchars($google_auth_url) ?>" style="flex:1;padding:14px;background:var(--primary-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-color);font-family:var(--font-main);">
+                <a id="login-save-url" href="login.php" style="flex:1;padding:14px;background:var(--primary-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-color);font-family:var(--font-main);">
                     <i class="fa-brands fa-google" style="margin-right:8px;"></i> Login with Google
                 </a>
             </div>

@@ -15,22 +15,22 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // --- Avatar Pool ---
 $male_avatars = [
-    'profiledp/b1.png',
-    'profiledp/b2.png',
-    'profiledp/b3.png',
-    'profiledp/b4.png',
-    'profiledp/b5.png',
-    'profiledp/b6.png',
-    'profiledp/b7.png',
+    'profiledp/b1.webp',
+    'profiledp/b2.webp',
+    'profiledp/b3.webp',
+    'profiledp/b4.webp',
+    'profiledp/b5.webp',
+    'profiledp/b6.webp',
+    'profiledp/b7.webp',
 ];
 $female_avatars = [
-    'profiledp/g1.png',
-    'profiledp/g2.png',
-    'profiledp/g3.png',
-    'profiledp/g4.png',
-    'profiledp/g5.png',
-    'profiledp/g6.png',
-    'profiledp/g7.png',
+    'profiledp/g1.webp',
+    'profiledp/g2.webp',
+    'profiledp/g3.webp',
+    'profiledp/g4.webp',
+    'profiledp/g5.webp',
+    'profiledp/g6.webp',
+    'profiledp/g7.webp',
 ];
 $all_avatars = array_merge($male_avatars, $female_avatars);
 

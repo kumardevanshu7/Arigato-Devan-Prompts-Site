@@ -1,8 +1,6 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
-require_once 'google_config.php';
-
 $slug = $_GET['slug'] ?? '';
 if (!$slug) { header("Location: blogs.php"); exit(); }
 
@@ -140,9 +138,9 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
     <div class="header-divider"></div>
     <?php if(isset($_SESSION['user_id'])): ?>
       <?php if($_SESSION['role']==='admin'): ?>
-        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
       <?php else: ?>
-        <a href="profile.php" style="color:var(--text-color)"><img src="<?=htmlspecialchars($_SESSION['profile_image']??'')?>" class="admin-avatar" alt="Profile" referrerpolicy="no-referrer"></a>
+        <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile') ?></a>
       <?php endif; ?>
       <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
     <?php else: ?>
@@ -202,7 +200,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
     <div id="comments-list">
       <?php foreach($comments as $c): ?>
       <div class="comment-item">
-        <img src="<?=htmlspecialchars($c['profile_image']??'https://api.dicebear.com/7.x/avataaars/svg?seed='.urlencode($c['username']??'x'))?>" class="comment-avatar" alt="">
+        <?= renderAvatar($c['profile_image'] ?? '', 'comment-avatar', '') ?>
         <div class="comment-body">
           <div class="comment-name"><?=htmlspecialchars($c['username']??'User')?></div>
           <div class="comment-text"><?=nl2br(htmlspecialchars($c['comment']))?></div>
