@@ -17,6 +17,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     <title>Upload Prompt - Admin</title>
     <link rel="stylesheet" href="style.css?v=1777999999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <style>
         body { background: var(--bg-color); }
         .dashboard-wrap { max-width: 800px; margin: 0 auto; padding: 30px 40px 100px; }
@@ -86,17 +88,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     <div class="type-selector">
                         <label class="type-card selected-secret" id="card-secret">
                             <input type="radio" name="prompt_type" value="secret" checked onchange="onTypeChange('secret')">
-                            <span class="type-icon">ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â</span>
+                            <span class="type-icon"><i class="bx bx-lock-alt type-icon"></i></span>
                             <span class="type-label">Secret Code</span>
                         </label>
                         <label class="type-card" id="card-unreleased">
                             <input type="radio" name="prompt_type" value="unreleased" onchange="onTypeChange('unreleased')">
-                            <span class="type-icon">ÃƒÂ°Ã…Â¸Ã…â€™Ã¢â€žÂ¢</span>
+                            <span class="type-icon"><i class="bx bx-moon type-icon"></i></span>
                             <span class="type-label">Unreleased</span>
                         </label>
                         <label class="type-card" id="card-viral">
                             <input type="radio" name="prompt_type" value="insta_viral" onchange="onTypeChange('insta_viral')">
-                            <span class="type-icon">ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥</span>
+                            <span class="type-icon"><i class="bx bxs-hot type-icon"></i></span>
                             <span class="type-label">Insta Viral</span>
                         </label>
                     </div>
@@ -145,13 +147,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     <textarea id="prompt_text" name="prompt_text" rows="5" placeholder="A cinematic photo of a couple at golden hour..." required></textarea>
                 </div>
 
-                <!-- Access Code ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â full width, only shows for Secret Code type -->
+                <!-- Access Code — full width, only shows for Secret Code type -->
                 <div class="form-group" id="unlock-code-group" style="display:block;">
-                    <label for="unlock_code">ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Ëœ Access Code (6 chars)</label>
+                    <label for="unlock_code"><i class="bx bx-key"></i> Access Code (6 chars)</label>
                     <input type="text" id="unlock_code" name="unlock_code" maxlength="6" pattern="[A-Za-z0-9]{6}" title="Exactly 6 alphanumeric characters" placeholder="e.g. MAGIC1" style="text-transform:uppercase; letter-spacing: 4px; font-weight: 900; font-size: 1.1rem;" required>
                 </div>
 
-                <!-- Cover Image + Reel Link ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â side by side -->
+                <!-- Cover Image + Reel Link — side by side -->
                 <div class="form-row" style="gap:20px; margin-bottom:0;">
                     <div class="form-group" style="flex:1; min-width:0;">
                         <label>Cover Image</label>
@@ -169,7 +171,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     </div>
                 </div>
 
-                <!-- Upload Button ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â full width with space -->
+                <!-- Upload Button &mdash; full width with space -->
                 <div style="margin-top: 24px;">
                     <button type="submit" class="comic-btn" style="width:100%; background:var(--secondary-color); font-size:1.15rem; padding:18px; letter-spacing:1px;">
                         Upload to Verse! <i class="fa-solid fa-rocket"></i>
@@ -260,7 +262,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             // Check tags
             if (tags.length === 0) {
                 e.preventDefault();
-                alert('ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Please add at least one tag before uploading!');
+                alert('⚠️ Please add at least one tag before uploading!');
                 tagInputField.focus();
                 return;
             }
@@ -271,7 +273,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 const code = codeInput.value.trim();
                 if (!code || code.length !== 6) {
                     e.preventDefault();
-                    alert('ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Access Code must be exactly 6 characters for Secret Code type!');
+                    alert('&mdash; Access Code must be exactly 6 characters for Secret Code type!');
                     codeInput.focus();
                     return;
                 }

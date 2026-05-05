@@ -59,7 +59,9 @@ canvas{max-height:280px}
 @media(max-width:900px){.charts-grid{grid-template-columns:1fr}.s-card.a6{grid-column:span 1}}
 @media(max-width:600px){.an-wrap{padding:22px 18px 80px}.an-title{font-size:1.6rem}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 <header>
@@ -84,7 +86,7 @@ canvas{max-height:280px}
 
 <div class="an-wrap">
   <div class="an-title"><i class="fa-solid fa-chart-simple"></i> Analytics Dashboard</div>
-  <div class="an-sub">Real-time data from your database Ã¢â‚¬â€ updated on every page load.</div>
+  <div class="an-sub">Real-time data from your database &mdash; updated on every page load.</div>
 
   <!-- Stat Cards -->
   <div class="stat-grid">
@@ -96,7 +98,7 @@ canvas{max-height:280px}
     <?php if($most_liked):?>
     <div class="s-card a6">
       <div class="s-val" style="font-size:1.15rem;font-weight:900;"><i class="fa-solid fa-star"></i> <?=htmlspecialchars($most_liked['title'])?></div>
-      <div class="s-label">Top Performing Prompt Ã¢â‚¬â€ <?=$most_liked['likes_count']?> <i class="fa-solid fa-heart"></i></div>
+      <div class="s-label">Top Performing Prompt &mdash; <?=$most_liked['likes_count']?> <i class="fa-solid fa-heart"></i></div>
     </div>
     <?php endif;?>
     <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?=$monthly_p?></div><div class="s-label">Prompts</div><div class="s-sub">This Month</div></div>

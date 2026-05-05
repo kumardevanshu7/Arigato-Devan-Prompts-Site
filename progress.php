@@ -9,22 +9,24 @@ $milestones = [
     ['file'=>'progress04.png','count'=>'2,000+','label'=>'2K Family','sub'=>'The community grows','side'=>'right','size'=>'md'],
     ['file'=>'progress05.png','count'=>'3,000+','label'=>'3K & Climbing','sub'=>'Growth accelerating','side'=>'left','size'=>'md'],
     ['file'=>'progress06.png','count'=>'4,000+','label'=>'Almost 5K','sub'=>'Something big is coming...','side'=>'right','size'=>'md'],
-    ['file'=>'progress07.png','count'=>'1M Views','label'=>'1 Million Views ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬','sub'=>'The viral moment that changed everything','side'=>'center','size'=>'hero'],
+    ['file'=>'progress07.png','count'=>'1M Views','label'=>'1 Million Views 🚀','sub'=>'The viral moment that changed everything','side'=>'center','size'=>'hero'],
     ['file'=>'progress08.png','count'=>'5,000+','label'=>'5K Unlocked','sub'=>'Post-viral surge','side'=>'left','size'=>'md'],
     ['file'=>'progress09.png','count'=>'6,000+','label'=>'6K Strong','sub'=>'Consistent growth','side'=>'right','size'=>'md'],
     ['file'=>'progress10.png','count'=>'7,000+','label'=>'7K Family','sub'=>'Growing every day','side'=>'left','size'=>'md'],
     ['file'=>'progress11.png','count'=>'8,000+','label'=>'8K & Rising','sub'=>'Nearly at the goal','side'=>'right','size'=>'md'],
     ['file'=>'progress12.png','count'=>'9,500+','label'=>'So Close...','sub'=>'The final stretch','side'=>'left','size'=>'lg'],
-    ['file'=>'progress13.png','count'=>'10,000+','label'=>'10K Achieved ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°','sub'=>'From 693 to 10K ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â The Journey Complete','side'=>'center','size'=>'finale'],
+    ['file'=>'progress13.png','count'=>'10,000+','label'=>'10K Achieved 🌟','sub'=>'From 693 to 10K &mdash; The Journey Complete','side'=>'center','size'=>'finale'],
 ];
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Growth Journey ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PromptVerse</title>
-<meta name="description" content="The story of growing from 693 followers to 10,000+ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â a visual journey.">
+<title>Growth Journey &mdash; PromptVerse</title>
+<meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -69,7 +71,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 .side-left .tl-connector{right:calc(50% + 9px);width:40px}
 .side-right .tl-connector{left:calc(50% + 9px);width:40px}
 
-/* SIZES ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â increased for visual impact */
+/* SIZES &mdash; increased for visual impact */
 .size-sm .polaroid{width:260px;transform:rotate(-2deg)}
 .size-sm .polaroid:hover{transform:rotate(0deg) scale(1.05)}
 .size-md .polaroid{width:300px;transform:rotate(1.5deg)}
@@ -80,14 +82,14 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 .side-right .size-md .polaroid{transform:rotate(1.8deg)}
 .side-right .size-lg .polaroid{transform:rotate(2deg)}
 
-/* HERO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 1M Views */
+/* HERO &mdash; 1M Views */
 .size-hero{display:flex;flex-direction:column;align-items:center;width:100%}
 .size-hero .polaroid{width:min(360px,90vw);transform:rotate(0deg);border:3px solid #7c3aed;box-shadow:0 0 40px rgba(124,58,237,0.4),0 0 0 6px rgba(124,58,237,0.1),4px 8px 24px rgba(0,0,0,0.2);animation:heroGlow 3s ease-in-out infinite}
 .size-hero .polaroid:hover{transform:scale(1.03)}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;padding:8px 22px;border-radius:40px;font-weight:900;font-size:0.9rem;margin-bottom:16px;box-shadow:0 4px 16px rgba(124,58,237,0.4)}
 @keyframes heroGlow{0%,100%{box-shadow:0 0 30px rgba(124,58,237,0.3),4px 8px 24px rgba(0,0,0,0.2)}50%{box-shadow:0 0 60px rgba(124,58,237,0.6),0 0 0 8px rgba(124,58,237,0.12),4px 8px 24px rgba(0,0,0,0.2)}}
 
-/* FINALE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 10K */
+/* FINALE &mdash; 10K */
 .size-finale{display:flex;flex-direction:column;align-items:center;width:100%}
 .size-finale .polaroid{width:min(400px,92vw);transform:rotate(0deg);border:3px solid #f59e0b;box-shadow:0 0 50px rgba(245,158,11,0.5),0 0 0 8px rgba(245,158,11,0.1),4px 10px 30px rgba(0,0,0,0.25);animation:finaleShine 4s ease-in-out infinite}
 .size-finale .polaroid:hover{transform:scale(1.02)}
@@ -158,8 +160,8 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 <div class="progress-hero">
     <p style="font-size:0.9rem;font-weight:700;letter-spacing:3px;color:#7c3aed;text-transform:uppercase;margin-bottom:12px;"><i class="fa-solid fa-chart-line"></i> Growth Story</p>
     <h1>From 0 to<br>10,000+</h1>
-    <p>A real, raw, emotional journey of building an Instagram community from scratch ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â one prompt at a time.</p>
-    <div class="hero-stat"><i class="fa-brands fa-instagram" style="color:#dc2743;"></i> 13 Milestones &nbsp;Ãƒâ€šÃ‚Â·&nbsp; <i class="fa-solid fa-eye" style="color:#7c3aed;"></i> 1M+ Views &nbsp;Ãƒâ€šÃ‚Â·&nbsp; <i class="fa-solid fa-users" style="color:#f59e0b;"></i> 10K+ Family</div>
+    <p>A real, raw, emotional journey of building an Instagram community from scratch &mdash; one prompt at a time.</p>
+    <div class="hero-stat"><i class="fa-brands fa-instagram" style="color:#dc2743;"></i> 13 Milestones &nbsp;&middot;&nbsp; <i class="fa-solid fa-eye" style="color:#7c3aed;"></i> 1M+ Views &nbsp;&middot;&nbsp; <i class="fa-solid fa-users" style="color:#f59e0b;"></i> 10K+ Family</div>
 </div>
 
 <!-- TIMELINE -->
@@ -187,7 +189,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 
         <?php if($m['size'] === 'hero'): ?>
             <div class="size-hero">
-                <div class="hero-badge"><i class="fa-solid fa-fire"></i> VIRAL MILESTONE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 1M VIEWS</div>
+                <div class="hero-badge"><i class="fa-solid fa-fire"></i> VIRAL MILESTONE &mdash; 1M VIEWS</div>
                 <div class="polaroid" style="position:relative;">
                     <div class="pin"><svg width="24" height="36" viewBox="0 0 24 36"><circle cx="12" cy="8" r="7" fill="#dc2743" stroke="#fff" stroke-width="2"/><line x1="12" y1="15" x2="12" y2="36" stroke="#888" stroke-width="2"/></svg></div>
                     <img src="progresspics/<?= $m['file'] ?>" alt="<?= htmlspecialchars($m['label']) ?>" loading="lazy">
@@ -201,7 +203,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 
         <?php elseif($m['size'] === 'finale'): ?>
             <div class="size-finale">
-                <div class="finale-badge"><i class="fa-solid fa-trophy"></i> FINAL ACHIEVEMENT ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 10K+ FAMILY</div>
+                <div class="finale-badge"><i class="fa-solid fa-trophy"></i> FINAL ACHIEVEMENT &mdash; 10K+ FAMILY</div>
                 <div class="polaroid" style="position:relative;">
                     <div class="pin"><svg width="24" height="36" viewBox="0 0 24 36"><circle cx="12" cy="8" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/><line x1="12" y1="15" x2="12" y2="36" stroke="#888" stroke-width="2"/></svg></div>
                     <img src="progresspics/<?= $m['file'] ?>" alt="<?= htmlspecialchars($m['label']) ?>" loading="lazy">

@@ -41,11 +41,11 @@ $strip_imgs = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Arigato Devan PromptVerse</title>
+    <title>Login "&ndash; Arigato Devan PromptVerse</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
-        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Login Page Root ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Login Page Root &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
         html,
         body {
             height: 100%;
@@ -88,7 +88,7 @@ $strip_imgs = [
                     rgba(253, 251, 247, 0.25) 100%);
         }
 
-        /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Minimal Login Header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
+        /* &mdash; Minimal Login Header &mdash; */
         .login-header {
             position: relative;
             z-index: 10;
@@ -144,7 +144,7 @@ $strip_imgs = [
             background: var(--primary-color);
         }
 
-        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Center Content ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Center Content &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
         .login-body {
             position: relative;
             z-index: 5;
@@ -155,7 +155,7 @@ $strip_imgs = [
             padding: 40px 20px;
         }
 
-        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Login Card ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Login Card &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
         .login-card {
             background: var(--card-bg);
             border: var(--border-width) solid var(--text-color);
@@ -351,7 +351,7 @@ $strip_imgs = [
             padding: 4px 12px;
         }
 
-        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Ticker at bottom ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Ticker at bottom &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
         .login-ticker {
             position: relative;
             z-index: 10;
@@ -363,7 +363,7 @@ $strip_imgs = [
             border-top: 3px solid var(--primary-dark);
         }
 
-        /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ RESPONSIVE ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
+        /* &mdash; RESPONSIVE &mdash; */
         @media (max-width: 600px) {
             .login-header {
                 padding: 12px 20px;
@@ -403,6 +403,8 @@ $strip_imgs = [
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
@@ -505,7 +507,7 @@ $strip_imgs = [
             <div class="ticker-track-wrap">
                 <div class="ticker-track">
                     <?php
-                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made ÃƒÂ Ã‚Â¤Ã¢â‚¬Â ÃƒÂ Ã‚Â¤Ã‚Â¸ÃƒÂ Ã‚Â¤Ã‚Â¾ÃƒÂ Ã‚Â¤Ã‚Â¨", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
+                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made easy", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
                     foreach (array_merge($ticker, $ticker) as $t):
                         ?><span class="ticker-item"><?= $t ?><span class="ticker-sep"><i
                                     class="fa-solid fa-star-of-life"></i></span></span><?php endforeach; ?>
@@ -539,7 +541,7 @@ $strip_imgs = [
             apiKey: "AIzaSyBAzDxElpLX--lJ8xnvCrQBP-zYFMW_QLQ",
             authDomain: "arigato-devan-prompts.firebaseapp.com",
             projectId: "arigato-devan-prompts",
-            storageBucket: "arigato-devan-prompts.appspot.com",
+            storageBucket: "arigato-devan-prompts.firebasestorage.app",
             messagingSenderId: "770814780270",
             appId: "1:770814780270:web:03e1cd5de780452217d77f"
         };

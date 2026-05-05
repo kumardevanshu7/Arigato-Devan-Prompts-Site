@@ -1,5 +1,5 @@
 <?php
-// Blog Comment Submit "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â AJAX/POST endpoint
+// Blog Comment Submit "&ndash; AJAX/POST endpoint
 session_start();
 require_once 'db.php';
 header('Content-Type: application/json');

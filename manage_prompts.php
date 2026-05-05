@@ -20,6 +20,8 @@ $total_prompts = count($prompts);
     <title>Manage Prompts - Admin</title>
     <link rel="stylesheet" href="style.css?v=1777999999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <style>
         body { background: var(--bg-color); }
         .dashboard-wrap { max-width: 1000px; margin: 0 auto; padding: 30px 40px 100px; }
@@ -83,7 +85,7 @@ $total_prompts = count($prompts);
             </div>
             
             <?php if(count($prompts)===0): ?>
-                <p style="text-align:center;color:#7D7887;font-weight:600;padding:60px 0;font-size:1.1rem;">No prompts yet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â start uploading!</p>
+                <p style="text-align:center;color:#7D7887;font-weight:600;padding:60px 0;font-size:1.1rem;">No prompts yet &mdash; start uploading!</p>
             <?php else: ?>
             <div id="prompts-list">
                 <?php foreach($prompts as $p):
@@ -99,7 +101,7 @@ $total_prompts = count($prompts);
                     <div class="prompt-item-details">
                         <div class="prompt-item-title">
                             <?=htmlspecialchars($p['title'])?>
-                            <span class="card-type-badge <?=$type_badge_cls[$ptype]?>" style="font-size:0.6rem;padding:2px 7px;"><?=$type_badge_map[$ptype]?></span>
+                            <span class="card-type-badge <?=$type_badge_cls[$ptype]?>" style="font-size:0.6rem;padding:2px 7px;position:relative;top:auto;right:auto;border-top:2px solid var(--text-color);border-radius:6px;display:inline-block;margin-left:8px;box-shadow:none;"><?=$type_badge_map[$ptype]?></span>
                         </div>
                         <div class="prompt-item-meta">
                             <?php if($ptype === 'secret'): ?>

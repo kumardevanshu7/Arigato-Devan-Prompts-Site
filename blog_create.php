@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create Blog "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
+<title>Create Blog "&ndash; Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px;font-size:.95rem}
@@ -80,7 +80,9 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 .btn-cancel:hover{transform:translateY(-2px);box-shadow:var(--shadow-comic-hover)}
 .flash-error{background:#ffe6e6;color:#a70000;padding:14px;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;margin-bottom:18px;box-shadow:3px 3px 0 var(--text-color)}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.bc-card{padding:22px 18px}}
-</style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head><body>
 <header>
   <div class="logo-area"  style="cursor:pointer">

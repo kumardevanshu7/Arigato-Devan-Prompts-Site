@@ -271,7 +271,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .avatar-img-wrap { width: 52px; height: 52px; }
         }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="prof-wrap">
@@ -286,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      alt="Your Avatar" class="prof-current-avatar" id="live-avatar-preview" referrerpolicy="no-referrer">
                 <div class="prof-header-info">
                     <h2><?= htmlspecialchars($user['username'] ?? 'Your Profile') ?></h2>
-                    <p>Update your profile anytime Ã¢â‚¬â€ no restrictions!</p>
+                    <p>Update your profile anytime &mdash; no restrictions!</p>
                 </div>
             </div>
 
@@ -379,7 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const len = input.value.length;
             if (len < 3)       { hint.textContent = `${len}/15 "Ã¢â‚¬Â Need at least 3`; hint.style.color = '#FF6B6B'; }
             else if (len > 15) { hint.textContent = `${len}/15 "Ã¢â‚¬Â Too long!`;        hint.style.color = '#FF6B6B'; }
-            else               { hint.textContent = `${len}/15 ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“`;                  hint.style.color = '#2ecc71'; }
+            else               { hint.textContent = `${len}/15 ✓`;                  hint.style.color = '#2ecc71'; }
         });
 
         // Live avatar preview in header

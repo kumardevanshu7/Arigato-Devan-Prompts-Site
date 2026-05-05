@@ -30,11 +30,11 @@ arsort($all_tags);
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blogs "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Arigato Devan PromptVerse</title>
+<title>Blogs "&ndash; Arigato Devan PromptVerse</title>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <style>
-/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Blogs Page ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-hero {
     padding: 60px 40px 40px;
     max-width: 1300px;
@@ -58,7 +58,7 @@ arsort($all_tags);
     font-family: var(--font-blog-body);
 }
 
-/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Tag Filter Pills ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Tag Filter Pills &mdash;&ndash;&mdash;&ndash;&mdash; */
 .tag-filter-wrap {
     max-width: 1300px;
     margin: 0 auto 40px;
@@ -95,7 +95,7 @@ arsort($all_tags);
     transform: translateY(-1px);
 }
 
-/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Blog Grid ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Blog Grid &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-wrap {
     max-width: 1300px;
     margin: 0 auto;
@@ -195,7 +195,7 @@ arsort($all_tags);
 }
 .blog-author-name { color: var(--text-color); font-weight: 800; }
 
-/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Normal Grid ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Normal Grid &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-grid {
     column-count: 3;
     column-gap: 26px;
@@ -318,7 +318,9 @@ arsort($all_tags);
     .blogs-grid { column-count: 1; }
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Scrollable Wallpaper Background -->
@@ -382,7 +384,7 @@ arsort($all_tags);
 </div>
 
 <?php if(count($blogs) === 0): ?>
-<div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â check back soon!</div>
+<div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet &mdash; check back soon!</div>
 <?php else: ?>
 
 <!-- Tag Filter -->
@@ -421,7 +423,7 @@ arsort($all_tags);
           <div class="blog-card-meta-left">
             <img src="<?=htmlspecialchars($b['author_avatar']??'https://api.dicebear.com/7.x/avataaars/svg?seed=x')?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
             <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($b['author_name']??'Admin')?></span>
-            <span>ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·</span>
+            <span>&middot;</span>
             <span><?=date('d M Y', strtotime($b['created_at']))?></span>
           </div>
           <div>
@@ -435,7 +437,7 @@ arsort($all_tags);
   </div>
   <!-- No results message -->
   <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#7D7887;font-weight:700;font-size:1.1rem;">
-    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>Ãƒâ€šÃ‚Â
+    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>
   </div>
 
 </div>

@@ -51,7 +51,7 @@ $current_tags = array_map('trim', explode(',', strtolower($p['tag'])));
 $is_secret = in_array('secret', $current_tags);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
+<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
 .edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
@@ -81,6 +81,8 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:22px 18px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head><body>
 <header>
@@ -152,7 +154,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?=htmlspecialchars($p['prompt_text'])?></textarea></div>
 
-      <!-- Code field ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â only shown for secret -->
+      <!-- Code field &mdash; only shown for secret -->
       <div class="form-row" id="code-field-row" style="<?= $is_secret ? '' : 'display:none;' ?>">
         <div class="form-group">
           <label for="e-code">Access Code (6 chars) *</label>

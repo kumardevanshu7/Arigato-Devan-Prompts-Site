@@ -32,7 +32,9 @@ if (isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan - PromptVerse</title>
     <link rel="stylesheet" href="style.css?v=1777999999">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Preload first 3 prompt images for faster perceived loading -->
     <?php
@@ -105,7 +107,7 @@ if (isset($_SESSION['user_id'])) {
                         <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile', 'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
                     </a>
                 <?php endif; ?>
-                <a href="logout.php" class="logout">
+                <a href="login.php?logout=1" class="logout">
                     <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
                 </a>
             <?php else: ?>
@@ -201,7 +203,7 @@ if (isset($_SESSION['user_id'])) {
                     Login with Google
                 </a>
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
-                    Explore Prompts ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢
+                    Explore Prompts →
                 </a>
             </div>
 
@@ -222,7 +224,7 @@ if (isset($_SESSION['user_id'])) {
                         "Your next viral reel starts here",
                         "Premium prompts. Real emotions.",
                         "Turn ideas into aesthetic visuals",
-                        "AI couple content made ÃƒÂ Ã‚Â¤Ã¢â‚¬Â ÃƒÂ Ã‚Â¤Ã‚Â¸ÃƒÂ Ã‚Â¤Ã‚Â¾ÃƒÂ Ã‚Â¤Ã‚Â¨",
+                        "AI couple content made easy",
                         "Scroll. Unlock. Create.",
                         "More drops coming every week <i class=\"fa-solid fa-rocket\"></i>",
                     ];
@@ -276,7 +278,7 @@ if (isset($_SESSION['user_id'])) {
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php else: ?>
                 <?php foreach($prompts as $index => $p): 
-                    // Map DB prompt_type ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ JS/UI ptype key
+                    // Map DB prompt_type → JS/UI ptype key
                     $db_type = $p['prompt_type'] ?? 'secret';
                     if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
                     elseif ($db_type === 'unreleased') $ptype = 'unreleased';
@@ -323,7 +325,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="card end-card card-next" id="end-card">
                     <div class="end-card-content">
                         <div class="end-card-heart"><i class="fa-solid fa-heart"></i></div>
-                        <h3>More prompts coming soonÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</h3>
+                        <h3>More prompts coming soon&ndash;¦</h3>
                         <p>stay tuned</p>
                     </div>
                 </div>

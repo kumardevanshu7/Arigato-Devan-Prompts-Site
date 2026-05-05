@@ -36,10 +36,12 @@ function sessionAvatar() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Arigato Devan PromptVerse</title>
+    <title>Gallery &mdash; Arigato Devan PromptVerse</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <style>
         .gallery-header {
             display: flex;
@@ -162,7 +164,7 @@ function sessionAvatar() {
 
             <div class="gallery-grid" id="card-stack">
             <?php foreach($prompts as $p):
-                        // Map DB prompt_type ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UI ptype key
+                        // Map DB prompt_type → UI ptype key
                         $db_type = $p['prompt_type'] ?? 'secret';
                         if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
                         elseif ($db_type === 'unreleased') $ptype = 'unreleased';

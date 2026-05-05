@@ -12,10 +12,12 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Insta Viral Reels ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PromptVerse</title>
-<meta name="description" content="Insta Viral Reels ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Coming Soon on PromptVerse.">
+<title>Insta Viral Reels &mdash; PromptVerse</title>
+<meta name="description" content="Insta Viral Reels &mdash; Coming Soon on PromptVerse.">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
 <style>
 .coming-soon-wrap {
     min-height: 70vh;
@@ -162,7 +164,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
     <div class="cs-icon"><i class="fa-brands fa-instagram" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
     <h1 class="cs-title">Insta Viral<br><span class="highlight">Reels</span></h1>
-    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
+    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram &mdash; just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
     <div class="cs-notify-row">
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" class="cs-insta-btn">
             <i class="fa-brands fa-instagram"></i> Follow @arigato.devan
@@ -406,7 +408,7 @@ function revealPrompt(text) {
 }
 
 function spawnEmojis() {
-    const emojis = ['ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥','ÃƒÂ¢Ã…Â¡Ã‚Â¡','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¥','ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°','ÃƒÂ¢Ã…â€œÃ‚Â¨','ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â¸','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â«','ÃƒÂ°Ã…Â¸Ã…Â½Ã…Â '];
+    const emojis = ['&mdash;','\u2721','\uD83D\uDCA5','\uD83C\uDF1F&mdash;','&mdash;','&mdash;','&mdash;','\uD83C\uDF1F&mdash;'];
     for(let i = 0; i < 20; i++) {
         const span = document.createElement('span');
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];

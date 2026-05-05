@@ -38,7 +38,7 @@ function getAuthorAvatar(array $row): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blog Management "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Admin | PromptVerse</title>
+<title>Blog Management "&ndash; Admin | PromptVerse</title>
 <link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body { background: var(--bg-color); }
@@ -288,7 +288,9 @@ body { background: var(--bg-color); }
     .blog-item { flex-wrap: wrap; }
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -388,17 +390,17 @@ body { background: var(--bg-color); }
                 <div class="blog-item-meta">
                     <?= renderAvatar($authorAv, 'author-av', '') ?>
                     <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($bl['author_name']??'Admin')?></span>
-                    <span>Ãƒâ€šÃ‚Â·</span>
+                    <span>&middot;</span>
                     <span><i class="fa-solid fa-heart"></i> <?=(int)$bl['likes_count']?></span>
-                    <span>Ãƒâ€šÃ‚Â·</span>
+                    <span>&middot;</span>
                     <span><?=date('d M Y', strtotime($bl['created_at']))?></span>
                     <?php if(!empty($tagsArr)): ?>
-                    <span>Ãƒâ€šÃ‚Â·</span>
+                    <span>&middot;</span>
                     <?php foreach(array_slice($tagsArr,0,3) as $t): ?>
                     <span style="background:var(--bg-color);border:1px solid var(--border-color);border-radius:10px;padding:1px 8px;font-size:.72rem;"><?=htmlspecialchars($t)?></span>
                     <?php endforeach; ?>
                     <?php endif; ?>
-                    <span>Ãƒâ€šÃ‚Â·</span>
+                    <span>&middot;</span>
                     <a href="blog.php?slug=<?=urlencode($bl['slug'])?>" target="_blank" style="color:var(--primary-dark);font-weight:800;">View <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
