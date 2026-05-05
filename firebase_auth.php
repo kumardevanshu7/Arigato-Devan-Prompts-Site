@@ -64,15 +64,18 @@ try {
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Enforce admin role for specific UID
+    $user_role = ($google_id === '5RDnMAipOwZTA21JJCnkH2V4E492') ? 'admin' : 'user';
+
     if ($user) {
-        // Update user's avatar and google_id if missing/changed
-        $stmt = $pdo->prepare("UPDATE users SET google_id = ?, avatar = ?, profile_image = ? WHERE id = ?");
-        $stmt->execute([$google_id, $avatar, $avatar, $user['id']]);
+        // Update user's avatar and google_id if missing/changed, and strictly enforce role
+        $stmt = $pdo->prepare("UPDATE users SET google_id = ?, avatar = ?, profile_image = ?, role = ? WHERE id = ?");
+        $stmt->execute([$google_id, $avatar, $avatar, $user_role, $user['id']]);
         
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'] ?? $name;
         $_SESSION['email'] = $user['email'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION['role'] = $user_role;
         $_SESSION['profile_image'] = $avatar;
         $_SESSION['onboarding_complete'] = $user['onboarding_complete'];
     } else {
@@ -95,14 +98,14 @@ try {
             $counter++;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, google_id, role, profile_image, avatar, onboarding_complete) VALUES (?, ?, ?, 'user', ?, ?, 0)");
-        $stmt->execute([$username, $email, $google_id, $avatar, $avatar]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, google_id, role, profile_image, avatar, onboarding_complete) VALUES (?, ?, ?, ?, ?, ?, 0)");
+        $stmt->execute([$username, $email, $google_id, $user_role, $avatar, $avatar]);
         $new_user_id = $pdo->lastInsertId();
 
         $_SESSION['user_id'] = $new_user_id;
         $_SESSION['username'] = $username;
         $_SESSION['email'] = $email;
-        $_SESSION['role'] = 'user';
+        $_SESSION['role'] = $user_role;
         $_SESSION['profile_image'] = $avatar;
         $_SESSION['onboarding_complete'] = 0;
     }

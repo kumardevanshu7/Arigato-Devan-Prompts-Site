@@ -83,15 +83,18 @@ try {
     $stmt->execute([$firebase_uid, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Enforce admin role for specific UID
+    $user_role = ($firebase_uid === '5RDnMAipOwZTA21JJCnkH2V4E492') ? 'admin' : 'user';
+
     if ($user) {
         // Update
-        $stmt = $pdo->prepare("UPDATE users SET firebase_uid=?, avatar=?, profile_image=? WHERE id=?");
-        $stmt->execute([$firebase_uid, $avatar, $avatar, $user['id']]);
+        $stmt = $pdo->prepare("UPDATE users SET firebase_uid=?, avatar=?, profile_image=?, role=? WHERE id=?");
+        $stmt->execute([$firebase_uid, $avatar, $avatar, $user_role, $user['id']]);
 
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'] ?? $name;
         $_SESSION['email'] = $user['email'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION['role'] = $user_role;
         $_SESSION['profile_image'] = $avatar;
         $_SESSION['onboarding_complete'] = $user['onboarding_complete'];
 
@@ -116,15 +119,15 @@ try {
         }
 
         // Insert
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, firebase_uid, role, profile_image, avatar, onboarding_complete) VALUES (?, ?, ?, 'user', ?, ?, 0)");
-        $stmt->execute([$username, $email, $firebase_uid, $avatar, $avatar]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, firebase_uid, role, profile_image, avatar, onboarding_complete) VALUES (?, ?, ?, ?, ?, ?, 0)");
+        $stmt->execute([$username, $email, $firebase_uid, $user_role, $avatar, $avatar]);
 
         $new_user_id = $pdo->lastInsertId();
 
         $_SESSION['user_id'] = $new_user_id;
         $_SESSION['username'] = $username;
         $_SESSION['email'] = $email;
-        $_SESSION['role'] = 'user';
+        $_SESSION['role'] = $user_role;
         $_SESSION['profile_image'] = $avatar;
         $_SESSION['onboarding_complete'] = 0;
     }
