@@ -12,9 +12,9 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Insta Viral Reels — PromptVerse</title>
-<meta name="description" content="Insta Viral Reels — Coming Soon on PromptVerse.">
-<link rel="stylesheet" href="style.css?v=1777723415">
+<title>Insta Viral Reels â€” PromptVerse</title>
+<meta name="description" content="Insta Viral Reels â€” Coming Soon on PromptVerse.">
+<link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 .coming-soon-wrap {
@@ -162,7 +162,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
     <div class="cs-icon"><i class="fa-brands fa-instagram" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
     <h1 class="cs-title">Insta Viral<br><span class="highlight">Reels</span></h1>
-    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram — just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
+    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram â€” just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
     <div class="cs-notify-row">
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" class="cs-insta-btn">
             <i class="fa-brands fa-instagram"></i> Follow @arigato.devan
@@ -279,7 +279,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script src="script.js?v=1777723415"></script>
+<script src="script.js?v=1777999999"></script>
 <script>
 // Scrolling background
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -406,7 +406,7 @@ function revealPrompt(text) {
 }
 
 function spawnEmojis() {
-    const emojis = ['🔥','⚡','💥','🎉','✨','🌟','💫','🎊'];
+    const emojis = ['ðŸ”¥','âš¡','ðŸ’¥','ðŸŽ‰','âœ¨','ðŸŒŸ','ðŸ’«','ðŸŽŠ'];
     for(let i = 0; i < 20; i++) {
         const span = document.createElement('span');
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];

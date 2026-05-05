@@ -51,7 +51,7 @@ $current_tags = array_map('trim', explode(',', strtolower($p['tag'])));
 $is_secret = in_array('secret', $current_tags);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt — Admin</title><link rel="stylesheet" href="style.css?v=1777723415">
+<title>Edit Prompt â€” Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
 .edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
@@ -152,7 +152,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?=htmlspecialchars($p['prompt_text'])?></textarea></div>
 
-      <!-- Code field — only shown for secret -->
+      <!-- Code field â€” only shown for secret -->
       <div class="form-row" id="code-field-row" style="<?= $is_secret ? '' : 'display:none;' ?>">
         <div class="form-group">
           <label for="e-code">Access Code (6 chars) *</label>

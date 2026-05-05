@@ -25,10 +25,10 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "” Arigato Devan</title>
+<title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "â€ Arigato Devan</title>
 <meta name="description" content="<?=htmlspecialchars($blog['meta_description']??$blog['description']??'')?>">
 <?php if($blog['tags']): ?><meta name="keywords" content="<?=htmlspecialchars($blog['tags'])?>"><?php endif; ?>
-<link rel="stylesheet" href="style.css?v=1777723415">
+<link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 .blog-detail-wrap{max-width:800px;margin:0 auto;padding:48px 32px 100px}
 .blog-detail-hero-img{width:100%;max-height:440px;object-fit:cover;border-radius:22px;border:var(--border-width) solid var(--text-color);box-shadow:var(--shadow-comic);margin-bottom:36px;display:block}
@@ -151,7 +151,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="blog-detail-wrap">
   <!-- Back link -->
-  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
+  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i>Â Back to Blogs</a>
 
   <!-- Hero image -->
   <?php if($blog['image_path']): ?>
@@ -181,7 +181,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 
   <!-- Content -->
-  <div class="blog-content"><?= $blog['content'] /* HTML stored from editor "” safe because only admin writes it */ ?></div>
+  <div class="blog-content"><?= $blog['content'] /* HTML stored from editor "â€ safe because only admin writes it */ ?></div>
 
   <!-- Like + action bar -->
   <div class="blog-action-bar">
@@ -189,7 +189,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="<?=$user_liked?'#fff':'none'?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?=(int)$blog['likes_count']?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>Â All Blogs</a>
   </div>
 
   <!-- Comments -->
@@ -229,6 +229,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
+<script src="script.js?v=1777999999"></script>
 <script>
 // Blog Like
 const likeBtn = document.getElementById('blog-like-btn');

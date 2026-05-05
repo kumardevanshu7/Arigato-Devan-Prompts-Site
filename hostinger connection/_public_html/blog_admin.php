@@ -38,8 +38,8 @@ function getAuthorAvatar(array $row): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blog Management "” Admin | PromptVerse</title>
-<link rel="stylesheet" href="style.css?v=1777723415">
+<title>Blog Management "â€ Admin | PromptVerse</title>
+<link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body { background: var(--bg-color); }
 
@@ -388,17 +388,17 @@ body { background: var(--bg-color); }
                 <div class="blog-item-meta">
                     <?= renderAvatar($authorAv, 'author-av', '') ?>
                     <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($bl['author_name']??'Admin')?></span>
-                    <span>·</span>
+                    <span>Â·</span>
                     <span><i class="fa-solid fa-heart"></i> <?=(int)$bl['likes_count']?></span>
-                    <span>·</span>
+                    <span>Â·</span>
                     <span><?=date('d M Y', strtotime($bl['created_at']))?></span>
                     <?php if(!empty($tagsArr)): ?>
-                    <span>·</span>
+                    <span>Â·</span>
                     <?php foreach(array_slice($tagsArr,0,3) as $t): ?>
                     <span style="background:var(--bg-color);border:1px solid var(--border-color);border-radius:10px;padding:1px 8px;font-size:.72rem;"><?=htmlspecialchars($t)?></span>
                     <?php endforeach; ?>
                     <?php endif; ?>
-                    <span>·</span>
+                    <span>Â·</span>
                     <a href="blog.php?slug=<?=urlencode($bl['slug'])?>" target="_blank" style="color:var(--primary-dark);font-weight:800;">View <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>

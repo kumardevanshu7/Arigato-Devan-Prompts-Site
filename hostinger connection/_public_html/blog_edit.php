@@ -27,7 +27,7 @@ if(!$bl){header("Location: blog_admin.php");exit();}
 $edit_error=$_SESSION['edit_error']??''; unset($_SESSION['edit_error']);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Blog "” Admin</title><link rel="stylesheet" href="style.css?v=1777723415">
+<title>Edit Blog "â€ Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px}
@@ -77,7 +77,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
   </div>
 </header>
 <div class="bc-wrap">
-  <div class="bc-title">âœï¸ Edit Blog</div>
+  <div class="bc-title">Ã¢Å“ÂÃ¯Â¸Â Edit Blog</div>
   <div class="bc-sub">Editing: <strong><?=htmlspecialchars($bl['title'])?></strong></div>
   <?php if($edit_error):?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?=htmlspecialchars($edit_error)?></div><?php endif;?>
   <form method="POST" action="blog_edit.php?id=<?=$id?>" enctype="multipart/form-data">

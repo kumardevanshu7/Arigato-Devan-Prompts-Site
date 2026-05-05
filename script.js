@@ -415,19 +415,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (unlockedState) textToCopy = unlockedState.querySelector('.unlocked-text')?.textContent || '';
             }
 
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
-                btn.style.backgroundColor = '#00ff66';
-                btn.style.color = '#000';
+            function fallbackCopy(text) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try { document.execCommand('copy'); } catch (err) {}
+                textArea.remove();
+            }
 
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).catch(() => fallbackCopy(textToCopy));
+            } else {
+                fallbackCopy(textToCopy);
+            }
 
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                }, 2000);
-            });
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
+            btn.style.backgroundColor = '#00ff66';
+            btn.style.color = '#000';
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+            }, 2000);
         }
         
         // Like Button Logic
@@ -676,13 +691,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Copy button
         if (copyBtn) {
-            copyBtn.addEventListener('click', () => {
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const text = promptText.textContent;
-                navigator.clipboard.writeText(text).then(() => {
-                    const orig = copyBtn.textContent;
-                    copyBtn.textContent = 'COPIED! ✅';
-                    setTimeout(() => copyBtn.textContent = orig, 2000);
-                });
+                
+                function fallbackCopy(txt) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = txt;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err) {}
+                    textArea.remove();
+                }
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+
+                const orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = 'COPIED! ✅';
+                copyBtn.style.backgroundColor = '#00ff66';
+                copyBtn.style.color = '#000';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = orig;
+                    copyBtn.style.backgroundColor = '';
+                    copyBtn.style.color = '';
+                }, 2000);
             });
         }
     });

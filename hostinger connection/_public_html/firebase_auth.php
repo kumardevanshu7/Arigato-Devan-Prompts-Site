@@ -18,7 +18,7 @@ if (empty($idToken)) {
     exit();
 }
 
-// 🔥 FIXED API KEY (IMPORTANT - check this matches Firebase exactly)
+// ðŸ”¥ FIXED API KEY (IMPORTANT - check this matches Firebase exactly)
 $apiKey = 'AIzaSyBAzDxElpLX--lJ8xnvCrQBP-zYFMW_QLQ';
 
 // Verify token
@@ -30,14 +30,14 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['idToken' => $idToken]));
 
-// 🔥 IMPORTANT FIX (hosting ke liye)
+// ðŸ”¥ IMPORTANT FIX (hosting ke liye)
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// 🔥 DEBUG (agar fail hua to reason milega)
+// ðŸ”¥ DEBUG (agar fail hua to reason milega)
 if (!$response) {
     echo json_encode([
         'success' => false,
@@ -64,7 +64,7 @@ if (!isset($data['users']) || count($data['users']) === 0) {
     exit();
 }
 
-// 🔥 Extract user
+// ðŸ”¥ Extract user
 $firebaseUser = $data['users'][0];
 
 $firebase_uid = $firebaseUser['localId'];
@@ -78,7 +78,7 @@ if (empty($email)) {
 }
 
 try {
-    // 🔥 Check user
+    // ðŸ”¥ Check user
     $stmt = $pdo->prepare("SELECT * FROM users WHERE firebase_uid = ? OR email = ?");
     $stmt->execute([$firebase_uid, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
 
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile "” PromptVerse</title>
-    <link rel="stylesheet" href="style.css?v=1777723415">
+    <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
         body { min-height: 100vh; padding: 40px 16px 80px; background: var(--bg-color); }
 

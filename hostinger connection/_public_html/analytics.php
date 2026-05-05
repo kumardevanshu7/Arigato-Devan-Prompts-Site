@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
@@ -32,7 +32,7 @@ $pg_data   = json_encode(array_column($prompt_growth_raw, 'c'));
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analytics "” PromptVerse Admin</title>
-<link rel="stylesheet" href="style.css?v=1777723415">
+<link rel="stylesheet" href="style.css?v=1777999999">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
 body{background:var(--bg-color)}

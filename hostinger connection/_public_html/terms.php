@@ -1,4 +1,4 @@
-﻿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service "” Arigato Devan PromptVerse</title>
     <meta name="description" content="Terms of Service for Arigato Devan PromptVerse. Usage rules, ownership, and platform guidelines.">
-    <link rel="stylesheet" href="style.css?v=1777723415">
+    <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
         .legal-wrap { max-width: 780px; margin: 40px auto; padding: 0 24px 100px; }
         .legal-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 48px 48px; box-shadow: var(--shadow-comic); }

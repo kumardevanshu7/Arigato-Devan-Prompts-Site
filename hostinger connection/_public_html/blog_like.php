@@ -4,13 +4,13 @@ require_once 'db.php';
 
 header('Content-Type: application/json');
 
-// 🔒 Login check
+// ðŸ”’ Login check
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Login required']);
     exit();
 }
 
-// 🔒 Method check
+// ðŸ”’ Method check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
     exit();
@@ -25,7 +25,7 @@ if ($blog_id <= 0) {
 }
 
 try {
-    // 🔥 Transaction start
+    // ðŸ”¥ Transaction start
     $pdo->beginTransaction();
 
     // Check existing like
@@ -34,7 +34,7 @@ try {
     $liked = $check->fetch(PDO::FETCH_ASSOC);
 
     if ($liked) {
-        // 🔥 UNLIKE
+        // ðŸ”¥ UNLIKE
         $pdo->prepare("DELETE FROM blog_likes WHERE user_id=? AND blog_id=?")
             ->execute([$user_id, $blog_id]);
 
@@ -50,7 +50,7 @@ try {
         $action = 'unliked';
 
     } else {
-        // 🔥 LIKE (prevent duplicate)
+        // ðŸ”¥ LIKE (prevent duplicate)
         $pdo->prepare("
             INSERT IGNORE INTO blog_likes (user_id, blog_id) 
             VALUES (?, ?)
@@ -70,7 +70,7 @@ try {
     $stmt->execute([$blog_id]);
     $likes = (int)$stmt->fetchColumn();
 
-    // 🔥 Commit
+    // ðŸ”¥ Commit
     $pdo->commit();
 
     echo json_encode([

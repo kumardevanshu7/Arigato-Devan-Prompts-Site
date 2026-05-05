@@ -41,11 +41,11 @@ $strip_imgs = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login "” Arigato Devan PromptVerse</title>
+    <title>Login "â€ Arigato Devan PromptVerse</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
-    <link rel="stylesheet" href="style.css?v=1777723415">
+    <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
-        /* â”€â”€â”€ Login Page Root â”€â”€â”€ */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Login Page Root Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
         html,
         body {
             height: 100%;
@@ -88,7 +88,7 @@ $strip_imgs = [
                     rgba(253, 251, 247, 0.25) 100%);
         }
 
-        /* ─── Minimal Login Header ─── */
+        /* â”€â”€â”€ Minimal Login Header â”€â”€â”€ */
         .login-header {
             position: relative;
             z-index: 10;
@@ -144,7 +144,7 @@ $strip_imgs = [
             background: var(--primary-color);
         }
 
-        /* â”€â”€â”€ Center Content â”€â”€â”€ */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Center Content Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
         .login-body {
             position: relative;
             z-index: 5;
@@ -155,7 +155,7 @@ $strip_imgs = [
             padding: 40px 20px;
         }
 
-        /* â”€â”€â”€ Login Card â”€â”€â”€ */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Login Card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
         .login-card {
             background: var(--card-bg);
             border: var(--border-width) solid var(--text-color);
@@ -351,7 +351,7 @@ $strip_imgs = [
             padding: 4px 12px;
         }
 
-        /* â”€â”€â”€ Ticker at bottom â”€â”€â”€ */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Ticker at bottom Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
         .login-ticker {
             position: relative;
             z-index: 10;
@@ -363,7 +363,7 @@ $strip_imgs = [
             border-top: 3px solid var(--primary-dark);
         }
 
-        /* ─── RESPONSIVE ─── */
+        /* â”€â”€â”€ RESPONSIVE â”€â”€â”€ */
         @media (max-width: 600px) {
             .login-header {
                 padding: 12px 20px;
@@ -505,7 +505,7 @@ $strip_imgs = [
             <div class="ticker-track-wrap">
                 <div class="ticker-track">
                     <?php
-                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made आसान", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
+                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made à¤†à¤¸à¤¾à¤¨", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
                     foreach (array_merge($ticker, $ticker) as $t):
                         ?><span class="ticker-item"><?= $t ?><span class="ticker-sep"><i
                                     class="fa-solid fa-star-of-life"></i></span></span><?php endforeach; ?>

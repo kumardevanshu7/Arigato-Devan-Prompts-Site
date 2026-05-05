@@ -4,13 +4,13 @@ require_once 'db.php';
 
 header('Content-Type: application/json');
 
-// 🔒 Login check
+// ðŸ”’ Login check
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Login required']);
     exit();
 }
 
-// 🔒 Method check
+// ðŸ”’ Method check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
     exit();
@@ -25,7 +25,7 @@ if ($prompt_id <= 0) {
 }
 
 try {
-    // 🔥 Transaction start (important for consistency)
+    // ðŸ”¥ Transaction start (important for consistency)
     $pdo->beginTransaction();
 
     // Check existing like
@@ -34,7 +34,7 @@ try {
     $like = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($like) {
-        // 🔥 UNLIKE
+        // ðŸ”¥ UNLIKE
         $pdo->prepare("DELETE FROM likes WHERE id = ?")->execute([$like['id']]);
 
         $pdo->prepare("
@@ -49,7 +49,7 @@ try {
         $action = 'unliked';
 
     } else {
-        // 🔥 LIKE (prevent duplicate)
+        // ðŸ”¥ LIKE (prevent duplicate)
         $pdo->prepare("
             INSERT IGNORE INTO likes (user_id, prompt_id) 
             VALUES (?, ?)
@@ -69,7 +69,7 @@ try {
     $stmt->execute([$prompt_id]);
     $likes_count = (int)$stmt->fetchColumn();
 
-    // 🔥 Commit
+    // ðŸ”¥ Commit
     $pdo->commit();
 
     echo json_encode([

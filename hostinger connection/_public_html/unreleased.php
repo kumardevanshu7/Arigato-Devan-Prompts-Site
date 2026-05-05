@@ -4,7 +4,7 @@ require_once 'db.php';
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
-// Guests allowed — they need 120 taps; logged-in users need only 20
+// Guests allowed â€” they need 120 taps; logged-in users need only 20
 $tap_threshold = isset($_SESSION['user_id']) ? 20 : 120;
 
 // Fetch unreleased prompts by prompt_type
@@ -14,9 +14,9 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unreleased Reels — PromptVerse</title>
+<title>Unreleased Reels â€” PromptVerse</title>
 <meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
-<link rel="stylesheet" href="style.css?v=1777723415">
+<link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
@@ -80,7 +80,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
         <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:30px;">
-        Show some love to unlock — tap the Love Bar 
+        Show some love to unlock â€” tap the Love Bar 
         <strong><?= isset($_SESSION['user_id']) ? '20' : '120' ?></strong> times!
         <i class="fa-solid fa-heart"></i>
         <?php if(!isset($_SESSION['user_id'])): ?>
@@ -185,7 +185,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script src="script.js?v=1777723415"></script>
+<script src="script.js?v=1777999999"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');

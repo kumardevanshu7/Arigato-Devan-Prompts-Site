@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Blog Like Toggle "” AJAX endpoint
 session_start();
 require_once 'db.php';
