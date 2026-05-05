@@ -4,7 +4,7 @@ require_once 'db.php';
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
-// Guests allowed â€” they need 120 taps; logged-in users need only 20
+// Guests allowed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â they need 120 taps; logged-in users need only 20
 $tap_threshold = isset($_SESSION['user_id']) ? 20 : 120;
 
 // Fetch unreleased prompts by prompt_type
@@ -14,7 +14,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unreleased Reels â€” PromptVerse</title>
+<title>Unreleased Reels ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PromptVerse</title>
 <meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,7 +33,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
 </div>
 
 <header>
-    <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer">
+    <div class="logo-area" id="logo-container"  style="cursor:pointer">
         <div class="logo-flipper">
             <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
             <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -56,7 +56,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">11K+</span>
+            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">12K+</span>
         </a>
     </nav>
     <div class="header-right">
@@ -80,7 +80,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
         <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:30px;">
-        Show some love to unlock â€” tap the Love Bar 
+        Show some love to unlock ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â tap the Love Bar 
         <strong><?= isset($_SESSION['user_id']) ? '20' : '120' ?></strong> times!
         <i class="fa-solid fa-heart"></i>
         <?php if(!isset($_SESSION['user_id'])): ?>
@@ -115,22 +115,36 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
-        <div class="unreleased-grid" id="unreleased-grid">
-            <?php foreach($unreleased as $ur): ?>
-            <div class="unreleased-card" data-id="<?=$ur['id']?>" data-prompt="<?=htmlspecialchars($ur['prompt_text'])?>" data-threshold="<?= $tap_threshold ?>" data-tags="<?= htmlspecialchars(implode(',', array_map('trim', explode(',', strtolower($ur['tag'])))))  ?>">
-                <img src="<?=htmlspecialchars($ur['image_path'])?>" class="unreleased-img" alt="<?=htmlspecialchars($ur['title'])?>" loading="lazy">
-                <div class="unreleased-overlay">
-                    <div class="unreleased-title"><?=htmlspecialchars($ur['title'])?></div>
-                </div>
-                <div class="unreleased-lock-panel">
-                    <div class="love-bar-wrap">
-                        <div class="love-bar-label"><i class="fa-solid fa-heart"></i> Tap to Unlock (<span class="tap-count">0</span>/<?= $tap_threshold ?>)</div>
-                        <div class="love-bar-track"><div class="love-bar-fill"></div></div>
-                        <button class="love-tap-btn" type="button">TAP WITH LOVE <i class="fa-solid fa-heart"></i></button>
-                    </div>
-                    <div class="unreleased-prompt-reveal" style="display:none;">
-                        <div class="unreleased-prompt-text"></div>
-                        <button class="copy-btn unreleased-copy-btn">COPY PROMPT <i class="fa-solid fa-clipboard"></i></button>
+        <div class="gallery-grid" id="card-stack">
+            <?php foreach($unreleased as $ur): 
+                $tags_arr = array_map('trim', explode(',', strtolower($ur['tag'])));
+                $is_unlocked = $ur['is_unlocked'];
+                $blur_style = ($is_unlocked) ? '' : 'filter: blur(15px) grayscale(50%); transform: scale(1.1);';
+            ?>
+            <div class="card" 
+                 data-id="<?=$ur['id']?>" 
+                 data-image="<?=htmlspecialchars($ur['image_path'])?>" 
+                 data-title="<?=htmlspecialchars($ur['title'])?>" 
+                 data-prompt-type="unreleased" 
+                 data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>" 
+                 data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
+                 <?= $is_unlocked ? 'data-prompt-text="'.htmlspecialchars($ur['prompt_text']).'"' : '' ?>>
+                
+                <img src="<?=htmlspecialchars($ur['image_path'])?>" class="card-bg-image" alt="<?=htmlspecialchars($ur['title'])?>" style="<?= $blur_style ?>" loading="lazy">
+                <div class="card-type-badge urp">UNRELEASED</div>
+                
+                <?php if(!$is_unlocked): ?>
+                    <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
+                <?php else: ?>
+                    <div class="card-lock-icon" style="background:var(--primary-color);"><i class="fa-solid fa-check"></i></div>
+                <?php endif; ?>
+                
+                <div class="card-click-trigger"></div>
+                <div class="card-content-overlay">
+                    <div class="card-title"><?=htmlspecialchars($ur['title'])?></div>
+                    <div class="like-btn" data-prompt-id="<?=$ur['id']?>">
+                        <i class="fa-solid fa-heart"></i>
+                        <span class="like-count"><?=(int)$ur['likes_count']?></span>
                     </div>
                 </div>
             </div>

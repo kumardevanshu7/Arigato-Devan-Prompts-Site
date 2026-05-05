@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome "â€ Set Up Your Profile | PromptVerse</title>
+    <title>Welcome "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Set Up Your Profile | PromptVerse</title>
     <meta name="description" content="Set up your PromptVerse profile before exploring exclusive AI prompts.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
@@ -410,7 +410,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="ob-card">
             <div class="ob-step-label"><i class="fa-solid fa-sparkles"></i> Profile Setup</div>
             <h1 class="ob-title">Welcome to <span class="highlight">PromptVerse!</span></h1>
-            <p class="ob-sub">Quick setup before you unlock the magic â€” takes 10 seconds!</p>
+            <p class="ob-sub">Quick setup before you unlock the magic ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â takes 10 seconds!</p>
 
             <!-- Errors -->
             <?php if (!empty($errors)): ?>
@@ -526,10 +526,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input.addEventListener('input', () => {
             const len = input.value.length;
             if (len < 3) {
-                hint.textContent = `${len}/15 â€” Need at least 3 characters`;
+                hint.textContent = `${len}/15 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Need at least 3 characters`;
                 hint.style.color = '#FF6B6B';
             } else if (len > 15) {
-                hint.textContent = `${len}/15 â€” Too long!`;
+                hint.textContent = `${len}/15 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Too long!`;
                 hint.style.color = '#FF6B6B';
             } else {
                 hint.innerHTML = `${len}/15 <i class="fa-solid fa-check"></i> Looks good!`;

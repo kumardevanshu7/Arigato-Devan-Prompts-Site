@@ -4,13 +4,13 @@ require_once 'db.php';
 
 header('Content-Type: application/json');
 
-// ðŸ”’ Login check
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢ Login check
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Login required']);
     exit();
 }
 
-// ðŸ”’ Method check
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢ Method check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
     exit();
@@ -20,7 +20,7 @@ $user_id = $_SESSION['user_id'];
 $blog_id = isset($_POST['blog_id']) ? (int)$_POST['blog_id'] : 0;
 $comment = trim($_POST['comment'] ?? '');
 
-// ðŸ”’ Validation
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢ Validation
 if ($blog_id <= 0 || $comment === '') {
     echo json_encode(['success' => false, 'message' => 'Invalid input']);
     exit();
@@ -32,11 +32,11 @@ if (mb_strlen($comment) > 1000) {
 }
 
 try {
-    // ðŸ”¥ Insert comment
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ Insert comment
     $stmt = $pdo->prepare("INSERT INTO blog_comments (blog_id, user_id, comment) VALUES (?,?,?)");
     $stmt->execute([$blog_id, $user_id, $comment]);
 
-    // ðŸ”¥ Fetch user
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ Fetch user
     $user = $pdo->prepare("SELECT username, avatar FROM users WHERE id=?");
     $user->execute([$user_id]);
     $u = $user->fetch(PDO::FETCH_ASSOC);

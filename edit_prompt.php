@@ -51,7 +51,7 @@ $current_tags = array_map('trim', explode(',', strtolower($p['tag'])));
 $is_secret = in_array('secret', $current_tags);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt â€” Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
+<title>Edit Prompt ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
 .edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
@@ -84,7 +84,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head><body>
 <header>
-  <div class="logo-area" onclick="window.location.href='index.php'" style="cursor:pointer">
+  <div class="logo-area"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
       <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -152,7 +152,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?=htmlspecialchars($p['prompt_text'])?></textarea></div>
 
-      <!-- Code field â€” only shown for secret -->
+      <!-- Code field ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â only shown for secret -->
       <div class="form-row" id="code-field-row" style="<?= $is_secret ? '' : 'display:none;' ?>">
         <div class="form-group">
           <label for="e-code">Access Code (6 chars) *</label>

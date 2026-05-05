@@ -1,6 +1,6 @@
 <?php
 /**
- * get_prompt.php â€” AJAX endpoint for fetching prompt text
+ * get_prompt.php ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â AJAX endpoint for fetching prompt text
  * Called by insta_viral.php after the math challenge is solved.
  * Returns JSON: { prompt_text: "..." } or { error: "..." }
  */

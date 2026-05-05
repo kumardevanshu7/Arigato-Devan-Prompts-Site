@@ -36,7 +36,7 @@ function sessionAvatar() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery â€” Arigato Devan PromptVerse</title>
+    <title>Gallery ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Arigato Devan PromptVerse</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -74,7 +74,7 @@ function sessionAvatar() {
     </div>
 
     <header>
-        <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer;">
+        <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo">
@@ -103,7 +103,7 @@ function sessionAvatar() {
                 <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
                 <span style="font-weight:600;">@arigato.devan</span>
                 <span class="pulse-dot"></span>
-                <span style="font-weight:800;font-size:1.1rem;">11K+</span>
+                <span style="font-weight:800;font-size:1.1rem;">12K+</span>
             </a>
         </nav>
         <div class="header-right">
@@ -162,7 +162,7 @@ function sessionAvatar() {
 
             <div class="gallery-grid" id="card-stack">
             <?php foreach($prompts as $p):
-                        // Map DB prompt_type â†’ UI ptype key
+                        // Map DB prompt_type ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UI ptype key
                         $db_type = $p['prompt_type'] ?? 'secret';
                         if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
                         elseif ($db_type === 'unreleased') $ptype = 'unreleased';
@@ -187,7 +187,10 @@ function sessionAvatar() {
                          data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
                          <?= $p['is_unlocked'] ? 'data-prompt-text="'.htmlspecialchars($p['prompt_text']).'"' : '' ?>>
 
-                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
+                        <?php 
+                            $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter: blur(15px) grayscale(50%); transform: scale(1.1);' : '';
+                        ?>
+                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" loading="lazy">
 
                         <!-- Type Label Ribbon -->
                         <div class="card-type-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></div>
@@ -361,6 +364,35 @@ document.querySelectorAll('.tag-filter-btn').forEach(btn => {
             }
         });
     });
+});
+
+// Smart Search Read Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        const query = searchQuery.toLowerCase().trim();
+        document.querySelectorAll('.gallery-grid .card').forEach(card => {
+            const title = (card.dataset.title || '').toLowerCase();
+            const tags = (card.dataset.tags || '').toLowerCase();
+            if (title.includes(query) || tags.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        const titleEl = document.querySelector('.gallery-title');
+        if(titleEl) {
+            titleEl.innerHTML = `Search: <span class="highlight">"` + searchQuery + `"</span>`;
+        }
+        
+        // Remove active class from "All" button
+        document.querySelectorAll('.tag-filter-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'var(--bg-color)';
+        });
+    }
 });
 </script>
 </body>

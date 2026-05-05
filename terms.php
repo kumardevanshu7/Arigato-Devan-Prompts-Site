@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service "” Arigato Devan PromptVerse</title>
+    <title>Terms of Service "Ã¢â‚¬Â Arigato Devan PromptVerse</title>
     <meta name="description" content="Terms of Service for Arigato Devan PromptVerse. Usage rules, ownership, and platform guidelines.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
@@ -55,7 +55,7 @@
         <div class="filmstrip-overlay" style="background: linear-gradient(to bottom, var(--bg-color) 0%, transparent 20%, transparent 80%, var(--bg-color) 100%);"></div>
     </div>
     <header>
-        <div class="logo-area" onclick="window.location.href='index.php'" style="cursor:pointer;">
+        <div class="logo-area"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo">

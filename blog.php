@@ -25,7 +25,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "â€ Arigato Devan</title>
+<title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Arigato Devan</title>
 <meta name="description" content="<?=htmlspecialchars($blog['meta_description']??$blog['description']??'')?>">
 <?php if($blog['tags']): ?><meta name="keywords" content="<?=htmlspecialchars($blog['tags'])?>"><?php endif; ?>
 <link rel="stylesheet" href="style.css?v=1777999999">
@@ -108,7 +108,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
         <div class="bg-creamy-overlay"></div>
     </div>
 <header>
-  <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer">
+  <div class="logo-area" id="logo-container"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
       <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -131,7 +131,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
             </div>
     <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-      <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">11K+</span>
+      <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">12K+</span>
     </a>
   </nav>
   <div class="header-right">
@@ -151,7 +151,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="blog-detail-wrap">
   <!-- Back link -->
-  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i>Â Back to Blogs</a>
+  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i>Ãƒâ€šÃ‚Â Back to Blogs</a>
 
   <!-- Hero image -->
   <?php if($blog['image_path']): ?>
@@ -181,7 +181,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 
   <!-- Content -->
-  <div class="blog-content"><?= $blog['content'] /* HTML stored from editor "â€ safe because only admin writes it */ ?></div>
+  <div class="blog-content"><?= $blog['content'] /* HTML stored from editor "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â safe because only admin writes it */ ?></div>
 
   <!-- Like + action bar -->
   <div class="blog-action-bar">
@@ -189,7 +189,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="<?=$user_liked?'#fff':'none'?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?=(int)$blog['likes_count']?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>Â All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>Ãƒâ€šÃ‚Â All Blogs</a>
   </div>
 
   <!-- Comments -->

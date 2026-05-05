@@ -58,7 +58,7 @@ if (isset($_SESSION['user_id'])) {
 <?php endif; ?>
 
     <header>
-        <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer;">
+        <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Arigato Devan Logo" id="profile-logo">
@@ -87,7 +87,7 @@ if (isset($_SESSION['user_id'])) {
                 <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
                 <span style="font-weight:600;">@arigato.devan</span>
                 <span class="pulse-dot"></span>
-                <span style="font-weight:800;font-size:1.1rem;">11K+</span>
+                <span style="font-weight:800;font-size:1.1rem;">12K+</span>
             </a>
         </nav>
         <div class="header-right">
@@ -201,7 +201,7 @@ if (isset($_SESSION['user_id'])) {
                     Login with Google
                 </a>
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
-                    Explore Prompts â†’
+                    Explore Prompts ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢
                 </a>
             </div>
 
@@ -222,7 +222,7 @@ if (isset($_SESSION['user_id'])) {
                         "Your next viral reel starts here",
                         "Premium prompts. Real emotions.",
                         "Turn ideas into aesthetic visuals",
-                        "AI couple content made à¤†à¤¸à¤¾à¤¨",
+                        "AI couple content made ÃƒÂ Ã‚Â¤Ã¢â‚¬Â ÃƒÂ Ã‚Â¤Ã‚Â¸ÃƒÂ Ã‚Â¤Ã‚Â¾ÃƒÂ Ã‚Â¤Ã‚Â¨",
                         "Scroll. Unlock. Create.",
                         "More drops coming every week <i class=\"fa-solid fa-rocket\"></i>",
                     ];
@@ -276,7 +276,7 @@ if (isset($_SESSION['user_id'])) {
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php else: ?>
                 <?php foreach($prompts as $index => $p): 
-                    // Map DB prompt_type â†’ JS/UI ptype key
+                    // Map DB prompt_type ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ JS/UI ptype key
                     $db_type = $p['prompt_type'] ?? 'secret';
                     if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
                     elseif ($db_type === 'unreleased') $ptype = 'unreleased';
@@ -323,7 +323,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="card end-card card-next" id="end-card">
                     <div class="end-card-content">
                         <div class="end-card-heart"><i class="fa-solid fa-heart"></i></div>
-                        <h3>More prompts coming soonâ€¦</h3>
+                        <h3>More prompts coming soonÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</h3>
                         <p>stay tuned</p>
                     </div>
                 </div>

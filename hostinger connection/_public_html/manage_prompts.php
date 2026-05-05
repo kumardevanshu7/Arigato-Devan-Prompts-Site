@@ -46,7 +46,7 @@ $total_prompts = count($prompts);
 </head>
 <body>
     <header>
-        <div class="logo-area" onclick="window.location.href='index.php'" style="cursor:pointer">
+        <div class="logo-area"  style="cursor:pointer">
             <div class="logo-text" style="font-size:1.5rem;">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
         <nav class="nav-links">
@@ -83,7 +83,7 @@ $total_prompts = count($prompts);
             </div>
             
             <?php if(count($prompts)===0): ?>
-                <p style="text-align:center;color:#7D7887;font-weight:600;padding:60px 0;font-size:1.1rem;">No prompts yet â€” start uploading!</p>
+                <p style="text-align:center;color:#7D7887;font-weight:600;padding:60px 0;font-size:1.1rem;">No prompts yet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â start uploading!</p>
             <?php else: ?>
             <div id="prompts-list">
                 <?php foreach($prompts as $p):

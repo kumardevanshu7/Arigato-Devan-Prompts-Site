@@ -147,7 +147,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const unlockedText  = document.getElementById('modal-unlocked-text');
             const saveBtn       = document.getElementById('modal-save-btn');
 
-            if(modalImage) modalImage.src = card.dataset.image;
+            if(modalImage) {
+                modalImage.src = card.dataset.image;
+                // Add blur if unreleased and locked
+                if(card.dataset.promptType === 'unreleased' && card.dataset.unlocked !== 'true') {
+                    modalImage.style.filter = 'blur(15px) grayscale(50%)';
+                    modalImage.style.transition = 'filter 0.3s ease-out';
+                } else {
+                    modalImage.style.filter = '';
+                    modalImage.style.transition = '';
+                }
+            }
             if(modalTitle) modalTitle.textContent = card.dataset.title;
             if(saveBtn) {
                 saveBtn.dataset.promptId = card.dataset.id;
@@ -269,6 +279,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             tapBtn.style.transform = 'scale(0.94)';
                             setTimeout(() => tapBtn.style.transform = '', 100);
 
+                            // Progressive blur reduction
+                            const modalImg = document.getElementById('modal-image');
+                            if(modalImg) {
+                                const blurVal = 15 - (15 * (pct / 100));
+                                const grayVal = 50 - (50 * (pct / 100));
+                                modalImg.style.filter = `blur(${blurVal}px) grayscale(${grayVal}%)`;
+                            }
+
                             // Floating heart
                             const h = document.createElement('span');
                             h.textContent = '❤️';
@@ -279,6 +297,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (taps >= LOVE_THRESHOLD) {
                                 tapBtn.textContent = '🔓 Unlocking...';
                                 tapBtn.disabled = true;
+                                if(modalImg) modalImg.style.filter = ''; // fully clear
+                                
+                                // Update underlying card immediately
+                                if (currentCardElement) {
+                                    const bgImg = currentCardElement.querySelector('.card-bg-image');
+                                    if(bgImg) bgImg.style.filter = '';
+                                }
+                                
                                 unlockUnreleased(currentPromptId);
                             }
                         });
@@ -584,24 +610,34 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(() => showComicAlert('Something went wrong!', 'error'));
     }
 
-    // Logo Triple Tap Logic
+    // Logo Interaction Logic
     const logoContainer = document.getElementById('logo-container');
     let tapCount = 0;
     let tapTimeout = null;
 
     if(logoContainer) {
         logoContainer.addEventListener('click', (e) => {
-            // Only trigger custom logic on smaller screens (mobile)
-            if(window.innerWidth > 768) return; 
+            if(window.innerWidth > 768) {
+                // Desktop: immediate navigation
+                window.location.href = 'index.php';
+                return;
+            } 
             
+            // Mobile: handle double tap vs single tap
             tapCount++;
             
-            if(tapCount === 3) {
-                // Triple tap detected!
-                tapCount = 0;
+            if(tapCount === 1) {
+                tapTimeout = setTimeout(() => {
+                    if(tapCount === 1) {
+                        window.location.href = 'index.php';
+                    }
+                    tapCount = 0;
+                }, 300); // 300ms wait for a potential second tap
+            } else if(tapCount === 2) {
                 clearTimeout(tapTimeout);
+                tapCount = 0;
                 
-                logoContainer.classList.add('triple-tapped');
+                logoContainer.classList.add('triple-tapped'); // reusing the flip CSS class
                 
                 // Spawn floating hearts
                 for(let i=0; i<5; i++) {
@@ -610,13 +646,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 setTimeout(() => {
                     logoContainer.classList.remove('triple-tapped');
-                }, 3000); // Revert after 3s
+                }, 4000); // Revert after 4s
             }
-            
-            clearTimeout(tapTimeout);
-            tapTimeout = setTimeout(() => {
-                tapCount = 0;
-            }, 600); // Max 600ms between taps
         });
     }
 
@@ -756,4 +787,98 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
     });
     // --- End Nav Dropdown ---
+
+    // --- Smart Search Function ---
+    const searchInput = document.querySelector('.search-bar input');
+    const searchContainer = document.querySelector('.search-bar');
+    
+    if(searchInput && searchContainer) {
+        searchContainer.style.position = 'relative';
+        
+        // Create dropdown container
+        const searchDropdown = document.createElement('div');
+        searchDropdown.className = 'search-dropdown';
+        searchDropdown.style.display = 'none';
+        searchContainer.appendChild(searchDropdown);
+        
+        // Read local cards
+        const localCards = Array.from(document.querySelectorAll('.card:not(#end-card)'));
+        const searchableData = localCards.map(card => {
+            return {
+                title: (card.dataset.title || '').toLowerCase(),
+                tags: (card.dataset.tags || '').toLowerCase(),
+                element: card,
+                rawTitle: card.dataset.title || 'Untitled'
+            };
+        });
+        
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if(!query) {
+                searchDropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = searchableData.filter(item => item.title.includes(query) || item.tags.includes(query));
+            
+            searchDropdown.innerHTML = '';
+            if(matches.length > 0) {
+                const summary = document.createElement('div');
+                summary.style.padding = '12px 16px';
+                summary.style.fontWeight = '800';
+                summary.style.borderBottom = 'var(--border-width) solid var(--text-color)';
+                summary.style.background = 'var(--bg-color)';
+                summary.innerHTML = '<i class="fa-solid fa-list" style="margin-right:8px; opacity:0.5;"></i> ' + matches.length + ' results found';
+                searchDropdown.appendChild(summary);
+                
+                // Show up to 5 suggestions
+                matches.slice(0, 5).forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = 'search-suggestion';
+                    item.innerHTML = '<i class="fa-solid fa-search" style="margin-right:8px; opacity:0.5;"></i> ' + match.rawTitle;
+                    item.addEventListener('click', () => {
+                        searchInput.value = match.rawTitle;
+                        executeSearch(match.rawTitle);
+                    });
+                    searchDropdown.appendChild(item);
+                });
+                
+                const goBtn = document.createElement('button');
+                goBtn.className = 'comic-btn';
+                goBtn.style.width = '100%';
+                goBtn.style.borderRadius = '0 0 16px 16px';
+                goBtn.style.padding = '12px';
+                goBtn.style.border = 'none';
+                goBtn.style.borderTop = 'var(--border-width) solid var(--text-color)';
+                goBtn.innerHTML = 'Go There <i class="fa-solid fa-arrow-right"></i>';
+                goBtn.addEventListener('click', () => executeSearch(query));
+                searchDropdown.appendChild(goBtn);
+                
+                searchDropdown.style.display = 'block';
+            } else {
+                searchDropdown.innerHTML = '<div style="padding:15px; font-weight:700;">No results found.</div>';
+                searchDropdown.style.display = 'block';
+            }
+        });
+        
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if(!searchContainer.contains(e.target)) {
+                searchDropdown.style.display = 'none';
+            }
+        });
+        
+        // Handle Enter key
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                executeSearch(searchInput.value);
+            }
+        });
+        
+        function executeSearch(query) {
+            searchDropdown.style.display = 'none';
+            window.location.href = 'gallery.php?search=' + encodeURIComponent(query);
+        }
+    }
 });

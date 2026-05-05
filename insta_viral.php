@@ -12,8 +12,8 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Insta Viral Reels â€” PromptVerse</title>
-<meta name="description" content="Insta Viral Reels â€” Coming Soon on PromptVerse.">
+<title>Insta Viral Reels ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PromptVerse</title>
+<meta name="description" content="Insta Viral Reels ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Coming Soon on PromptVerse.">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -116,7 +116,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
 </div>
 
 <header>
-    <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer">
+    <div class="logo-area" id="logo-container"  style="cursor:pointer">
         <div class="logo-flipper">
             <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
             <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -139,7 +139,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">11K+</span>
+            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">12K+</span>
         </a>
     </nav>
     <div class="header-right">
@@ -162,7 +162,7 @@ $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt
     <div class="cs-icon"><i class="fa-brands fa-instagram" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
     <h1 class="cs-title">Insta Viral<br><span class="highlight">Reels</span></h1>
-    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram â€” just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
+    <p class="cs-sub">We're curating the hottest, most viral AI couple prompt reels from Instagram ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â just for you. Stay tuned, this is going to be <strong>huge</strong>. &#9889;</p>
     <div class="cs-notify-row">
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" class="cs-insta-btn">
             <i class="fa-brands fa-instagram"></i> Follow @arigato.devan
@@ -406,7 +406,7 @@ function revealPrompt(text) {
 }
 
 function spawnEmojis() {
-    const emojis = ['ðŸ”¥','âš¡','ðŸ’¥','ðŸŽ‰','âœ¨','ðŸŒŸ','ðŸ’«','ðŸŽŠ'];
+    const emojis = ['ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥','ÃƒÂ¢Ã…Â¡Ã‚Â¡','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¥','ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°','ÃƒÂ¢Ã…â€œÃ‚Â¨','ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â¸','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â«','ÃƒÂ°Ã…Â¸Ã…Â½Ã…Â '];
     for(let i = 0; i < 20; i++) {
         const span = document.createElement('span');
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];

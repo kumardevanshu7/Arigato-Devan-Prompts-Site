@@ -30,11 +30,11 @@ arsort($all_tags);
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blogs "â€ Arigato Devan PromptVerse</title>
+<title>Blogs "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Arigato Devan PromptVerse</title>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <style>
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Blogs Page Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Blogs Page ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
 .blogs-hero {
     padding: 60px 40px 40px;
     max-width: 1300px;
@@ -58,7 +58,7 @@ arsort($all_tags);
     font-family: var(--font-blog-body);
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Tag Filter Pills Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Tag Filter Pills ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
 .tag-filter-wrap {
     max-width: 1300px;
     margin: 0 auto 40px;
@@ -95,7 +95,7 @@ arsort($all_tags);
     transform: translateY(-1px);
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Blog Grid Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Blog Grid ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
 .blogs-wrap {
     max-width: 1300px;
     margin: 0 auto;
@@ -195,7 +195,7 @@ arsort($all_tags);
 }
 .blog-author-name { color: var(--text-color); font-weight: 800; }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Normal Grid Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Normal Grid ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
 .blogs-grid {
     column-count: 3;
     column-gap: 26px;
@@ -331,7 +331,7 @@ arsort($all_tags);
         <div class="bg-creamy-overlay"></div>
     </div>
 <header>
-  <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer">
+  <div class="logo-area" id="logo-container"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
       <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -356,7 +356,7 @@ arsort($all_tags);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <span style="font-weight:600;">@arigato.devan</span>
       <span class="pulse-dot"></span>
-      <span style="font-weight:800;font-size:1.1rem;">11K+</span>
+      <span style="font-weight:800;font-size:1.1rem;">12K+</span>
     </a>
   </nav>
   <div class="header-right">
@@ -382,7 +382,7 @@ arsort($all_tags);
 </div>
 
 <?php if(count($blogs) === 0): ?>
-<div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet â€” check back soon!</div>
+<div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â check back soon!</div>
 <?php else: ?>
 
 <!-- Tag Filter -->
@@ -421,7 +421,7 @@ arsort($all_tags);
           <div class="blog-card-meta-left">
             <img src="<?=htmlspecialchars($b['author_avatar']??'https://api.dicebear.com/7.x/avataaars/svg?seed=x')?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
             <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($b['author_name']??'Admin')?></span>
-            <span>Ã‚Â·</span>
+            <span>ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·</span>
             <span><?=date('d M Y', strtotime($b['created_at']))?></span>
           </div>
           <div>
@@ -435,7 +435,7 @@ arsort($all_tags);
   </div>
   <!-- No results message -->
   <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#7D7887;font-weight:700;font-size:1.1rem;">
-    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>Â
+    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>Ãƒâ€šÃ‚Â
   </div>
 
 </div>

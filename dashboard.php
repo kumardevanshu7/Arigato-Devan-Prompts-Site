@@ -38,7 +38,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard "â€ PromptVerse</title>
+    <title>Admin Dashboard "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â PromptVerse</title>
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
         body { background: var(--bg-color); }
@@ -372,7 +372,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 </head>
 <body>
     <header>
-        <div class="logo-area" id="logo-container" onclick="window.location.href='index.php'" style="cursor:pointer;">
+        <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Arigato Devan Logo" id="profile-logo">
@@ -438,7 +438,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
             <?php if($most_liked): ?>
             <div class="stat-card" style="background: #fff3cd; grid-column: span 2;">
                 <div class="stat-value" style="font-size:1.1rem; font-weight:800; color:var(--text-color);"><i class="fa-solid fa-star"></i> <?= htmlspecialchars($most_liked['title']) ?></div>
-                <div class="stat-label">Most Liked â€” <?= $most_liked['likes_count'] ?> <i class="fa-solid fa-heart"></i></div>
+                <div class="stat-label">Most Liked ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â <?= $most_liked['likes_count'] ?> <i class="fa-solid fa-heart"></i></div>
             </div>
             <?php endif; ?>
         </div>
@@ -489,13 +489,13 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                 <?php foreach($users as $u): ?>
                 <tr>
                 <td><?php
-                    // Show avatar (from onboarding) first, then dicebear â€” NEVER Google pic
+                    // Show avatar (from onboarding) first, then dicebear ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â NEVER Google pic
                     $u_avatar = !empty($u['avatar'])
                         ? $u['avatar']
                         : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($u['email'] ?? 'x');
                 ?><img src="<?=htmlspecialchars($u_avatar)?>" class="user-avatar-sm" alt=""></td>
-                    <td><div style="font-weight:800;font-size:.95rem;"><?=htmlspecialchars($u['username']??'â€”')?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?=htmlspecialchars($u['email']??'')?></div></td>
-                    <td><?=htmlspecialchars(ucfirst($u['gender']??'â€”'))?></td>
+                    <td><div style="font-weight:800;font-size:.95rem;"><?=htmlspecialchars($u['username']??'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â')?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?=htmlspecialchars($u['email']??'')?></div></td>
+                    <td><?=htmlspecialchars(ucfirst($u['gender']??'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â'))?></td>
                     <td><span class="role-badge <?=$u['role']==='admin'?'role-admin':'role-user'?>"><?=htmlspecialchars(strtoupper($u['role']??'user'))?></span></td>
                     <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?=date('d M Y',strtotime($u['created_at']))?></td>
                 </tr>

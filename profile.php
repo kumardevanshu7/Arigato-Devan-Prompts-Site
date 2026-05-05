@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile "” PromptVerse</title>
+    <title>Edit Profile "Ã¢â‚¬Â PromptVerse</title>
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
         body { min-height: 100vh; padding: 40px 16px 80px; background: var(--bg-color); }
@@ -286,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      alt="Your Avatar" class="prof-current-avatar" id="live-avatar-preview" referrerpolicy="no-referrer">
                 <div class="prof-header-info">
                     <h2><?= htmlspecialchars($user['username'] ?? 'Your Profile') ?></h2>
-                    <p>Update your profile anytime — no restrictions!</p>
+                    <p>Update your profile anytime Ã¢â‚¬â€ no restrictions!</p>
                 </div>
             </div>
 
@@ -377,9 +377,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const hint    = document.getElementById('char-counter');
         input.addEventListener('input', () => {
             const len = input.value.length;
-            if (len < 3)       { hint.textContent = `${len}/15 "” Need at least 3`; hint.style.color = '#FF6B6B'; }
-            else if (len > 15) { hint.textContent = `${len}/15 "” Too long!`;        hint.style.color = '#FF6B6B'; }
-            else               { hint.textContent = `${len}/15 âœ“`;                  hint.style.color = '#2ecc71'; }
+            if (len < 3)       { hint.textContent = `${len}/15 "Ã¢â‚¬Â Need at least 3`; hint.style.color = '#FF6B6B'; }
+            else if (len > 15) { hint.textContent = `${len}/15 "Ã¢â‚¬Â Too long!`;        hint.style.color = '#FF6B6B'; }
+            else               { hint.textContent = `${len}/15 ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“`;                  hint.style.color = '#2ecc71'; }
         });
 
         // Live avatar preview in header

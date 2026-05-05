@@ -41,11 +41,11 @@ $strip_imgs = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login "â€ Arigato Devan PromptVerse</title>
+    <title>Login "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Arigato Devan PromptVerse</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
     <link rel="stylesheet" href="style.css?v=1777999999">
     <style>
-        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Login Page Root Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Login Page Root ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
         html,
         body {
             height: 100%;
@@ -88,7 +88,7 @@ $strip_imgs = [
                     rgba(253, 251, 247, 0.25) 100%);
         }
 
-        /* â”€â”€â”€ Minimal Login Header â”€â”€â”€ */
+        /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Minimal Login Header ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
         .login-header {
             position: relative;
             z-index: 10;
@@ -144,7 +144,7 @@ $strip_imgs = [
             background: var(--primary-color);
         }
 
-        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Center Content Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Center Content ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
         .login-body {
             position: relative;
             z-index: 5;
@@ -155,7 +155,7 @@ $strip_imgs = [
             padding: 40px 20px;
         }
 
-        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Login Card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Login Card ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
         .login-card {
             background: var(--card-bg);
             border: var(--border-width) solid var(--text-color);
@@ -351,7 +351,7 @@ $strip_imgs = [
             padding: 4px 12px;
         }
 
-        /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Ticker at bottom Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Ticker at bottom ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
         .login-ticker {
             position: relative;
             z-index: 10;
@@ -363,7 +363,7 @@ $strip_imgs = [
             border-top: 3px solid var(--primary-dark);
         }
 
-        /* â”€â”€â”€ RESPONSIVE â”€â”€â”€ */
+        /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ RESPONSIVE ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
         @media (max-width: 600px) {
             .login-header {
                 padding: 12px 20px;
@@ -505,7 +505,7 @@ $strip_imgs = [
             <div class="ticker-track-wrap">
                 <div class="ticker-track">
                     <?php
-                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made à¤†à¤¸à¤¾à¤¨", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
+                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made ÃƒÂ Ã‚Â¤Ã¢â‚¬Â ÃƒÂ Ã‚Â¤Ã‚Â¸ÃƒÂ Ã‚Â¤Ã‚Â¾ÃƒÂ Ã‚Â¤Ã‚Â¨", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
                     foreach (array_merge($ticker, $ticker) as $t):
                         ?><span class="ticker-item"><?= $t ?><span class="ticker-sep"><i
                                     class="fa-solid fa-star-of-life"></i></span></span><?php endforeach; ?>

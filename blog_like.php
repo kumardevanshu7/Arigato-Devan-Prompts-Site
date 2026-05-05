@@ -1,5 +1,5 @@
 <?php
-// Blog Like Toggle "” AJAX endpoint
+// Blog Like Toggle "Ã¢â‚¬Â AJAX endpoint
 session_start();
 require_once 'db.php';
 header('Content-Type: application/json');

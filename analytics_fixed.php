@@ -31,7 +31,7 @@ $pg_data   = json_encode(array_column($prompt_growth_raw, 'c'));
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Analytics "” PromptVerse Admin</title>
+<title>Analytics "Ã¢â‚¬Â PromptVerse Admin</title>
 <link rel="stylesheet" href="style.css?v=1777999999">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
@@ -63,7 +63,7 @@ canvas{max-height:280px}
 </head>
 <body>
 <header>
-  <div class="logo-area" onclick="window.location.href='index.php'" style="cursor:pointer">
+  <div class="logo-area"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
       <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
@@ -84,7 +84,7 @@ canvas{max-height:280px}
 
 <div class="an-wrap">
   <div class="an-title"><i class="fa-solid fa-chart-simple"></i> Analytics Dashboard</div>
-  <div class="an-sub">Real-time data from your database — updated on every page load.</div>
+  <div class="an-sub">Real-time data from your database Ã¢â‚¬â€ updated on every page load.</div>
 
   <!-- Stat Cards -->
   <div class="stat-grid">
@@ -96,7 +96,7 @@ canvas{max-height:280px}
     <?php if($most_liked):?>
     <div class="s-card a6">
       <div class="s-val" style="font-size:1.15rem;font-weight:900;"><i class="fa-solid fa-star"></i> <?=htmlspecialchars($most_liked['title'])?></div>
-      <div class="s-label">Top Performing Prompt — <?=$most_liked['likes_count']?> <i class="fa-solid fa-heart"></i></div>
+      <div class="s-label">Top Performing Prompt Ã¢â‚¬â€ <?=$most_liked['likes_count']?> <i class="fa-solid fa-heart"></i></div>
     </div>
     <?php endif;?>
     <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?=$monthly_p?></div><div class="s-label">Prompts</div><div class="s-sub">This Month</div></div>
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Chart.defaults.font.weight = '700';
   Chart.defaults.color = '#2D2A35';
 
-  // Bar "“ Likes per prompt
+  // Bar "Ã¢â‚¬Å“ Likes per prompt
   new Chart(document.getElementById('barChart'), {
     type: 'bar',
     data: {
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1}, grid:{color:'#EAE3F2'} }, x:{ grid:{display:false}, ticks:{maxRotation:30} } } }
   });
 
-  // Line "“ User Growth
+  // Line "Ã¢â‚¬Å“ User Growth
   new Chart(document.getElementById('userLineChart'), {
     type: 'line',
     data: {
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#EAE3F2'}}, x:{grid:{display:false}} } }
   });
 
-  // Line "“ Prompt Growth
+  // Line "Ã¢â‚¬Å“ Prompt Growth
   new Chart(document.getElementById('promptLineChart'), {
     type: 'line',
     data: {

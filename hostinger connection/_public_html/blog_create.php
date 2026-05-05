@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create Blog "â€ Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
+<title>Create Blog "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px;font-size:.95rem}
@@ -83,7 +83,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head><body>
 <header>
-  <div class="logo-area" onclick="window.location.href='index.php'" style="cursor:pointer">
+  <div class="logo-area"  style="cursor:pointer">
     <div class="logo-flipper"><div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div><div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div></div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
