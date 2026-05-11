@@ -928,7 +928,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    pointer-events: none; /* Let click pass through to card */
+    pointer-events: none; /* Let click pass through to card-click-trigger */
+}
+/* like-btn MUST receive clicks even inside pointer-events:none parent */
+.card-content-overlay .like-btn {
+    pointer-events: auto;
 }
 
 /* ====== Card Click Trigger ====== */
@@ -940,6 +944,8 @@ header {
     pointer-events: auto;
     background: transparent;
 }
+/* like-btn must sit above card-click-trigger — z-index:15 set in .like-btn */
+
 
 /* ====== Gallery Grid ====== */
 .gallery-grid {
@@ -984,6 +990,113 @@ header {
     margin-right: 12px;
 }
 
+/* ── Card static like display (non-clickable) ── */
+.card-like-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #fff;
+    pointer-events: none;
+    flex-shrink: 0;
+    backdrop-filter: blur(4px);
+}
+.card-like-display .liked-heart { color: #FF6B6B !important; }
+.card-like-display.is-liked-active { background: rgba(255,107,107,0.25); border-color: #FF6B6B; }
+
+/* ── Modal Like Button ── */
+/* ── Like button: small circle at bottom-right (same style as close button at top-right) ── */
+.modal-like-btn {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 12px !important;
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: unset !important;
+    padding: 0 !important;
+    border: 2px solid var(--text-color) !important;
+    border-radius: 50% !important;
+    font-family: var(--font-main) !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1px !important;
+    cursor: pointer !important;
+    box-shadow: 2px 2px 0px var(--text-color) !important;
+    transition: all 0.2s ease-out !important;
+    z-index: 100 !important;
+    line-height: 1 !important;
+}
+.modal-like-btn i {
+    font-size: 0.9rem !important;
+    line-height: 1 !important;
+}
+.modal-like-btn span {
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+.modal-like-btn:hover {
+    background: #ffe0e0 !important;
+    transform: scale(1.1) !important;
+    box-shadow: var(--shadow-comic-hover) !important;
+}
+.modal-like-btn.liked-active {
+    background: #FF6B6B !important;
+    color: #fff !important;
+    border-color: #d94f4f !important;
+}
+.modal-like-btn.liked-active i { color: #fff !important; }
+.modal-like-btn.popped { transform: scale(0.88) !important; }
+.modal-like-count-display {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 12px !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1px !important;
+    font-weight: 800 !important;
+    color: var(--text-color) !important;
+    background: var(--card-bg) !important;
+    border: 2px solid var(--text-color) !important;
+    border-radius: 50% !important;
+    box-shadow: 2px 2px 0px var(--text-color) !important;
+    z-index: 100 !important;
+}
+.modal-like-count-display i { font-size: 0.9rem !important; }
+.modal-like-count-display span { font-size: 0.65rem !important; font-weight: 800 !important; }
+
+
+.modal-like-hint {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
+    padding: 3px 8px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+}
+/* old modal-like-btn duplicate removed — styles defined above with !important */
+
+/* modal-like-count-display styles defined above in the like button section */
+
+
+/* legacy like-btn kept for backward compat */
 .like-btn {
     display: inline-flex;
     align-items: center;
@@ -1000,10 +1113,11 @@ header {
     transition: all 0.2s ease-out;
     position: relative;
     z-index: 15;
-    pointer-events: auto; /* explicitly clickable even inside pointer-events:none parent */
+    pointer-events: none;  /* now non-clickable on cards — modal handles it */
     flex-shrink: 0;
     margin-bottom: 4px;
 }
+
 
 .like-btn:hover {
     background: var(--secondary-dark);
@@ -1106,7 +1220,10 @@ footer {
     align-items: center;
     justify-content: center;
     border-right: var(--border-width) solid var(--text-color);
+    position: relative; /* needed for modal-image-like absolute positioning */
+    overflow: hidden;
 }
+
 
 .modal-left img {
     width: 100%;

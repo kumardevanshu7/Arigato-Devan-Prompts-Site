@@ -121,6 +121,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- End Swipe Stack Logic ---
 
+    // ── Modal Like Button handler ──
+    const modalLikeBtn = document.getElementById('modal-like-btn');
+    if (modalLikeBtn) {
+        modalLikeBtn.addEventListener('click', function() {
+            const promptId = this.dataset.promptId;
+            if (!promptId) return;
+
+            const isLiked = this.classList.contains('liked-active');
+            const countSpan = document.getElementById('modal-like-count');
+            // Sync card elements
+            const cardEl = document.querySelector(`.card[data-id="${promptId}"]`);
+            const cardCountSpan = cardEl ? cardEl.querySelector('.like-count') : null;
+            const cardHeartIcon = cardEl ? cardEl.querySelector('.card-like-display i') : null;
+            const cardLikeDisplay = cardEl ? cardEl.querySelector('.card-like-display') : null;
+
+            // Optimistic UI
+            this.classList.toggle('liked-active');
+            this.classList.add('popped');
+            setTimeout(() => this.classList.remove('popped'), 300);
+            const cur = parseInt(countSpan ? countSpan.textContent : 0) || 0;
+            const newCount = isLiked ? Math.max(0, cur - 1) : cur + 1;
+            if (countSpan) countSpan.textContent = newCount;
+            if (cardCountSpan) cardCountSpan.textContent = newCount;
+            // Sync card heart color immediately
+            if (cardHeartIcon) cardHeartIcon.classList.toggle('liked-heart', !isLiked);
+            if (cardLikeDisplay) cardLikeDisplay.classList.toggle('is-liked-active', !isLiked);
+
+            const fd = new FormData();
+            fd.append('prompt_id', promptId);
+            fetch('like.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        if (countSpan) countSpan.textContent = data.likes_count;
+                        if (cardCountSpan) cardCountSpan.textContent = data.likes_count;
+                        this.classList.toggle('liked-active', data.action === 'liked');
+                        // Sync card heart color from server
+                        if (cardHeartIcon) cardHeartIcon.classList.toggle('liked-heart', data.action === 'liked');
+                        if (cardLikeDisplay) cardLikeDisplay.classList.toggle('is-liked-active', data.action === 'liked');
+                    } else {
+                        // revert
+                        this.classList.toggle('liked-active');
+                        if (countSpan) countSpan.textContent = cur;
+                        if (cardCountSpan) cardCountSpan.textContent = cur;
+                        if (cardHeartIcon) cardHeartIcon.classList.toggle('liked-heart', isLiked);
+                        if (cardLikeDisplay) cardLikeDisplay.classList.toggle('is-liked-active', isLiked);
+                    }
+                })
+                .catch(() => {
+                    this.classList.toggle('liked-active');
+                    if (countSpan) countSpan.textContent = cur;
+                    if (cardHeartIcon) cardHeartIcon.classList.toggle('liked-heart', isLiked);
+                    if (cardLikeDisplay) cardLikeDisplay.classList.toggle('is-liked-active', isLiked);
+                });
+        });
+    }
+
     cards.forEach(card => {
         card.addEventListener('click', (e) => {
             if (window.isSwiping) {
@@ -131,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Prevent opening modal when clicking like button or category pill
             if (e.target.closest('.like-btn') || e.target.closest('.card-category-pill')) {
+                e.stopPropagation();
                 return;
             }
 
@@ -164,6 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
                 saveBtn.style.background = '';
+            }
+            // Populate modal like button
+            if (modalLikeBtn) {
+                modalLikeBtn.dataset.promptId = card.dataset.id;
+                const cardLikeBtn = card.querySelector('.card-like-display');
+                const isLiked = cardLikeBtn && cardLikeBtn.dataset.liked === 'true';
+                const likeCount = cardLikeBtn ? (cardLikeBtn.querySelector('.like-count')?.textContent || '0') : '0';
+                modalLikeBtn.classList.toggle('liked-active', isLiked);
+                const modalCountEl = document.getElementById('modal-like-count');
+                if (modalCountEl) modalCountEl.textContent = likeCount;
             }
 
             const pType = (card.dataset.promptType || '').trim();
@@ -529,43 +597,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
         }
         
-        // Like Button Logic
-        const likeBtn = e.target.closest('.like-btn');
-        if(likeBtn) {
-            const promptId = likeBtn.dataset.promptId;
-            if(!promptId) return;
-            
-            // Visual feedback
-            likeBtn.classList.add('popped');
-            setTimeout(() => {
-                likeBtn.classList.remove('popped');
-            }, 300);
-
-            // AJAX request to like.php
-            const formData = new FormData();
-            formData.append('prompt_id', promptId);
-
-            fetch('like.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    const countSpan = likeBtn.querySelector('.like-count');
-                    if(countSpan) {
-                        countSpan.textContent = data.likes_count;
-                    }
-                    if(data.action === 'liked') {
-                        likeBtn.classList.add('liked-active');
-                    } else {
-                        likeBtn.classList.remove('liked-active');
-                    }
-                }
-            })
-            .catch(err => console.error('Error liking prompt', err));
-        }
+        // Like button clicks are handled by attachLikeListeners() above — skip here
+        if (e.target.closest('.like-btn')) return;
     });
+
 
     function unlockInstaViral(promptId) {
         const formData = new FormData();

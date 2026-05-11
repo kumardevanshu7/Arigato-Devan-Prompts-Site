@@ -8,16 +8,18 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 // Fetch Insta Viral prompts by prompt_type
 if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
-        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked 
+        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+               IF(l.id IS NOT NULL, 1, 0) as is_liked
         FROM prompts p 
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         WHERE p.prompt_type = 'insta_viral'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $insta_viral = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 }
 
 ?><!DOCTYPE html>
@@ -234,7 +236,12 @@ if (isset($_SESSION['user_id'])) {
             <div class="card-content">
                 <h3 class="card-title"><?= htmlspecialchars($p['title']) ?></h3>
                 <div class="card-footer">
-                    <div class="likes"><i class="fa-solid fa-heart"></i> <?= number_format($p['likes_count']) ?></div>
+                    <div class="card-like-display"
+                         data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>"
+                         data-prompt-id="<?= $p['id'] ?>">
+                        <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
+                        <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                    </div>
                     <button class="lock-icon" title="Unlock Prompt"><i class="fa-solid fa-lock"></i></button>
                 </div>
             </div>

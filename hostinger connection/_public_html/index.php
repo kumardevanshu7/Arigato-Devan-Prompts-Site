@@ -388,10 +388,12 @@ if (isset($_SESSION['user_id'])) {
                         
                         <div class="card-content-overlay">
                             <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
-                            <div class="like-btn" data-prompt-id="<?= $p['id'] ?>">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <?php if(isset($_SESSION['user_id'])): ?>
+                            <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>">
+                                <i class="fa-solid fa-heart<?= $p['is_liked'] ? ' liked-heart' : '' ?>"></i>
                                 <span class="like-count"><?= (int)$p['likes_count'] ?></span>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -438,6 +440,17 @@ if (isset($_SESSION['user_id'])) {
     <div id="unlock-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
+            <?php if(isset($_SESSION['user_id'])): ?>
+            <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="">
+                <i class="fa-solid fa-heart"></i>
+                <span id="modal-like-count">0</span>
+            </button>
+            <?php else: ?>
+            <div class="modal-like-count-display">
+                <i class="fa-solid fa-heart"></i>
+                <span id="modal-like-count">0</span>
+            </div>
+            <?php endif; ?>
             <div class="modal-left">
                 <img src="" id="modal-image" alt="Prompt Preview">
             </div>
