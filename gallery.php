@@ -416,6 +416,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+
+<!-- Wrong Code Comic Popup -->
+<div id="wrong-code-popup">
+    <div class="wrong-code-card">
+        <span class="wrong-code-emoji">🙅‍♂️</span>
+        <div class="wrong-code-title">NO NO BACHA…</div>
+        <div class="wrong-code-msg">its wrong code 😅<br>Watch the reel to get the correct one!</div>
+        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN 🔄</button>
+    </div>
+</div>
 </body>
 </html>
 

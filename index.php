@@ -10,18 +10,21 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 // Fetch ONLY secret prompts for Home page
 if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
-        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked 
+        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+               IF(l.id IS NOT NULL, 1, 0) as is_liked
         FROM prompts p 
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         WHERE p.prompt_type = 'secret'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type = 'secret' ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type = 'secret' ORDER BY created_at DESC");
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 // Generate state token for CSRF if not exists
 ?>

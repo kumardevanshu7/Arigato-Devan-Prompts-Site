@@ -540,9 +540,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } else {
-                showComicAlert('Invalid Code! Try again.', 'error');
-                codeInput.value = '';
-                codeInput.focus();
+                // Show comic "NO NO BACHA" popup
+                const popup = document.getElementById('wrong-code-popup');
+                if (popup) {
+                    popup.classList.add('show');
+                    // Auto-dismiss after 4s
+                    setTimeout(() => popup.classList.remove('show'), 4000);
+                } else {
+                    showComicAlert('Invalid Code! Try again.', 'error');
+                }
+                const ci2 = document.getElementById('unlock-code-input');
+                if (ci2) { ci2.value = ''; ci2.focus(); }
+                // Shake input
+                const scInput = document.getElementById('unlock-code-input');
+                if (scInput) {
+                    scInput.style.animation = 'none';
+                    setTimeout(() => scInput.style.animation = 'shake 0.4s', 10);
+                }
             }
         })
         .catch(err => {
