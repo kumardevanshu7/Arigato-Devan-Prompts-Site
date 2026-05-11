@@ -6,7 +6,19 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 }
 
 // Fetch Insta Viral prompts by prompt_type
-$insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("
+        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked 
+        FROM prompts p 
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        WHERE p.prompt_type = 'insta_viral'
+        ORDER BY p.created_at DESC
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $insta_viral = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?><!DOCTYPE html>
 <html lang="en">

@@ -8,7 +8,19 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 $tap_threshold = isset($_SESSION['user_id']) ? 20 : 90;
 
 // Fetch unreleased prompts by prompt_type
-$unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("
+        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked 
+        FROM prompts p 
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        WHERE p.prompt_type = 'unreleased'
+        ORDER BY p.created_at DESC
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $unreleased = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $unreleased = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?><!DOCTYPE html>
 <html lang="en">

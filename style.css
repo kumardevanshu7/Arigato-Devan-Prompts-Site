@@ -920,7 +920,7 @@ header {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100%;
+    right: 0;
     background: linear-gradient(to top, rgba(45, 42, 53, 0.95) 0%, rgba(45, 42, 53, 0.7) 60%, transparent 100%);
     padding: 60px 20px 20px;
     z-index: 10;
@@ -977,6 +977,10 @@ header {
     line-height: 1.2;
     flex: 1;
     text-shadow: 2px 2px 0px var(--text-color);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+    margin-right: 12px;
 }
 
 .like-btn {
@@ -996,6 +1000,8 @@ header {
     position: relative;
     z-index: 15;
     pointer-events: auto; /* explicitly clickable even inside pointer-events:none parent */
+    flex-shrink: 0;
+    margin-bottom: 4px;
 }
 
 .like-btn:hover {
@@ -1704,6 +1710,12 @@ footer {
     filter: saturate(0.9) brightness(0.9);
 }
 
+.filmstrip-frame.frame-large {
+    width: 200px;
+    height: 280px;
+    border-width: 4px;
+}
+
 /* Gradient overlay — makes content readable */
 .filmstrip-overlay {
     position: absolute;
@@ -2021,6 +2033,12 @@ footer {
     .filmstrip-frame {
         width: 120px;
         height: 170px;
+    }
+
+    .filmstrip-frame.frame-large {
+        width: 150px;
+        height: 210px;
+        border-width: 3px;
     }
 
     .filmstrip-track {

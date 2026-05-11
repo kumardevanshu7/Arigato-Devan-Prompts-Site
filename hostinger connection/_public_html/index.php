@@ -127,23 +127,12 @@ if (isset($_SESSION['user_id'])) {
                 <div class="filmstrip-track">
                     <?php
                     $strip_imgs = [
-                        'landingpics/lan1.webp',
-                        'landingpics/lan2.webp',
-                        'landingpics/lan3.webp',
-                        'landingpics/lan4.webp',
-                        'landingpics/lan5.webp',
-                        'landingpics/lan6.webp',
-                        'landingpics/lan7.webp',
-                        'landingpics/lan8.webp',
-                        'landingpics/lan9.webp',
-                        'landingpics/lan10.webp',
-                        'landingpics/lan11.webp',
-                        'landingpics/lan12.webp',
-                        'landingpics/lan13.webp',
-                        'landingpics/lan14.webp',
-                        'landingpics/lan15.webp',
-                        'landingpics/lan16.webp',
-                        'landingpics/lan17.webp',
+                        'landingpics/lan1.webp', 'landingpics/lan2.webp', 'landingpics/lan3.webp',
+                        'landingpics/lan4.webp', 'landingpics/lan5.webp', 'landingpics/lan6.webp',
+                        'landingpics/lan7.webp', 'landingpics/lan8.webp', 'landingpics/lan9.webp',
+                        'landingpics/lan10.webp', 'landingpics/lan11.webp', 'landingpics/lan12.webp',
+                        'landingpics/lan13.webp', 'landingpics/lan14.webp', 'landingpics/lan15.webp',
+                        'landingpics/lan16.webp', 'landingpics/lan17.webp',
                     ];
                     // Duplicate for seamless loop
                     $all = array_merge($strip_imgs, $strip_imgs);
@@ -157,16 +146,33 @@ if (isset($_SESSION['user_id'])) {
                     <?php endforeach; ?>
                 </div>
             </div>
-            <!-- Row 2: right scroll (reversed) -->
+            <!-- Row 2: right scroll (reversed, middle row, larger) -->
             <div class="filmstrip-row row-2">
                 <div class="filmstrip-track track-reverse">
+                    <?php 
+                    // Shift array for variety in middle row
+                    $middle_imgs = array_slice($strip_imgs, 8);
+                    $middle_imgs = array_merge($middle_imgs, array_slice($strip_imgs, 0, 8));
+                    foreach(array_merge($middle_imgs, $middle_imgs) as $img): ?>
+                    <div class="filmstrip-frame frame-large">
+                        <picture>
+                            <source srcset="<?= $img ?>" type="image/webp">
+                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                        </picture>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <!-- Row 3: left scroll (bottom row) -->
+            <div class="filmstrip-row row-3">
+                <div class="filmstrip-track">
                     <?php foreach(array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
                     <div class="filmstrip-frame">
-                            <picture>
-                                <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
-                            </picture>
-                        </div>
+                        <picture>
+                            <source srcset="<?= $img ?>" type="image/webp">
+                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                        </picture>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>
