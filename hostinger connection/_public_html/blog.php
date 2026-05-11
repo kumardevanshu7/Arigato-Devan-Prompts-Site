@@ -28,7 +28,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "&ndash; Arigato Devan</title>
 <meta name="description" content="<?=htmlspecialchars($blog['meta_description']??$blog['description']??'')?>">
 <?php if($blog['tags']): ?><meta name="keywords" content="<?=htmlspecialchars($blog['tags'])?>"><?php endif; ?>
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 .blog-detail-wrap{max-width:800px;margin:0 auto;padding:48px 32px 100px}
 .blog-detail-hero-img{width:100%;max-height:440px;object-fit:cover;border-radius:22px;border:var(--border-width) solid var(--text-color);box-shadow:var(--shadow-comic);margin-bottom:36px;display:block}
@@ -232,7 +232,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script src="script.js?v=1777999999"></script>
+<script src="script.js?v=177853384400519"></script>
 <script>
 // Blog Like
 const likeBtn = document.getElementById('blog-like-btn');
@@ -311,6 +311,7 @@ if (submitBtn) {
         }
 </script>
 </body></html>
+
 
 
 

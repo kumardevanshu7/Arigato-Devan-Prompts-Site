@@ -482,7 +482,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script src="script.js?v=1778000001"></script>
+    <script src="script.js?v=177853384400519"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
 
@@ -573,6 +573,7 @@ if (isset($_SESSION['user_id'])) {
     </script>
 </body>
 </html>
+
 
 
 

@@ -32,7 +32,7 @@ arsort($all_tags);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs "&ndash; Arigato Devan PromptVerse</title>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 /* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-hero {
@@ -452,7 +452,7 @@ arsort($all_tags);
   </div>
 </footer>
 
-<script src="script.js?v=1777999999"></script>
+<script src="script.js?v=1778000000"></script>
 <script>
 function filterByTag(tag, btn) {
   // Update active pill

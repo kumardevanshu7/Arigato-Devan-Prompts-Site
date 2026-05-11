@@ -32,7 +32,7 @@ $pg_data   = json_encode(array_column($prompt_growth_raw, 'c'));
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analytics "Ã¢â‚¬Â PromptVerse Admin</title>
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
 body{background:var(--bg-color)}

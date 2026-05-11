@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome "&ndash; Set Up Your Profile | PromptVerse</title>
     <meta name="description" content="Set up your PromptVerse profile before exploring exclusive AI prompts.">
-    <link rel="stylesheet" href="style.css?v=1777999999">
+    <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
         body {
             min-height: 100vh;

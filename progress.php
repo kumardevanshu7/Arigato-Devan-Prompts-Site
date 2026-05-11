@@ -23,7 +23,7 @@ $milestones = [
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Growth Journey &mdash; PromptVerse</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 

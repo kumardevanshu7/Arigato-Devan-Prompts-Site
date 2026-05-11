@@ -38,7 +38,7 @@ function sessionAvatar() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan PromptVerse</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
-    <link rel="stylesheet" href="style.css?v=1777999999">
+    <link rel="stylesheet" href="style.css?v=1778100000">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -283,7 +283,7 @@ function sessionAvatar() {
         </div>
     </div>
 
-    <script src="script.js?v=1777999999"></script>
+    <script src="script.js?v=1778000000"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
 

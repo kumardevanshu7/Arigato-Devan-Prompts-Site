@@ -28,7 +28,7 @@ if (isset($_SESSION['user_id'])) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unreleased Reels &mdash; PromptVerse</title>
 <meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -215,7 +215,7 @@ if (isset($_SESSION['user_id'])) {
 </footer>
 
 <script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
-<script src="script.js?v=1777999999"></script>
+<script src="script.js?v=1778000000"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');

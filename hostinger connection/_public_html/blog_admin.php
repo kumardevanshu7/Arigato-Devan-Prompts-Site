@@ -39,7 +39,7 @@ function getAuthorAvatar(array $row): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blog Management "&ndash; Admin | PromptVerse</title>
-<link rel="stylesheet" href="style.css?v=1777999999">
+<link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 body { background: var(--bg-color); }
 

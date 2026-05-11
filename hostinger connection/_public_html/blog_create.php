@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create Blog "&ndash; Admin</title><link rel="stylesheet" href="style.css?v=1777999999">
+<title>Create Blog "&ndash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px;font-size:.95rem}
