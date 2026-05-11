@@ -36,33 +36,33 @@ files.forEach(filePath => {
         }
 
         // 2. Fix Garbled text / Mojibake
-        content = content.replace(/ /g, ' '); // Trailing non-breaking space
-        content = content.replace(/$/gm, '');
-        content = content.replace(/&middot;/g, '&middot;'); // Middle dot
-        content = content.replace(/&ndash;(?= )/g, '&ndash;'); // Em dash
-        content = content.replace(/&ndash; "/g, '&ndash; "');
-        content = content.replace(/&ndash;/g, '&ndash;');
-        content = content.replace(/&mdash;/g, '&mdash;'); // Em dash in analytics
-        content = content.replace(/&ndash;¦/g, '&hellip;'); // Ellipsis
+        content = content.replace(/\u00c2\u00a0/g, ' ');         // Non-breaking space (UTF-8 mojibake)
+        content = content.replace(/\u00e2\u0080\u008b/g, '');     // Zero-width space
+        content = content.replace(/&middot;/g, '&middot;');        // Middle dot (already correct)
+        content = content.replace(/\u00e2\u0080\u0093/g, '&ndash;'); // En dash mojibake
+        content = content.replace(/\u00e2\u0080\u0094/g, '&mdash;'); // Em dash mojibake
+        content = content.replace(/\u00e2\u0080\u00a6/g, '&hellip;'); // Ellipsis mojibake
 
-        // 3. Icon replacements
-        content = content.replace(/<i class='bx bx-key'></i>/g, "<i class='bx bx-key'></i>"); // Key
-        content = content.replace(/\uD83D\uDD25/g, '\\uD83D\\uDD25'); // Fire
-        content = content.replace(/\u2721/g, '\\u2721'); // Star
-        content = content.replace(/\uD83D\uDCA5/g, '\\uD83D\\uDCA5'); // Collision
-        content = content.replace(/\uD83C\uDF89/g, '\\uD83C\\uDF89'); // Party
-        content = content.replace(/\uD83C\uDF1F/g, '\\uD83C\\uDF1F'); // Glowing star
-        
+        // 3. Icon replacements — replace garbled mojibake with proper Boxicon markup
+        // Lock icon (was garbled bx-key)
+        content = content.replace(/<i class='bx bx-key'><\/i>/g, "<i class='bx bx-key'></i>");
+        // Fire emoji mojibake -> boxicon
+        content = content.replace(/\uD83D\uDD25/g, "<i class='bx bxs-hot'></i>");
+        // Star of David mojibake -> boxicon star
+        content = content.replace(/\u2721/g, "<i class='bx bxs-star'></i>");
+        // Collision emoji mojibake -> boxicon
+        content = content.replace(/\uD83D\uDCA5/g, "<i class='bx bx-error-circle'></i>");
+        // Party popper emoji mojibake -> boxicon
+        content = content.replace(/\uD83C\uDF89/g, "<i class='bx bx-party'></i>");
+        // Glowing star emoji mojibake -> boxicon
+        content = content.replace(/\uD83C\uDF1F/g, "<i class='bx bxs-star'></i>");
+
         // upload_prompt.php prompt types specific fixes (Lock, Moon, Hot)
         if (filePath.includes('upload_prompt.php')) {
-            content = content.replace(/<span class="type-icon"><i class='bx bx-key'></i><\/span>/g, '<i class="bx bx-lock-alt type-icon"></i>');
-            content = content.replace(/<span class="type-icon">ÃƒÂ°Ã…Â¸Ã…â€™Ã¢â‚¬â„¢<\/span>/g, '<i class="bx bx-moon type-icon"></i>');
-            content = content.replace(/<span class="type-icon">\uD83D\uDD25<\/span>/g, '<i class="bx bxs-hot type-icon"></i>');
+            content = content.replace(/<span class="type-icon"><i class='bx bx-key'><\/i><\/span>/g, '<i class="bx bx-lock-alt type-icon"></i>');
+            content = content.replace(/<span class="type-icon">[\uD83C\uDF19\u{1F319}]<\/span>/gu, '<i class="bx bx-moon type-icon"></i>');
+            content = content.replace(/<span class="type-icon">[\uD83D\uDD25\u{1F525}]<\/span>/gu, '<i class="bx bxs-hot type-icon"></i>');
         }
-
-        // Catch-alls
-        content = content.replace(//g, ''); 
-        content = content.replace(//g, ''); 
 
         if (content !== originalContent) {
             fs.writeFileSync(filePath, content, 'utf8');
