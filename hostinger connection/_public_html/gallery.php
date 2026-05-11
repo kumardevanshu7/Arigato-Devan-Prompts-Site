@@ -10,15 +10,17 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
 // Fetch prompts with unlocked status
 if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
-        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked
+        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+               IF(l.id IS NOT NULL, 1, 0) as is_liked
         FROM prompts p
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
+        LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts ORDER BY created_at DESC");
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -38,7 +40,7 @@ function sessionAvatar() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan PromptVerse</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
-    <link rel="stylesheet" href="style.css?v=1778100000">
+    <link rel="stylesheet" href="style.css?v=2026051205">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -213,12 +215,13 @@ function sessionAvatar() {
                         <div class="card-click-trigger"></div>
                         <div class="card-content-overlay">
                             <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
-                            <?php if(isset($_SESSION['user_id'])): ?>
-                            <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-heart<?= $p['is_liked'] ? ' liked-heart' : '' ?>"></i>
+                            <!-- Static like display on card (not clickable) -->
+                            <div class="card-like-display" 
+                                 data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>"
+                                 data-prompt-id="<?= $p['id'] ?>">
+                                <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
                                 <span class="like-count"><?= (int)$p['likes_count'] ?></span>
                             </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -238,17 +241,6 @@ function sessionAvatar() {
     <div id="unlock-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
-            <?php if(isset($_SESSION['user_id'])): ?>
-            <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </button>
-            <?php else: ?>
-            <div class="modal-like-count-display">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </div>
-            <?php endif; ?>
             <div class="modal-left">
                 <img src="" id="modal-image" alt="Prompt Preview">
             </div>
@@ -275,6 +267,18 @@ function sessionAvatar() {
                         <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
                         <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
                     </div>
+                    <!-- Like button: below copy/save -->
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="modal-like-count">0</span>
+                    </button>
+                    <?php else: ?>
+                    <div class="modal-like-count-display" style="margin-top:12px;">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="modal-like-count">0</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -295,7 +299,7 @@ function sessionAvatar() {
         </div>
     </div>
 
-    <script src="script.js?v=177853384400519"></script>
+    <script src="script.js?v=2026051205"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
 
@@ -424,6 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 </body>
 </html>
+
+
 
 
 

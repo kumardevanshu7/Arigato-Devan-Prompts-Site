@@ -25,6 +25,7 @@ if (isset($_SESSION['user_id'])) {
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+
 // Generate state token for CSRF if not exists
 ?>
 <!DOCTYPE html>
@@ -33,7 +34,7 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan - PromptVerse</title>
-    <link rel="stylesheet" href="style.css?v=1778000001">
+    <link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -390,12 +391,10 @@ if (isset($_SESSION['user_id'])) {
                         
                         <div class="card-content-overlay">
                             <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
-                            <?php if(isset($_SESSION['user_id'])): ?>
-                            <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-heart<?= $p['is_liked'] ? ' liked-heart' : '' ?>"></i>
+                            <div class="like-btn" data-prompt-id="<?= $p['id'] ?>">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                                 <span class="like-count"><?= (int)$p['likes_count'] ?></span>
                             </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -442,17 +441,6 @@ if (isset($_SESSION['user_id'])) {
     <div id="unlock-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
-            <?php if(isset($_SESSION['user_id'])): ?>
-            <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </button>
-            <?php else: ?>
-            <div class="modal-like-count-display">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </div>
-            <?php endif; ?>
             <div class="modal-left">
                 <img src="" id="modal-image" alt="Prompt Preview">
             </div>
@@ -473,9 +461,20 @@ if (isset($_SESSION['user_id'])) {
                 <div class="modal-unlocked-area" id="modal-unlocked-area" style="display:none;flex-direction:column;text-align:left;">
                     <h3 style="margin-bottom:10px;color:var(--text-color);font-size:1rem;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3>
                     <div class="unlocked-text" id="modal-unlocked-text" style="font-family:monospace;font-size:0.95rem;font-weight:500;background:var(--bg-color);padding:15px;border-radius:12px;border:var(--border-width) solid var(--text-color);flex-grow:1;margin-bottom:15px;overflow-y:auto;max-height:200px;white-space:pre-wrap;word-break:break-all;color:var(--text-color);box-shadow:var(--shadow-comic);"></div>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
-                        <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
+                    <div style="display:flex;gap:10px;flex-wrap:nowrap;width:100%;">
+                        <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
+                        <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-bookmark"></i> SAVE</button>
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                        <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
+                            <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
+                        </button>
+                        <?php else: ?>
+                        <div class="modal-like-count-display" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow-comic);">
+                            <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
+                            <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -497,7 +496,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script src="script.js?v=177853384400519"></script>
+    <script src="script.js?v=2026051205"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
 
@@ -586,16 +585,6 @@ if (isset($_SESSION['user_id'])) {
         });
     });
     </script>
-
-<!-- Wrong Code Comic Popup -->
-<div id="wrong-code-popup">
-    <div class="wrong-code-card">
-        <span class="wrong-code-emoji">🙅‍♂️</span>
-        <div class="wrong-code-title">NO NO BACHA…</div>
-        <div class="wrong-code-msg">its wrong code 😅<br>Watch the reel to get the correct one!</div>
-        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN 🔄</button>
-    </div>
-</div>
 </body>
 </html>
 

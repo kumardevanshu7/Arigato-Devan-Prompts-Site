@@ -1011,64 +1011,14 @@ header {
 
 /* ── Modal Like Button ── */
 /* ── Like button: small circle at bottom-right (same style as close button at top-right) ── */
-.modal-like-btn {
-    position: absolute !important;
-    bottom: 12px !important;
-    right: 12px !important;
-    background: var(--card-bg) !important;
-    color: var(--text-color) !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: unset !important;
-    padding: 0 !important;
-    border: 2px solid var(--text-color) !important;
-    border-radius: 50% !important;
-    font-family: var(--font-main) !important;
-    font-weight: 800 !important;
-    font-size: 1rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 1px !important;
-    cursor: pointer !important;
-    box-shadow: 2px 2px 0px var(--text-color) !important;
-    transition: all 0.2s ease-out !important;
-    z-index: 200 !important;
-    line-height: 1 !important;
-}
-/* On mobile: move to inside modal-left bottom-right (above image, not over buttons) */
-@media (max-width: 768px) {
-    .modal-like-btn {
-        bottom: auto !important;
-        top: auto !important;
-        /* Keep it anchored to modal-content bottom-right but above the right-panel fold */
-        bottom: calc(50vh - 60px) !important;
-        right: 12px !important;
-    }
-}
-@media (max-width: 480px) {
-    .modal-like-btn {
-        width: 38px !important;
-        height: 38px !important;
-        bottom: calc(50vh - 52px) !important;
-        right: 10px !important;
-    }
-}
-.modal-like-btn i {
-    font-size: 0.9rem !important;
-    line-height: 1 !important;
-}
-.modal-like-btn span {
-    font-size: 0.65rem !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    color: #FF4444 !important;
-}
+/* ── Modal Like Button (inside modal-right, below Copy/Save) ── */
+
+
+
 .modal-like-btn:hover {
-    background: #ffe0e0 !important;
-    transform: scale(1.1) !important;
-    box-shadow: var(--shadow-comic-hover) !important;
+    background: #fff0f0 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 3px 3px 0px var(--text-color) !important;
 }
 .modal-like-btn.liked-active {
     background: #FF6B6B !important;
@@ -1076,28 +1026,12 @@ header {
     border-color: #d94f4f !important;
 }
 .modal-like-btn.liked-active i { color: #fff !important; }
-.modal-like-btn.popped { transform: scale(0.88) !important; }
-.modal-like-count-display {
-    position: absolute !important;
-    bottom: 12px !important;
-    right: 12px !important;
-    width: 44px !important;
-    height: 44px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 1px !important;
-    font-weight: 800 !important;
-    color: var(--text-color) !important;
-    background: var(--card-bg) !important;
-    border: 2px solid var(--text-color) !important;
-    border-radius: 50% !important;
-    box-shadow: 2px 2px 0px var(--text-color) !important;
-    z-index: 100 !important;
-}
-.modal-like-count-display i { font-size: 0.9rem !important; }
-.modal-like-count-display span { font-size: 0.65rem !important; font-weight: 800 !important; }
+.modal-like-btn.liked-active span { color: #fff !important; }
+.modal-like-btn.popped { transform: scale(0.96) !important; }
+/* Guest display — same style as button but not clickable */
+
+.modal-like-count-display i { font-size: 1rem !important; }
+.modal-like-count-display span { font-size: 0.9rem !important; font-weight: 800 !important; color: #FF4444 !important; }
 
 
 .modal-like-hint {
@@ -1305,14 +1239,7 @@ footer {
         max-height: 50vh;
         min-height: 220px;
     }
-    /* Heart button on mobile: bottom-right of image area only */
-    .modal-like-btn {
-        position: absolute !important;
-        bottom: 10px !important;
-        right: 10px !important;
-        top: auto !important;
-        z-index: 200 !important;
-    }
+    
 }
 
 /* ===== Wrong Code Comic Popup ===== */
@@ -3066,3 +2993,4 @@ footer {
 .modal-like-count-display span {
     color: #FF4444 !important;
 }
+

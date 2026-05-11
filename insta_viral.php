@@ -28,7 +28,7 @@ if (isset($_SESSION['user_id'])) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; PromptVerse</title>
 <meta name="description" content="Insta Viral Reels &mdash; Coming Soon on PromptVerse.">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -280,10 +280,20 @@ if (isset($_SESSION['user_id'])) {
                     <div style="background:linear-gradient(135deg,#f09433,#dc2743);color:white;padding:8px 14px;border-radius:10px;font-weight:800;font-size:0.8rem;margin-bottom:12px;display:inline-block;"><i class="fa-brands fa-instagram"></i> VIRAL PROMPT UNLOCKED!</div>
                     <h3 style="margin-bottom:10px;color:var(--text-color);font-size:1rem;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3>
                     <div class="unlocked-text" id="modal-unlocked-text" style="font-family:monospace;font-size:0.95rem;font-weight:500;background:var(--bg-color);padding:15px;border-radius:12px;border:var(--border-width) solid var(--text-color);flex-grow:1;margin-bottom:15px;overflow-y:auto;max-height:200px;white-space:pre-wrap;word-break:break-all;color:var(--text-color);box-shadow:var(--shadow-comic);"></div>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
-                        <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
+                <div style="display:flex;gap:10px;flex-wrap:nowrap;width:100%;">
+                    <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
+                    <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-bookmark"></i> SAVE</button>
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
+                        <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
+                    </button>
+                    <?php else: ?>
+                    <div class="modal-like-count-display" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow-comic);">
+                        <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
+                        <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -302,7 +312,7 @@ if (isset($_SESSION['user_id'])) {
 </footer>
 
 <script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
-<script src="script.js?v=1778000000"></script>
+<script src="script.js?v=2026051205"></script>
 <script>
 // Scrolling background
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -346,9 +356,10 @@ function generateMathQuestion() {
     mathQuestion.textContent = `${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
 }
 
-// Open modal when card or lock-icon clicked
-document.querySelectorAll('.card, .lock-icon').forEach(el => {
+// Open modal when card or card-lock-icon clicked
+document.querySelectorAll('.card, .card-lock-icon').forEach(el => {
     el.addEventListener('click', function(e) {
+        if(e.target.closest('.like-btn') || e.target.closest('.card-like-display')) { e.stopPropagation(); return; }
         e.stopPropagation();
         const card = this.closest('.card') || this.parentElement.closest('.card');
         if (!card) return;

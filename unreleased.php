@@ -31,7 +31,7 @@ if (isset($_SESSION['user_id'])) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unreleased Reels &mdash; PromptVerse</title>
 <meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -174,17 +174,6 @@ if (isset($_SESSION['user_id'])) {
     <div id="unlock-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
-            <?php if(isset($_SESSION['user_id'])): ?>
-            <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </button>
-            <?php else: ?>
-            <div class="modal-like-count-display">
-                <i class="fa-solid fa-heart"></i>
-                <span id="modal-like-count">0</span>
-            </div>
-            <?php endif; ?>
             <div class="modal-left">
                 <img src="" id="modal-image" alt="Prompt Preview">
             </div>
@@ -211,6 +200,18 @@ if (isset($_SESSION['user_id'])) {
                         <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
                         <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
                     </div>
+                    <!-- Like button: below copy/save -->
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="modal-like-count">0</span>
+                    </button>
+                    <?php else: ?>
+                    <div class="modal-like-count-display" style="margin-top:12px;">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="modal-like-count">0</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -229,7 +230,7 @@ if (isset($_SESSION['user_id'])) {
 </footer>
 
 <script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
-<script src="script.js?v=1778000000"></script>
+<script src="script.js?v=2026051205"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -272,6 +273,7 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
     });
 });
 </script></body></html>
+
 
 
 
