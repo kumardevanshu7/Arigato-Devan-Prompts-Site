@@ -4,30 +4,27 @@ require_once 'db.php';
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
-// Guests allowed &mdash; they need 90 taps; logged-in users need only 20
-$tap_threshold = isset($_SESSION['user_id']) ? 20 : 90;
-
-// Fetch unreleased prompts by prompt_type
+// Fetch already uploaded prompts by prompt_type
 if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked 
         FROM prompts p 
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
-        WHERE p.prompt_type = 'unreleased'
+        WHERE p.prompt_type = 'already_uploaded'
         ORDER BY p.created_at DESC
     ");
     $stmt->execute([$_SESSION['user_id']]);
-    $unreleased = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $uploaded_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $unreleased = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $uploaded_prompts = $pdo->query("SELECT *, 0 as is_unlocked FROM prompts WHERE prompt_type='already_uploaded' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 }
 
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unreleased Reels &mdash; PromptVerse</title>
-<meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
+<title>Already Uploaded Prompts &mdash; PromptVerse</title>
+<meta name="description" content="Unlock prompts previously shared on Instagram with just 9 taps!">
 <link rel="stylesheet" href="style.css?v=1777999999">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -91,62 +88,58 @@ if (isset($_SESSION['user_id'])) {
 
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-        <div class="badge" style="margin:0;transform:rotate(-1deg);"><i class="fa-solid fa-lock"></i> UNRELEASED</div>
-        <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
+        <div class="badge" style="margin:0;transform:rotate(-1deg);background:#e6f2ff;color:#00509e;"><i class="bx bx-history"></i> ALREADY UPLOADED</div>
+        <h1 style="font-size:2rem;font-weight:900;">Already <span class="highlight">Uploaded</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:30px;">
-        Show some love to unlock &mdash; tap the Love Bar 
-        <strong><?= isset($_SESSION['user_id']) ? '20' : '90' ?></strong> times!
-        <i class="fa-solid fa-heart"></i>
-        <?php if(!isset($_SESSION['user_id'])): ?>
-            <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>
-        <?php endif; ?>
+        Explore the collection of prompts previously shared on Instagram. <br>Tap just <strong>9 times</strong> to unlock them!
+        <i class="bx bxs-pointer"></i>
     </p>
 
-    <?php if(empty($unreleased)): ?>
+    <?php if(empty($uploaded_prompts)): ?>
         <div style="text-align:center;padding:80px 20px;">
-            <div style="font-size:3rem;margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
+            <div style="font-size:3rem;margin-bottom:16px;color:#00509e;"><i class="bx bx-history"></i></div>
             <h2 style="font-size:1.6rem;font-weight:900;margin-bottom:8px;">Nothing here yet...</h2>
-            <p style="color:#888;font-weight:600;">Unreleased reels will appear here when the admin drops them!</p>
+            <p style="color:#888;font-weight:600;">Already uploaded reels will appear here when the admin adds them!</p>
         </div>
     <?php else: ?>
         <?php
-        // Collect sub-tags (excluding 'unreleased' itself)
-        $ur_sub_tags = [];
-        foreach($unreleased as $ur_item) {
-            $tarr = array_map('trim', explode(',', strtolower($ur_item['tag'])));
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        $aup_sub_tags = [];
+        foreach($uploaded_prompts as $aup_item) {
+            $tarr = array_map('trim', explode(',', strtolower($aup_item['tag'])));
             foreach($tarr as $t) {
-                if(!empty($t) && $t !== 'unreleased') $ur_sub_tags[] = $t;
+                if(!empty($t) && $t !== 'already_uploaded') $aup_sub_tags[] = $t;
             }
         }
-        $ur_sub_tags = array_unique($ur_sub_tags);
-        sort($ur_sub_tags);
+        $aup_sub_tags = array_unique($aup_sub_tags);
+        sort($aup_sub_tags);
         ?>
-        <?php if(!empty($ur_sub_tags)): ?>
+        <?php if(!empty($aup_sub_tags)): ?>
         <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 28px;">
-            <button class="ur-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
-            <?php foreach($ur_sub_tags as $t): ?>
-                <button class="ur-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
+            <button class="aup-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
+            <?php foreach($aup_sub_tags as $t): ?>
+                <button class="aup-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
         <div class="gallery-grid" id="card-stack">
-            <?php foreach($unreleased as $ur): 
-                $tags_arr = array_map('trim', explode(',', strtolower($ur['tag'])));
-                $is_unlocked = $ur['is_unlocked'];
-                $blur_style = ($is_unlocked) ? '' : 'filter: blur(5px); transform: scale(1.1);';
+            <?php foreach($uploaded_prompts as $aup): 
+                $tags_arr = array_map('trim', explode(',', strtolower($aup['tag'])));
+                $is_unlocked = $aup['is_unlocked'];
+                $blur_style = '';
             ?>
             <div class="card" 
-                 data-id="<?=$ur['id']?>" 
-                 data-image="<?=htmlspecialchars($ur['image_path'])?>" 
-                 data-title="<?=htmlspecialchars($ur['title'])?>" 
-                 data-prompt-type="unreleased" 
+                 data-id="<?=$aup['id']?>" 
+                 data-image="<?=htmlspecialchars($aup['image_path'])?>" 
+                 data-title="<?=htmlspecialchars($aup['title'])?>" 
+                 data-prompt-type="already_uploaded" 
                  data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>" 
                  data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-                 <?= $is_unlocked ? 'data-prompt-text="'.htmlspecialchars($ur['prompt_text']).'"' : '' ?>>
+                 <?= $is_unlocked ? 'data-prompt-text="'.htmlspecialchars($aup['prompt_text']).'"' : '' ?>>
                 
-                <img src="<?=htmlspecialchars($ur['image_path'])?>" class="card-bg-image" alt="<?=htmlspecialchars($ur['title'])?>" style="<?= $blur_style ?>" loading="lazy">
-                <div class="card-type-badge urp">UNRELEASED</div>
+                <img src="<?=htmlspecialchars($aup['image_path'])?>" class="card-bg-image" alt="<?=htmlspecialchars($aup['title'])?>" style="<?= $blur_style ?>" loading="lazy">
+                <div class="card-type-badge aup">UPLOADED</div>
                 
                 <?php if(!$is_unlocked): ?>
                     <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
@@ -156,10 +149,10 @@ if (isset($_SESSION['user_id'])) {
                 
                 <div class="card-click-trigger"></div>
                 <div class="card-content-overlay">
-                    <div class="card-title"><?=htmlspecialchars($ur['title'])?></div>
-                    <div class="like-btn" data-prompt-id="<?=$ur['id']?>">
+                    <div class="card-title"><?=htmlspecialchars($aup['title'])?></div>
+                    <div class="like-btn" data-prompt-id="<?=$aup['id']?>">
                         <i class="fa-solid fa-heart"></i>
-                        <span class="like-count"><?=(int)$ur['likes_count']?></span>
+                        <span class="like-count"><?=(int)$aup['likes_count']?></span>
                     </div>
                 </div>
             </div>
@@ -240,10 +233,10 @@ if (bgLayers.length > 0) {
 </script>
 
 <script>
-// Unreleased filter
-document.querySelectorAll('.ur-filter-btn').forEach(btn => {
+// Already Uploaded filter
+document.querySelectorAll('.aup-filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.ur-filter-btn').forEach(b => {
+        document.querySelectorAll('.aup-filter-btn').forEach(b => {
             b.classList.remove('active');
             b.style.background = 'var(--bg-color)';
             b.style.color = 'var(--text-color)';
@@ -251,7 +244,7 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
         btn.classList.add('active');
         btn.style.background = 'var(--primary-color)';
         const tag = btn.dataset.tag;
-        document.querySelectorAll('#unreleased-grid .unreleased-card').forEach(card => {
+        document.querySelectorAll('#card-stack .card').forEach(card => {
             const tags = (card.dataset.tags || '').split(',').map(t => t.trim());
             card.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
         });

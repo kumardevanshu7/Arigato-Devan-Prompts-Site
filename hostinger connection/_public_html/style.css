@@ -915,6 +915,7 @@ header {
 .card-type-badge.scp { background: #E6D7FF; color: #4a00b0; }
 .card-type-badge.urp { background: #FFF1B8; color: #7a5c00; }
 .card-type-badge.ivp { background: #c8f5d4; color: #1a5c30; }
+.card-type-badge.aup { background: #e6f2ff; color: #00509e; }
 
 .card-content-overlay {
     position: absolute;

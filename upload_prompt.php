@@ -49,6 +49,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         .type-card.selected-secret { background: #ffe3e3; border-color: #d03030; color: #d03030; box-shadow: 4px 4px 0 #d03030; }
         .type-card.selected-unreleased { background: #fff4cc; border-color: #e6a800; color: #7a5800; box-shadow: 4px 4px 0 #e6a800; }
         .type-card.selected-viral { background: #e3f7ff; border-color: #007ab8; color: #004f7a; box-shadow: 4px 4px 0 #007ab8; }
+        .type-card.selected-uploaded { background: #e6f2ff; border-color: #00509e; color: #00509e; box-shadow: 4px 4px 0 #00509e; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
@@ -100,6 +101,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             <input type="radio" name="prompt_type" value="insta_viral" onchange="onTypeChange('insta_viral')">
                             <span class="type-icon"><i class="bx bxs-hot type-icon"></i></span>
                             <span class="type-label">Insta Viral</span>
+                        </label>
+                        <label class="type-card" id="card-uploaded">
+                            <input type="radio" name="prompt_type" value="already_uploaded" onchange="onTypeChange('already_uploaded')">
+                            <span class="type-icon"><i class="bx bx-history type-icon"></i></span>
+                            <span class="type-label">Already Uploaded</span>
                         </label>
                     </div>
                 </div>
@@ -195,6 +201,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             document.getElementById('card-secret').className = 'type-card';
             document.getElementById('card-unreleased').className = 'type-card';
             document.getElementById('card-viral').className = 'type-card';
+            document.getElementById('card-uploaded').className = 'type-card';
 
             if (type === 'secret') {
                 document.getElementById('card-secret').className = 'type-card selected-secret';
@@ -207,6 +214,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 codeInput.value = '';
             } else if (type === 'insta_viral') {
                 document.getElementById('card-viral').className = 'type-card selected-viral';
+                codeGroup.style.display = 'none';
+                codeInput.required = false;
+                codeInput.value = '';
+            } else if (type === 'already_uploaded') {
+                document.getElementById('card-uploaded').className = 'type-card selected-uploaded';
                 codeGroup.style.display = 'none';
                 codeInput.required = false;
                 codeInput.value = '';

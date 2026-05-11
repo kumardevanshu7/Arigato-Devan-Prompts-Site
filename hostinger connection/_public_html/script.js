@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalImage.src = card.dataset.image;
                 // Add blur if unreleased and locked
                 if(card.dataset.promptType === 'unreleased' && card.dataset.unlocked !== 'true') {
-                    modalImage.style.filter = 'blur(15px) grayscale(50%)';
+                    modalImage.style.filter = 'blur(5px)';
                     modalImage.style.transition = 'filter 0.3s ease-out';
                 } else {
                     modalImage.style.filter = '';
@@ -282,9 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Progressive blur reduction
                             const modalImg = document.getElementById('modal-image');
                             if(modalImg) {
-                                const blurVal = 15 - (15 * (pct / 100));
-                                const grayVal = 50 - (50 * (pct / 100));
-                                modalImg.style.filter = `blur(${blurVal}px) grayscale(${grayVal}%)`;
+                                const blurVal = 5 - (5 * (pct / 100));
+                                modalImg.style.filter = `blur(${blurVal}px)`;
                             }
 
                             // Floating heart
@@ -306,6 +305,65 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                                 
                                 unlockUnreleased(currentPromptId);
+                            }
+                        });
+                    }, 50);
+
+                // ══════════════════════════════════════════
+                // AUP — Already Uploaded Prompts: 9 Taps
+                // ══════════════════════════════════════════
+                } else if (pType === 'already_uploaded') {
+                    const LOVE_THRESHOLD = 9; // Strictly 9 taps for everyone
+                    let taps = 0;
+
+                    unlockArea.innerHTML = `
+                        <p style="font-weight:900;font-size:1rem;margin-bottom:14px;color:#00509e;">
+                            👆 Tap to Unlock Prompt!
+                        </p>
+                        <p style="font-weight:600;font-size:0.85rem;color:#888;margin-bottom:14px;">
+                            Tap 9 times to reveal this already uploaded prompt
+                        </p>
+                        <div style="background:#f0f0f0;border:2px solid var(--text-color);border-radius:20px;overflow:hidden;height:16px;margin-bottom:12px;box-shadow:2px 2px 0 var(--text-color);">
+                            <div id="aup-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#80c1ff,#007ab8);transition:width 0.2s;border-radius:20px;"></div>
+                        </div>
+                        <div style="text-align:center;font-weight:800;font-size:0.9rem;margin-bottom:14px;">
+                            <span id="aup-tap-count">0</span> / ${LOVE_THRESHOLD} taps
+                        </div>
+                        <button id="aup-tap-btn" style="width:100%;padding:16px;background:#e6f2ff;border:var(--border-width) solid var(--text-color);border-radius:16px;font-family:var(--font-main);font-weight:900;font-size:1.2rem;cursor:pointer;box-shadow:var(--shadow-comic);color:#00509e;transition:transform 0.1s;">
+                            👆 TAP
+                        </button>
+                    `;
+
+                    setTimeout(() => {
+                        const tapBtn  = document.getElementById('aup-tap-btn');
+                        const fill    = document.getElementById('aup-bar-fill');
+                        const counter = document.getElementById('aup-tap-count');
+                        if (!tapBtn) return;
+
+                        tapBtn.addEventListener('click', () => {
+                            if (taps >= LOVE_THRESHOLD) return;
+                            taps++;
+                            const pct = (taps / LOVE_THRESHOLD) * 100;
+                            fill.style.width = pct + '%';
+                            counter.textContent = taps;
+
+                            tapBtn.style.transform = 'scale(0.94)';
+                            setTimeout(() => tapBtn.style.transform = '', 100);
+
+                            const modalImg = document.getElementById('modal-image');
+
+
+                            if (taps >= LOVE_THRESHOLD) {
+                                tapBtn.textContent = '🔓 Unlocking...';
+                                tapBtn.disabled = true;
+                                if(modalImg) modalImg.style.filter = '';
+                                
+                                if (currentCardElement) {
+                                    const bgImg = currentCardElement.querySelector('.card-bg-image');
+                                    if(bgImg) bgImg.style.filter = '';
+                                }
+                                
+                                unlockAlreadyUploaded(currentPromptId);
                             }
                         });
                     }, 50);
@@ -565,6 +623,56 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(h);
             setTimeout(() => h.remove(), 2000);
         }
+    }
+
+    function unlockAlreadyUploaded(promptId) {
+        const formData = new FormData();
+        formData.append('action', 'already_uploaded');
+        formData.append('prompt_id', promptId);
+
+        fetch('unlock.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const unlockArea  = document.getElementById('modal-unlock-area');
+                const unlockedArea = document.getElementById('modal-unlocked-area');
+                const unlockedText = document.getElementById('modal-unlocked-text');
+                const wantCode    = document.getElementById('modal-want-code');
+                const saveBtn     = document.getElementById('modal-save-btn');
+
+                if(unlockArea)  unlockArea.style.display  = 'none';
+                if(wantCode)    wantCode.style.display    = 'none';
+                if(unlockedArea) {
+                    unlockedArea.style.display = 'flex';
+                    if(unlockedText) unlockedText.textContent = data.prompt_text;
+                }
+
+                if (currentCardElement) {
+                    currentCardElement.dataset.unlocked = 'true';
+                    currentCardElement.dataset.promptText = data.prompt_text;
+                    const lockIcon = currentCardElement.querySelector('.card-lock-icon');
+                    if(lockIcon) lockIcon.remove();
+                }
+
+                // Check if already saved
+                if(saveBtn) {
+                    const formDataCheck = new FormData();
+                    formDataCheck.append('action', 'check');
+                    formDataCheck.append('prompt_id', promptId);
+                    fetch('like.php', { method: 'POST', body: formDataCheck })
+                    .then(r=>r.json())
+                    .then(d => {
+                        if(d.saved) {
+                            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED';
+                            saveBtn.style.background = '#4CAF50';
+                            saveBtn.style.color = 'white';
+                        }
+                    });
+                }
+            } else {
+                showComicAlert('Could not unlock. Please try again later.');
+            }
+        });
     }
 
     function unlockUnreleased(promptId) {

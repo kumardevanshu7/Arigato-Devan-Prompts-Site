@@ -99,6 +99,7 @@ function sessionAvatar() {
                     <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
                     <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
                     <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
                 </div>
             </div>
             <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -168,6 +169,7 @@ function sessionAvatar() {
                         $db_type = $p['prompt_type'] ?? 'secret';
                         if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
                         elseif ($db_type === 'unreleased') $ptype = 'unreleased';
+                        elseif ($db_type === 'already_uploaded') $ptype = 'already_uploaded';
                         else                              $ptype = 'secret_code';
                         
                         $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
@@ -176,6 +178,7 @@ function sessionAvatar() {
                             'secret_code' => ['label'=>'SECRET','cls'=>'scp'],
                             'unreleased'  => ['label'=>'UNRELEASED','cls'=>'urp'],
                             'insta_viral' => ['label'=>'VIRAL','cls'=>'ivp'],
+                            'already_uploaded' => ['label'=>'UPLOADED','cls'=>'aup'],
                         ];
                         $tinfo = $type_labels[$ptype] ?? $type_labels['secret_code'];
                     ?>
@@ -190,7 +193,7 @@ function sessionAvatar() {
                          <?= $p['is_unlocked'] ? 'data-prompt-text="'.htmlspecialchars($p['prompt_text']).'"' : '' ?>>
 
                         <?php 
-                            $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter: blur(15px) grayscale(50%); transform: scale(1.1);' : '';
+                            $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter: blur(5px); transform: scale(1.1);' : '';
                         ?>
                         <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" loading="lazy">
 

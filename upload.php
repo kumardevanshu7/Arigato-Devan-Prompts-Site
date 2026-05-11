@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prompt_type = trim($_POST['prompt_type'] ?? 'secret'); // 'secret', 'unreleased', 'insta_viral'
     
     // Validate prompt_type
-    $valid_types = ['secret', 'unreleased', 'insta_viral'];
+    $valid_types = ['secret', 'unreleased', 'insta_viral', 'already_uploaded'];
     if (!in_array($prompt_type, $valid_types)) $prompt_type = 'secret';
 
     // For secret type, unlock code is required

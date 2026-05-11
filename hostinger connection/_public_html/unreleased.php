@@ -66,6 +66,7 @@ if (isset($_SESSION['user_id'])) {
                 <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
                 <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
                 <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
             </div>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -133,7 +134,7 @@ if (isset($_SESSION['user_id'])) {
             <?php foreach($unreleased as $ur): 
                 $tags_arr = array_map('trim', explode(',', strtolower($ur['tag'])));
                 $is_unlocked = $ur['is_unlocked'];
-                $blur_style = ($is_unlocked) ? '' : 'filter: blur(15px) grayscale(50%); transform: scale(1.1);';
+                $blur_style = ($is_unlocked) ? '' : 'filter: blur(5px); transform: scale(1.1);';
             ?>
             <div class="card" 
                  data-id="<?=$ur['id']?>" 
@@ -213,6 +214,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
+<script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
 <script src="script.js?v=1777999999"></script>
 <script>
 // Background Scroll Logic
