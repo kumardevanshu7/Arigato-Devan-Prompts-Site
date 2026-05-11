@@ -31,7 +31,7 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan - PromptVerse</title>
-    <link rel="stylesheet" href="style.css?v=1777999999">
+    <link rel="stylesheet" href="style.css?v=1778000001">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@ if (isset($_SESSION['user_id'])) {
                 <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
                 <span style="font-weight:600;">@arigato.devan</span>
                 <span class="pulse-dot"></span>
-                <span style="font-weight:800;font-size:1.1rem;">12K+</span>
+                <span style="font-weight:800;font-size:1.1rem;">13K+</span>
             </a>
         </nav>
         <div class="header-right">
@@ -205,6 +205,74 @@ if (isset($_SESSION['user_id'])) {
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
                     Explore Prompts →
                 </a>
+            </div>
+            
+            <!-- Comparison Cards -->
+            <div class="login-compare-section" aria-label="Login vs Guest comparison" style="padding-top:30px; margin-bottom:-20px;">
+                <p class="login-compare-heading"><i class="fa-solid fa-scale-balanced"></i>&nbsp; What you get</p>
+                <div class="login-compare-row">
+
+                    <!-- WITH LOGIN -->
+                    <div class="cmp-card cmp-card-with">
+                        <div class="cmp-card-badge">
+                            <i class="fa-solid fa-circle-check"></i> WITH LOGIN
+                        </div>
+                        <div class="cmp-card-title">Logged-in Benefits</div>
+                        <ul class="cmp-list">
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                                <span>Save your prompts permanently</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                                <span>No need to unlock again after refresh</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                                <span>Only <strong>20 taps</strong> required to unlock prompts</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                                <span>Access &amp; purchase premium couple prompts</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                                <span>Can comment on blog posts</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- WITHOUT LOGIN -->
+                    <div class="cmp-card cmp-card-without">
+                        <div class="cmp-card-badge">
+                            <i class="fa-solid fa-circle-xmark"></i> WITHOUT LOGIN
+                        </div>
+                        <div class="cmp-card-title">Guest Limitations</div>
+                        <ul class="cmp-list">
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                                <span>Cannot save prompts permanently</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                                <span>Need to unlock again after refresh</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                                <span><strong>90 taps</strong> required to unlock prompts</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                                <span>Cannot access or purchase premium couple prompts</span>
+                            </li>
+                            <li>
+                                <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                                <span>Cannot comment on blog posts</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
             </div>
 
         </div>
@@ -407,7 +475,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script src="script.js?v=1777999999"></script>
+    <script src="script.js?v=1778000001"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
 

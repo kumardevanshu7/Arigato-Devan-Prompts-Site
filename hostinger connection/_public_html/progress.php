@@ -143,7 +143,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">12K+</span>
+            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">13K+</span>
         </a>
     </nav>
     <div class="header-right">

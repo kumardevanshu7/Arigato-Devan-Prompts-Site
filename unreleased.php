@@ -4,8 +4,8 @@ require_once 'db.php';
 if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
     header("Location: onboarding.php"); exit();
 }
-// Guests allowed &mdash; they need 120 taps; logged-in users need only 20
-$tap_threshold = isset($_SESSION['user_id']) ? 20 : 120;
+// Guests allowed &mdash; they need 90 taps; logged-in users need only 20
+$tap_threshold = isset($_SESSION['user_id']) ? 20 : 90;
 
 // Fetch unreleased prompts by prompt_type
 $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
@@ -58,7 +58,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">12K+</span>
+            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">13K+</span>
         </a>
     </nav>
     <div class="header-right">
@@ -83,7 +83,7 @@ $unreleased = $pdo->query("SELECT * FROM prompts WHERE prompt_type='unreleased' 
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:30px;">
         Show some love to unlock &mdash; tap the Love Bar 
-        <strong><?= isset($_SESSION['user_id']) ? '20' : '120' ?></strong> times!
+        <strong><?= isset($_SESSION['user_id']) ? '20' : '90' ?></strong> times!
         <i class="fa-solid fa-heart"></i>
         <?php if(!isset($_SESSION['user_id'])): ?>
             <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>

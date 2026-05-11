@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // URP — Unreleased: Love Bar inside modal
                 // ══════════════════════════════════════════
                 } else if (pType === 'unreleased') {
-                    const LOVE_THRESHOLD = (typeof isLoggedIn !== 'undefined' && isLoggedIn) ? 20 : 120;
+                    const LOVE_THRESHOLD = (typeof isLoggedIn !== 'undefined' && isLoggedIn) ? 20 : 90;
                     let taps = 0;
 
                     unlockArea.innerHTML = `
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ❤️ Show Some Love to Unlock!
                         </p>
                         <p style="font-weight:600;font-size:0.85rem;color:#888;margin-bottom:14px;">
-                            ${LOVE_THRESHOLD === 120 ? '⚠️ Login to unlock with just 20 taps!' : `Tap ${LOVE_THRESHOLD} times to reveal this prompt`}
+                            ${LOVE_THRESHOLD === 90 ? '⚠️ Login to unlock with just 20 taps!' : `Tap ${LOVE_THRESHOLD} times to reveal this prompt`}
                         </p>
                         <div style="background:#f0f0f0;border:2px solid var(--text-color);border-radius:20px;overflow:hidden;height:16px;margin-bottom:12px;box-shadow:2px 2px 0 var(--text-color);">
                             <div id="urp-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#ff6b9d,#ff3b6e);transition:width 0.2s;border-radius:20px;"></div>

@@ -351,7 +351,141 @@ $strip_imgs = [
             padding: 4px 12px;
         }
 
-        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Ticker at bottom &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
+        /* ─── Comparison Cards ─── */
+        .login-compare-section {
+            position: relative;
+            z-index: 5;
+            padding: 0 20px 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .login-compare-heading {
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .login-compare-row {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 760px;
+            justify-content: center;
+        }
+
+        .cmp-card {
+            flex: 1;
+            max-width: 360px;
+            background: var(--card-bg);
+            border: 3px solid var(--text-color);
+            border-radius: 20px;
+            padding: 28px 24px 24px;
+            box-shadow: 6px 6px 0px var(--text-color);
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+            cursor: default;
+        }
+
+        .cmp-card:hover {
+            transform: translateY(-5px) rotate(-0.5deg);
+            box-shadow: 8px 10px 0px var(--text-color);
+        }
+
+        .cmp-card:active {
+            transform: translate(3px, 3px);
+            box-shadow: 3px 3px 0px var(--text-color);
+        }
+
+        .cmp-card-with {
+            background: #fffbe8;
+            border-color: var(--text-color);
+        }
+
+        .cmp-card-without {
+            background: #fff0f0;
+            border-color: var(--text-color);
+        }
+
+        .cmp-card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border: 2.5px solid var(--text-color);
+            border-radius: 30px;
+            margin-bottom: 16px;
+        }
+
+        .cmp-card-with .cmp-card-badge {
+            background: #ffe066;
+            color: var(--text-color);
+        }
+
+        .cmp-card-without .cmp-card-badge {
+            background: #ffb3b3;
+            color: var(--text-color);
+        }
+
+        .cmp-card-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .cmp-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cmp-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .cmp-icon {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            margin-top: 1px;
+        }
+
+        .cmp-card-with .cmp-icon {
+            background: #2ecc71;
+            color: #fff;
+        }
+
+        .cmp-card-without .cmp-icon {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        /* &mdash;&ndash; &mdash;&ndash; &mdash;&ndash; &mdash; Ticker at bottom &mdash;&ndash; &mdash;&ndash; &mdash;&ndash; &mdash; */
         .login-ticker {
             position: relative;
             z-index: 10;
@@ -389,6 +523,16 @@ $strip_imgs = [
             .card-logo {
                 width: 68px;
                 height: 68px;
+            }
+
+            .login-compare-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cmp-card {
+                max-width: 100%;
+                width: 100%;
             }
         }
 
@@ -500,6 +644,74 @@ $strip_imgs = [
                 </div>
             </div>
         </div>
+
+        <!-- Comparison Cards -->
+        <section class="login-compare-section" aria-label="Login vs Guest comparison">
+            <p class="login-compare-heading"><i class="fa-solid fa-scale-balanced"></i>&nbsp; What you get</p>
+            <div class="login-compare-row">
+
+                <!-- WITH LOGIN -->
+                <div class="cmp-card cmp-card-with">
+                    <div class="cmp-card-badge">
+                        <i class="fa-solid fa-circle-check"></i> WITH LOGIN
+                    </div>
+                    <div class="cmp-card-title">Logged-in Benefits</div>
+                    <ul class="cmp-list">
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                            <span>Save your prompts permanently</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                            <span>No need to unlock again after refresh</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                            <span>Only <strong>20 taps</strong> required to unlock prompts</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                            <span>Access &amp; purchase premium couple prompts</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-check"></i></span>
+                            <span>Can comment on blog posts</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- WITHOUT LOGIN -->
+                <div class="cmp-card cmp-card-without">
+                    <div class="cmp-card-badge">
+                        <i class="fa-solid fa-circle-xmark"></i> WITHOUT LOGIN
+                    </div>
+                    <div class="cmp-card-title">Guest Limitations</div>
+                    <ul class="cmp-list">
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                            <span>Cannot save prompts permanently</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                            <span>Need to unlock again after refresh</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                            <span><strong>90 taps</strong> required to unlock prompts</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                            <span>Cannot access or purchase premium couple prompts</span>
+                        </li>
+                        <li>
+                            <span class="cmp-icon"><i class="fa-solid fa-xmark"></i></span>
+                            <span>Cannot comment on blog posts</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
 
         <!-- Ticker -->
         <div class="login-ticker">

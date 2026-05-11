@@ -2660,3 +2660,163 @@ footer {
 .search-suggestion { padding: 12px 16px; cursor: pointer; font-weight: 600; border-bottom: 2px solid #eee; transition: all 0.2s; }
 .search-suggestion:hover { background: var(--primary-color); }
 .search-suggestion:last-of-type { border-bottom: none; }
+
+/* ─── Comparison Cards (Used in login & index) ─── */
+.login-compare-section {
+    position: relative;
+    z-index: 5;
+    padding: 0 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.login-compare-heading {
+    font-size: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.login-compare-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 760px;
+    justify-content: center;
+}
+
+.cmp-card {
+    flex: 1;
+    max-width: 360px;
+    background: var(--card-bg);
+    border: 3px solid var(--text-color);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+    box-shadow: 6px 6px 0px var(--text-color);
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+    cursor: default;
+    font-family: var(--font-main);
+    text-align: left;
+}
+
+.cmp-card:hover {
+    transform: translateY(-5px) rotate(-0.5deg);
+    box-shadow: 8px 10px 0px var(--text-color);
+}
+
+.cmp-card:active {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0px var(--text-color);
+}
+
+.cmp-card-with {
+    background: #fffbe8;
+    border-color: var(--text-color);
+}
+
+.cmp-card-without {
+    background: #fff0f0;
+    border-color: var(--text-color);
+}
+
+.cmp-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 2.5px solid var(--text-color);
+    border-radius: 30px;
+    margin-bottom: 16px;
+}
+
+.cmp-card-with .cmp-card-badge {
+    background: #ffe066;
+    color: var(--text-color);
+}
+
+.cmp-card-without .cmp-card-badge {
+    background: #ffb3b3;
+    color: var(--text-color);
+}
+
+.cmp-card-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+}
+
+.cmp-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cmp-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #333;
+}
+
+.cmp-list li > span:not(.cmp-icon) {
+    flex: 1;
+}
+
+.cmp-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-top: 1px;
+}
+
+.cmp-card-with .cmp-icon {
+    background: #2ecc71;
+    color: #fff;
+}
+
+.cmp-card-without .cmp-icon {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Responsive for comparison cards */
+@media (max-width: 600px) {
+    .login-compare-section {
+        padding: 0 16px 30px;
+    }
+    .login-compare-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+    .cmp-card {
+        max-width: 100%;
+        width: 100%;
+        padding: 24px 20px;
+    }
+    .cmp-list li {
+        font-size: 0.9rem;
+    }
+}
