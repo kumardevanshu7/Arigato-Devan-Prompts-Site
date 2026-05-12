@@ -207,10 +207,10 @@ if (isset($_SESSION['user_id'])) {
                         <span id="modal-like-count">0</span>
                     </button>
                     <?php else: ?>
-                    <div class="modal-like-count-display" style="margin-top:12px;">
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" data-guest="true" style="margin-top:12px;">
                         <i class="fa-solid fa-heart"></i>
                         <span id="modal-like-count">0</span>
-                    </div>
+                    </button>
                     <?php endif; ?>
                 </div>
             </div>

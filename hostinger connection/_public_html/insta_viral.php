@@ -289,10 +289,10 @@ if (isset($_SESSION['user_id'])) {
                         <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
                     </button>
                     <?php else: ?>
-                    <div class="modal-like-count-display" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow-comic);">
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" data-guest="true" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
                         <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
                         <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
-                    </div>
+                    </button>
                     <?php endif; ?>
                 </div>
             </div>

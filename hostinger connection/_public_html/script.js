@@ -125,6 +125,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalLikeBtn = document.getElementById('modal-like-btn');
     if (modalLikeBtn) {
         modalLikeBtn.addEventListener('click', function() {
+            // Guest like restriction — show login popup
+            if (this.dataset.guest === 'true') {
+                let popup = document.getElementById('login-like-popup');
+                if (!popup) {
+                    popup = document.createElement('div');
+                    popup.id = 'login-like-popup';
+                    popup.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(45,42,53,.5);backdrop-filter:blur(8px);z-index:3000;align-items:center;justify-content:center;';
+                    popup.innerHTML = '<div style="background:var(--card-bg,#fff);border:3px solid var(--text-color,#2d2a35);border-radius:24px;padding:36px 32px;max-width:400px;width:90%;box-shadow:8px 8px 0 var(--text-color,#2d2a35);text-align:center;">'
+                        + '<div style="font-size:2.5rem;margin-bottom:12px;">\u2764\uFE0F</div>'
+                        + '<h3 style="font-size:1.4rem;font-weight:900;margin-bottom:10px;font-family:var(--font-main,Outfit,sans-serif);">Pehle Login \u2014 Then Like Bacha \uD83D\uDE0F</h3>'
+                        + '<p style="font-weight:600;color:#555;margin-bottom:24px;font-family:var(--font-main,Outfit,sans-serif);">Login karke apna like save karo!</p>'
+                        + '<div style="display:flex;gap:12px;flex-wrap:wrap;">'
+                        + '<button onclick="document.getElementById(\'login-like-popup\').style.display=\'none\'" style="flex:1;padding:14px;background:var(--bg-color,#FDFBF7);border:3px solid var(--text-color,#2d2a35);border-radius:14px;font-family:var(--font-main,Outfit,sans-serif);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:4px 4px 0 var(--text-color,#2d2a35);">Cancel</button>'
+                        + '<a href="login.php" style="flex:1;padding:14px;background:var(--primary-color,#E6D7FF);border:3px solid var(--text-color,#2d2a35);border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:4px 4px 0 var(--text-color,#2d2a35);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-color,#2d2a35);font-family:var(--font-main,Outfit,sans-serif);"><i class="fa-brands fa-google" style="margin-right:8px;"></i> Login with Google</a>'
+                        + '</div></div>';
+                    document.body.appendChild(popup);
+                }
+                popup.style.display = 'flex';
+                return;
+            }
+
             const promptId = this.dataset.promptId;
             if (!promptId) return;
 
