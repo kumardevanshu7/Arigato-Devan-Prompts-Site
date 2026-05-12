@@ -2994,6 +2994,54 @@ footer {
     color: #FF4444 !important;
 }
 
+/* ===== Modal Like Button Base Styles ===== */
+.modal-like-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 70px;
+    padding: 12px 16px;
+    background: var(--card-bg, #fff);
+    border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow-comic, 4px 4px 0 #2d2a35);
+    transition: all 0.2s;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 0.95rem;
+    color: #FF4444;
+    font-weight: 900;
+}
+.modal-like-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0 var(--text-color, #2d2a35);
+}
+.modal-like-btn:active {
+    transform: translateY(0);
+    box-shadow: 2px 2px 0 var(--text-color, #2d2a35);
+}
+.modal-like-btn i {
+    font-size: 1.1rem;
+    color: #FF4444;
+}
+.modal-like-btn span {
+    font-weight: 900;
+    color: #FF4444;
+    font-size: 0.95rem;
+}
+.modal-like-btn.liked-active {
+    background: #ffe0e0;
+}
+.modal-like-btn.popped {
+    animation: likePopAnim 0.3s ease;
+}
+@keyframes likePopAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
 /* ===== Mobile Swipe Hint Box ===== */
 .swipe-hint-box {
     display: none; /* hidden by default — shown only on mobile */
