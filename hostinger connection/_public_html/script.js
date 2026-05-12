@@ -275,27 +275,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 // IVP — Insta Viral: 7-number math challenge
                 // ══════════════════════════════════════════
                 if (pType === 'insta_viral') {
-                    // Simple addition: two 4-digit numbers
-                    const num1 = Math.floor(Math.random() * 9000) + 1000;
-                    const num2 = Math.floor(Math.random() * 9000) + 1000;
-                    const ans  = num1 + num2;
+                    // Simple addition: four numbers between 0 and 10
+                    const n1 = Math.floor(Math.random() * 11);
+                    const n2 = Math.floor(Math.random() * 11);
+                    const n3 = Math.floor(Math.random() * 11);
+                    const n4 = Math.floor(Math.random() * 11);
+                    const ans  = n1 + n2 + n3 + n4;
 
                     // 4 MCQ options — all unique, answer always included
                     let opts = new Set([ans]);
                     while (opts.size < 4) {
-                        const decoy = ans + (Math.floor(Math.random() * 200) - 100);
-                        if (decoy !== ans && decoy > 0) opts.add(decoy);
+                        const decoy = ans + (Math.floor(Math.random() * 10) - 5);
+                        if (decoy !== ans && decoy >= 0) opts.add(decoy);
                     }
                     const options = [...opts].sort(() => Math.random() - 0.5);
 
                     let html = `<p style="font-weight:900;font-size:1.1rem;margin-bottom:12px;color:#d03030;">🧮 MATH CHALLENGE!</p>`;
-                    html += `<p style="font-weight:700;font-size:1.6rem;margin-bottom:18px;letter-spacing:1px;">${num1} + ${num2} = ?</p>`;
+                    html += `<p style="font-weight:700;font-size:1.6rem;margin-bottom:18px;letter-spacing:1px;">${n1} + ${n2} + ${n3} + ${n4} = ?</p>`;
                     html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
                     options.forEach(opt => {
                         html += `<button class="math-opt comic-btn-small" data-ans="${ans}" data-val="${opt}" style="background:var(--secondary-color);color:var(--text-color);font-size:1.1rem;padding:14px 8px;font-weight:900;">${opt}</button>`;
                     });
                     html += `</div>`;
-                    html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Chalo Chalo School jao 😏</div>`;
+                    html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Admission lo school mein... itna sa nhi aata 😂</div>`;
 
                     if (unlockArea) unlockArea.innerHTML = html;
 
@@ -313,8 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     triggerEmojiRain('😂', 15);
                                     // Regenerate after 1.5s on wrong answer
                                     setTimeout(() => {
-                                        const newNum1 = Math.floor(Math.random() * 9000) + 1000;
-                                        const newNum2 = Math.floor(Math.random() * 9000) + 1000;
                                         const card = currentCardElement;
                                         if (card) {
                                             // Re-open with fresh numbers
