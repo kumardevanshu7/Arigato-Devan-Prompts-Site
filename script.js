@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `</div>`;
                     html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Chalo Chalo School jao 😏</div>`;
 
-                    unlockArea.innerHTML = html;
+                    if (unlockArea) unlockArea.innerHTML = html;
 
                     setTimeout(() => {
                         document.querySelectorAll('.math-opt').forEach(btn => {
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const LOVE_THRESHOLD = (typeof isLoggedIn !== 'undefined' && isLoggedIn) ? 20 : 90;
                     let taps = 0;
 
-                    unlockArea.innerHTML = `
+                    if (unlockArea) unlockArea.innerHTML = `
                         <p style="font-weight:900;font-size:1rem;margin-bottom:14px;color:#d03030;">
                             ❤️ Show Some Love to Unlock!
                         </p>
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const LOVE_THRESHOLD = 9; // Strictly 9 taps for everyone
                     let taps = 0;
 
-                    unlockArea.innerHTML = `
+                    if (unlockArea) unlockArea.innerHTML = `
                         <p style="font-weight:900;font-size:1rem;margin-bottom:14px;color:#00509e;">
                             👆 Tap to Unlock Prompt!
                         </p>
@@ -465,11 +465,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(modalReelLink) modalReelLink.href = card.dataset.reel;
                         if(wantCodeSection) wantCodeSection.style.display = 'block';
                     }
-                    unlockArea.innerHTML = `
-                        <p style="font-weight:700;margin-bottom:16px;color:#555;">Enter the secret code to reveal this prompt.</p>
-                        <input type="text" id="unlock-code-input" placeholder="6-Letter Code" maxlength="6">
-                        <button id="submit-code"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt</button>
-                    `;
+                    if (unlockArea) {
+                        unlockArea.innerHTML = `
+                            <p style="font-weight:700;margin-bottom:16px;color:#555;">Enter the secret code to reveal this prompt.</p>
+                            <input type="text" id="unlock-code-input" placeholder="6-Letter Code" maxlength="6">
+                            <button id="submit-code"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt</button>
+                        `;
+                    }
                     const ci  = document.getElementById('unlock-code-input');
                     const scb = document.getElementById('submit-code');
                     if (ci)  { ci.value = ''; ci.focus(); ci.addEventListener('input', e => e.target.value = e.target.value.toUpperCase()); ci.addEventListener('keypress', e => { if(e.key === 'Enter') verifyCode(); }); }
