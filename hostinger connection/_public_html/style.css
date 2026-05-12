@@ -2994,3 +2994,70 @@ footer {
     color: #FF4444 !important;
 }
 
+/* ===== Mobile Swipe Hint Box ===== */
+.swipe-hint-box {
+    display: none; /* hidden by default — shown only on mobile */
+}
+
+@media (max-width: 900px) {
+    .swipe-hint-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: #FFE566;
+        border: 3.5px solid #2d2a35;
+        border-radius: 18px;
+        box-shadow: 5px 5px 0px #2d2a35;
+        padding: 13px 22px;
+        margin: 0 auto 24px;
+        max-width: 88%;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-weight: 900;
+        font-size: 0.95rem;
+        color: #2d2a35;
+        letter-spacing: 0.3px;
+        position: relative;
+        z-index: 2;
+        animation: swipeHintBounce 2.2s ease-in-out infinite;
+        cursor: default;
+        user-select: none;
+    }
+
+    .swipe-hint-box span {
+        flex: 1;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .swipe-hint-arrow {
+        font-size: 1.15rem;
+        color: #e5533c;
+        flex-shrink: 0;
+    }
+
+    .swipe-hint-box .swipe-hint-arrow:first-of-type {
+        animation: arrowSlideLeft 1.2s ease-in-out infinite;
+    }
+
+    .swipe-hint-box .swipe-hint-arrow:last-of-type {
+        animation: arrowSlideRight 1.2s ease-in-out infinite;
+    }
+
+    @keyframes swipeHintBounce {
+        0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+        45%       { transform: translateY(-6px) rotate(0.5deg); }
+        65%       { transform: translateY(-3px) rotate(-0.2deg); }
+    }
+
+    @keyframes arrowSlideLeft {
+        0%, 100% { transform: translateX(0);    opacity: 1; }
+        50%       { transform: translateX(-5px); opacity: 0.5; }
+    }
+
+    @keyframes arrowSlideRight {
+        0%, 100% { transform: translateX(0);   opacity: 1; }
+        50%       { transform: translateX(5px); opacity: 0.5; }
+    }
+}
+

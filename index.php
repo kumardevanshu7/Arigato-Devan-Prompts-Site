@@ -351,6 +351,14 @@ if (isset($_SESSION['user_id'])) {
                 <button class="tag-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
             <?php endforeach; ?>
         </div>
+
+        <!-- Mobile Swipe Hint — only visible on mobile via CSS, hidden on desktop -->
+        <div class="swipe-hint-box" id="swipe-hint-box" aria-label="Swipe instruction">
+            <i class="fa-solid fa-arrow-left swipe-hint-arrow"></i>
+            <span>Swipe right or left to see the cards</span>
+            <i class="fa-solid fa-arrow-right swipe-hint-arrow"></i>
+        </div>
+
         <div class="card-stack-container" id="card-stack">
             <?php if(count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
