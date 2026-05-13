@@ -51,7 +51,11 @@ function sessionAvatar()
     <title>Gallery &mdash; Arigato Devan PromptVerse</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
     <link rel="stylesheet" href="style.css?v=2026051205">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+        <link rel="preconnect" href="https://unpkg.com" crossorigin>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <style>
@@ -198,6 +202,10 @@ function sessionAvatar()
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
         <?php
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
             // Extract all unique tags
             // Map DB prompt_type → UI ptype key
             // Extract all unique tags
@@ -402,7 +410,7 @@ function sessionAvatar()
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
         ? "true"
         : "false" ?>;</script>
-        <script src="script.js?v=2026051205"></script>
+        <script defer src="script.js?v=2026051205"></script>
         <script>
 
         // Background Scroll Logic

@@ -1,33 +1,51 @@
 <?php
 session_start();
-require_once 'db.php';
-$slug = $_GET['slug'] ?? '';
-if (!$slug) { header("Location: blogs.php"); exit(); }
+require_once "db.php";
+$slug = $_GET["slug"] ?? "";
+if (!$slug) {
+    header("Location: blogs.php");
+    exit();
+}
 
-$stmt = $pdo->prepare("SELECT b.*, u.username as author_name, u.avatar as author_avatar FROM blogs b LEFT JOIN users u ON b.author_id=u.id WHERE b.slug=? AND b.is_published=1");
+$stmt = $pdo->prepare(
+    "SELECT b.*, u.username as author_name, u.avatar as author_avatar FROM blogs b LEFT JOIN users u ON b.author_id=u.id WHERE b.slug=? AND b.is_published=1",
+);
 $stmt->execute([$slug]);
 $blog = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$blog) { header("Location: blogs.php"); exit(); }
+if (!$blog) {
+    header("Location: blogs.php");
+    exit();
+}
 
 // Has current user liked?
 $user_liked = false;
-if (isset($_SESSION['user_id'])) {
-    $lk = $pdo->prepare("SELECT id FROM blog_likes WHERE user_id=? AND blog_id=?");
-    $lk->execute([$_SESSION['user_id'], $blog['id']]);
-    $user_liked = (bool)$lk->fetch();
+if (isset($_SESSION["user_id"])) {
+    $lk = $pdo->prepare(
+        "SELECT id FROM blog_likes WHERE user_id=? AND blog_id=?",
+    );
+    $lk->execute([$_SESSION["user_id"], $blog["id"]]);
+    $user_liked = (bool) $lk->fetch();
 }
 
 // Comments
-$comments = $pdo->prepare("SELECT bc.*, u.username, u.avatar as profile_image FROM blog_comments bc LEFT JOIN users u ON bc.user_id=u.id WHERE bc.blog_id=? ORDER BY bc.created_at ASC");
-$comments->execute([$blog['id']]);
+$comments = $pdo->prepare(
+    "SELECT bc.*, u.username, u.avatar as profile_image FROM blog_comments bc LEFT JOIN users u ON bc.user_id=u.id WHERE bc.blog_id=? ORDER BY bc.created_at ASC",
+);
+$comments->execute([$blog["id"]]);
 $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?=htmlspecialchars($blog['meta_title']??$blog['title'])?> "&ndash; Arigato Devan</title>
-<meta name="description" content="<?=htmlspecialchars($blog['meta_description']??$blog['description']??'')?>">
-<?php if($blog['tags']): ?><meta name="keywords" content="<?=htmlspecialchars($blog['tags'])?>"><?php endif; ?>
+<title><?= htmlspecialchars(
+    $blog["meta_title"] ?? $blog["title"],
+) ?> "&ndash; Arigato Devan</title>
+<meta name="description" content="<?= htmlspecialchars(
+    $blog["meta_description"] ?? ($blog["description"] ?? ""),
+) ?>">
+<?php if ($blog["tags"]): ?><meta name="keywords" content="<?= htmlspecialchars(
+    $blog["tags"],
+) ?>"><?php endif; ?>
 <link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 .blog-detail-wrap{max-width:800px;margin:0 auto;padding:48px 32px 100px}
@@ -42,7 +60,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 /* Paper Notebook Styling */
 .blog-paper {
     background-color: #FDFBF7 !important;
-    background-image: 
+    background-image:
         linear-gradient(90deg, transparent 55px, #ff9999 55px, #ff9999 57px, transparent 57px),
         repeating-linear-gradient(transparent, transparent calc(2rem - 2px), #EAE3F2 calc(2rem - 2px), #EAE3F2 2rem) !important;
     background-attachment: local !important;
@@ -95,7 +113,11 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 .login-to-comment a{color:var(--primary-dark);font-weight:900;text-decoration:none}
 @media(max-width:600px){.blog-detail-wrap{padding:28px 16px 80px}.blog-action-bar{flex-wrap:wrap}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
@@ -124,12 +146,45 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-                <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+                <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
                 <div class="nav-dropdown-menu">
-                    <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                    <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
                 </div>
             </div>
     <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -139,11 +194,20 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   </nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <?php if(isset($_SESSION['user_id'])): ?>
-      <?php if($_SESSION['role']==='admin'): ?>
-        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <?php if (isset($_SESSION["user_id"])): ?>
+      <?php if ($_SESSION["role"] === "admin"): ?>
+        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+            $_SESSION["profile_image"] ?? "",
+            "admin-avatar",
+            "Admin",
+            'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+        ) ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
       <?php else: ?>
-        <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile') ?></a>
+        <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar(
+            $_SESSION["profile_image"] ?? "",
+            "admin-avatar",
+            "Profile",
+        ) ?></a>
       <?php endif; ?>
       <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
     <?php else: ?>
@@ -157,57 +221,91 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
 
   <!-- Hero image -->
-  <?php if($blog['image_path']): ?>
-  <img src="<?=htmlspecialchars($blog['image_path'])?>" class="blog-detail-hero-img" alt="<?=htmlspecialchars($blog['title'])?>">
+  <?php if ($blog["image_path"]): ?>
+  <img src="<?= htmlspecialchars(
+      $blog["image_path"],
+  ) ?>" class="blog-detail-hero-img" alt="<?= htmlspecialchars(
+    $blog["title"],
+) ?>">
   <?php endif; ?>
 
   <div class="blog-paper">
   <!-- Title -->
-  <h1 class="blog-detail-title"><?=htmlspecialchars($blog['title'])?></h1>
+  <h1 class="blog-detail-title"><?= htmlspecialchars($blog["title"]) ?></h1>
 
   <!-- Meta -->
   <div class="blog-detail-meta">
-    <img src="<?=htmlspecialchars(!empty($blog['author_avatar']) ? $blog['author_avatar'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed='.urlencode($blog['author_name']??'Admin'))?>" class="blog-author-avatar" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?=urlencode($blog['author_name']??'Admin')?>'">
+    <img src="<?= htmlspecialchars(
+        !empty($blog["author_avatar"])
+            ? $blog["author_avatar"]
+            : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
+                urlencode($blog["author_name"] ?? "Admin"),
+    ) ?>" class="blog-author-avatar" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode(
+    $blog["author_name"] ?? "Admin",
+) ?>'">
     <div>
-      <div class="blog-author-name"><?=htmlspecialchars($blog['author_name']??'Admin')?></div>
-      <div class="blog-detail-date"><?=date('d M Y', strtotime($blog['created_at']))?></div>
+      <div class="blog-author-name"><?= htmlspecialchars(
+          $blog["author_name"] ?? "Admin",
+      ) ?></div>
+      <div class="blog-detail-date"><?= date(
+          "d M Y",
+          strtotime($blog["created_at"]),
+      ) ?></div>
     </div>
   </div>
 
   <!-- Tags -->
-  <?php if($blog['tags']): ?>
+  <?php if ($blog["tags"]): ?>
   <div class="blog-tags">
-    <?php foreach(array_filter(array_map('trim', explode(',', $blog['tags']))) as $tag): ?>
-    <span class="blog-tag"><?=htmlspecialchars($tag)?></span>
+    <?php foreach (
+        array_filter(array_map("trim", explode(",", $blog["tags"])))
+        as $tag
+    ): ?>
+    <span class="blog-tag"><?= htmlspecialchars($tag) ?></span>
     <?php endforeach; ?>
   </div>
   <?php endif; ?>
 
   <!-- Content -->
-  <div class="blog-content"><?= $blog['content'] /* HTML stored from editor "&ndash; safe because only admin writes it */ ?></div>
+  <div class="blog-content"><?= $blog["content"]
+/* HTML stored from editor "&ndash; safe because only admin writes it */
+?></div>
 
   <!-- Like + action bar -->
   <div class="blog-action-bar">
-    <button class="blog-like-btn <?=$user_liked?'liked':''?>" id="blog-like-btn" data-blog-id="<?=$blog['id']?>">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="<?=$user_liked?'#fff':'none'?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      <span id="blog-like-count"><?=(int)$blog['likes_count']?></span> Likes
+    <button class="blog-like-btn <?= $user_liked
+        ? "liked"
+        : "" ?>" id="blog-like-btn" data-blog-id="<?= $blog["id"] ?>">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="<?= $user_liked
+          ? "#fff"
+          : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
     </button>
     <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> All Blogs</a>
   </div>
 
   <!-- Comments -->
   <div class="comments-section">
-    <h3><i class="fa-solid fa-comment"></i> Comments (<?=count($comments)?>)</h3>
+    <h3><i class="fa-solid fa-comment"></i> Comments (<?= count(
+        $comments,
+    ) ?>)</h3>
 
-    <?php if(count($comments) > 0): ?>
+    <?php if (count($comments) > 0): ?>
     <div id="comments-list">
-      <?php foreach($comments as $c): ?>
+      <?php foreach ($comments as $c): ?>
       <div class="comment-item">
-        <?= renderAvatar($c['profile_image'] ?? '', 'comment-avatar', '') ?>
+        <?= renderAvatar($c["profile_image"] ?? "", "comment-avatar", "") ?>
         <div class="comment-body">
-          <div class="comment-name"><?=htmlspecialchars($c['username']??'User')?></div>
-          <div class="comment-text"><?=nl2br(htmlspecialchars($c['comment']))?></div>
-          <div class="comment-time"><?=date('d M Y H:i', strtotime($c['created_at']))?></div>
+          <div class="comment-name"><?= htmlspecialchars(
+              $c["username"] ?? "User",
+          ) ?></div>
+          <div class="comment-text"><?= nl2br(
+              htmlspecialchars($c["comment"]),
+          ) ?></div>
+          <div class="comment-time"><?= date(
+              "d M Y H:i",
+              strtotime($c["created_at"]),
+          ) ?></div>
         </div>
       </div>
       <?php endforeach; ?>
@@ -216,10 +314,12 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
     <p id="no-comments-msg" style="color:#aaa;font-weight:600;margin-bottom:20px;">Be the first to comment! <i class="fa-solid fa-hand-point-down"></i></p>
     <?php endif; ?>
 
-    <?php if(isset($_SESSION['user_id'])): ?>
+    <?php if (isset($_SESSION["user_id"])): ?>
     <div class="comment-form">
       <textarea id="comment-input" placeholder="Share your thoughts..."></textarea>
-      <button class="comment-submit" id="comment-submit-btn" data-blog-id="<?=$blog['id']?>">Post Comment <i class="fa-solid fa-paper-plane"></i></button>
+      <button class="comment-submit" id="comment-submit-btn" data-blog-id="<?= $blog[
+          "id"
+      ] ?>">Post Comment <i class="fa-solid fa-paper-plane"></i></button>
     </div>
     <?php else: ?>
     <div class="login-to-comment">Login to leave a comment <i class="fa-solid fa-arrow-right"></i> <a href="login.php">Sign in with Google</a></div>
@@ -232,13 +332,13 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script src="script.js?v=1778000000"></script>
+<script defer src="script.js?v=1778000000"></script>
 <script>
 // Blog Like
 const likeBtn = document.getElementById('blog-like-btn');
 if (likeBtn) {
   likeBtn.addEventListener('click', () => {
-    <?php if(!isset($_SESSION['user_id'])): ?>
+    <?php if (!isset($_SESSION["user_id"])): ?>
     alert('Login first to like!'); return;
     <?php endif; ?>
     const blogId = likeBtn.dataset.blogId;
@@ -296,7 +396,7 @@ if (submitBtn) {
                 if (!ticking) {
                     window.requestAnimationFrame(() => {
                         const scrollPos = window.scrollY;
-                        const pixelsPerLayer = 500; 
+                        const pixelsPerLayer = 500;
                         let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
                         if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
                         bgLayers.forEach((layer, index) => {
@@ -311,22 +411,3 @@ if (submitBtn) {
         }
 </script>
 </body></html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -33,7 +33,11 @@ if (isset($_SESSION["user_id"])) {
 <title>Insta Viral Reels &mdash; PromptVerse</title>
 <meta name="description" content="Insta Viral Reels &mdash; Coming Soon on PromptVerse.">
 <link rel="stylesheet" href="style.css?v=2026051205">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 <style>
@@ -243,6 +247,14 @@ if (isset($_SESSION["user_id"])) {
     // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
     else: ?>
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
@@ -373,7 +385,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script src="script.js?v=2026051205"></script>
+<script defer src="script.js?v=2026051205"></script>
 <script>
 // Scrolling background
 const bgLayers = document.querySelectorAll('.bg-layer');

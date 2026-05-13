@@ -32,7 +32,11 @@ if (isset($_SESSION["user_id"])) {
 <title>Already Uploaded Prompts &mdash; PromptVerse</title>
 <meta name="description" content="Unlock prompts previously shared on Instagram with just 9 taps!">
 <link rel="stylesheet" href="style.css?v=2026051205">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -150,6 +154,8 @@ if (isset($_SESSION["user_id"])) {
             <p style="color:#888;font-weight:600;">Already uploaded reels will appear here when the admin adds them!</p>
         </div>
     <?php
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         else: ?>
@@ -297,7 +303,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script src="script.js?v=2026051205"></script>
+<script defer src="script.js?v=2026051205"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');

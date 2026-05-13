@@ -1,24 +1,32 @@
 <?php
 session_start();
-require_once 'db.php';
-if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
-    header("Location: onboarding.php"); exit();
+require_once "db.php";
+if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
+    header("Location: onboarding.php");
+    exit();
 }
 
 // Fetch published blogs with author info
-$blogs = $pdo->query("
+$blogs = $pdo
+    ->query(
+        "
     SELECT b.*, u.username as author_name, u.avatar as author_avatar
     FROM blogs b
     LEFT JOIN users u ON b.author_id = u.id
     WHERE b.is_published = 1
     ORDER BY b.created_at DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
 
 // Extract all unique tags for filter
 $all_tags = [];
 foreach ($blogs as $b) {
-    if ($b['tags']) {
-        foreach (array_filter(array_map('trim', explode(',', $b['tags']))) as $tag) {
+    if ($b["tags"]) {
+        foreach (
+            array_filter(array_map("trim", explode(",", $b["tags"])))
+            as $tag
+        ) {
             $all_tags[$tag] = ($all_tags[$tag] ?? 0) + 1;
         }
     }
@@ -318,6 +326,10 @@ arsort($all_tags);
     .blogs-grid { column-count: 1; }
 }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -347,12 +359,45 @@ arsort($all_tags);
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-                <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+                <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
                 <div class="nav-dropdown-menu">
-                    <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                    <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
                 </div>
             </div>
     <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -364,11 +409,20 @@ arsort($all_tags);
   </nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <?php if(isset($_SESSION['user_id'])): ?>
-      <?php if($_SESSION['role']==='admin'): ?>
-        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <?php if (isset($_SESSION["user_id"])): ?>
+      <?php if ($_SESSION["role"] === "admin"): ?>
+        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+            $_SESSION["profile_image"] ?? "",
+            "admin-avatar",
+            "Admin",
+            'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+        ) ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
       <?php else: ?>
-        <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile') ?></a>
+        <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar(
+            $_SESSION["profile_image"] ?? "",
+            "admin-avatar",
+            "Profile",
+        ) ?></a>
       <?php endif; ?>
       <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
     <?php else: ?>
@@ -384,16 +438,22 @@ arsort($all_tags);
   <p>Tips, stories, and ideas to fuel your creative AI journey.</p>
 </div>
 
-<?php if(count($blogs) === 0): ?>
+<?php if (count($blogs) === 0): ?>
 <div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet &mdash; check back soon!</div>
 <?php else: ?>
 
 <!-- Tag Filter -->
-<?php if(!empty($all_tags)): ?>
+<?php if (!empty($all_tags)): ?>
 <div class="tag-filter-wrap" id="tag-filters">
   <button class="tag-pill active" data-tag="all" onclick="filterByTag('all', this)">ALL</button>
-  <?php foreach($all_tags as $tag => $count): ?>
-  <button class="tag-pill" data-tag="<?=htmlspecialchars(strtolower($tag))?>" onclick="filterByTag('<?=htmlspecialchars(strtolower($tag))?>', this)"><?=htmlspecialchars($tag)?> <span style="opacity:.5;font-size:.7em;"><?=$count?></span></button>
+  <?php foreach ($all_tags as $tag => $count): ?>
+  <button class="tag-pill" data-tag="<?= htmlspecialchars(
+      strtolower($tag),
+  ) ?>" onclick="filterByTag('<?= htmlspecialchars(
+    strtolower($tag),
+) ?>', this)"><?= htmlspecialchars(
+    $tag,
+) ?> <span style="opacity:.5;font-size:.7em;"><?= $count ?></span></button>
   <?php endforeach; ?>
 </div>
 <?php endif; ?>
@@ -401,40 +461,62 @@ arsort($all_tags);
 <div class="blogs-wrap">
 
   <div class="blogs-grid" id="blogs-grid">
-    <?php foreach($blogs as $b): 
-      $ratio_class = ($b['image_ratio']??'16:9') === '9:16' ? 'ratio-9-16' : 'ratio-16-9';
-      $short_preview = mb_substr(strip_tags($b['content']), 0, 60) . '...';
-    ?>
-    <a href="blog.php?slug=<?=urlencode($b['slug'])?>" class="blog-card"
-       data-tags="<?=htmlspecialchars(strtolower($b['tags']??''))?>">
-      <?php if($b['image_path']): ?>
-        <img src="<?=htmlspecialchars($b['image_path'])?>" class="blog-card-img <?=$ratio_class?>" alt="<?=htmlspecialchars($b['title'])?>" loading="lazy">
+    <?php foreach ($blogs as $b):
+
+        $ratio_class =
+            ($b["image_ratio"] ?? "16:9") === "9:16"
+                ? "ratio-9-16"
+                : "ratio-16-9";
+        $short_preview = mb_substr(strip_tags($b["content"]), 0, 60) . "...";
+        ?>
+    <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
+       data-tags="<?= htmlspecialchars(strtolower($b["tags"] ?? "")) ?>">
+      <?php if ($b["image_path"]): ?>
+        <img src="<?= htmlspecialchars(
+            $b["image_path"],
+        ) ?>" class="blog-card-img <?= $ratio_class ?>" alt="<?= htmlspecialchars(
+    $b["title"],
+) ?>" loading="lazy">
       <?php else: ?>
-        <div class="blog-card-img-placeholder <?=$ratio_class?>"><i class="fa-solid fa-image"></i></div>
+        <div class="blog-card-img-placeholder <?= $ratio_class ?>"><i class="fa-solid fa-image"></i></div>
       <?php endif; ?>
       <div class="blog-card-body">
-        <?php if($b['tags']): ?>
-          <div class="blog-card-tag"><?=htmlspecialchars(explode(',', $b['tags'])[0])?></div>
+        <?php if ($b["tags"]): ?>
+          <div class="blog-card-tag"><?= htmlspecialchars(
+              explode(",", $b["tags"])[0],
+          ) ?></div>
         <?php endif; ?>
-        <div class="blog-card-title"><?=htmlspecialchars($b['title'])?></div>
-        
-        <div class="blog-card-desc"><?=htmlspecialchars($short_preview)?></div>
-        
+        <div class="blog-card-title"><?= htmlspecialchars($b["title"]) ?></div>
+
+        <div class="blog-card-desc"><?= htmlspecialchars(
+            $short_preview,
+        ) ?></div>
+
         <div class="blog-card-meta">
           <div class="blog-card-meta-left">
-            <img src="<?=htmlspecialchars($b['author_avatar']??'https://api.dicebear.com/7.x/avataaars/svg?seed=x')?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
-            <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($b['author_name']??'Admin')?></span>
+            <img src="<?= htmlspecialchars(
+                $b["author_avatar"] ??
+                    "https://api.dicebear.com/7.x/avataaars/svg?seed=x",
+            ) ?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
+            <span style="color:var(--text-color);font-weight:800;"><?= htmlspecialchars(
+                $b["author_name"] ?? "Admin",
+            ) ?></span>
             <span>&middot;</span>
-            <span><?=date('d M Y', strtotime($b['created_at']))?></span>
+            <span><?= date("d M Y", strtotime($b["created_at"])) ?></span>
           </div>
           <div>
-            <span class="blog-card-likes" style="margin-right:8px;"><i class="fa-solid fa-heart"></i> <?=(int)$b['likes_count']?></span>
-            <span class="blog-card-likes"><i class="fa-solid fa-eye"></i> <?=(int)($b['views_count']??0)?></span>
+            <span class="blog-card-likes" style="margin-right:8px;"><i class="fa-solid fa-heart"></i> <?= (int) $b[
+                "likes_count"
+            ] ?></span>
+            <span class="blog-card-likes"><i class="fa-solid fa-eye"></i> <?= (int) ($b[
+                "views_count"
+            ] ?? 0) ?></span>
           </div>
         </div>
       </div>
     </a>
-    <?php endforeach; ?>
+    <?php
+    endforeach; ?>
   </div>
   <!-- No results message -->
   <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#7D7887;font-weight:700;font-size:1.1rem;">
@@ -452,7 +534,7 @@ arsort($all_tags);
   </div>
 </footer>
 
-<script src="script.js?v=177853384400519"></script>
+<script defer src="script.js?v=1778000000"></script>
 <script>
 function filterByTag(tag, btn) {
   // Update active pill
@@ -496,7 +578,7 @@ function filterByTag(tag, btn) {
         if (bgLayers.length > 0) {
             window.addEventListener('scroll', () => {
                 const scrollPos = window.scrollY;
-                const pixelsPerLayer = 500; 
+                const pixelsPerLayer = 500;
                 let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
                 if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
                 bgLayers.forEach((layer, index) => {
@@ -507,20 +589,3 @@ function filterByTag(tag, btn) {
         }
 </script>
 </body></html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,58 @@
+# ─── Gzip / Deflate Compression ─────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE font/woff2
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE application/font-woff2
+</IfModule>
+
+# ─── Browser Caching ─────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images — 30 days
+    ExpiresByType image/webp             "access plus 30 days"
+    ExpiresByType image/jpeg             "access plus 30 days"
+    ExpiresByType image/png              "access plus 30 days"
+    ExpiresByType image/gif              "access plus 30 days"
+    ExpiresByType image/svg+xml          "access plus 30 days"
+
+    # CSS + JS — 7 days
+    ExpiresByType text/css               "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType text/javascript        "access plus 7 days"
+
+    # Fonts — 30 days
+    ExpiresByType font/woff2             "access plus 30 days"
+    ExpiresByType font/woff              "access plus 30 days"
+    ExpiresByType application/font-woff2 "access plus 30 days"
+</IfModule>
+
+# ─── Cache-Control Headers ───────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|jpg|jpeg|png|gif|svg)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "max-age=604800, public"
+    </FilesMatch>
+    <FilesMatch "\.(woff2|woff)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+
+    # Basic Security Headers (bonus — low effort, good security)
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ─── PHP file — no caching (always fresh) ────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>

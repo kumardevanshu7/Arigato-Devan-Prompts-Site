@@ -35,10 +35,14 @@ if (isset($_SESSION["user_id"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan - PromptVerse</title>
-    <link rel="stylesheet" href="style.css?v=2026051205">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+        <link rel="preconnect" href="https://unpkg.com" crossorigin>
+        <link rel="stylesheet" href="style.css?v=2026051205">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <!-- Preload first 3 prompt images for faster perceived loading -->
     <?php if (isset($prompts) && is_array($prompts)) {
@@ -454,6 +458,8 @@ if (isset($_SESSION["user_id"])) {
             <?php
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
                 else: ?>
                 <?php foreach ($prompts as $index => $p):
 
@@ -627,8 +633,8 @@ if (isset($_SESSION["user_id"])) {
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
         ? "true"
         : "false" ?>;</script>
-        <script src="script.js?v=2026051205"></script>
-        <script>
+        <script defer src="script.js?v=2026051205"></script>
+                <script>
 
         // Background Scroll Logic
         const bgLayers = document.querySelectorAll('.bg-layer');

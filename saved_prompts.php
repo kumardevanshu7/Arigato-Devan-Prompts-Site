@@ -1,20 +1,20 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Must be logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
 }
 
 // Onboarding check
-if (empty($_SESSION['onboarding_complete'])) {
+if (empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
 }
 
-$user_id = (int)$_SESSION['user_id'];
+$user_id = (int) $_SESSION["user_id"];
 
 // Fetch all prompts this user has saved/unlocked
 $stmt = $pdo->prepare("
@@ -27,15 +27,35 @@ $stmt = $pdo->prepare("
     WHERE up.user_id = :uid2
     ORDER BY up.created_at DESC
 ");
-$stmt->execute([':uid' => $user_id, ':uid2' => $user_id]);
+$stmt->execute([":uid" => $user_id, ":uid2" => $user_id]);
 $saved = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $total = count($saved);
 
 $type_map = [
-    'secret'           => ['emoji'=>'🔒', 'label'=>'Secret Code',     'bg'=>'#ffe3e3', 'color'=>'#d03030'],
-    'unreleased'       => ['emoji'=>'🌙', 'label'=>'Unreleased',       'bg'=>'#fff4cc', 'color'=>'#7a5800'],
-    'insta_viral'      => ['emoji'=>'🔥', 'label'=>'Insta Viral',      'bg'=>'#e3f7ff', 'color'=>'#004f7a'],
-    'already_uploaded' => ['emoji'=>'📤', 'label'=>'Already Uploaded', 'bg'=>'#e6f2ff', 'color'=>'#00509e'],
+    "secret" => [
+        "emoji" => "🔒",
+        "label" => "Secret Code",
+        "bg" => "#ffe3e3",
+        "color" => "#d03030",
+    ],
+    "unreleased" => [
+        "emoji" => "🌙",
+        "label" => "Unreleased",
+        "bg" => "#fff4cc",
+        "color" => "#7a5800",
+    ],
+    "insta_viral" => [
+        "emoji" => "🔥",
+        "label" => "Insta Viral",
+        "bg" => "#e3f7ff",
+        "color" => "#004f7a",
+    ],
+    "already_uploaded" => [
+        "emoji" => "📤",
+        "label" => "Already Uploaded",
+        "bg" => "#e6f2ff",
+        "color" => "#00509e",
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -45,7 +65,11 @@ $type_map = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saved Prompts — PromptVerse</title>
     <link rel="stylesheet" href="style.css?v=1778100000">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+        <link rel="preconnect" href="https://unpkg.com" crossorigin>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
@@ -66,8 +90,8 @@ $type_map = [
 
 <!-- Background -->
 <div class="scroll-bg-container" aria-hidden="true">
-    <?php for($i=1; $i<=4; $i++): ?>
-    <div class="bg-layer" style="background-image:url('landingpics/lan<?=$i?>.webp');"></div>
+    <?php for ($i = 1; $i <= 4; $i++): ?>
+    <div class="bg-layer" style="background-image:url('landingpics/lan<?= $i ?>.webp');"></div>
     <?php endfor; ?>
 </div>
 <div class="bg-creamy-overlay" aria-hidden="true"></div>
@@ -91,7 +115,11 @@ $type_map = [
     <div class="header-right">
         <div class="header-divider"></div>
         <a href="profile.php" style="color:var(--text-color)">
-            <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile') ?>
+            <?= renderAvatar(
+                $_SESSION["profile_image"] ?? "",
+                "admin-avatar",
+                "Profile",
+            ) ?>
         </a>
         <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
     </div>
@@ -118,24 +146,34 @@ $type_map = [
     <?php else: ?>
     <div class="sp-grid gallery-grid">
         <?php foreach ($saved as $p):
-            $pt    = $p['prompt_type'] ?? 'secret';
-            $tinfo = $type_map[$pt] ?? $type_map['secret'];
-            $tags  = array_map('trim', explode(',', strtolower($p['tag'])));
-        ?>
+
+            $pt = $p["prompt_type"] ?? "secret";
+            $tinfo = $type_map[$pt] ?? $type_map["secret"];
+            $tags = array_map("trim", explode(",", strtolower($p["tag"])));
+            ?>
         <div class="card"
-             data-id="<?= $p['id'] ?>"
-             data-image="<?= htmlspecialchars($p['image_path']) ?>"
-             data-title="<?= htmlspecialchars($p['title']) ?>"
+             data-id="<?= $p["id"] ?>"
+             data-image="<?= htmlspecialchars($p["image_path"]) ?>"
+             data-title="<?= htmlspecialchars($p["title"]) ?>"
              data-prompt-type="<?= htmlspecialchars($pt) ?>"
              data-unlocked="true"
-             data-prompt-text="<?= htmlspecialchars($p['prompt_text']) ?>"
-             data-tags="<?= htmlspecialchars(implode(',', $tags)) ?>"
+             data-prompt-text="<?= htmlspecialchars($p["prompt_text"]) ?>"
+             data-tags="<?= htmlspecialchars(implode(",", $tags)) ?>"
              data-reel="">
 
-            <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
+            <img src="<?= htmlspecialchars(
+                $p["image_path"],
+            ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
+    $p["title"],
+) ?>" loading="lazy">
 
-            <span class="card-type-badge <?= ['secret'=>'scp','unreleased'=>'urp','insta_viral'=>'ivp','already_uploaded'=>'aup'][$pt] ?? 'scp' ?>" style="font-size:.55rem;padding:2px 6px;">
-                <?= $tinfo['emoji'] ?> <?= $tinfo['label'] ?>
+            <span class="card-type-badge <?= [
+                "secret" => "scp",
+                "unreleased" => "urp",
+                "insta_viral" => "ivp",
+                "already_uploaded" => "aup",
+            ][$pt] ?? "scp" ?>" style="font-size:.55rem;padding:2px 6px;">
+                <?= $tinfo["emoji"] ?> <?= $tinfo["label"] ?>
             </span>
 
             <div class="card-lock-icon" style="background:var(--primary-color);">
@@ -144,16 +182,23 @@ $type_map = [
 
             <div class="card-click-trigger"></div>
             <div class="card-content-overlay">
-                <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
+                <div class="card-title"><?= htmlspecialchars(
+                    $p["title"],
+                ) ?></div>
                 <div class="card-like-display"
-                     data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>"
-                     data-prompt-id="<?= $p['id'] ?>">
-                    <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                    <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                     data-liked="<?= $p["is_liked"] ? "true" : "false" ?>"
+                     data-prompt-id="<?= $p["id"] ?>">
+                    <i class="fa-solid fa-heart <?= $p["is_liked"]
+                        ? "liked-heart"
+                        : "" ?>"></i>
+                    <span class="like-count"><?= (int) $p[
+                        "likes_count"
+                    ] ?></span>
                 </div>
             </div>
         </div>
-        <?php endforeach; ?>
+        <?php
+        endforeach; ?>
     </div>
     <?php endif; ?>
 </div>
@@ -174,7 +219,7 @@ $type_map = [
                 <div class="modal-action-buttons" style="display:flex;gap:10px;flex-wrap:wrap;">
                     <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
                 </div>
-                <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if (isset($_SESSION["user_id"])): ?>
                 <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
                     <i class="fa-solid fa-heart"></i>
                     <span id="modal-like-count">0</span>
@@ -190,7 +235,9 @@ $type_map = [
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
-<script src="script.js?v=2026051206"></script>
+<script>const isLoggedIn = <?= isset($_SESSION["user_id"])
+    ? "true"
+    : "false" ?>;</script>
+<script defer src="script.js?v=2026051206"></script>
 </body>
 </html>
