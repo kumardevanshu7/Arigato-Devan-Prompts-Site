@@ -552,6 +552,7 @@ $strip_imgs = [
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
+    <?php include_once 'gtag.php'; ?>
 </head>
 
 <body>

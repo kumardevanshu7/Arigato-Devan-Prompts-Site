@@ -85,6 +85,7 @@ $type_map = [
         .sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
         @media (max-width: 600px) { .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .sp-wrap { padding: 20px 14px 80px; } }
     </style>
+    <?php include_once 'gtag.php'; ?>
 </head>
 <body>
 

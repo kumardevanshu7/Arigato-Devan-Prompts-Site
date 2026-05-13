@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+# Block admin & private pages from Google
+Disallow: /dashboard.php
+Disallow: /analytics.php
+Disallow: /manage_prompts.php
+Disallow: /upload_prompt.php
+Disallow: /upload.php
+Disallow: /edit_prompt.php
+Disallow: /delete_prompt.php
+Disallow: /blog_admin.php
+Disallow: /blog_create.php
+Disallow: /blog_edit.php
+Disallow: /blog_delete.php
+Disallow: /blog_toggle.php
+Disallow: /prompt_links.php
+Disallow: /onboarding.php
+Disallow: /saved_prompts.php
+Disallow: /profile.php
+Disallow: /firebase_auth.php
+Disallow: /unlock.php
+Disallow: /like.php
+Disallow: /save_prompt.php
+Disallow: /get_prompt.php
+Disallow: /user_data.php
+Disallow: /db.php
+Disallow: /uploads/
+Disallow: /profiledp/
+
+# Sitemap location
+Sitemap: https://arigatodevan.com/sitemap.xml

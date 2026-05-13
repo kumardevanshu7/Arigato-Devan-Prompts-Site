@@ -116,6 +116,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 .size-sm .polaroid,.size-md .polaroid,.size-lg .polaroid{width:240px}
 }
 </style>
+    <?php include_once 'gtag.php'; ?>
 </head>
 <body>
 <div class="pg-bg"></div>

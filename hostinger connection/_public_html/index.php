@@ -53,6 +53,7 @@ if (isset($_SESSION["user_id"])) {
                 "\n";
         }
     } ?>
+    <?php include_once 'gtag.php'; ?>
 </head>
 <body>
 

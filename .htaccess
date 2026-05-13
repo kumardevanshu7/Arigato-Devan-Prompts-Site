@@ -1,3 +1,9 @@
+# ─── sitemap.xml → sitemap.php ──────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
+</IfModule>
+
 # ─── Gzip / Deflate Compression ─────────────────────────────────────────────
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html

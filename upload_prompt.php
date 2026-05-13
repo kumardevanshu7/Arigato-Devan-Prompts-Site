@@ -53,6 +53,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .type-card.selected-uploaded { background: #e6f2ff; border-color: #00509e; color: #00509e; box-shadow: 4px 4px 0 #00509e; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <?php include_once 'gtag.php'; ?>
 </head>
 <body>
     <header>

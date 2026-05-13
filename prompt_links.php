@@ -205,6 +205,7 @@ $total = count($prompts);
             .pl-title-cell { max-width: 140px; }
         }
     </style>
+    <?php include_once 'gtag.php'; ?>
 </head>
 <body>
 
