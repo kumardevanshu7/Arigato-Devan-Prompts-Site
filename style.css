@@ -3682,3 +3682,220 @@ footer {
         }
     }
 }
+
+/* ===== Prompt of the Day ===== */
+.potd-section {
+    position: relative;
+    z-index: 2;
+}
+/* ===== Prompt of the Day ===== */
+.potd-section {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.potd-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--secondary-color);
+    border: var(--border-width) solid var(--text-color);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    box-shadow: var(--shadow-comic);
+    margin-bottom: 14px;
+}
+.potd-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    padding: 28px 32px;
+}
+/* Floating heart decorations */
+.potd-heart {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+    user-select: none;
+}
+.ph1 {
+    font-size: 2rem;
+    top: -10px;
+    right: 10px;
+    color: #e74c3c;
+}
+.ph2 {
+    font-size: 1.3rem;
+    top: 16px;
+    left: -18px;
+    color: #ff9f43;
+}
+.ph3 {
+    font-size: 0.85rem;
+    top: 0px;
+    left: 50px;
+    color: #c6adfa;
+}
+.ph4 {
+    font-size: 1.9rem;
+    bottom: -8px;
+    right: -8px;
+    color: #ff6b9d;
+}
+.ph5 {
+    font-size: 1rem;
+    bottom: 24px;
+    left: -10px;
+    color: #ffd32a;
+}
+.ph6 {
+    font-size: 0.7rem;
+    top: 50%;
+    right: -18px;
+    color: #e74c3c;
+}
+.ph7 {
+    font-size: 1.5rem;
+    bottom: 6px;
+    left: 32px;
+    color: #c6adfa;
+}
+/* The card itself */
+.potd-card {
+    position: relative !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 200px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    border-radius: 24px !important;
+    border: 3px solid var(--text-color) !important;
+    box-shadow: 5px 5px 0px var(--text-color) !important;
+    background: var(--card-bg) !important;
+    overflow: hidden !important;
+    outline: 4px solid var(--secondary-color);
+    outline-offset: 3px;
+    cursor: pointer;
+    transition:
+        transform 0.18s,
+        box-shadow 0.18s;
+    top: unset !important;
+    left: unset !important;
+    z-index: 2 !important;
+}
+.potd-card:hover {
+    transform: translate(-2px, -2px) !important;
+    box-shadow: 7px 7px 0px var(--text-color) !important;
+}
+/* Left: inset portrait image */
+.potd-img-wrap {
+    width: 128px;
+    flex-shrink: 0;
+    margin: 12px 0 12px 12px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2.5px solid var(--text-color);
+    position: relative;
+}
+.potd-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.potd-lock-icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #fff;
+    border: 2px solid var(--text-color);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Right: info */
+.potd-info {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 9px;
+    flex: 1;
+    min-width: 0;
+}
+.potd-title {
+    font-weight: 900;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: var(--text-color);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.potd-likes-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.potd-type-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    border: 2px solid var(--text-color);
+    border-radius: 8px;
+    padding: 2px 9px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    width: fit-content;
+}
+.potd-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--secondary-color);
+    border: 2px solid var(--text-color);
+    border-radius: 10px;
+    padding: 6px 13px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    font-family: var(--font-main);
+    box-shadow: 2px 2px 0px var(--text-color);
+    width: fit-content;
+    color: var(--text-color);
+    cursor: pointer;
+}
+@media (max-width: 500px) {
+    .potd-wrapper {
+        padding: 22px 20px;
+    }
+    .potd-img-wrap {
+        width: 95px;
+    }
+    .potd-title {
+        font-size: 0.9rem;
+    }
+    .potd-cta {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+    .pb1 {
+        width: 38px;
+        height: 38px;
+    }
+    .pb4 {
+        width: 32px;
+        height: 32px;
+    }
+}

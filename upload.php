@@ -40,6 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: upload_prompt.php");
             exit();
         }
+        if (empty($reel_link)) {
+            $_SESSION["error_msg"] =
+                "Reel Link is required for Secret Code type.";
+            header("Location: upload_prompt.php");
+            exit();
+        }
     } else {
         // No code needed for unreleased / insta_viral
         $unlock_code = "XXXXXX";

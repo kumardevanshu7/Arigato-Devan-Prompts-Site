@@ -27,6 +27,49 @@ if (isset($_SESSION["user_id"])) {
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Featured Prompt of the Day
+$featuredPrompt = null;
+try {
+    if (isset($_SESSION["user_id"])) {
+        $fStmt = $pdo->prepare("
+            SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+                   IF(l.id IS NOT NULL, 1, 0) as is_liked
+            FROM prompts p
+            LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
+            LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+            WHERE p.is_featured = 1
+            LIMIT 1
+        ");
+        $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
+    } else {
+        $fStmt = $pdo->query(
+            "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE is_featured = 1 LIMIT 1",
+        );
+    }
+    $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
+    // Fallback: most liked prompt
+    if (!$featuredPrompt) {
+        if (isset($_SESSION["user_id"])) {
+            $fStmt = $pdo->prepare("
+                SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+                       IF(l.id IS NOT NULL, 1, 0) as is_liked
+                FROM prompts p
+                LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
+                LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+                ORDER BY p.likes_count DESC LIMIT 1
+            ");
+            $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
+        } else {
+            $fStmt = $pdo->query(
+                "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts ORDER BY likes_count DESC LIMIT 1",
+            );
+        }
+        $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    $featuredPrompt = null;
+}
+
 // Generate state token for CSRF if not exists
 ?>
 <!DOCTYPE html>
@@ -304,6 +347,28 @@ if (isset($_SESSION["user_id"])) {
                 </a>
             </div>
 
+            <?php if ($featuredPrompt): ?>
+            <div style="max-width:480px;margin:32px auto;padding:0 20px;">
+                <div style="background:var(--secondary-color);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:20px;box-shadow:var(--shadow-comic);text-align:center;">
+                    <div class="badge" style="margin:0 auto 12px;display:inline-flex;">&#11088; PROMPT OF THE DAY</div>
+                    <div style="position:relative;border-radius:16px;overflow:hidden;border:3px solid var(--text-color);margin-bottom:14px;">
+                        <img src="<?= htmlspecialchars(
+                            $featuredPrompt["image_path"],
+                        ) ?>" style="width:100%;height:180px;object-fit:cover;filter:blur(8px) brightness(0.7);" alt="Featured Prompt">
+                        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.95);border:3px solid var(--text-color);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d2a35" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <span style="color:#fff;font-weight:900;font-size:.95rem;text-shadow:0 1px 4px rgba(0,0,0,.5);"><?= htmlspecialchars(
+                                $featuredPrompt["title"],
+                            ) ?></span>
+                        </div>
+                    </div>
+                    <a href="login.php" class="comic-btn" style="text-decoration:none;padding:12px 28px;background:var(--primary-color);display:inline-block;">&#128275; Login to Unlock</a>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Comparison Cards -->
             <div class="login-compare-section" aria-label="Login vs Guest comparison" style="padding-top:30px; margin-bottom:-20px;">
                 <p class="login-compare-heading"><i class="fa-solid fa-scale-balanced"></i>&nbsp; What you get</p>
@@ -435,6 +500,97 @@ if (isset($_SESSION["user_id"])) {
         $secret_sub_tags = array_unique($secret_sub_tags);
         sort($secret_sub_tags);
         ?>
+        <?php if ($featuredPrompt):
+
+            $fdb_type = $featuredPrompt["prompt_type"] ?? "secret";
+            if ($fdb_type === "insta_viral") {
+                $fptype = "insta_viral";
+            } elseif ($fdb_type === "unreleased") {
+                $fptype = "unreleased";
+            } elseif ($fdb_type === "already_uploaded") {
+                $fptype = "already_uploaded";
+            } else {
+                $fptype = "secret_code";
+            }
+            $potd_badges = [
+                "secret_code" => "🔐 SECRET",
+                "unreleased" => "🌙 UNRELEASED",
+                "insta_viral" => "🔥 VIRAL",
+                "already_uploaded" => "✅ UPLOADED",
+            ];
+            $type_badge = $potd_badges[$fptype] ?? "🔐 SECRET";
+            ?>
+        <div class="potd-section" style="margin-bottom:36px;">
+            <div class="potd-label">⭐ PROMPT OF THE DAY</div>
+            <div class="potd-wrapper">
+                <!-- Floating heart decorations -->
+                <span class="potd-heart ph1">❤</span>
+                <span class="potd-heart ph2">❤</span>
+                <span class="potd-heart ph3">❤</span>
+                <span class="potd-heart ph4">❤</span>
+                <span class="potd-heart ph5">❤</span>
+                <span class="potd-heart ph6">❤</span>
+                <span class="potd-heart ph7">❤</span>
+                <!-- Card -->
+                <div class="card potd-card"
+                     data-id="<?= $featuredPrompt["id"] ?>"
+                     data-image="<?= htmlspecialchars(
+                         $featuredPrompt["image_path"],
+                     ) ?>"
+                     data-title="<?= htmlspecialchars(
+                         $featuredPrompt["title"],
+                     ) ?>"
+                     data-reel="<?= htmlspecialchars(
+                         $featuredPrompt["reel_link"] ?? "",
+                     ) ?>"
+                     data-prompt-type="<?= htmlspecialchars($fptype) ?>"
+                     data-tags="<?= htmlspecialchars(
+                         strtolower($featuredPrompt["tag"]),
+                     ) ?>"
+                     data-unlocked="<?= $featuredPrompt["is_unlocked"]
+                         ? "true"
+                         : "false" ?>"
+                     <?= $featuredPrompt["is_unlocked"]
+                         ? 'data-prompt-text="' .
+                             htmlspecialchars($featuredPrompt["prompt_text"]) .
+                             '"'
+                         : "" ?>>
+                    <!-- Left: inset portrait image -->
+                    <div class="potd-img-wrap">
+                        <img src="<?= htmlspecialchars(
+                            $featuredPrompt["image_path"],
+                        ) ?>" alt="Prompt of the Day">
+                        <div class="potd-lock-icon">
+                            <?php if (!$featuredPrompt["is_unlocked"]): ?>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <?php else: ?>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2d2a35" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <!-- Right: info -->
+                    <div class="potd-info">
+                        <div class="potd-title"><?= htmlspecialchars(
+                            $featuredPrompt["title"],
+                        ) ?></div>
+                        <div class="potd-likes-row">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#e74c3c"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span><?= (int) $featuredPrompt[
+                                "likes_count"
+                            ] ?> likes</span>
+                        </div>
+                        <div class="potd-type-badge"><?= $type_badge ?></div>
+                        <div class="potd-cta"><?= $featuredPrompt["is_unlocked"]
+                            ? "View Prompt →"
+                            : "Tap to Unlock →" ?></div>
+                    </div>
+                    <div class="card-click-trigger"></div>
+                </div>
+            </div>
+        </div>
+        <?php
+        endif; ?>
+
         <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 24px;">
             <button class="tag-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
             <?php foreach ($secret_sub_tags as $t): ?>
@@ -457,6 +613,14 @@ if (isset($_SESSION["user_id"])) {
             <?php if (count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key

@@ -53,7 +53,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .type-card.selected-uploaded { background: #e6f2ff; border-color: #00509e; color: #00509e; box-shadow: 4px 4px 0 #00509e; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <header>
@@ -185,8 +185,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                             <input type="file" id="image" name="image" accept="image/*" required style="display:none;" onchange="document.getElementById('file-name-display').textContent = this.files[0] ? this.files[0].name : 'No file chosen'">
                         </div>
                     </div>
-                    <div class="form-group" style="flex:1; min-width:0;">
-                        <label for="reel_link">Reel Link <span style="font-weight:600;color:#888;">(Optional)</span></label>
+                    <div class="form-group" id="reel-link-group" style="flex:1; min-width:0;">
+                        <label for="reel_link">Reel Link <span style="font-weight:600;color:var(--text-color);">(Required for Secret Code)</span></label>
                         <input type="url" id="reel_link" name="reel_link" placeholder="https://instagram.com/reel/...">
                     </div>
                 </div>
@@ -206,6 +206,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         const hiddenTagInput = document.getElementById('tag');
         const codeGroup = document.getElementById('unlock-code-group');
         const codeInput = document.getElementById('unlock_code');
+        const reelLinkGroup = document.getElementById('reel-link-group');
+        const reelLinkInput = document.getElementById('reel_link');
 
         let tags = [];
 
@@ -221,21 +223,32 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 document.getElementById('card-secret').className = 'type-card selected-secret';
                 codeGroup.style.display = 'block';
                 codeInput.required = true;
+                reelLinkGroup.style.display = 'block';
+                reelLinkInput.required = true;
             } else if (type === 'unreleased') {
                 document.getElementById('card-unreleased').className = 'type-card selected-unreleased';
                 codeGroup.style.display = 'none';
                 codeInput.required = false;
                 codeInput.value = '';
+                reelLinkGroup.style.display = 'none';
+                reelLinkInput.required = false;
+                reelLinkInput.value = '';
             } else if (type === 'insta_viral') {
                 document.getElementById('card-viral').className = 'type-card selected-viral';
                 codeGroup.style.display = 'none';
                 codeInput.required = false;
                 codeInput.value = '';
+                reelLinkGroup.style.display = 'none';
+                reelLinkInput.required = false;
+                reelLinkInput.value = '';
             } else if (type === 'already_uploaded') {
                 document.getElementById('card-uploaded').className = 'type-card selected-uploaded';
                 codeGroup.style.display = 'none';
                 codeInput.required = false;
                 codeInput.value = '';
+                reelLinkGroup.style.display = 'none';
+                reelLinkInput.required = false;
+                reelLinkInput.value = '';
             }
         }
         // Set initial state
@@ -301,6 +314,17 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     e.preventDefault();
                     alert('&mdash; Access Code must be exactly 6 characters for Secret Code type!');
                     codeInput.focus();
+                    return;
+                }
+            }
+
+            // Check reel link for secret type
+            if (selectedType === 'secret') {
+                const reel = reelLinkInput.value.trim();
+                if (!reel) {
+                    e.preventDefault();
+                    alert('⚠️ Reel Link is required for Secret Code type!');
+                    reelLinkInput.focus();
                     return;
                 }
             }

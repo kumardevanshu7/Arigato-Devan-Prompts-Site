@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 }
 
 $prompts = $pdo
-    ->query("SELECT * FROM prompts ORDER BY created_at DESC")
+    ->query("SELECT *, is_featured FROM prompts ORDER BY created_at DESC")
     ->fetchAll(PDO::FETCH_ASSOC);
 $total_prompts = count($prompts);
 
@@ -55,7 +55,7 @@ sort($all_mgr_tags);
         .delete-btn:hover { background: #ffc9c9; transform: translateY(-2px); }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 <header>
@@ -148,7 +148,19 @@ sort($all_mgr_tags);
                         endforeach; ?>
                     </div>
                 </div>
-                <div style="display:flex;gap:8px;flex-shrink:0;">
+                <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+                    <?php $feat_bg = $p["is_featured"]
+                        ? "var(--secondary-color)"
+                        : "var(--bg-color)"; ?>
+                    <button onclick="featurePrompt(<?= $p["id"] ?>)"
+                        class="comic-btn-small"
+                        style="background:<?= $feat_bg ?>; font-size:0.8rem; padding:6px 12px; border:2px solid var(--text-color); border-radius:10px; cursor:pointer; font-family:var(--font-main); font-weight:800;"
+                        id="feat-btn-<?= $p["id"] ?>"
+                        title="<?= $p["is_featured"]
+                            ? "Currently Featured"
+                            : "Set as Prompt of the Day" ?>">
+                        <?= $p["is_featured"] ? "⭐ Featured" : "☆ Feature" ?>
+                    </button>
                     <a href="edit_prompt.php?id=<?= $item_id ?>" class="edit-btn" title="Edit"><i class="fa-solid fa-pencil"></i></a>
                     <button class="delete-btn" title="Delete" onclick="confirmDelete(<?= $item_id ?>, '<?= $item_js ?>')">
                         <i class="fa-solid fa-trash"></i>
@@ -168,6 +180,32 @@ sort($all_mgr_tags);
 </form>
 
 <script>
+function featurePrompt(id) {
+    fetch('feature_prompt.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'prompt_id=' + id
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            // Reset all feature buttons
+            document.querySelectorAll('[id^="feat-btn-"]').forEach(btn => {
+                btn.textContent = '☆ Feature';
+                btn.style.background = 'var(--bg-color)';
+                btn.title = 'Set as Prompt of the Day';
+            });
+            // Highlight selected
+            const btn = document.getElementById('feat-btn-' + id);
+            if (btn) {
+                btn.textContent = '⭐ Featured';
+                btn.style.background = 'var(--secondary-color)';
+                btn.title = 'Currently Featured';
+            }
+        }
+    });
+}
+
 function confirmDelete(id, title) {
     if (confirm("Are you sure you want to delete '" + title + "'?")) {
         document.getElementById('delete-prompt-id').value = id;

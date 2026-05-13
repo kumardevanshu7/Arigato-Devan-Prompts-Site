@@ -129,7 +129,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head><body>
 <header>
   <div class="logo-area"  style="cursor:pointer">
@@ -283,11 +283,15 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
       </div>
 
       <!-- Reel link standalone -->
-      <div class="form-group">
-        <label for="e-reel">Reel Link (optional)</label>
+      <div class="form-group" id="reel-link-group" style="<?= $is_secret
+          ? ""
+          : "display:none;" ?>">
+        <label for="e-reel">Reel Link <span style="font-weight:600;color:var(--text-color);">(Required for Secret Code)</span></label>
         <input type="url" id="e-reel" name="reel_link" value="<?= htmlspecialchars(
             $p["reel_link"] ?? "",
-        ) ?>" placeholder="https://instagram.com/reel/...">
+        ) ?>" placeholder="https://instagram.com/reel/..." <?= $is_secret
+    ? "required"
+    : "" ?>>
       </div>
 
       <div class="form-group">
@@ -321,6 +325,8 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         const hiddenTagInput = document.getElementById('e-tag');
         const codeRow = document.getElementById('code-field-row');
         const codeInput = document.getElementById('e-code');
+        const reelLinkGroup = document.getElementById('reel-link-group');
+        const reelLinkInput = document.getElementById('e-reel');
 
         // Initialize from PHP
         let tags = <?= json_encode(array_values($current_tags)) ?>;
@@ -372,6 +378,9 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             const card = document.getElementById(idMap[type]);
             if (card) card.classList.add(classMap[type]);
             checkSecretTag();
+            if (type !== 'secret') {
+                reelLinkInput.value = '';
+            }
         }
 
         function checkSecretTag() {
@@ -380,10 +389,14 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                 codeRow.style.display = 'flex';
                 codeInput.required = true;
                 codeInput.disabled = false;
+                reelLinkGroup.style.display = 'block';
+                reelLinkInput.required = true;
             } else {
                 codeRow.style.display = 'none';
                 codeInput.required = false;
                 codeInput.disabled = true;
+                reelLinkGroup.style.display = 'none';
+                reelLinkInput.required = false;
             }
         }
 
