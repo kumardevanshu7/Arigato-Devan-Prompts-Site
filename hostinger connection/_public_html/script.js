@@ -890,10 +890,18 @@ document.addEventListener("DOMContentLoaded", () => {
           // First unlock celebration
           if (typeof checkFirstUnlock === "function") checkFirstUnlock();
         } else {
-          showComicAlert("Failed to unlock! Try again.", "error");
+          showComicAlert(data.message || "Failed to unlock! Try again.", "error");
+          setTimeout(() => {
+            if (currentCardElement) currentCardElement.click();
+          }, 1500);
         }
       })
-      .catch(() => showComicAlert("Something went wrong!", "error"));
+      .catch(() => {
+        showComicAlert("Something went wrong!", "error");
+        setTimeout(() => {
+          if (currentCardElement) currentCardElement.click();
+        }, 1500);
+      });
   }
 
   // Logo Interaction Logic

@@ -175,12 +175,12 @@ if ($action === "unreleased") {
     $start_key = "urp_start_" . $prompt_id;
     if (isset($_SESSION[$start_key])) {
         $elapsed = time() - $_SESSION[$start_key];
-        // Must take at least 8 seconds (20 taps × ~0.4s per tap minimum)
-        if ($elapsed < 8) {
+        // Must take at least 2 seconds for human tapping
+        if ($elapsed < 2) {
             echo json_encode([
                 "success" => false,
                 "message" =>
-                    "Please complete the love tap challenge properly! ❤️",
+                    "Too fast! Please complete the love tap challenge properly! ❤️",
             ]);
             exit();
         }
