@@ -1,30 +1,33 @@
 <?php
 session_start();
-require_once 'db.php';
-if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
-    header("Location: onboarding.php"); exit();
+require_once "db.php";
+if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
+    header("Location: onboarding.php");
+    exit();
 }
 // Guests allowed &mdash; they need 90 taps; logged-in users need only 20
-$tap_threshold = isset($_SESSION['user_id']) ? 20 : 90;
+$tap_threshold = isset($_SESSION["user_id"]) ? 20 : 90;
 
 // Fetch unreleased prompts by prompt_type
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked
-        FROM prompts p 
-        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        FROM prompts p
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         WHERE p.prompt_type = 'unreleased'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
     $unreleased = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $unreleased = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
-
+    $unreleased = $pdo
+        ->query(
+            "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='unreleased' ORDER BY created_at DESC",
+        )
+        ->fetchAll(PDO::FETCH_ASSOC);
 }
-
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,12 +67,45 @@ if (isset($_SESSION['user_id'])) {
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
         <div class="nav-dropdown">
             <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-            <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+            <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
             <div class="nav-dropdown-menu">
-                <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
             </div>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -79,11 +115,19 @@ if (isset($_SESSION['user_id'])) {
     </nav>
     <div class="header-right">
         <div class="header-divider"></div>
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <?php if($_SESSION['role']==='admin'): ?>
-                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Admin') ?></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
+        <?php if (isset($_SESSION["user_id"])): ?>
+            <?php if ($_SESSION["role"] === "admin"): ?>
+                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+                    $_SESSION["profile_image"] ?? "",
+                    "admin-avatar",
+                    "Admin",
+                ) ?></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
             <?php else: ?>
-                <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Profile') ?></a>
+                <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar(
+                    $_SESSION["profile_image"] ?? "",
+                    "admin-avatar",
+                    "Profile",
+                ) ?></a>
             <?php endif; ?>
             <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
         <?php else: ?>
@@ -98,75 +142,105 @@ if (isset($_SESSION['user_id'])) {
         <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:30px;">
-        Show some love to unlock &mdash; tap the Love Bar 
-        <strong><?= isset($_SESSION['user_id']) ? '20' : '90' ?></strong> times!
+        Show some love to unlock &mdash; tap the Love Bar
+        <strong><?= isset($_SESSION["user_id"]) ? "20" : "90" ?></strong> times!
         <i class="fa-solid fa-heart"></i>
-        <?php if(!isset($_SESSION['user_id'])): ?>
+        <?php if (!isset($_SESSION["user_id"])): ?>
             <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>
         <?php endif; ?>
     </p>
 
-    <?php if(empty($unreleased)): ?>
+    <?php if (empty($unreleased)): ?>
         <div style="text-align:center;padding:80px 20px;">
             <div style="font-size:3rem;margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
             <h2 style="font-size:1.6rem;font-weight:900;margin-bottom:8px;">Nothing here yet...</h2>
             <p style="color:#888;font-weight:600;">Unreleased reels will appear here when the admin drops them!</p>
         </div>
-    <?php else: ?>
-        <?php
+    <?php
         // Collect sub-tags (excluding 'unreleased' itself)
+        // Collect sub-tags (excluding 'unreleased' itself)
+        else: ?>
+        <?php
         $ur_sub_tags = [];
-        foreach($unreleased as $ur_item) {
-            $tarr = array_map('trim', explode(',', strtolower($ur_item['tag'])));
-            foreach($tarr as $t) {
-                if(!empty($t) && $t !== 'unreleased') $ur_sub_tags[] = $t;
+        foreach ($unreleased as $ur_item) {
+            $tarr = array_map(
+                "trim",
+                explode(",", strtolower($ur_item["tag"])),
+            );
+            foreach ($tarr as $t) {
+                if (!empty($t) && $t !== "unreleased") {
+                    $ur_sub_tags[] = $t;
+                }
             }
         }
         $ur_sub_tags = array_unique($ur_sub_tags);
         sort($ur_sub_tags);
         ?>
-        <?php if(!empty($ur_sub_tags)): ?>
+        <?php if (!empty($ur_sub_tags)): ?>
         <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 28px;">
             <button class="ur-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
-            <?php foreach($ur_sub_tags as $t): ?>
-                <button class="ur-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
+            <?php foreach ($ur_sub_tags as $t): ?>
+                <button class="ur-filter-btn" data-tag="<?= htmlspecialchars(
+                    $t,
+                ) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(
+    ucfirst($t),
+) ?></button>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
         <div class="gallery-grid" id="card-stack">
-            <?php foreach($unreleased as $ur): 
-                $tags_arr = array_map('trim', explode(',', strtolower($ur['tag'])));
-                $is_unlocked = $ur['is_unlocked'];
-                $blur_style = ($is_unlocked) ? '' : 'filter: blur(5px); transform: scale(1.1);';
-            ?>
-            <div class="card" 
-                 data-id="<?=$ur['id']?>" 
-                 data-image="<?=htmlspecialchars($ur['image_path'])?>" 
-                 data-title="<?=htmlspecialchars($ur['title'])?>" 
-                 data-prompt-type="unreleased" 
-                 data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>" 
-                 data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-                 <?= $is_unlocked ? 'data-prompt-text="'.htmlspecialchars($ur['prompt_text']).'"' : '' ?>>
-                
-                <img src="<?=htmlspecialchars($ur['image_path'])?>" class="card-bg-image" alt="<?=htmlspecialchars($ur['title'])?>" style="<?= $blur_style ?>" loading="lazy">
+            <?php foreach ($unreleased as $ur):
+
+                $tags_arr = array_map(
+                    "trim",
+                    explode(",", strtolower($ur["tag"])),
+                );
+                $is_unlocked = $ur["is_unlocked"];
+                $blur_style = $is_unlocked
+                    ? ""
+                    : "filter: blur(5px); transform: scale(1.1);";
+                ?>
+            <div class="card"
+                 data-id="<?= $ur["id"] ?>"
+                 data-image="<?= htmlspecialchars($ur["image_path"]) ?>"
+                 data-title="<?= htmlspecialchars($ur["title"]) ?>"
+                 data-prompt-type="unreleased"
+                 data-unlocked="<?= $is_unlocked ? "true" : "false" ?>"
+                 data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
+                 <?= $is_unlocked
+                     ? 'data-prompt-text="' .
+                         htmlspecialchars($ur["prompt_text"]) .
+                         '"'
+                     : "" ?>>
+
+                <img src="<?= htmlspecialchars(
+                    $ur["image_path"],
+                ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
+    $ur["title"],
+) ?>" style="<?= $blur_style ?>" loading="lazy">
                 <div class="card-type-badge urp">UNRELEASED</div>
-                
-                <?php if(!$is_unlocked): ?>
+
+                <?php if (!$is_unlocked): ?>
                     <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
                 <?php else: ?>
                     <div class="card-lock-icon" style="background:var(--primary-color);"><i class="fa-solid fa-check"></i></div>
                 <?php endif; ?>
-                
+
                 <div class="card-click-trigger"></div>
                 <div class="card-content-overlay">
-                    <div class="card-title"><?=htmlspecialchars($ur['title'])?></div>
-                    <div class="like-btn" data-prompt-id="<?=$ur['id']?>">
+                    <div class="card-title"><?= htmlspecialchars(
+                        $ur["title"],
+                    ) ?></div>
+                    <div class="like-btn" data-prompt-id="<?= $ur["id"] ?>">
                         <i class="fa-solid fa-heart"></i>
-                        <span class="like-count"><?=(int)$ur['likes_count']?></span>
+                        <span class="like-count"><?= (int) $ur[
+                            "likes_count"
+                        ] ?></span>
                     </div>
                 </div>
             </div>
-            <?php endforeach; ?>
+            <?php
+            endforeach; ?>
         </div>
     <?php endif; ?>
 </div>
@@ -201,7 +275,7 @@ if (isset($_SESSION['user_id'])) {
                         <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
                     </div>
                     <!-- Like button: below copy/save -->
-                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION["user_id"])): ?>
                     <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
                         <i class="fa-solid fa-heart"></i>
                         <span id="modal-like-count">0</span>
@@ -229,7 +303,9 @@ if (isset($_SESSION['user_id'])) {
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
+<script>const isLoggedIn = <?= isset($_SESSION["user_id"])
+    ? "true"
+    : "false" ?>;</script>
 <script src="script.js?v=2026051205"></script>
 <script>
 // Background Scroll Logic
@@ -272,12 +348,14 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
         });
     });
 });
+
+// Auto-open card from shareable link (?open=ID)
+(function(){
+    var openId = new URLSearchParams(window.location.search).get('open');
+    if (!openId) return;
+    setTimeout(function(){
+        var card = document.querySelector('#card-stack .card[data-id="' + openId + '"]');
+        if (card) card.click();
+    }, 400);
+})();
 </script></body></html>
-
-
-
-
-
-
-
-

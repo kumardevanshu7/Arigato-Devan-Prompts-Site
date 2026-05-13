@@ -1,37 +1,57 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Protect page (Admin Only)
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    $_SESSION['error_msg'] = "You do not have permission to access the dashboard.";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    $_SESSION["error_msg"] =
+        "You do not have permission to access the dashboard.";
     header("Location: index.php");
     exit();
 }
 
 // --- Analytics Queries ---
-$total_prompts   = $pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
-$total_likes     = $pdo->query("SELECT SUM(likes_count) FROM prompts")->fetchColumn() ?: 0;
-$total_users     = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total_prompts = $pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
+$total_likes =
+    $pdo->query("SELECT SUM(likes_count) FROM prompts")->fetchColumn() ?: 0;
+$total_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 
 // Most liked prompt
-$most_liked = $pdo->query("SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$most_liked = $pdo
+    ->query(
+        "SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 1",
+    )
+    ->fetch(PDO::FETCH_ASSOC);
 
 // Weekly growth (prompts added this week)
-$weekly_prompts = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
-$weekly_users   = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+$weekly_prompts = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+    )
+    ->fetchColumn();
+$weekly_users = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+    )
+    ->fetchColumn();
 
 // All prompts list
-$prompts = $pdo->query("SELECT * FROM prompts ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+$prompts = $pdo
+    ->query("SELECT * FROM prompts ORDER BY created_at DESC")
+    ->fetchAll(PDO::FETCH_ASSOC);
 
 // Users list
-$users = $pdo->query("SELECT id, username, email, avatar, gender, role, created_at FROM users ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo
+    ->query(
+        "SELECT id, username, email, avatar, gender, role, created_at FROM users ORDER BY created_at DESC",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
 $total_users_count = count($users);
 
 // Flash messages
-$success = $_SESSION['success_msg'] ?? '';
-$error   = $_SESSION['error_msg'] ?? '';
-unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+$success = $_SESSION["success_msg"] ?? "";
+$error = $_SESSION["error_msg"] ?? "";
+unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -395,7 +415,12 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
             <div class="header-divider"></div>
             <div style="display:flex;align-items:center;gap:8px;">
                 <a href="profile.php" title="Edit Profile">
-                    <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                    <?= renderAvatar(
+                        $_SESSION["profile_image"] ?? "",
+                        "admin-avatar",
+                        "Admin",
+                        'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                    ) ?>
                 </a>
                 <a href="dashboard.php" style="color:var(--text-color);font-weight:800;" class="active">ADMIN</a>
             </div>
@@ -406,10 +431,10 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
     </header>
 
     <div class="dashboard-wrap">
-        <?php if($success): ?>
+        <?php if ($success): ?>
             <div class="flash-success"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
-        <?php if($error): ?>
+        <?php if ($error): ?>
             <div class="flash-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
@@ -437,10 +462,14 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                 <div class="stat-value">+<?= $weekly_users ?></div>
                 <div class="stat-label">New Users (7d)</div>
             </div>
-            <?php if($most_liked): ?>
+            <?php if ($most_liked): ?>
             <div class="stat-card" style="background: #fff3cd; grid-column: span 2;">
-                <div class="stat-value" style="font-size:1.1rem; font-weight:800; color:var(--text-color);"><i class="fa-solid fa-star"></i> <?= htmlspecialchars($most_liked['title']) ?></div>
-                <div class="stat-label">Most Liked &mdash; <?= $most_liked['likes_count'] ?> <i class="fa-solid fa-heart"></i></div>
+                <div class="stat-value" style="font-size:1.1rem; font-weight:800; color:var(--text-color);"><i class="fa-solid fa-star"></i> <?= htmlspecialchars(
+                    $most_liked["title"],
+                ) ?></div>
+                <div class="stat-label">Most Liked &mdash; <?= $most_liked[
+                    "likes_count"
+                ] ?> <i class="fa-solid fa-heart"></i></div>
             </div>
             <?php endif; ?>
         </div>
@@ -474,32 +503,147 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                     <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
                 </div>
             </a>
-        
+
+        <!-- Prompt Share Links Card (links to dedicated page) -->
+        <a href="prompt_links.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:#d4eaff;transition:all .2s;cursor:pointer;margin-top:0;align-self:start;" onmouseover="this.style.transform='translateY(-4px) rotate(-1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="display:flex;align-items:center;gap:18px;">
+                <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-link" style="font-size:1.6rem;color:#d4eaff;"></i>
+                </div>
+                <div>
+                    <h2 style="font-size:1.4rem;margin-bottom:4px;">Prompt Share Links</h2>
+                    <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Copy direct links for any prompt to share with users</p>
+                </div>
+                <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
+            </div>
+        </a>
+
+        <!-- PLACEHOLDER for old section start - will be removed below -->
+        <div class="dash-card" style="display:none;margin-top:28px;grid-column:1/-1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;flex-wrap:wrap;gap:12px;">
+                <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-link" style="color:#007ab8;"></i> Prompt Share Links</h2>
+                <div class="badge" style="margin:0;transform:rotate(0);background:#d4eaff;padding:6px 16px;"><?= $total_prompts ?> Prompts</div>
+            </div>
+            <p style="color:#7D7887;font-weight:600;margin-bottom:14px;font-size:.88rem;"><i class="fa-solid fa-circle-info"></i> Copy a prompt's direct link &mdash; when the user opens it, that card auto-opens on the site. Works for guests too!</p>
+            <input type="text" id="link-table-search" placeholder="&#128269; Search by title..." oninput="filterLinkTable(this.value)" style="width:100%;padding:11px 15px;border:2px solid var(--border-color);border-radius:12px;font-family:var(--font-main);font-weight:600;font-size:.9rem;background:var(--bg-color);color:var(--text-color);outline:none;transition:all .2s;margin-bottom:16px;box-sizing:border-box;" onfocus="this.style.borderColor='var(--text-color)'" onblur="this.style.borderColor='var(--border-color)'">
+            <div style="overflow-x:auto;">
+                <table id="link-table" style="width:100%;border-collapse:collapse;min-width:480px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--text-color);text-align:left;">
+                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;width:52px;">Cover</th>
+                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;">Title</th>
+                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;">Type</th>
+                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;text-align:right;white-space:nowrap;">Share</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $ltype_map = [
+                        "secret" => [
+                            "label" => "&#128274; SCP",
+                            "bg" => "#ffe3e3",
+                            "color" => "#d03030",
+                        ],
+                        "unreleased" => [
+                            "label" => "&#127769; URP",
+                            "bg" => "#fff4cc",
+                            "color" => "#7a5800",
+                        ],
+                        "insta_viral" => [
+                            "label" => "&#128293; IVP",
+                            "bg" => "#e3f7ff",
+                            "color" => "#004f7a",
+                        ],
+                        "already_uploaded" => [
+                            "label" => "&#128228; AUP",
+                            "bg" => "#e6f2ff",
+                            "color" => "#00509e",
+                        ],
+                    ];
+                    foreach ($prompts as $lp):
+
+                        $lt = $lp["prompt_type"] ?? "secret";
+                        $linfo = $ltype_map[$lt] ?? $ltype_map["secret"];
+                        $ltitle = htmlspecialchars($lp["title"]);
+                        $limg = htmlspecialchars($lp["image_path"]);
+                        $lid = (int) $lp["id"];
+                        ?>
+                        <tr data-search="<?= strtolower(
+                            $ltitle,
+                        ) ?>" style="border-bottom:1px solid var(--border-color);transition:background .15s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background=''">
+                            <td style="padding:9px 12px;"><img src="<?= $limg ?>" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);display:block;"></td>
+                            <td style="padding:9px 12px;font-weight:700;font-size:.92rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= $ltitle ?></td>
+                            <td style="padding:9px 12px;"><span style="background:<?= $linfo[
+                                "bg"
+                            ] ?>;color:<?= $linfo[
+    "color"
+] ?>;border:1.5px solid currentColor;border-radius:8px;padding:3px 9px;font-size:.72rem;font-weight:900;white-space:nowrap;"><?= $linfo[
+    "label"
+] ?></span></td>
+                            <td style="padding:9px 12px;text-align:right;">
+                                <button onclick="copyPromptLink(<?= $lid ?>, this)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.8rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);transition:all .15s;white-space:nowrap;">
+                                    <i class="fa-solid fa-copy"></i> Copy Link
+                                </button>
+                            </td>
+                        </tr>
+                    <?php
+                    endforeach;
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+            <p id="link-table-empty" style="display:none;text-align:center;color:#7D7887;font-weight:600;padding:20px 0;">No prompts found.</p>
+        </div>
+
         <!-- User Management -->
         <div class="dash-card" style="margin-top:40px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;">
                 <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-users"></i> User Management</h2>
-                <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;"><?=$total_users_count?> Users</div>
+                <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;"><?= $total_users_count ?> Users</div>
             </div>
-            <?php if(count($users)===0): ?>
+            <?php if (count($users) === 0): ?>
                 <p style="text-align:center;color:#7D7887;font-weight:600;padding:30px 0;">No users registered yet.</p>
-            <?php else: ?>
+            <?php
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                else: ?>
             <div style="overflow-x:auto;">
             <table class="users-table">
                 <thead><tr><th>Avatar</th><th>Name / Email</th><th>Gender</th><th>Role</th><th>Joined</th></tr></thead>
                 <tbody>
-                <?php foreach($users as $u): ?>
+                <?php foreach ($users as $u): ?>
                 <tr>
-                <td><?php
-                    // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                    $u_avatar = !empty($u['avatar'])
-                        ? $u['avatar']
-                        : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($u['email'] ?? 'x');
-                ?><img src="<?=htmlspecialchars($u_avatar)?>" class="user-avatar-sm" alt=""></td>
-                    <td><div style="font-weight:800;font-size:.95rem;"><?=htmlspecialchars($u['username']??'&mdash;')?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?=htmlspecialchars($u['email']??'')?></div></td>
-                    <td><?=htmlspecialchars(ucfirst($u['gender']??'&mdash;'))?></td>
-                    <td><span class="role-badge <?=$u['role']==='admin'?'role-admin':'role-user'?>"><?=htmlspecialchars(strtoupper($u['role']??'user'))?></span></td>
-                    <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?=date('d M Y',strtotime($u['created_at']))?></td>
+                <td><?php $u_avatar = !empty($u["avatar"])
+                    ? $u["avatar"]
+                    : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
+                        urlencode(
+                            $u["email"] ?? "x",
+                        ); ?><img src="<?= htmlspecialchars(
+    $u_avatar,
+) ?>" class="user-avatar-sm" alt=""></td>
+                    <td><div style="font-weight:800;font-size:.95rem;"><?= htmlspecialchars(
+                        $u["username"] ?? "&mdash;",
+                    ) ?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?= htmlspecialchars(
+    $u["email"] ?? "",
+) ?></div></td>
+                    <td><?= htmlspecialchars(
+                        ucfirst($u["gender"] ?? "&mdash;"),
+                    ) ?></td>
+                    <td><span class="role-badge <?= $u["role"] === "admin"
+                        ? "role-admin"
+                        : "role-user" ?>"><?= htmlspecialchars(
+    strtoupper($u["role"] ?? "user"),
+) ?></span></td>
+                    <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?= date(
+                        "d M Y",
+                        strtotime($u["created_at"]),
+                    ) ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -568,9 +712,42 @@ function confirmBlogDelete(id, name) {
 document.getElementById('blog-delete-modal')?.addEventListener('click', function(e){
     if (e.target === this) this.style.display = 'none';
 });
+
+// Copy prompt shareable link
+function copyPromptLink(id, btn) {
+    var link = window.location.origin + '/card.php?id=' + id;
+    navigator.clipboard.writeText(link).then(function() {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        btn.style.background = '#d9f5e5';
+        btn.style.color = '#2a7a4b';
+        btn.style.borderColor = '#2a7a4b';
+        btn.style.boxShadow = '2px 2px 0 #2a7a4b';
+        setTimeout(function() {
+            btn.innerHTML = orig;
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
+        }, 2000);
+    }).catch(function() {
+        // Fallback for older browsers
+        window.prompt('Copy this link:', window.location.origin + '/card.php?id=' + id);
+    });
+}
+
+// Filter prompt link table
+function filterLinkTable(query) {
+    query = query.toLowerCase();
+    var rows = document.querySelectorAll('#link-table tbody tr');
+    var anyVisible = false;
+    rows.forEach(function(row) {
+        var match = (row.dataset.search || '').includes(query);
+        row.style.display = match ? '' : 'none';
+        if (match) anyVisible = true;
+    });
+    var emptyMsg = document.getElementById('link-table-empty');
+    if (emptyMsg) emptyMsg.style.display = anyVisible ? 'none' : 'block';
+}
 </script>
 </html>
-
-
-
-

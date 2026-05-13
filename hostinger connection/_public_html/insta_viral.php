@@ -237,6 +237,12 @@ if (isset($_SESSION["user_id"])) {
 <?php
     // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
     else: ?>
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
@@ -402,4 +408,14 @@ document.querySelectorAll('.iv-filter-btn').forEach(btn => {
         });
     });
 });
+
+// Auto-open card from shareable link (?open=ID)
+(function(){
+    var openId = new URLSearchParams(window.location.search).get('open');
+    if (!openId) return;
+    setTimeout(function(){
+        var card = document.querySelector('#iv-grid .card[data-id="' + openId + '"]');
+        if (card) card.click();
+    }, 400);
+})();
 </script></body></html>
