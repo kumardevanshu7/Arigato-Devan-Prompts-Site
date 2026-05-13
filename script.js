@@ -313,61 +313,80 @@ document.addEventListener("DOMContentLoaded", () => {
         // IVP — Insta Viral: 7-number math challenge
         // ══════════════════════════════════════════
         if (pType === "insta_viral") {
-          // Simple addition: four numbers between 0 and 10
-          const n1 = Math.floor(Math.random() * 11);
-          const n2 = Math.floor(Math.random() * 11);
-          const n3 = Math.floor(Math.random() * 11);
-          const n4 = Math.floor(Math.random() * 11);
-          const ans = n1 + n2 + n3 + n4;
+          // Fetch challenge from server — answer is stored in session server-side
+          if (unlockArea)
+            unlockArea.innerHTML = `<p style="font-weight:700;text-align:center;padding:20px;">🧮 Loading challenge...</p>`;
+          const _cfd = new FormData();
+          _cfd.append("action", "get_challenge");
+          _cfd.append("prompt_id", currentPromptId);
+          fetch("unlock.php", { method: "POST", body: _cfd })
+            .then((r) => r.json())
+            .then((challenge) => {
+              const n1 = challenge.n1,
+                n2 = challenge.n2,
+                n3 = challenge.n3,
+                n4 = challenge.n4;
+              const ans = n1 + n2 + n3 + n4;
 
-          // 4 MCQ options — all unique, answer always included
-          let opts = new Set([ans]);
-          while (opts.size < 4) {
-            const decoy = ans + (Math.floor(Math.random() * 10) - 5);
-            if (decoy !== ans && decoy >= 0) opts.add(decoy);
-          }
-          const options = [...opts].sort(() => Math.random() - 0.5);
+              // 4 MCQ options — all unique, answer always included
+              let opts = new Set([ans]);
+              while (opts.size < 4) {
+                const decoy = ans + (Math.floor(Math.random() * 10) - 5);
+                if (decoy !== ans && decoy >= 0) opts.add(decoy);
+              }
+              const options = [...opts].sort(() => Math.random() - 0.5);
 
-          let html = `<p style="font-weight:900;font-size:1.1rem;margin-bottom:12px;color:#d03030;">🧮 MATH CHALLENGE!</p>`;
-          html += `<p style="font-weight:700;font-size:1.6rem;margin-bottom:18px;letter-spacing:1px;">${n1} + ${n2} + ${n3} + ${n4} = ?</p>`;
-          html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
-          options.forEach((opt) => {
-            html += `<button class="math-opt comic-btn-small" data-ans="${ans}" data-val="${opt}" style="background:var(--secondary-color);color:var(--text-color);font-size:1.1rem;padding:14px 8px;font-weight:900;">${opt}</button>`;
-          });
-          html += `</div>`;
-          html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Admission lo school mein... itna sa nhi aata 😂</div>`;
-
-          if (unlockArea) unlockArea.innerHTML = html;
-
-          setTimeout(() => {
-            document.querySelectorAll(".math-opt").forEach((btn) => {
-              btn.addEventListener("click", function () {
-                if (parseInt(this.dataset.val) === parseInt(this.dataset.ans)) {
-                  this.style.background = "#2ecc71";
-                  this.style.color = "#fff";
-                  unlockInstaViral(currentPromptId);
-                } else {
-                  this.style.background = "#e74c3c";
-                  this.style.color = "#fff";
-                  document.getElementById("math-error").style.display = "block";
-                  triggerEmojiRain("😂", 15);
-                  // Regenerate after 1.5s on wrong answer
-                  setTimeout(() => {
-                    const card = currentCardElement;
-                    if (card) {
-                      // Re-open with fresh numbers
-                      card.click();
-                    }
-                  }, 1500);
-                }
+              let html = `<p style="font-weight:900;font-size:1.1rem;margin-bottom:12px;color:#d03030;">🧮 MATH CHALLENGE!</p>`;
+              html += `<p style="font-weight:700;font-size:1.6rem;margin-bottom:18px;letter-spacing:1px;">${n1} + ${n2} + ${n3} + ${n4} = ?</p>`;
+              html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
+              options.forEach((opt) => {
+                html += `<button class="math-opt comic-btn-small" data-ans="${ans}" data-val="${opt}" style="background:var(--secondary-color);color:var(--text-color);font-size:1.1rem;padding:14px 8px;font-weight:900;">${opt}</button>`;
               });
+              html += `</div>`;
+              html += `<div id="math-error" style="color:#d03030;font-weight:800;margin-top:10px;display:none;">Admission lo school mein... itna sa nhi aata 😂</div>`;
+
+              if (unlockArea) unlockArea.innerHTML = html;
+
+              setTimeout(() => {
+                document.querySelectorAll(".math-opt").forEach((btn) => {
+                  btn.addEventListener("click", function () {
+                    if (
+                      parseInt(this.dataset.val) === parseInt(this.dataset.ans)
+                    ) {
+                      this.style.background = "#2ecc71";
+                      this.style.color = "#fff";
+                      unlockInstaViral(currentPromptId, ans); // send answer to server
+                    } else {
+                      this.style.background = "#e74c3c";
+                      this.style.color = "#fff";
+                      document.getElementById("math-error").style.display =
+                        "block";
+                      triggerEmojiRain("😂", 15);
+                      // Regenerate after 1.5s on wrong answer
+                      setTimeout(() => {
+                        const card = currentCardElement;
+                        if (card) card.click();
+                      }, 1500);
+                    }
+                  });
+                });
+              }, 50);
+            })
+            .catch(() => {
+              if (unlockArea)
+                unlockArea.innerHTML = `<p style="color:#d03030;font-weight:700;text-align:center;padding:20px;">Failed to load challenge. Please close and try again.</p>`;
             });
-          }, 50);
 
           // ══════════════════════════════════════════
           // URP — Unreleased: Love Bar inside modal
           // ══════════════════════════════════════════
         } else if (pType === "unreleased") {
+          // Notify server that love challenge has started (for time-based verification)
+          const _ifd = new FormData();
+          _ifd.append("action", "init_love");
+          _ifd.append("prompt_id", currentPromptId);
+          fetch("unlock.php", { method: "POST", body: _ifd });
+
           const LOVE_THRESHOLD =
             typeof isLoggedIn !== "undefined" && isLoggedIn ? 20 : 90;
           let taps = 0;
@@ -707,10 +726,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.closest(".like-btn")) return;
   });
 
-  function unlockInstaViral(promptId) {
+  function unlockInstaViral(promptId, userAnswer) {
     const formData = new FormData();
     formData.append("action", "insta_viral");
     formData.append("prompt_id", promptId);
+    formData.append("user_answer", userAnswer); // server verifies this against session
 
     fetch("unlock.php", {
       method: "POST",
