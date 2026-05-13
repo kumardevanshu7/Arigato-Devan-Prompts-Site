@@ -1,14 +1,14 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 // Guard: if logged in but onboarding not done, force setup
-if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
+if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
 }
 
 // Fetch prompts with unlocked status
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked
@@ -17,20 +17,30 @@ if (isset($_SESSION['user_id'])) {
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts ORDER BY created_at DESC");
+    $stmt = $pdo->query(
+        "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts ORDER BY created_at DESC",
+    );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Avatar helper
-function getAvatar($user) {
-    if (!empty($user['avatar'])) return $user['avatar'];
-    return 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($user['email'] ?? 'user');
+function getAvatar($user)
+{
+    if (!empty($user["avatar"])) {
+        return $user["avatar"];
+    }
+    return "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
+        urlencode($user["email"] ?? "user");
 }
-function sessionAvatar() {
-    return !empty($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($_SESSION['username'] ?? 'user');
+function sessionAvatar()
+{
+    return !empty($_SESSION["profile_image"])
+        ? $_SESSION["profile_image"]
+        : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
+                urlencode($_SESSION["username"] ?? "user");
 }
 ?>
 <!DOCTYPE html>
@@ -96,12 +106,45 @@ function sessionAvatar() {
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-                <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+                <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
                 <div class="nav-dropdown-menu">
-                    <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                    <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
                 </div>
             </div>
             <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -113,17 +156,27 @@ function sessionAvatar() {
         </nav>
         <div class="header-right">
             <div class="header-divider"></div>
-            <?php if(isset($_SESSION['user_id'])): ?>
-                <?php if($_SESSION['role'] === 'admin'): ?>
+            <?php if (isset($_SESSION["user_id"])): ?>
+                <?php if ($_SESSION["role"] === "admin"): ?>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <a href="profile.php" title="Edit Profile">
-                            <?= renderAvatar(sessionAvatar(), 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                            <?= renderAvatar(
+                                sessionAvatar(),
+                                "admin-avatar",
+                                "Admin",
+                                'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                            ) ?>
                         </a>
                         <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
-                        <?= renderAvatar(sessionAvatar(), 'admin-avatar', 'Profile', 'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                        <?= renderAvatar(
+                            sessionAvatar(),
+                            "admin-avatar",
+                            "Profile",
+                            'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                        ) ?>
                     </a>
                 <?php endif; ?>
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
@@ -142,17 +195,23 @@ function sessionAvatar() {
             <div class="gallery-count"><?= count($prompts) ?> Prompts</div>
         </div>
 
-        <?php if(count($prompts) === 0): ?>
+        <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
-        <?php else: ?>
-            <?php
+        <?php
             // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            else: ?>
+            <?php
             $all_tags = [];
-            foreach($prompts as $p) {
-                $tarr = explode(',', $p['tag']);
-                foreach($tarr as $t) {
+            foreach ($prompts as $p) {
+                $tarr = explode(",", $p["tag"]);
+                foreach ($tarr as $t) {
                     $t = trim(strtolower($t));
-                    if(!empty($t)) $all_tags[] = $t;
+                    if (!empty($t)) {
+                        $all_tags[] = $t;
+                    }
                 }
             }
             $unique_tags = array_unique($all_tags);
@@ -160,49 +219,81 @@ function sessionAvatar() {
             ?>
             <div class="tag-filter-container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:30px;">
                 <button class="tag-filter-btn active" data-tag="all" style="background:var(--primary-color); padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s;">All</button>
-                <?php foreach($unique_tags as $t): ?>
-                    <button class="tag-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color); padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
+                <?php foreach ($unique_tags as $t): ?>
+                    <button class="tag-filter-btn" data-tag="<?= htmlspecialchars(
+                        $t,
+                    ) ?>" style="background:var(--bg-color); padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-transform:capitalize;"><?= htmlspecialchars(
+    ucfirst($t),
+) ?></button>
                 <?php endforeach; ?>
             </div>
 
             <div class="gallery-grid" id="card-stack">
-            <?php foreach($prompts as $p):
-                        // Map DB prompt_type → UI ptype key
-                        $db_type = $p['prompt_type'] ?? 'secret';
-                        if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
-                        elseif ($db_type === 'unreleased') $ptype = 'unreleased';
-                        elseif ($db_type === 'already_uploaded') $ptype = 'already_uploaded';
-                        else                              $ptype = 'secret_code';
-                        
-                        $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
-                        
-                        $type_labels = [
-                            'secret_code' => ['label'=>'SECRET','cls'=>'scp'],
-                            'unreleased'  => ['label'=>'UNRELEASED','cls'=>'urp'],
-                            'insta_viral' => ['label'=>'VIRAL','cls'=>'ivp'],
-                            'already_uploaded' => ['label'=>'UPLOADED','cls'=>'aup'],
-                        ];
-                        $tinfo = $type_labels[$ptype] ?? $type_labels['secret_code'];
-                    ?>
-                    <div class="card"
-                         data-id="<?= $p['id'] ?>"
-                         data-image="<?= htmlspecialchars($p['image_path']) ?>"
-                         data-title="<?= htmlspecialchars($p['title']) ?>"
-                         data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
-                         data-unlocked="<?= $p['is_unlocked'] ? 'true' : 'false' ?>"
-                         data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-                         data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-                         <?= $p['is_unlocked'] ? 'data-prompt-text="'.htmlspecialchars($p['prompt_text']).'"' : '' ?>>
+            <?php foreach ($prompts as $p):
 
-                        <?php 
-                            $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter: blur(5px); transform: scale(1.1);' : '';
-                        ?>
-                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" loading="lazy">
+                $db_type = $p["prompt_type"] ?? "secret";
+                if ($db_type === "insta_viral") {
+                    $ptype = "insta_viral";
+                } elseif ($db_type === "unreleased") {
+                    $ptype = "unreleased";
+                } elseif ($db_type === "already_uploaded") {
+                    $ptype = "already_uploaded";
+                } else {
+                    $ptype = "secret_code";
+                }
+
+                $tags_arr = array_map(
+                    "trim",
+                    explode(",", strtolower($p["tag"])),
+                );
+
+                $type_labels = [
+                    "secret_code" => ["label" => "SECRET", "cls" => "scp"],
+                    "unreleased" => ["label" => "UNRELEASED", "cls" => "urp"],
+                    "insta_viral" => ["label" => "VIRAL", "cls" => "ivp"],
+                    "already_uploaded" => [
+                        "label" => "UPLOADED",
+                        "cls" => "aup",
+                    ],
+                ];
+                $tinfo = $type_labels[$ptype] ?? $type_labels["secret_code"];
+                ?>
+                    <div class="card"
+                         data-id="<?= $p["id"] ?>"
+                         data-image="<?= htmlspecialchars($p["image_path"]) ?>"
+                         data-title="<?= htmlspecialchars($p["title"]) ?>"
+                         data-reel="<?= htmlspecialchars(
+                             $p["reel_link"] ?? "",
+                         ) ?>"
+                         data-unlocked="<?= $p["is_unlocked"]
+                             ? "true"
+                             : "false" ?>"
+                         data-prompt-type="<?= htmlspecialchars($ptype) ?>"
+                         data-tags="<?= htmlspecialchars(
+                             implode(",", $tags_arr),
+                         ) ?>"
+                         <?= $p["is_unlocked"]
+                             ? 'data-prompt-text="' .
+                                 htmlspecialchars($p["prompt_text"]) .
+                                 '"'
+                             : "" ?>>
+
+                        <?php $blur_style =
+                            $ptype === "unreleased" && !$p["is_unlocked"]
+                                ? "filter: blur(5px); transform: scale(1.1);"
+                                : ""; ?>
+                        <img src="<?= htmlspecialchars(
+                            $p["image_path"],
+                        ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
+    $p["title"],
+) ?>" style="<?= $blur_style ?>" loading="lazy">
 
                         <!-- Type Label Ribbon -->
-                        <div class="card-type-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></div>
+                        <div class="card-type-badge <?= $tinfo[
+                            "cls"
+                        ] ?>"><?= $tinfo["label"] ?></div>
 
-                        <?php if(!$p['is_unlocked']): ?>
+                        <?php if (!$p["is_unlocked"]): ?>
                             <div class="card-lock-icon">
                                 <i class="fa-solid fa-lock" style="font-size:14px;"></i>
                             </div>
@@ -214,17 +305,26 @@ function sessionAvatar() {
 
                         <div class="card-click-trigger"></div>
                         <div class="card-content-overlay">
-                            <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
+                            <div class="card-title"><?= htmlspecialchars(
+                                $p["title"],
+                            ) ?></div>
                             <!-- Static like display on card (not clickable) -->
-                            <div class="card-like-display" 
-                                 data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>"
-                                 data-prompt-id="<?= $p['id'] ?>">
-                                <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                                <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                            <div class="card-like-display"
+                                 data-liked="<?= $p["is_liked"]
+                                     ? "true"
+                                     : "false" ?>"
+                                 data-prompt-id="<?= $p["id"] ?>">
+                                <i class="fa-solid fa-heart <?= $p["is_liked"]
+                                    ? "liked-heart"
+                                    : "" ?>"></i>
+                                <span class="like-count"><?= (int) $p[
+                                    "likes_count"
+                                ] ?></span>
                             </div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
+                    <?php
+            endforeach; ?>
             </div>
         <?php endif; ?>
     </div>
@@ -268,7 +368,7 @@ function sessionAvatar() {
                         <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);"><i class="fa-solid fa-bookmark"></i> SAVE</button>
                     </div>
                     <!-- Like button: below copy/save -->
-                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION["user_id"])): ?>
                     <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
                         <i class="fa-solid fa-heart"></i>
                         <span id="modal-like-count">0</span>
@@ -299,9 +399,11 @@ function sessionAvatar() {
         </div>
     </div>
 
-    <script src="script.js?v=2026051205"></script>
-    <script>
-        const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+    <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
+        ? "true"
+        : "false" ?>;</script>
+        <script src="script.js?v=2026051205"></script>
+        <script>
 
         // Background Scroll Logic
         const bgLayers = document.querySelectorAll('.bg-layer');
@@ -370,7 +472,7 @@ document.querySelectorAll('.tag-filter-btn').forEach(btn => {
         });
         btn.classList.add('active');
         btn.style.background = 'var(--primary-color)';
-        
+
         const filterTag = btn.dataset.tag;
         document.querySelectorAll('.gallery-grid .card').forEach(card => {
             if (filterTag === 'all') {
@@ -402,12 +504,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.display = 'none';
             }
         });
-        
+
         const titleEl = document.querySelector('.gallery-title');
         if(titleEl) {
             titleEl.innerHTML = `Search: <span class="highlight">"` + searchQuery + `"</span>`;
         }
-        
+
         // Remove active class from "All" button
         document.querySelectorAll('.tag-filter-btn').forEach(b => {
             b.classList.remove('active');
@@ -428,11 +530,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-

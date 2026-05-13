@@ -1,30 +1,31 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 // Guard: if logged in but onboarding not done, force setup
-if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
+if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
 }
 
 // Fetch ONLY secret prompts for Home page
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked
-        FROM prompts p 
-        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        FROM prompts p
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         WHERE p.prompt_type = 'secret'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type = 'secret' ORDER BY created_at DESC");
+    $stmt = $pdo->query(
+        "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type = 'secret' ORDER BY created_at DESC",
+    );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 
 // Generate state token for CSRF if not exists
 ?>
@@ -38,19 +39,20 @@ if (isset($_SESSION['user_id'])) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    
+
     <!-- Preload first 3 prompt images for faster perceived loading -->
-    <?php
-    if (isset($prompts) && is_array($prompts)) {
+    <?php if (isset($prompts) && is_array($prompts)) {
         for ($i = 0; $i < min(3, count($prompts)); $i++) {
-            echo '<link rel="preload" as="image" href="' . htmlspecialchars($prompts[$i]['image_path']) . '">' . "\n";
+            echo '<link rel="preload" as="image" href="' .
+                htmlspecialchars($prompts[$i]["image_path"]) .
+                '">' .
+                "\n";
         }
-    }
-    ?>
+    } ?>
 </head>
 <body>
 
-<?php if(isset($_SESSION['user_id'])): ?>
+<?php if (isset($_SESSION["user_id"])): ?>
     <!-- Scrollable Wallpaper Background -->
     <div class="scroll-bg-container" id="scroll-bg-container">
         <div class="bg-layer active" style="background-image: url('https://i.pinimg.com/736x/4d/e2/71/4de271ae9997273cf3fdd47098fa69a3.jpg')"></div>
@@ -81,12 +83,45 @@ if (isset($_SESSION['user_id'])) {
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-                <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+                <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
                 <div class="nav-dropdown-menu">
-                    <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                    <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                    <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                    <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                        ? 'style="background:var(--primary-color)"'
+                        : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
                 </div>
             </div>
             <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -98,17 +133,27 @@ if (isset($_SESSION['user_id'])) {
         </nav>
         <div class="header-right">
             <div class="header-divider"></div>
-            <?php if(isset($_SESSION['user_id'])): ?>
-                <?php if($_SESSION['role'] === 'admin'): ?>
+            <?php if (isset($_SESSION["user_id"])): ?>
+                <?php if ($_SESSION["role"] === "admin"): ?>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <a href="profile.php" title="Edit Profile">
-                            <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                            <?= renderAvatar(
+                                $_SESSION["profile_image"] ?? "",
+                                "admin-avatar",
+                                "Admin",
+                                'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                            ) ?>
                         </a>
                         <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
-                        <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Profile', 'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                        <?= renderAvatar(
+                            $_SESSION["profile_image"] ?? "",
+                            "admin-avatar",
+                            "Profile",
+                            'style="transition:transform 0.2s;cursor:pointer;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                        ) ?>
                     </a>
                 <?php endif; ?>
                 <a href="login.php?logout=1" class="logout">
@@ -120,7 +165,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </header>
 
-    <?php if(!isset($_SESSION['user_id'])): ?>
+    <?php if (!isset($_SESSION["user_id"])): ?>
     <!-- ============ LANDING PAGE (LOGGED OUT) ============ -->
     <div class="landing-page-root">
 
@@ -131,50 +176,87 @@ if (isset($_SESSION['user_id'])) {
                 <div class="filmstrip-track">
                     <?php
                     $strip_imgs = [
-                        'landingpics/lan1.webp', 'landingpics/lan2.webp', 'landingpics/lan3.webp',
-                        'landingpics/lan4.webp', 'landingpics/lan5.webp', 'landingpics/lan6.webp',
-                        'landingpics/lan7.webp', 'landingpics/lan8.webp', 'landingpics/lan9.webp',
-                        'landingpics/lan10.webp', 'landingpics/lan11.webp', 'landingpics/lan12.webp',
-                        'landingpics/lan13.webp', 'landingpics/lan14.webp', 'landingpics/lan15.webp',
-                        'landingpics/lan16.webp', 'landingpics/lan17.webp',
+                        "landingpics/lan1.webp",
+                        "landingpics/lan2.webp",
+                        "landingpics/lan3.webp",
+                        "landingpics/lan4.webp",
+                        "landingpics/lan5.webp",
+                        "landingpics/lan6.webp",
+                        "landingpics/lan7.webp",
+                        "landingpics/lan8.webp",
+                        "landingpics/lan9.webp",
+                        "landingpics/lan10.webp",
+                        "landingpics/lan11.webp",
+                        "landingpics/lan12.webp",
+                        "landingpics/lan13.webp",
+                        "landingpics/lan14.webp",
+                        "landingpics/lan15.webp",
+                        "landingpics/lan16.webp",
+                        "landingpics/lan17.webp",
                     ];
                     // Duplicate for seamless loop
                     $all = array_merge($strip_imgs, $strip_imgs);
-                    foreach($all as $img): ?>
+                    foreach ($all as $img): ?>
                     <div class="filmstrip-frame">
                         <picture>
                             <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy" width="200" height="356">
+                            <img src="<?= str_replace(
+                                ".webp",
+                                ".png",
+                                $img,
+                            ) ?>" alt="" loading="lazy" width="200" height="356">
                         </picture>
                     </div>
-                    <?php endforeach; ?>
+                    <?php endforeach;
+                    ?>
                 </div>
             </div>
             <!-- Row 2: right scroll (reversed, middle row, larger) -->
             <div class="filmstrip-row row-2">
                 <div class="filmstrip-track track-reverse">
-                    <?php 
+                    <?php
                     // Shift array for variety in middle row
                     $middle_imgs = array_slice($strip_imgs, 8);
-                    $middle_imgs = array_merge($middle_imgs, array_slice($strip_imgs, 0, 8));
-                    foreach(array_merge($middle_imgs, $middle_imgs) as $img): ?>
+                    $middle_imgs = array_merge(
+                        $middle_imgs,
+                        array_slice($strip_imgs, 0, 8),
+                    );
+                    foreach (
+                        array_merge($middle_imgs, $middle_imgs)
+                        as $img
+                    ): ?>
                     <div class="filmstrip-frame frame-large">
                         <picture>
                             <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            <img src="<?= str_replace(
+                                ".webp",
+                                ".png",
+                                $img,
+                            ) ?>" alt="" loading="lazy">
                         </picture>
                     </div>
-                    <?php endforeach; ?>
+                    <?php endforeach;
+                    ?>
                 </div>
             </div>
             <!-- Row 3: left scroll (bottom row) -->
             <div class="filmstrip-row row-3">
                 <div class="filmstrip-track">
-                    <?php foreach(array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
+                    <?php foreach (
+                        array_merge(
+                            array_reverse($strip_imgs),
+                            array_reverse($strip_imgs),
+                        )
+                        as $img
+                    ): ?>
                     <div class="filmstrip-frame">
                         <picture>
                             <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                            <img src="<?= str_replace(
+                                ".webp",
+                                ".png",
+                                $img,
+                            ) ?>" alt="" loading="lazy">
                         </picture>
                     </div>
                     <?php endforeach; ?>
@@ -216,7 +298,7 @@ if (isset($_SESSION['user_id'])) {
                     Explore Prompts →
                 </a>
             </div>
-            
+
             <!-- Comparison Cards -->
             <div class="login-compare-section" aria-label="Login vs Guest comparison" style="padding-top:30px; margin-bottom:-20px;">
                 <p class="login-compare-heading"><i class="fa-solid fa-scale-balanced"></i>&nbsp; What you get</p>
@@ -307,9 +389,10 @@ if (isset($_SESSION['user_id'])) {
                         "More drops coming every week <i class=\"fa-solid fa-rocket\"></i>",
                     ];
                     $all_ticker = array_merge($ticker_items, $ticker_items); // duplicate for loop
-                    foreach($all_ticker as $t): ?>
+                    foreach ($all_ticker as $t): ?>
                     <span class="ticker-item"><?= $t ?><span class="ticker-sep"><i class="fa-solid fa-star"></i></span></span>
-                    <?php endforeach; ?>
+                    <?php endforeach;
+                    ?>
                 </div>
             </div>
         </div>
@@ -331,15 +414,17 @@ if (isset($_SESSION['user_id'])) {
     <?php endif; ?>
 
 
-    <?php if(isset($_SESSION['user_id'])): ?>
+    <?php if (isset($_SESSION["user_id"])): ?>
     <div class="container">
         <?php
         // Collect unique sub-tags across these secret prompts (exclude 'secret' itself)
         $secret_sub_tags = [];
-        foreach($prompts as $sp) {
-            $tarr = array_map('trim', explode(',', strtolower($sp['tag'])));
-            foreach($tarr as $t) {
-                if(!empty($t) && $t !== 'secret') $secret_sub_tags[] = $t;
+        foreach ($prompts as $sp) {
+            $tarr = array_map("trim", explode(",", strtolower($sp["tag"])));
+            foreach ($tarr as $t) {
+                if (!empty($t) && $t !== "secret") {
+                    $secret_sub_tags[] = $t;
+                }
             }
         }
         $secret_sub_tags = array_unique($secret_sub_tags);
@@ -347,8 +432,12 @@ if (isset($_SESSION['user_id'])) {
         ?>
         <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 24px;">
             <button class="tag-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
-            <?php foreach($secret_sub_tags as $t): ?>
-                <button class="tag-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
+            <?php foreach ($secret_sub_tags as $t): ?>
+                <button class="tag-filter-btn" data-tag="<?= htmlspecialchars(
+                    $t,
+                ) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(
+    ucfirst($t),
+) ?></button>
             <?php endforeach; ?>
         </div>
 
@@ -360,31 +449,58 @@ if (isset($_SESSION['user_id'])) {
         </div>
 
         <div class="card-stack-container" id="card-stack">
-            <?php if(count($prompts) === 0): ?>
+            <?php if (count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
-            <?php else: ?>
-                <?php foreach($prompts as $index => $p): 
-                    // Map DB prompt_type → JS/UI ptype key
-                    $db_type = $p['prompt_type'] ?? 'secret';
-                    if ($db_type === 'insta_viral')  $ptype = 'insta_viral';
-                    elseif ($db_type === 'unreleased') $ptype = 'unreleased';
-                    else                              $ptype = 'secret_code';
-                    
-                    $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
-                ?>
-                    <div class="card <?= $index === 0 ? 'card-active' : 'card-next' ?>" 
-                         data-index="<?= $index ?>" 
-                         data-id="<?= $p['id'] ?>" 
-                         data-image="<?= htmlspecialchars($p['image_path']) ?>" 
-                         data-title="<?= htmlspecialchars($p['title']) ?>" 
-                         data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
+            <?php
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                else: ?>
+                <?php foreach ($prompts as $index => $p):
+
+                    $db_type = $p["prompt_type"] ?? "secret";
+                    if ($db_type === "insta_viral") {
+                        $ptype = "insta_viral";
+                    } elseif ($db_type === "unreleased") {
+                        $ptype = "unreleased";
+                    } else {
+                        $ptype = "secret_code";
+                    }
+
+                    $tags_arr = array_map(
+                        "trim",
+                        explode(",", strtolower($p["tag"])),
+                    );
+                    ?>
+                    <div class="card <?= $index === 0
+                        ? "card-active"
+                        : "card-next" ?>"
+                         data-index="<?= $index ?>"
+                         data-id="<?= $p["id"] ?>"
+                         data-image="<?= htmlspecialchars($p["image_path"]) ?>"
+                         data-title="<?= htmlspecialchars($p["title"]) ?>"
+                         data-reel="<?= htmlspecialchars(
+                             $p["reel_link"] ?? "",
+                         ) ?>"
                          data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-                         data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-                         data-unlocked="<?= $p['is_unlocked'] ? 'true' : 'false' ?>"
-                         <?= $p['is_unlocked'] ? 'data-prompt-text="'.htmlspecialchars($p['prompt_text']).'"' : '' ?>>
-                        <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="Prompt Image" <?= $index < 3 ? '' : 'loading="lazy"' ?>>
-                        
-                        <?php if(!$p['is_unlocked']): ?>
+                         data-tags="<?= htmlspecialchars(
+                             implode(",", $tags_arr),
+                         ) ?>"
+                         data-unlocked="<?= $p["is_unlocked"]
+                             ? "true"
+                             : "false" ?>"
+                         <?= $p["is_unlocked"]
+                             ? 'data-prompt-text="' .
+                                 htmlspecialchars($p["prompt_text"]) .
+                                 '"'
+                             : "" ?>>
+                        <img src="<?= htmlspecialchars(
+                            $p["image_path"],
+                        ) ?>" class="card-bg-image" alt="Prompt Image" <?= $index <
+3
+    ? ""
+    : 'loading="lazy"' ?>>
+
+                        <?php if (!$p["is_unlocked"]): ?>
                             <div class="card-lock-icon">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             </div>
@@ -396,17 +512,24 @@ if (isset($_SESSION['user_id'])) {
 
                         <!-- Clickable overlay to trigger modal -->
                         <div class="card-click-trigger"></div>
-                        
+
                         <div class="card-content-overlay">
-                            <div class="card-title"><?= htmlspecialchars($p['title']) ?></div>
-                            <div class="like-btn" data-prompt-id="<?= $p['id'] ?>">
+                            <div class="card-title"><?= htmlspecialchars(
+                                $p["title"],
+                            ) ?></div>
+                            <div class="like-btn" data-prompt-id="<?= $p[
+                                "id"
+                            ] ?>">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                                <span class="like-count"><?= (int) $p[
+                                    "likes_count"
+                                ] ?></span>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-                
+                <?php
+                endforeach; ?>
+
                 <!-- End Card -->
                 <div class="card end-card card-next" id="end-card">
                     <div class="end-card-content">
@@ -415,7 +538,7 @@ if (isset($_SESSION['user_id'])) {
                         <p>stay tuned</p>
                     </div>
                 </div>
-                
+
                 <!-- Desktop Navigation Controls (Optional but helpful) -->
                 <div class="swipe-controls">
                     <button id="swipe-left-btn" class="comic-btn-small">&larr; Prev</button>
@@ -424,7 +547,7 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
         </div>
     </div>
-    
+
     <div class="container" style="padding-top:40px;padding-bottom:20px;position:relative;z-index:2;">
         <div style="background:var(--secondary-color);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:28px 36px;box-shadow:var(--shadow-comic);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;">
             <div>
@@ -472,7 +595,11 @@ if (isset($_SESSION['user_id'])) {
                     <div style="display:flex;gap:10px;flex-wrap:nowrap;width:100%;">
                         <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
                         <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-bookmark"></i> SAVE</button>
-                        <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" <?= !isset($_SESSION['user_id']) ? 'data-guest="true"' : '' ?> style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" <?= !isset(
+                            $_SESSION["user_id"],
+                        )
+                            ? 'data-guest="true"'
+                            : "" ?> style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
                             <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
                             <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
                         </button>
@@ -497,9 +624,11 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script src="script.js?v=2026051205"></script>
-    <script>
-        const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+    <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
+        ? "true"
+        : "false" ?>;</script>
+        <script src="script.js?v=2026051205"></script>
+        <script>
 
         // Background Scroll Logic
         const bgLayers = document.querySelectorAll('.bg-layer');
@@ -588,8 +717,3 @@ if (isset($_SESSION['user_id'])) {
     </script>
 </body>
 </html>
-
-
-
-
-
