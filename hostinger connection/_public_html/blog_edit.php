@@ -1,33 +1,71 @@
 <?php
 session_start();
-require_once 'db.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
-$id = (int)($_GET['id'] ?? 0);
-if (!$id) { header("Location: blog_admin.php"); exit(); }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title=$_POST['title']??''; $description=$_POST['description']??'';
-    $content=$_POST['content']??''; $meta_title=$_POST['meta_title']??'';
-    $meta_desc=$_POST['meta_description']??''; $tags=$_POST['tags']??'';
-    $image_ratio=$_POST['image_ratio']??'16:9';
-    $publish=isset($_POST['publish'])?1:0;
-    if(!$title){$_SESSION['edit_error']="Title required.";header("Location: blog_edit.php?id=$id");exit();}
-    $image_path=$_POST['current_image'];
-    if(isset($_FILES['image'])&&$_FILES['image']['error']===UPLOAD_ERR_OK){
-        $ext=pathinfo($_FILES['image']['name'],PATHINFO_EXTENSION);
-        $fn='uploads/blog_'.uniqid().'.'.$ext;
-        if(move_uploaded_file($_FILES['image']['tmp_name'],$fn)) $image_path=$fn;
-    }
-    $pdo->prepare("UPDATE blogs SET title=?,description=?,content=?,image_path=?,image_ratio=?,meta_title=?,meta_description=?,tags=?,is_published=?,updated_at=NOW() WHERE id=?")
-        ->execute([$title,$description,$content,$image_path,$image_ratio,$meta_title,$meta_desc,$tags,$publish,$id]);
-    $_SESSION['success_msg']="<i class='fa-solid fa-check'></i> Blog updated!"; header("Location: blog_admin.php"); exit();
+require_once "db.php";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    header("Location: index.php");
+    exit();
 }
-$stmt=$pdo->prepare("SELECT * FROM blogs WHERE id=?"); $stmt->execute([$id]);
-$bl=$stmt->fetch(PDO::FETCH_ASSOC);
-if(!$bl){header("Location: blog_admin.php");exit();}
-$edit_error=$_SESSION['edit_error']??''; unset($_SESSION['edit_error']);
+$id = (int) ($_GET["id"] ?? 0);
+if (!$id) {
+    header("Location: blog_admin.php");
+    exit();
+}
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $title = $_POST["title"] ?? "";
+    $description = $_POST["description"] ?? "";
+    $content = $_POST["content"] ?? "";
+    $meta_title = $_POST["meta_title"] ?? "";
+    $meta_desc = $_POST["meta_description"] ?? "";
+    $tags = $_POST["tags"] ?? "";
+    $image_ratio = $_POST["image_ratio"] ?? "16:9";
+    $publish = isset($_POST["publish"]) ? 1 : 0;
+    if (!$title) {
+        $_SESSION["edit_error"] = "Title required.";
+        header("Location: blog_edit.php?id=$id");
+        exit();
+    }
+    $image_path = $_POST["current_image"];
+    if (
+        isset($_FILES["image"]) &&
+        $_FILES["image"]["error"] === UPLOAD_ERR_OK
+    ) {
+        $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+        $fn = "uploads/blog_" . uniqid() . "." . $ext;
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
+            $image_path = $fn;
+        }
+    }
+    $pdo->prepare(
+        "UPDATE blogs SET title=?,description=?,content=?,image_path=?,image_ratio=?,meta_title=?,meta_description=?,tags=?,is_published=?,updated_at=NOW() WHERE id=?",
+    )->execute([
+        $title,
+        $description,
+        $content,
+        $image_path,
+        $image_ratio,
+        $meta_title,
+        $meta_desc,
+        $tags,
+        $publish,
+        $id,
+    ]);
+    $_SESSION["success_msg"] =
+        "<i class='fa-solid fa-check'></i> Blog updated!";
+    header("Location: blog_admin.php");
+    exit();
+}
+$stmt = $pdo->prepare("SELECT * FROM blogs WHERE id=?");
+$stmt->execute([$id]);
+$bl = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$bl) {
+    header("Location: blog_admin.php");
+    exit();
+}
+$edit_error = $_SESSION["edit_error"] ?? "";
+unset($_SESSION["edit_error"]);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Blog "&ndash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
+<title>Edit Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px}
@@ -66,7 +104,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head><body>
 <header>
   <div class="logo-area"  style="cursor:pointer">
@@ -75,19 +113,36 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
   </div>
   <nav class="nav-links"><a href="index.php">HOME</a><a href="dashboard.php">DASHBOARD</a><a href="blog_admin.php" style="background:var(--primary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-pencil"></i> BLOGS</a></nav>
   <div class="header-right"><div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+        $_SESSION["profile_image"] ?? "",
+        "admin-avatar",
+        "Admin",
+        'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+    ) ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
     <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
   </div>
 </header>
 <div class="bc-wrap">
   <div class="bc-title"><i class="fa-solid fa-pen"></i> Edit Blog</div>
-  <div class="bc-sub">Editing: <strong><?=htmlspecialchars($bl['title'])?></strong></div>
-  <?php if($edit_error):?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?=htmlspecialchars($edit_error)?></div><?php endif;?>
-  <form method="POST" action="blog_edit.php?id=<?=$id?>" enctype="multipart/form-data">
-    <input type="hidden" name="current_image" value="<?=htmlspecialchars($bl['image_path'])?>">
+  <div class="bc-sub">Editing: <strong><?= htmlspecialchars(
+      $bl["title"],
+  ) ?></strong></div>
+  <?php if (
+      $edit_error
+  ): ?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars(
+    $edit_error,
+) ?></div><?php endif; ?>
+  <form method="POST" action="blog_edit.php?id=<?= $id ?>" enctype="multipart/form-data">
+    <input type="hidden" name="current_image" value="<?= htmlspecialchars(
+        $bl["image_path"],
+    ) ?>">
     <div class="bc-card"><h2><i class="fa-solid fa-align-left"></i> Content</h2>
-      <div class="fg"><label>Title *</label><input type="text" name="title" value="<?=htmlspecialchars($bl['title'])?>" required></div>
-      <div class="fg"><label>Short Description</label><textarea name="description" rows="3"><?=htmlspecialchars($bl['description']??'')?></textarea></div>
+      <div class="fg"><label>Title *</label><input type="text" name="title" value="<?= htmlspecialchars(
+          $bl["title"],
+      ) ?>" required></div>
+      <div class="fg"><label>Short Description</label><textarea name="description" rows="3"><?= htmlspecialchars(
+          $bl["description"] ?? "",
+      ) ?></textarea></div>
       <div class="fg"><label>Content *</label>
         <div class="editor-toolbar">
           <button type="button" onclick="fmt('bold')"><b>B</b></button><button type="button" onclick="fmt('italic')"><i>I</i></button><button type="button" onclick="fmt('underline')"><u>U</u></button>
@@ -104,7 +159,9 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
           <button type="button" onclick="document.getElementById('editor-img-upload').click()"><i class="fa-solid fa-image"></i> Image</button>
           <input type="file" id="editor-img-upload" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
         </div>
-        <div class="editor-area" id="blog-editor" contenteditable="true"><?= $bl['content'] ?></div>
+        <div class="editor-area" id="blog-editor" contenteditable="true"><?= $bl[
+            "content"
+        ] ?></div>
         <div style="margin-top:10px;"><span style="font-size:.8rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;">Font Styles:</span>
         <div class="font-style-btns">
           <button type="button" onclick="applyFontStyle('font-serif')" style="font-family:Georgia,serif">Serif</button>
@@ -117,23 +174,41 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
       </div>
     </div>
     <div class="bc-card"><h2><i class="fa-solid fa-image"></i> Cover Image</h2>
-      <?php if($bl['image_path']): ?><div class="img-preview"><img src="<?=htmlspecialchars($bl['image_path'])?>" alt=""><span>Current image</span></div><?php endif; ?>
+      <?php if (
+          $bl["image_path"]
+      ): ?><div class="img-preview"><img src="<?= htmlspecialchars(
+    $bl["image_path"],
+) ?>" alt=""><span>Current image</span></div><?php endif; ?>
       <div class="file-upload-wrapper" style="margin-bottom:18px"><label for="e-img" class="file-upload-btn">Replace Image</label><span class="file-upload-name" id="e-fname">No file chosen</span><input type="file" id="e-img" name="image" accept="image/*" style="display:none" onchange="document.getElementById('e-fname').textContent=this.files[0]?.name||'No file chosen'"></div>
       <div class="fg">
         <label>Aspect Ratio</label>
         <select name="image_ratio">
-          <option value="16:9" <?=($bl['image_ratio']??'')==='16:9'?'selected':''?>>Landscape (16:9)</option>
-          <option value="9:16" <?=($bl['image_ratio']??'')==='9:16'?'selected':''?>>Portrait (9:16)</option>
+          <option value="16:9" <?= ($bl["image_ratio"] ?? "") === "16:9"
+              ? "selected"
+              : "" ?>>Landscape (16:9)</option>
+          <option value="9:16" <?= ($bl["image_ratio"] ?? "") === "9:16"
+              ? "selected"
+              : "" ?>>Portrait (9:16)</option>
         </select>
       </div>
     </div>
     <div class="bc-card"><h2><i class="fa-solid fa-magnifying-glass"></i> SEO</h2>
-      <div class="fg"><label>Meta Title</label><input type="text" name="meta_title" value="<?=htmlspecialchars($bl['meta_title']??'')?>"></div>
-      <div class="fg"><label>Meta Description</label><textarea name="meta_description" rows="2"><?=htmlspecialchars($bl['meta_description']??'')?></textarea></div>
-      <div class="fg"><label>Tags / Keywords</label><input type="text" name="tags" value="<?=htmlspecialchars($bl['tags']??'')?>"></div>
+      <div class="fg"><label>Meta Title</label><input type="text" name="meta_title" value="<?= htmlspecialchars(
+          $bl["meta_title"] ?? "",
+      ) ?>"></div>
+      <div class="fg"><label>Meta Description</label><textarea name="meta_description" rows="2"><?= htmlspecialchars(
+          $bl["meta_description"] ?? "",
+      ) ?></textarea></div>
+      <div class="fg"><label>Tags / Keywords</label><input type="text" name="tags" value="<?= htmlspecialchars(
+          $bl["tags"] ?? "",
+      ) ?>"></div>
     </div>
     <div class="bc-card"><h2><i class="fa-solid fa-rocket"></i> Publish</h2>
-      <div class="fg"><label class="pub-toggle" for="e-pub"><input type="checkbox" id="e-pub" name="publish" value="1" <?=$bl['is_published']?'checked':''?>> Published (uncheck to set as draft)</label></div>
+      <div class="fg"><label class="pub-toggle" for="e-pub"><input type="checkbox" id="e-pub" name="publish" value="1" <?= $bl[
+          "is_published"
+      ]
+          ? "checked"
+          : "" ?>> Published (uncheck to set as draft)</label></div>
       <div class="btn-row"><a href="blog_admin.php" class="btn-cancel"><i class="fa-solid fa-arrow-left"></i> Cancel</a><button type="submit" class="comic-btn" style="flex:2;background:var(--secondary-color)">Save Changes <i class="fa-solid fa-check"></i></button></div>
     </div>
   </form>
@@ -187,14 +262,3 @@ function uploadEditorImage(file) {
 }
 </script>
 </body></html>
-
-
-
-
-
-
-
-
-
-
-

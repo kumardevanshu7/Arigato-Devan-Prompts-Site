@@ -1,13 +1,13 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy — Arigato Devan PromptVerse</title>
+    <title>Privacy Policy &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,13 +25,13 @@ require_once 'db.php';
         .legal-card a { color: var(--primary-dark); font-weight: 700; }
         @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-title { font-size: 1.5rem; } }
     </style>
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
 <div class="filmstrip-bg" aria-hidden="true" style="opacity:0.08;">
-    <?php for($i=1;$i<=4;$i++): ?>
-    <div class="bg-layer active" style="background-image:url('landingpics/lan<?=$i?>.webp');"></div>
+    <?php for ($i = 1; $i <= 4; $i++): ?>
+    <div class="bg-layer active" style="background-image:url('landingpics/lan<?= $i ?>.webp');"></div>
     <?php endfor; ?>
 </div>
 <div class="bg-creamy-overlay" aria-hidden="true"></div>
@@ -46,7 +46,7 @@ require_once 'db.php';
     </nav>
     <div class="header-right">
         <div class="header-divider"></div>
-        <?php if(isset($_SESSION['user_id'])): ?>
+        <?php if (isset($_SESSION["user_id"])): ?>
             <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
         <?php else: ?>
             <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;">LOGIN</a>
@@ -110,7 +110,7 @@ require_once 'db.php';
 </div>
 
 <footer>
-    <div>&copy; <?= date('Y') ?> ARIGATO DEVAN. KEEP CREATING.</div>
+    <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
     <div class="footer-links">
         <a href="disclaimer.php">DISCLAIMER</a>
         <a href="terms.php">TERMS OF SERVICE</a>

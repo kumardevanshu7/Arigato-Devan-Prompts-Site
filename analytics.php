@@ -67,7 +67,7 @@ $pg_data = json_encode(array_column($prompt_growth_raw, "c"));
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Analytics &mdash; PromptVerse Admin</title>
+<title>Analytics &mdash; Arigato Devan Prompts Admin</title>
 <link rel="stylesheet" href="style.css?v=1778100000">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
@@ -98,7 +98,7 @@ canvas{max-height:280px}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 <header>

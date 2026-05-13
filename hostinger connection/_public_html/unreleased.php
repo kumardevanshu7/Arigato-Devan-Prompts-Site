@@ -32,7 +32,7 @@ if (isset($_SESSION["user_id"])) {
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unreleased Reels &mdash; PromptVerse</title>
+<title>Unreleased Reels &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="Unlock exclusive unreleased prompts on PromptVerse by showing love!">
 <link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@ if (isset($_SESSION["user_id"])) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
@@ -162,6 +162,10 @@ if (isset($_SESSION["user_id"])) {
             <p style="color:#888;font-weight:600;">Unreleased reels will appear here when the admin drops them!</p>
         </div>
     <?php
+        // Collect sub-tags (excluding 'unreleased' itself)
+        // Collect sub-tags (excluding 'unreleased' itself)
+        // Collect sub-tags (excluding 'unreleased' itself)
+        // Collect sub-tags (excluding 'unreleased' itself)
         // Collect sub-tags (excluding 'unreleased' itself)
         // Collect sub-tags (excluding 'unreleased' itself)
         // Collect sub-tags (excluding 'unreleased' itself)

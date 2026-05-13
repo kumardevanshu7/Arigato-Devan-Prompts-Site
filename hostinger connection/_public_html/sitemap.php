@@ -9,34 +9,78 @@ $base = "https://arigatodevan.com";
 
 // Static pages — public only (no login required pages)
 $static_pages = [
-    ["url" => "/", "priority" => "1.0", "changefreq" => "daily"],
-    ["url" => "/gallery.php", "priority" => "0.9", "changefreq" => "daily"],
+    [
+        "url" => "/",
+        "priority" => "1.0",
+        "changefreq" => "daily",
+        "lastmod" => "2025-06-01",
+    ],
+    [
+        "url" => "/gallery.php",
+        "priority" => "0.9",
+        "changefreq" => "daily",
+        "lastmod" => "2025-05-28",
+    ],
     [
         "url" => "/secret_code.php",
         "priority" => "0.8",
         "changefreq" => "weekly",
+        "lastmod" => "2025-04-10",
     ],
     [
         "url" => "/insta_viral.php",
         "priority" => "0.8",
         "changefreq" => "weekly",
+        "lastmod" => "2025-03-22",
     ],
-    ["url" => "/unreleased.php", "priority" => "0.8", "changefreq" => "weekly"],
+    [
+        "url" => "/unreleased.php",
+        "priority" => "0.8",
+        "changefreq" => "weekly",
+        "lastmod" => "2025-04-05",
+    ],
     [
         "url" => "/already_uploaded.php",
         "priority" => "0.8",
         "changefreq" => "weekly",
+        "lastmod" => "2025-05-15",
     ],
-    ["url" => "/blogs.php", "priority" => "0.7", "changefreq" => "weekly"],
-    ["url" => "/progress.php", "priority" => "0.5", "changefreq" => "monthly"],
-    ["url" => "/login.php", "priority" => "0.4", "changefreq" => "monthly"],
-    ["url" => "/terms.php", "priority" => "0.2", "changefreq" => "monthly"],
+    [
+        "url" => "/blogs.php",
+        "priority" => "0.7",
+        "changefreq" => "weekly",
+        "lastmod" => "2025-05-20",
+    ],
+    [
+        "url" => "/progress.php",
+        "priority" => "0.5",
+        "changefreq" => "monthly",
+        "lastmod" => "2025-02-14",
+    ],
+    [
+        "url" => "/login.php",
+        "priority" => "0.4",
+        "changefreq" => "monthly",
+        "lastmod" => "2025-01-15",
+    ],
+    [
+        "url" => "/terms.php",
+        "priority" => "0.2",
+        "changefreq" => "monthly",
+        "lastmod" => "2025-01-15",
+    ],
     [
         "url" => "/disclaimer.php",
         "priority" => "0.2",
         "changefreq" => "monthly",
+        "lastmod" => "2025-01-18",
     ],
-    ["url" => "/privacy.php", "priority" => "0.2", "changefreq" => "monthly"],
+    [
+        "url" => "/privacy.php",
+        "priority" => "0.2",
+        "changefreq" => "monthly",
+        "lastmod" => "2025-01-20",
+    ],
 ];
 
 // Fetch all published blog posts dynamically
@@ -57,7 +101,7 @@ $today = date("Y-m-d");
 <?php foreach ($static_pages as $page): ?>
   <url>
     <loc><?= $base . $page["url"] ?></loc>
-    <lastmod><?= $today ?></lastmod>
+    <lastmod><?= $page["lastmod"] ?></lastmod>
     <changefreq><?= $page["changefreq"] ?></changefreq>
     <priority><?= $page["priority"] ?></priority>
   </url>

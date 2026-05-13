@@ -1,44 +1,53 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Admin only
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    $_SESSION['error_msg'] = "Access denied.";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    $_SESSION["error_msg"] = "Access denied.";
     header("Location: index.php");
     exit();
 }
 
 // Flash messages
-$success = $_SESSION['success_msg'] ?? '';
-$error   = $_SESSION['error_msg'] ?? '';
-unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+$success = $_SESSION["success_msg"] ?? "";
+$error = $_SESSION["error_msg"] ?? "";
+unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 
 // Fetch all blogs with author name
-$blogs_all = $pdo->query("
+$blogs_all = $pdo
+    ->query(
+        "
     SELECT b.*, u.username as author_name, u.avatar as author_avatar_ob, u.profile_image as author_google_img
     FROM blogs b
     LEFT JOIN users u ON b.author_id = u.id
     ORDER BY b.created_at DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
 
-$blog_count   = count($blogs_all);
-$pub_count    = count(array_filter($blogs_all, fn($b) => $b['is_published']));
-$draft_count  = $blog_count - $pub_count;
-$total_likes  = array_sum(array_column($blogs_all, 'likes_count'));
+$blog_count = count($blogs_all);
+$pub_count = count(array_filter($blogs_all, fn($b) => $b["is_published"]));
+$draft_count = $blog_count - $pub_count;
+$total_likes = array_sum(array_column($blogs_all, "likes_count"));
 
 // Helper: get best avatar for a row
-function getAuthorAvatar(array $row): string {
-    if (!empty($row['author_avatar_ob']))   return $row['author_avatar_ob'];
-    if (!empty($row['author_google_img']))  return $row['author_google_img'];
-    return 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin';
+function getAuthorAvatar(array $row): string
+{
+    if (!empty($row["author_avatar_ob"])) {
+        return $row["author_avatar_ob"];
+    }
+    if (!empty($row["author_google_img"])) {
+        return $row["author_google_img"];
+    }
+    return "https://api.dicebear.com/7.x/avataaars/svg?seed=admin";
 }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blog Management "&ndash; Admin | PromptVerse</title>
+<title>Blog Management &ndash; Admin | Arigato Devan Prompts</title>
 <link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 body { background: var(--bg-color); }
@@ -291,7 +300,7 @@ body { background: var(--bg-color); }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
@@ -313,7 +322,12 @@ body { background: var(--bg-color); }
         <div class="header-divider"></div>
             <div style="display:flex; align-items:center; gap:8px;">
                 <a href="profile.php" title="Edit Profile">
-                    <?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?>
+                    <?= renderAvatar(
+                        $_SESSION["profile_image"] ?? "",
+                        "admin-avatar",
+                        "Admin",
+                        'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+                    ) ?>
                 </a>
                 <a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a>
             </div>
@@ -326,11 +340,11 @@ body { background: var(--bg-color); }
 
 <div class="bm-wrap">
 
-    <?php if($success): ?>
-    <div class="flash-success"><?=htmlspecialchars($success)?></div>
+    <?php if ($success): ?>
+    <div class="flash-success"><?= htmlspecialchars($success) ?></div>
     <?php endif; ?>
-    <?php if($error): ?>
-    <div class="flash-error"><?=htmlspecialchars($error)?></div>
+    <?php if ($error): ?>
+    <div class="flash-error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <!-- Page Header -->
@@ -341,9 +355,9 @@ body { background: var(--bg-color); }
 
     <!-- Stats Row -->
     <div class="bm-stat-row">
-        <div class="bm-stat-chip" style="background:var(--secondary-color);"><i class="fa-solid fa-rocket"></i> <?=$pub_count?> Published</div>
-        <div class="bm-stat-chip" style="background:#ddd;"><i class="fa-solid fa-file-pen"></i> <?=$draft_count?> Drafts</div>
-        <div class="bm-stat-chip" style="background:#ffe3f0;"><i class="fa-solid fa-heart"></i> <?=$total_likes?> Total Likes</div>
+        <div class="bm-stat-chip" style="background:var(--secondary-color);"><i class="fa-solid fa-rocket"></i> <?= $pub_count ?> Published</div>
+        <div class="bm-stat-chip" style="background:#ddd;"><i class="fa-solid fa-file-pen"></i> <?= $draft_count ?> Drafts</div>
+        <div class="bm-stat-chip" style="background:#ffe3f0;"><i class="fa-solid fa-heart"></i> <?= $total_likes ?> Total Likes</div>
         <a href="blogs.php" target="_blank" class="bm-stat-chip" style="background:var(--primary-color);text-decoration:none;color:var(--text-color);"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Public Blog</a>
     </div>
 
@@ -351,10 +365,10 @@ body { background: var(--bg-color); }
     <div class="bm-card">
         <div class="bm-card-header">
             <h2>All Blog Posts</h2>
-            <div class="badge" style="margin:0;transform:rotate(0);background:var(--primary-color);padding:6px 16px;"><?=$blog_count?> Total</div>
+            <div class="badge" style="margin:0;transform:rotate(0);background:var(--primary-color);padding:6px 16px;"><?= $blog_count ?> Total</div>
         </div>
 
-        <?php if($blog_count === 0): ?>
+        <?php if ($blog_count === 0): ?>
         <div class="empty-state">
             No blog posts yet.<br>
             <a href="blog_create.php" style="color:var(--primary-dark);font-weight:800;">Create your first post <i class="fa-solid fa-arrow-right"></i></a>
@@ -365,17 +379,22 @@ body { background: var(--bg-color); }
         <input type="text" id="blog-search" class="bm-search" placeholder="Search by title or tag...">
 
         <div id="blog-items-list">
-        <?php foreach($blogs_all as $bl):
+        <?php foreach ($blogs_all as $bl):
+
             $authorAv = getAuthorAvatar($bl);
-            $tagsArr  = $bl['tags'] ? array_filter(array_map('trim', explode(',', $bl['tags']))) : [];
-        ?>
-        <div class="blog-item <?=$bl['is_published']?'':'is-draft'?>"
-             data-title="<?=strtolower(htmlspecialchars($bl['title']))?>"
-             data-tags="<?=strtolower(htmlspecialchars($bl['tags']??''))?>">
+            $tagsArr = $bl["tags"]
+                ? array_filter(array_map("trim", explode(",", $bl["tags"])))
+                : [];
+            ?>
+        <div class="blog-item <?= $bl["is_published"] ? "" : "is-draft" ?>"
+             data-title="<?= strtolower(htmlspecialchars($bl["title"])) ?>"
+             data-tags="<?= strtolower(htmlspecialchars($bl["tags"] ?? "")) ?>">
 
             <!-- Thumbnail -->
-            <?php if($bl['image_path']): ?>
-            <img src="<?=htmlspecialchars($bl['image_path'])?>" class="blog-item-img" alt="">
+            <?php if ($bl["image_path"]): ?>
+            <img src="<?= htmlspecialchars(
+                $bl["image_path"],
+            ) ?>" class="blog-item-img" alt="">
             <?php else: ?>
             <div class="blog-item-img-placeholder"><i class="fa-solid fa-file-pen"></i></div>
             <?php endif; ?>
@@ -383,47 +402,77 @@ body { background: var(--bg-color); }
             <!-- Details -->
             <div class="blog-item-details">
                 <div class="blog-item-title">
-                    <?=htmlspecialchars($bl['title'])?>
-                    <span class="status-badge <?=$bl['is_published']?'badge-pub':'badge-draft'?>">
-                        <?=$bl['is_published']?'Published':'Draft'?>
+                    <?= htmlspecialchars($bl["title"]) ?>
+                    <span class="status-badge <?= $bl["is_published"]
+                        ? "badge-pub"
+                        : "badge-draft" ?>">
+                        <?= $bl["is_published"] ? "Published" : "Draft" ?>
                     </span>
                 </div>
                 <div class="blog-item-meta">
-                    <?= renderAvatar($authorAv, 'author-av', '') ?>
-                    <span style="color:var(--text-color);font-weight:800;"><?=htmlspecialchars($bl['author_name']??'Admin')?></span>
+                    <?= renderAvatar($authorAv, "author-av", "") ?>
+                    <span style="color:var(--text-color);font-weight:800;"><?= htmlspecialchars(
+                        $bl["author_name"] ?? "Admin",
+                    ) ?></span>
                     <span>&middot;</span>
-                    <span><i class="fa-solid fa-heart"></i> <?=(int)$bl['likes_count']?></span>
+                    <span><i class="fa-solid fa-heart"></i> <?= (int) $bl[
+                        "likes_count"
+                    ] ?></span>
                     <span>&middot;</span>
-                    <span><?=date('d M Y', strtotime($bl['created_at']))?></span>
-                    <?php if(!empty($tagsArr)): ?>
+                    <span><?= date(
+                        "d M Y",
+                        strtotime($bl["created_at"]),
+                    ) ?></span>
+                    <?php if (!empty($tagsArr)): ?>
                     <span>&middot;</span>
-                    <?php foreach(array_slice($tagsArr,0,3) as $t): ?>
-                    <span style="background:var(--bg-color);border:1px solid var(--border-color);border-radius:10px;padding:1px 8px;font-size:.72rem;"><?=htmlspecialchars($t)?></span>
+                    <?php foreach (array_slice($tagsArr, 0, 3) as $t): ?>
+                    <span style="background:var(--bg-color);border:1px solid var(--border-color);border-radius:10px;padding:1px 8px;font-size:.72rem;"><?= htmlspecialchars(
+                        $t,
+                    ) ?></span>
                     <?php endforeach; ?>
                     <?php endif; ?>
                     <span>&middot;</span>
-                    <a href="blog.php?slug=<?=urlencode($bl['slug'])?>" target="_blank" style="color:var(--primary-dark);font-weight:800;">View <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="blog.php?slug=<?= urlencode(
+                        $bl["slug"],
+                    ) ?>" target="_blank" style="color:var(--primary-dark);font-weight:800;">View <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
 
             <!-- Actions -->
             <div class="action-btns">
-                <a href="blog_edit.php?id=<?=$bl['id']?>" class="edit-btn" title="Edit"><i class="fa-solid fa-pencil"></i></a>
+                <a href="blog_edit.php?id=<?= $bl[
+                    "id"
+                ] ?>" class="edit-btn" title="Edit"><i class="fa-solid fa-pencil"></i></a>
                 <form action="blog_toggle.php" method="POST" style="margin:0;">
-                    <input type="hidden" name="blog_id" value="<?=$bl['id']?>">
-                    <input type="hidden" name="status" value="<?=$bl['is_published']?0:1?>">
+                    <input type="hidden" name="blog_id" value="<?= $bl[
+                        "id"
+                    ] ?>">
+                    <input type="hidden" name="status" value="<?= $bl[
+                        "is_published"
+                    ]
+                        ? 0
+                        : 1 ?>">
                     <button type="submit" class="edit-btn"
-                        style="background:<?=$bl['is_published']?'#ffe3f0':'var(--secondary-color)'?>"
-                        title="<?=$bl['is_published']?'Unpublish':'Publish'?>">
-                        <?=$bl['is_published']?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-rocket"></i>'?>
+                        style="background:<?= $bl["is_published"]
+                            ? "#ffe3f0"
+                            : "var(--secondary-color)" ?>"
+                        title="<?= $bl["is_published"]
+                            ? "Unpublish"
+                            : "Publish" ?>">
+                        <?= $bl["is_published"]
+                            ? '<i class="fa-solid fa-eye-slash"></i>'
+                            : '<i class="fa-solid fa-rocket"></i>' ?>
                     </button>
                 </form>
-                <button class="delete-btn" onclick="confirmDel(<?=$bl['id']?>, '<?=addslashes(htmlspecialchars($bl['title']))?>')">
+                <button class="delete-btn" onclick="confirmDel(<?= $bl[
+                    "id"
+                ] ?>, '<?= addslashes(htmlspecialchars($bl["title"])) ?>')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
             </div>
         </div>
-        <?php endforeach; ?>
+        <?php
+        endforeach; ?>
         </div>
 
         <?php endif; ?>
@@ -471,7 +520,3 @@ document.getElementById('del-modal')?.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
-
-
-
-

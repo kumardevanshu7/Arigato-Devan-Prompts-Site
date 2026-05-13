@@ -8,10 +8,37 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPromptId = null;
   let currentCardElement = null;
 
-  // Custom Alert System — only shows errors, not success/debug toasts
+  // Custom Alert System — styled toast notification
   function showComicAlert(message, type = "error") {
-    // Disabled per user request
-    return;
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    Object.assign(toast.style, {
+      position: "fixed",
+      bottom: "32px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: type === "error" ? "#fff1b8" : "#fdfbf7",
+      color: "#2d2a35",
+      border: "3px solid #2d2a35",
+      borderRadius: "14px",
+      boxShadow: "4px 4px 0px #2d2a35",
+      fontFamily: "Outfit, sans-serif",
+      fontWeight: "800",
+      fontSize: "1rem",
+      padding: "14px 28px",
+      zIndex: "99999",
+      opacity: "1",
+      transition: "opacity 0.4s ease",
+      pointerEvents: "none",
+      whiteSpace: "nowrap",
+      maxWidth: "90vw",
+      textAlign: "center",
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => toast.remove(), 420);
+    }, 2500);
   }
 
   // --- Swipe Stack Logic ---
@@ -890,7 +917,10 @@ document.addEventListener("DOMContentLoaded", () => {
           // First unlock celebration
           if (typeof checkFirstUnlock === "function") checkFirstUnlock();
         } else {
-          showComicAlert(data.message || "Failed to unlock! Try again.", "error");
+          showComicAlert(
+            data.message || "Failed to unlock! Try again.",
+            "error",
+          );
           setTimeout(() => {
             if (currentCardElement) currentCardElement.click();
           }, 1500);

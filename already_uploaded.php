@@ -29,7 +29,7 @@ if (isset($_SESSION["user_id"])) {
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Already Uploaded Prompts &mdash; PromptVerse</title>
+<title>Already Uploaded Prompts &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="Unlock prompts previously shared on Instagram with just 9 taps!">
 <link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@ if (isset($_SESSION["user_id"])) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
@@ -155,6 +155,10 @@ if (isset($_SESSION["user_id"])) {
             <p style="color:#888;font-weight:600;">Already uploaded reels will appear here when the admin adds them!</p>
         </div>
     <?php
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)

@@ -39,7 +39,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars(
     $blog["meta_title"] ?? $blog["title"],
-) ?> "&ndash; Arigato Devan</title>
+) ?> &ndash; Arigato Devan Prompts</title>
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
 ) ?>">
@@ -120,7 +120,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <!-- Scrollable Wallpaper Background -->
@@ -336,11 +336,18 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <script defer src="script.js?v=1778000000"></script>
 <script>
 // Blog Like
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff1b8;color:#2d2a35;border:3px solid #2d2a35;border-radius:14px;padding:12px 22px;font-weight:800;font-family:Outfit,sans-serif;box-shadow:4px 4px 0px #2d2a35;z-index:9999;font-size:.95rem;transition:opacity .3s';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+}
 const likeBtn = document.getElementById('blog-like-btn');
 if (likeBtn) {
   likeBtn.addEventListener('click', () => {
     <?php if (!isset($_SESSION["user_id"])): ?>
-    alert('Login first to like!'); return;
+    showToast('Login first to like! 💛'); return;
     <?php endif; ?>
     const blogId = likeBtn.dataset.blogId;
     const fd = new FormData(); fd.append('blog_id', blogId);

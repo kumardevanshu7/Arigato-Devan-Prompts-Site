@@ -38,7 +38,7 @@ arsort($all_tags);
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blogs "&ndash; Arigato Devan PromptVerse</title>
+<title>Blogs &ndash; Arigato Devan Prompts</title>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <link rel="stylesheet" href="style.css?v=1778100000">
 <style>
@@ -333,7 +333,7 @@ arsort($all_tags);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <!-- Scrollable Wallpaper Background -->
@@ -435,7 +435,7 @@ arsort($all_tags);
 <!-- Hero -->
 <div class="blogs-hero">
   <div class="badge"><i class="fa-solid fa-pen-nib"></i> FRESH READS</div>
-  <h1>The <span class="highlight">PromptVerse</span> Blog</h1>
+  <h1>The <span class="highlight">Arigato Devan</span> Blog</h1>
   <p>Tips, stories, and ideas to fuel your creative AI journey.</p>
 </div>
 
@@ -576,16 +576,23 @@ function filterByTag(tag, btn) {
 <script>
         // Background Scroll Logic
         const bgLayers = document.querySelectorAll('.bg-layer');
+        let _blogsScrollTicking = false;
         if (bgLayers.length > 0) {
-            window.addEventListener('scroll', () => {
-                const scrollPos = window.scrollY;
-                const pixelsPerLayer = 500;
-                let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
-                if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
-                bgLayers.forEach((layer, index) => {
-                    if (index === activeIndex) layer.classList.add('active');
-                    else layer.classList.remove('active');
-                });
+            window.addEventListener('scroll', function() {
+                if (!_blogsScrollTicking) {
+                    requestAnimationFrame(function() {
+                        const scrollPos = window.scrollY;
+                        const pixelsPerLayer = 500;
+                        let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
+                        if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
+                        bgLayers.forEach((layer, index) => {
+                            if (index === activeIndex) layer.classList.add('active');
+                            else layer.classList.remove('active');
+                        });
+                        _blogsScrollTicking = false;
+                    });
+                    _blogsScrollTicking = true;
+                }
             });
         }
 </script>

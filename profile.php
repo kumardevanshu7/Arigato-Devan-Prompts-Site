@@ -1,52 +1,52 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Must be logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+if (!isset($_SESSION["user_id"])) {
+    header("Location: login.php");
     exit();
 }
 
 // Fetch current user data
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([$_SESSION["user_id"]]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // --- Avatar Pool ---
 $male_avatars = [
-    'profiledp/b1.webp',
-    'profiledp/b2.webp',
-    'profiledp/b3.webp',
-    'profiledp/b4.webp',
-    'profiledp/b5.webp',
-    'profiledp/b6.webp',
-    'profiledp/b7.webp',
+    "profiledp/b1.webp",
+    "profiledp/b2.webp",
+    "profiledp/b3.webp",
+    "profiledp/b4.webp",
+    "profiledp/b5.webp",
+    "profiledp/b6.webp",
+    "profiledp/b7.webp",
 ];
 $female_avatars = [
-    'profiledp/g1.webp',
-    'profiledp/g2.webp',
-    'profiledp/g3.webp',
-    'profiledp/g4.webp',
-    'profiledp/g5.webp',
-    'profiledp/g6.webp',
-    'profiledp/g7.webp',
+    "profiledp/g1.webp",
+    "profiledp/g2.webp",
+    "profiledp/g3.webp",
+    "profiledp/g4.webp",
+    "profiledp/g5.webp",
+    "profiledp/g6.webp",
+    "profiledp/g7.webp",
 ];
 $all_avatars = array_merge($male_avatars, $female_avatars);
 
-$errors   = [];
-$success  = false;
+$errors = [];
+$success = false;
 
 // Defaults: current values (or POST values if re-showing form after error)
-$cur_username = $_POST['username'] ?? $user['username'] ?? '';
-$cur_avatar   = $_POST['avatar']   ?? $user['avatar']   ?? '';
-$cur_gender   = $_POST['gender']   ?? $user['gender']   ?? '';
+$cur_username = $_POST["username"] ?? ($user["username"] ?? "");
+$cur_avatar = $_POST["avatar"] ?? ($user["avatar"] ?? "");
+$cur_gender = $_POST["gender"] ?? ($user["gender"] ?? "");
 
 // --- Handle POST ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $avatar   = trim($_POST['avatar']   ?? '');
-    $gender   = trim($_POST['gender']   ?? '');
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"] ?? "");
+    $avatar = trim($_POST["avatar"] ?? "");
+    $gender = trim($_POST["gender"] ?? "");
 
     if (strlen($username) < 3 || strlen($username) > 15) {
         $errors[] = "Username must be 3-15 characters.";
@@ -57,26 +57,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!in_array($avatar, $all_avatars)) {
         $errors[] = "Please select an avatar.";
     }
-    if (!in_array($gender, ['male', 'female', 'nonbinary'])) {
+    if (!in_array($gender, ["male", "female", "nonbinary"])) {
         $errors[] = "Please select a gender.";
     }
 
     if (empty($errors)) {
-        $pdo->prepare("UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?")
-            ->execute([$username, $avatar, $gender, $_SESSION['user_id']]);
+        $pdo->prepare(
+            "UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?",
+        )->execute([$username, $avatar, $gender, $_SESSION["user_id"]]);
 
-        $_SESSION['username']  = $username;
-        $_SESSION['profile_image'] = $avatar;
-        $_SESSION['onboarding_complete'] = 1;
+        $_SESSION["username"] = $username;
+        $_SESSION["profile_image"] = $avatar;
+        $_SESSION["onboarding_complete"] = 1;
 
         $success = true;
         // Re-fetch for display
-        $user['username'] = $username;
-        $user['avatar']   = $avatar;
-        $user['gender']   = $gender;
+        $user["username"] = $username;
+        $user["avatar"] = $avatar;
+        $user["gender"] = $gender;
         $cur_username = $username;
-        $cur_avatar   = $avatar;
-        $cur_gender   = $gender;
+        $cur_avatar = $avatar;
+        $cur_gender = $gender;
     }
 }
 ?>
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile "Ã¢â‚¬Â PromptVerse</title>
+    <title>Edit Profile &ndash; Arigato Devan Prompts</title>
     <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
         body { min-height: 100vh; padding: 40px 16px 80px; background: var(--bg-color); }
@@ -274,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <div class="prof-wrap">
@@ -285,10 +286,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Current Avatar Preview Header -->
             <div class="prof-header">
-                <img src="<?= htmlspecialchars($user['avatar'] ?: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default') ?>"
+                <img src="<?= htmlspecialchars(
+                    $user["avatar"] ?:
+                    "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
+                ) ?>"
                      alt="Your Avatar" class="prof-current-avatar" id="live-avatar-preview" referrerpolicy="no-referrer">
                 <div class="prof-header-info">
-                    <h2><?= htmlspecialchars($user['username'] ?? 'Your Profile') ?></h2>
+                    <h2><?= htmlspecialchars(
+                        $user["username"] ?? "Your Profile",
+                    ) ?></h2>
                     <p>Update your profile anytime &mdash; no restrictions!</p>
                 </div>
             </div>
@@ -299,7 +305,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (!empty($errors)): ?>
                 <div class="flash-error">
                     <i class="fa-solid fa-triangle-exclamation"></i> Fix the following:
-                    <ul><?php foreach($errors as $e): ?><li><?= htmlspecialchars($e) ?></li><?php endforeach; ?></ul>
+                    <ul><?php foreach (
+                        $errors
+                        as $e
+                    ): ?><li><?= htmlspecialchars(
+    $e,
+) ?></li><?php endforeach; ?></ul>
                 </div>
             <?php endif; ?>
 
@@ -311,12 +322,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="avatar-divider">Male</div>
                     <div class="avatar-grid">
-                        <?php foreach($male_avatars as $av): ?>
+                        <?php foreach ($male_avatars as $av): ?>
                         <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
-                                <?= ($cur_avatar === $av) ? 'checked' : '' ?>>
+                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
+                                $av,
+                            ) ?>"
+                                <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars($av) ?>" alt="Avatar" loading="lazy">
+                                <img src="<?= htmlspecialchars(
+                                    $av,
+                                ) ?>" alt="Avatar" loading="lazy">
                             </div>
                         </label>
                         <?php endforeach; ?>
@@ -324,12 +339,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="avatar-divider">Female</div>
                     <div class="avatar-grid">
-                        <?php foreach($female_avatars as $av): ?>
+                        <?php foreach ($female_avatars as $av): ?>
                         <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
-                                <?= ($cur_avatar === $av) ? 'checked' : '' ?>>
+                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
+                                $av,
+                            ) ?>"
+                                <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars($av) ?>" alt="Avatar" loading="lazy">
+                                <img src="<?= htmlspecialchars(
+                                    $av,
+                                ) ?>" alt="Avatar" loading="lazy">
                             </div>
                         </label>
                         <?php endforeach; ?>
@@ -355,15 +374,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="ob-section-title"><i class="fa-solid fa-venus-mars"></i> Gender</div>
                     <div class="gender-grid">
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="male" <?= ($cur_gender === 'male') ? 'checked' : '' ?>>
+                            <input type="radio" name="gender" value="male" <?= $cur_gender ===
+                            "male"
+                                ? "checked"
+                                : "" ?>>
                             <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-mars"></i></span> Male</div>
                         </label>
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="female" <?= ($cur_gender === 'female') ? 'checked' : '' ?>>
+                            <input type="radio" name="gender" value="female" <?= $cur_gender ===
+                            "female"
+                                ? "checked"
+                                : "" ?>>
                             <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-venus"></i></span> Female</div>
                         </label>
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="nonbinary" <?= ($cur_gender === 'nonbinary') ? 'checked' : '' ?>>
+                            <input type="radio" name="gender" value="nonbinary" <?= $cur_gender ===
+                            "nonbinary"
+                                ? "checked"
+                                : "" ?>>
                             <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-genderless"></i></span> Non-binary</div>
                         </label>
                     </div>
@@ -401,9 +429,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
-
-
-
-
-
-

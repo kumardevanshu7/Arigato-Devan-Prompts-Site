@@ -1,38 +1,38 @@
 <?php
 session_start();
 // Handle logout
-if (isset($_GET['logout'])) {
+if (isset($_GET["logout"])) {
     session_destroy();
     header("Location: login.php");
     exit();
 }
 
 // Redirect if already logged in
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["user_id"])) {
     header("Location: index.php");
     exit();
 }
-$error = $_SESSION['error_msg'] ?? '';
-unset($_SESSION['error_msg']);
+$error = $_SESSION["error_msg"] ?? "";
+unset($_SESSION["error_msg"]);
 
 $strip_imgs = [
-    'landingpics/lan1.webp',
-    'landingpics/lan2.webp',
-    'landingpics/lan3.webp',
-    'landingpics/lan4.webp',
-    'landingpics/lan5.webp',
-    'landingpics/lan6.webp',
-    'landingpics/lan7.webp',
-    'landingpics/lan8.webp',
-    'landingpics/lan9.webp',
-    'landingpics/lan10.webp',
-    'landingpics/lan11.webp',
-    'landingpics/lan12.webp',
-    'landingpics/lan13.webp',
-    'landingpics/lan14.webp',
-    'landingpics/lan15.webp',
-    'landingpics/lan16.webp',
-    'landingpics/lan17.webp',
+    "landingpics/lan1.webp",
+    "landingpics/lan2.webp",
+    "landingpics/lan3.webp",
+    "landingpics/lan4.webp",
+    "landingpics/lan5.webp",
+    "landingpics/lan6.webp",
+    "landingpics/lan7.webp",
+    "landingpics/lan8.webp",
+    "landingpics/lan9.webp",
+    "landingpics/lan10.webp",
+    "landingpics/lan11.webp",
+    "landingpics/lan12.webp",
+    "landingpics/lan13.webp",
+    "landingpics/lan14.webp",
+    "landingpics/lan15.webp",
+    "landingpics/lan16.webp",
+    "landingpics/lan17.webp",
 ];
 ?>
 <!DOCTYPE html>
@@ -41,7 +41,7 @@ $strip_imgs = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login "&ndash; Arigato Devan PromptVerse</title>
+    <title>Login &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
     <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
@@ -552,7 +552,7 @@ $strip_imgs = [
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 
 <body>
@@ -562,11 +562,18 @@ $strip_imgs = [
         <div class="login-filmstrip" aria-hidden="true">
             <div class="filmstrip-row row-1">
                 <div class="filmstrip-track">
-                    <?php foreach (array_merge($strip_imgs, $strip_imgs) as $img): ?>
+                    <?php foreach (
+                        array_merge($strip_imgs, $strip_imgs)
+                        as $img
+                    ): ?>
                         <div class="filmstrip-frame">
                             <picture>
                                 <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                                <img src="<?= str_replace(
+                                    ".webp",
+                                    ".png",
+                                    $img,
+                                ) ?>" alt="" loading="lazy">
                             </picture>
                         </div>
                     <?php endforeach; ?>
@@ -574,11 +581,21 @@ $strip_imgs = [
             </div>
             <div class="filmstrip-row row-2">
                 <div class="filmstrip-track track-reverse">
-                    <?php foreach (array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
+                    <?php foreach (
+                        array_merge(
+                            array_reverse($strip_imgs),
+                            array_reverse($strip_imgs),
+                        )
+                        as $img
+                    ): ?>
                         <div class="filmstrip-frame">
                             <picture>
                                 <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                                <img src="<?= str_replace(
+                                    ".webp",
+                                    ".png",
+                                    $img,
+                                ) ?>" alt="" loading="lazy">
                             </picture>
                         </div>
                     <?php endforeach; ?>
@@ -720,10 +737,24 @@ $strip_imgs = [
             <div class="ticker-track-wrap">
                 <div class="ticker-track">
                     <?php
-                    $ticker = ["Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>", "Get ready for ultra-realistic AI prompts", "Unlock viral content ideas instantly", "Create stunning couple scenes with AI", "Your next viral reel starts here", "Premium prompts. Real emotions.", "Turn ideas into aesthetic visuals", "AI couple content made easy", "Scroll. Unlock. Create.", "More drops coming every week <i class='fa-solid fa-rocket'></i>"];
-                    foreach (array_merge($ticker, $ticker) as $t):
-                        ?><span class="ticker-item"><?= $t ?><span class="ticker-sep"><i
-                                    class="fa-solid fa-star-of-life"></i></span></span><?php endforeach; ?>
+                    $ticker = [
+                        "Couple Prompts are here <i class='fa-solid fa-heart' style='color:#ff3366;'></i>",
+                        "Get ready for ultra-realistic AI prompts",
+                        "Unlock viral content ideas instantly",
+                        "Create stunning couple scenes with AI",
+                        "Your next viral reel starts here",
+                        "Premium prompts. Real emotions.",
+                        "Turn ideas into aesthetic visuals",
+                        "AI couple content made easy",
+                        "Scroll. Unlock. Create.",
+                        "More drops coming every week <i class='fa-solid fa-rocket'></i>",
+                    ];
+                    foreach (
+                        array_merge($ticker, $ticker)
+                        as $t
+                    ): ?><span class="ticker-item"><?= $t ?><span class="ticker-sep"><i
+                                    class="fa-solid fa-star-of-life"></i></span></span><?php endforeach;
+                    ?>
                 </div>
             </div>
         </div>
@@ -744,7 +775,7 @@ $strip_imgs = [
             });
         }
     </script>
-    
+
     <!-- Firebase Authentication SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -765,23 +796,23 @@ $strip_imgs = [
         provider.setCustomParameters({ prompt: 'select_account' });
 
         const loginBtn = document.getElementById('google-login-btn');
-        
+
         loginBtn.addEventListener('click', () => {
             loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
             loginBtn.disabled = true;
-            
+
             signInWithPopup(auth, provider)
                 .then(async (result) => {
                     // Get the secure ID token
                     const idToken = await result.user.getIdToken();
-                    
+
                     // Send to our PHP backend to start the session
                     const response = await fetch('firebase_auth.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ idToken: idToken })
                     });
-                    
+
                     const data = await response.json();
                     if(data.success) {
                         window.location.href = 'index.php'; // PHP session created, go to home

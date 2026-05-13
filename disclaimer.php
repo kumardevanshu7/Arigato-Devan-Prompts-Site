@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disclaimer "Ã¢â‚¬Â Arigato Devan PromptVerse</title>
+    <title>Disclaimer &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="AI-generated content disclaimer for Arigato Devan PromptVerse. Understand the nature of AI prompts and content.">
     <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <!-- Film Strip Background Layer -->
@@ -31,25 +31,42 @@
             <div class="filmstrip-track">
                 <?php
                 $strip_imgs = [];
-                for($i=1; $i<=17; $i++) $strip_imgs[] = "landingpics/lan$i.webp";
+                for ($i = 1; $i <= 17; $i++) {
+                    $strip_imgs[] = "landingpics/lan$i.webp";
+                }
                 $all = array_merge($strip_imgs, $strip_imgs);
-                foreach($all as $img): ?>
+                foreach ($all as $img): ?>
                 <div class="filmstrip-frame">
                             <picture>
                                 <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                                <img src="<?= str_replace(
+                                    ".webp",
+                                    ".png",
+                                    $img,
+                                ) ?>" alt="" loading="lazy">
                             </picture>
                         </div>
-                <?php endforeach; ?>
+                <?php endforeach;
+                ?>
             </div>
         </div>
         <div class="filmstrip-row row-2">
             <div class="filmstrip-track track-reverse">
-                <?php foreach(array_merge(array_reverse($strip_imgs), array_reverse($strip_imgs)) as $img): ?>
+                <?php foreach (
+                    array_merge(
+                        array_reverse($strip_imgs),
+                        array_reverse($strip_imgs),
+                    )
+                    as $img
+                ): ?>
                 <div class="filmstrip-frame">
                             <picture>
                                 <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace('.webp', '.png', $img) ?>" alt="" loading="lazy">
+                                <img src="<?= str_replace(
+                                    ".webp",
+                                    ".png",
+                                    $img,
+                                ) ?>" alt="" loading="lazy">
                             </picture>
                         </div>
                 <?php endforeach; ?>
@@ -78,7 +95,7 @@
     <div class="legal-wrap">
         <div class="legal-card">
             <h1>Disclaimer</h1>
-            <div class="legal-date">Effective Date: <?= date('F d, Y') ?></div>
+            <div class="legal-date">Effective Date: <?= date("F d, Y") ?></div>
 
             <div class="legal-highlight">
                 <i class="fa-solid fa-triangle-exclamation"></i> All prompts on this platform are designed for AI image generators. Results may vary based on the tool, settings, and version you use.
@@ -122,8 +139,3 @@
     </footer>
 </body>
 </html>
-
-
-
-
-

@@ -48,7 +48,7 @@ function sessionAvatar()
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery &mdash; Arigato Devan PromptVerse</title>
+    <title>Gallery &mdash; Arigato Devan Prompts</title>
     <meta name="description" content="Browse all AI couple prompts in the PromptVerse gallery. Unlock with your code to reveal the magic.">
     <link rel="stylesheet" href="style.css?v=2026051205">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -79,7 +79,7 @@ function sessionAvatar()
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-gallery">
     <!-- Scrollable Wallpaper Background -->
@@ -203,6 +203,14 @@ function sessionAvatar()
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
         <?php
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
             // Extract all unique tags
             // Map DB prompt_type → UI ptype key
             // Extract all unique tags

@@ -34,7 +34,7 @@ if (isset($_SESSION["user_id"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arigato Devan - PromptVerse</title>
+    <title>Arigato Devan Prompts</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -53,7 +53,7 @@ if (isset($_SESSION["user_id"])) {
                 "\n";
         }
     } ?>
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
@@ -457,6 +457,10 @@ if (isset($_SESSION["user_id"])) {
             <?php if (count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key

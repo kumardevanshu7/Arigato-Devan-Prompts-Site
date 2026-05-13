@@ -58,7 +58,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard "&ndash; PromptVerse</title>
+    <title>Admin Dashboard &ndash; Arigato Devan Prompts</title>
     <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
         body { background: var(--bg-color); }
@@ -391,7 +391,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <header>
@@ -605,6 +605,14 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             <?php if (count($users) === 0): ?>
                 <p style="text-align:center;color:#7D7887;font-weight:600;padding:30px 0;">No users registered yet.</p>
             <?php
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
+                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
                 // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
                 // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
                 // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic

@@ -1,49 +1,80 @@
 <?php
 session_start();
-require_once 'db.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
+require_once "db.php";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    header("Location: index.php");
+    exit();
+}
 
-$error = $success = '';
+$error = $success = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title       = trim($_POST['title'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $content     = $_POST['content'] ?? ''; // HTML from editor
-    $meta_title  = trim($_POST['meta_title'] ?? '');
-    $meta_desc   = trim($_POST['meta_description'] ?? '');
-    $tags        = trim($_POST['tags'] ?? '');
-    $image_ratio = trim($_POST['image_ratio'] ?? '16:9');
-    $publish     = isset($_POST['publish']) ? 1 : 0;
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $title = trim($_POST["title"] ?? "");
+    $description = trim($_POST["description"] ?? "");
+    $content = $_POST["content"] ?? ""; // HTML from editor
+    $meta_title = trim($_POST["meta_title"] ?? "");
+    $meta_desc = trim($_POST["meta_description"] ?? "");
+    $tags = trim($_POST["tags"] ?? "");
+    $image_ratio = trim($_POST["image_ratio"] ?? "16:9");
+    $publish = isset($_POST["publish"]) ? 1 : 0;
 
-    if (!$title) { $error = "Title is required."; }
-    else {
+    if (!$title) {
+        $error = "Title is required.";
+    } else {
         // Generate slug
-        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $title));
-        $slug = trim($slug, '-');
+        $slug = strtolower(preg_replace("/[^a-zA-Z0-9]+/", "-", $title));
+        $slug = trim($slug, "-");
         // Make unique
-        $exists = $pdo->prepare("SELECT id FROM blogs WHERE slug=?"); $exists->execute([$slug]);
-        if ($exists->fetch()) $slug .= '-' . time();
+        $exists = $pdo->prepare("SELECT id FROM blogs WHERE slug=?");
+        $exists->execute([$slug]);
+        if ($exists->fetch()) {
+            $slug .= "-" . time();
+        }
 
         // Image upload
-        $image_path = '';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $allowed = ['image/jpeg','image/png','image/gif','image/webp'];
-            if (in_array($_FILES['image']['type'], $allowed)) {
-                $ext      = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-                $filename = 'uploads/blog_' . uniqid() . '.' . $ext;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $filename)) $image_path = $filename;
+        $image_path = "";
+        if (
+            isset($_FILES["image"]) &&
+            $_FILES["image"]["error"] === UPLOAD_ERR_OK
+        ) {
+            $allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+            if (in_array($_FILES["image"]["type"], $allowed)) {
+                $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+                $filename = "uploads/blog_" . uniqid() . "." . $ext;
+                if (
+                    move_uploaded_file($_FILES["image"]["tmp_name"], $filename)
+                ) {
+                    $image_path = $filename;
+                }
             }
         }
 
-        $pdo->prepare("INSERT INTO blogs (title,slug,description,content,image_path,image_ratio,meta_title,meta_description,tags,is_published,author_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-            ->execute([$title,$slug,$description,$content,$image_path,$image_ratio,$meta_title,$meta_desc,$tags,$publish,$_SESSION['user_id']]);
-        $_SESSION['success_msg'] = "<i class='fa-solid fa-check'></i> Blog " . ($publish ? "published" : "saved as draft") . "!";
-        header("Location: blog_admin.php"); exit();
+        $pdo->prepare(
+            "INSERT INTO blogs (title,slug,description,content,image_path,image_ratio,meta_title,meta_description,tags,is_published,author_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        )->execute([
+            $title,
+            $slug,
+            $description,
+            $content,
+            $image_path,
+            $image_ratio,
+            $meta_title,
+            $meta_desc,
+            $tags,
+            $publish,
+            $_SESSION["user_id"],
+        ]);
+        $_SESSION["success_msg"] =
+            "<i class='fa-solid fa-check'></i> Blog " .
+            ($publish ? "published" : "saved as draft") .
+            "!";
+        header("Location: blog_admin.php");
+        exit();
     }
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create Blog "&ndash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
+<title>Create Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:36px 28px 100px}
 .bc-title{font-size:2rem;font-weight:900;margin-bottom:6px}.bc-sub{color:#7D7887;font-weight:600;margin-bottom:28px;font-size:.95rem}
@@ -83,7 +114,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head><body>
 <header>
   <div class="logo-area"  style="cursor:pointer">
@@ -93,7 +124,12 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
   <nav class="nav-links"><a href="index.php">HOME</a><a href="dashboard.php">DASHBOARD</a><a href="blog_admin.php" style="background:var(--primary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-pencil"></i> BLOGS</a></nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image'] ?? '', 'admin-avatar', 'Admin', 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+        $_SESSION["profile_image"] ?? "",
+        "admin-avatar",
+        "Admin",
+        'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
+    ) ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
     <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
   </div>
 </header>
@@ -101,7 +137,11 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 <div class="bc-wrap">
   <div class="bc-title"><i class="fa-solid fa-pencil"></i> Create Blog</div>
   <div class="bc-sub">Write, style, and publish your blog post.</div>
-  <?php if($error): ?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?=htmlspecialchars($error)?></div><?php endif; ?>
+  <?php if (
+      $error
+  ): ?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars(
+    $error,
+) ?></div><?php endif; ?>
 
   <form method="POST" enctype="multipart/form-data">
     <div class="bc-card">
@@ -254,14 +294,3 @@ function uploadEditorImage(file) {
 }
 </script>
 </body></html>
-
-
-
-
-
-
-
-
-
-
-

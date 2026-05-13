@@ -1,54 +1,55 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Must be logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION["user_id"])) {
     header("Location: index.php");
     exit();
 }
 
 // If already onboarded, send home
-if (!empty($_SESSION['onboarding_complete'])) {
+if (!empty($_SESSION["onboarding_complete"])) {
     header("Location: index.php");
     exit();
 }
 
 // --- Avatar Pool ---
 $male_avatars = [
-    'profiledp/b1.webp',
-    'profiledp/b2.webp',
-    'profiledp/b3.webp',
-    'profiledp/b4.webp',
-    'profiledp/b5.webp',
-    'profiledp/b6.webp',
-    'profiledp/b7.webp',
+    "profiledp/b1.webp",
+    "profiledp/b2.webp",
+    "profiledp/b3.webp",
+    "profiledp/b4.webp",
+    "profiledp/b5.webp",
+    "profiledp/b6.webp",
+    "profiledp/b7.webp",
 ];
 
 $female_avatars = [
-    'profiledp/g1.webp',
-    'profiledp/g2.webp',
-    'profiledp/g3.webp',
-    'profiledp/g4.webp',
-    'profiledp/g5.webp',
-    'profiledp/g6.webp',
-    'profiledp/g7.webp',
+    "profiledp/g1.webp",
+    "profiledp/g2.webp",
+    "profiledp/g3.webp",
+    "profiledp/g4.webp",
+    "profiledp/g5.webp",
+    "profiledp/g6.webp",
+    "profiledp/g7.webp",
 ];
 
 $errors = [];
 
 // --- Handle POST submission ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $avatar   = trim($_POST['avatar'] ?? '');
-    $gender   = trim($_POST['gender'] ?? '');
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"] ?? "");
+    $avatar = trim($_POST["avatar"] ?? "");
+    $gender = trim($_POST["gender"] ?? "");
 
     // Validate username
     if (strlen($username) < 3 || strlen($username) > 15) {
         $errors[] = "Username must be 3-15 characters.";
     }
     if (!preg_match('/^[a-zA-Z0-9_. ]+$/', $username)) {
-        $errors[] = "Username can only contain letters, numbers, spaces, underscores, and dots.";
+        $errors[] =
+            "Username can only contain letters, numbers, spaces, underscores, and dots.";
     }
 
     // Validate avatar
@@ -58,19 +59,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validate gender
-    if (!in_array($gender, ['male', 'female', 'nonbinary'])) {
+    if (!in_array($gender, ["male", "female", "nonbinary"])) {
         $errors[] = "Please select a gender option.";
+    }
+
+    // Check username uniqueness (only if no format errors so far)
+    if (empty($errors)) {
+        $existingUser = $pdo->prepare(
+            "SELECT id FROM users WHERE username = ? AND id != ?",
+        );
+        $existingUser->execute([$username, $_SESSION["user_id"]]);
+        if ($existingUser->fetch()) {
+            $errors[] =
+                "This username is already taken. Please choose another.";
+        }
     }
 
     if (empty($errors)) {
         // Save to DB
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?");
-        $stmt->execute([$username, $avatar, $gender, $_SESSION['user_id']]);
+        $stmt = $pdo->prepare(
+            "UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?",
+        );
+        $stmt->execute([$username, $avatar, $gender, $_SESSION["user_id"]]);
 
         // Update session
-        $_SESSION['username'] = $username;
-        $_SESSION['profile_image'] = $avatar;
-        $_SESSION['onboarding_complete'] = 1;
+        $_SESSION["username"] = $username;
+        $_SESSION["profile_image"] = $avatar;
+        $_SESSION["onboarding_complete"] = 1;
 
         header("Location: index.php");
         exit();
@@ -82,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome "&ndash; Set Up Your Profile | PromptVerse</title>
+    <title>Welcome &ndash; Set Up Your Profile | Arigato Devan Prompts</title>
     <meta name="description" content="Set up your PromptVerse profile before exploring exclusive AI prompts.">
     <link rel="stylesheet" href="style.css?v=1778100000">
     <style>
@@ -398,7 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
     <div class="ob-wrap">
@@ -420,7 +435,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="ob-errors">
                     <i class="fa-solid fa-triangle-exclamation"></i> Please fix the following:
                     <ul>
-                        <?php foreach($errors as $e): ?>
+                        <?php foreach ($errors as $e): ?>
                             <li><?= htmlspecialchars($e) ?></li>
                         <?php endforeach; ?>
                     </ul>
@@ -435,14 +450,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="avatar-divider">Male</div>
                     <div class="avatar-grid">
-                        <?php foreach($male_avatars as $i => $av): ?>
+                        <?php foreach ($male_avatars as $i => $av): ?>
                         <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
-                                <?= (($_POST['avatar'] ?? '') === $av) ? 'checked' : '' ?>>
+                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
+                                $av,
+                            ) ?>"
+                                <?= ($_POST["avatar"] ?? "") === $av
+                                    ? "checked"
+                                    : "" ?>>
                             <div class="avatar-img-wrap">
                                 <picture>
-                                    <source srcset="<?= htmlspecialchars($av) ?>" type="image/webp">
-                                    <img src="<?= htmlspecialchars(str_replace('.webp', '.png', $av)) ?>" alt="Male Avatar <?= $i+1 ?>" loading="lazy">
+                                    <source srcset="<?= htmlspecialchars(
+                                        $av,
+                                    ) ?>" type="image/webp">
+                                    <img src="<?= htmlspecialchars(
+                                        str_replace(".webp", ".png", $av),
+                                    ) ?>" alt="Male Avatar <?= $i +
+    1 ?>" loading="lazy">
                                 </picture>
                             </div>
                         </label>
@@ -451,14 +475,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="avatar-divider">Female</div>
                     <div class="avatar-grid">
-                        <?php foreach($female_avatars as $i => $av): ?>
+                        <?php foreach ($female_avatars as $i => $av): ?>
                         <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>"
-                                <?= (($_POST['avatar'] ?? '') === $av) ? 'checked' : '' ?>>
+                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
+                                $av,
+                            ) ?>"
+                                <?= ($_POST["avatar"] ?? "") === $av
+                                    ? "checked"
+                                    : "" ?>>
                             <div class="avatar-img-wrap">
                                 <picture>
-                                    <source srcset="<?= htmlspecialchars($av) ?>" type="image/webp">
-                                    <img src="<?= htmlspecialchars(str_replace('.webp', '.png', $av)) ?>" alt="Female Avatar <?= $i+1 ?>" loading="lazy">
+                                    <source srcset="<?= htmlspecialchars(
+                                        $av,
+                                    ) ?>" type="image/webp">
+                                    <img src="<?= htmlspecialchars(
+                                        str_replace(".webp", ".png", $av),
+                                    ) ?>" alt="Female Avatar <?= $i +
+    1 ?>" loading="lazy">
                                 </picture>
                             </div>
                         </label>
@@ -477,7 +510,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         placeholder="e.g. devan_, art_lover, kai03"
                         minlength="3"
                         maxlength="15"
-                        value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
+                        value="<?= htmlspecialchars(
+                            $_POST["username"] ?? "",
+                        ) ?>"
                         autocomplete="off"
                         required>
                     <div class="ob-input-hint" id="char-counter">3-15 characters. Letters, numbers, spaces, _ or . only.</div>
@@ -489,7 +524,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="gender-grid">
                         <label class="gender-option">
                             <input type="radio" name="gender" value="male"
-                                <?= (($_POST['gender'] ?? '') === 'male') ? 'checked' : '' ?>>
+                                <?= ($_POST["gender"] ?? "") === "male"
+                                    ? "checked"
+                                    : "" ?>>
                             <div class="gender-box">
                                 <span class="gender-emoji"><i class="fa-solid fa-mars"></i></span>
                                 Male
@@ -497,7 +534,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </label>
                         <label class="gender-option">
                             <input type="radio" name="gender" value="female"
-                                <?= (($_POST['gender'] ?? '') === 'female') ? 'checked' : '' ?>>
+                                <?= ($_POST["gender"] ?? "") === "female"
+                                    ? "checked"
+                                    : "" ?>>
                             <div class="gender-box">
                                 <span class="gender-emoji"><i class="fa-solid fa-venus"></i></span>
                                 Female
@@ -505,7 +544,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </label>
                         <label class="gender-option">
                             <input type="radio" name="gender" value="nonbinary"
-                                <?= (($_POST['gender'] ?? '') === 'nonbinary') ? 'checked' : '' ?>>
+                                <?= ($_POST["gender"] ?? "") === "nonbinary"
+                                    ? "checked"
+                                    : "" ?>>
                             <div class="gender-box">
                                 <span class="gender-emoji"><i class="fa-solid fa-transgender"></i></span>
                                 Non-binary
@@ -557,8 +598,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
-
-
-
-
-
