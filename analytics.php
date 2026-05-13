@@ -1,37 +1,73 @@
 <?php
 session_start();
-require_once 'db.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
+require_once "db.php";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    header("Location: index.php");
+    exit();
+}
 
 // Stat cards
 $total_prompts = $pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
-$total_likes   = $pdo->query("SELECT SUM(likes_count) FROM prompts")->fetchColumn() ?: 0;
-$total_users   = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-$weekly_p      = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)")->fetchColumn();
-$monthly_p     = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)")->fetchColumn();
-$weekly_u      = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)")->fetchColumn();
-$monthly_u     = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)")->fetchColumn();
-$most_liked    = $pdo->query("SELECT title,likes_count FROM prompts ORDER BY likes_count DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$total_likes =
+    $pdo->query("SELECT SUM(likes_count) FROM prompts")->fetchColumn() ?: 0;
+$total_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$weekly_p = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)",
+    )
+    ->fetchColumn();
+$monthly_p = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)",
+    )
+    ->fetchColumn();
+$weekly_u = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)",
+    )
+    ->fetchColumn();
+$monthly_u = $pdo
+    ->query(
+        "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)",
+    )
+    ->fetchColumn();
+$most_liked = $pdo
+    ->query(
+        "SELECT title,likes_count FROM prompts ORDER BY likes_count DESC LIMIT 1",
+    )
+    ->fetch(PDO::FETCH_ASSOC);
 
 // Bar chart: likes per prompt (top 10)
-$top_prompts = $pdo->query("SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
-$bar_labels  = json_encode(array_column($top_prompts, 'title'));
-$bar_data    = json_encode(array_column($top_prompts, 'likes_count'));
+$top_prompts = $pdo
+    ->query(
+        "SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 10",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
+$bar_labels = json_encode(array_column($top_prompts, "title"));
+$bar_data = json_encode(array_column($top_prompts, "likes_count"));
 
 // Line chart: users joined per day (last 30 days)
-$user_growth_raw = $pdo->query("SELECT DATE(created_at) as d, COUNT(*) as c FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC")->fetchAll(PDO::FETCH_ASSOC);
-$ug_labels = json_encode(array_column($user_growth_raw, 'd'));
-$ug_data   = json_encode(array_column($user_growth_raw, 'c'));
+$user_growth_raw = $pdo
+    ->query(
+        "SELECT DATE(created_at) as d, COUNT(*) as c FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
+$ug_labels = json_encode(array_column($user_growth_raw, "d"));
+$ug_data = json_encode(array_column($user_growth_raw, "c"));
 
 // Line chart: prompts added per day (last 30 days)
-$prompt_growth_raw = $pdo->query("SELECT DATE(created_at) as d, COUNT(*) as c FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC")->fetchAll(PDO::FETCH_ASSOC);
-$pg_labels = json_encode(array_column($prompt_growth_raw, 'd'));
-$pg_data   = json_encode(array_column($prompt_growth_raw, 'c'));
+$prompt_growth_raw = $pdo
+    ->query(
+        "SELECT DATE(created_at) as d, COUNT(*) as c FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
+$pg_labels = json_encode(array_column($prompt_growth_raw, "d"));
+$pg_data = json_encode(array_column($prompt_growth_raw, "c"));
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Analytics "Ã¢â‚¬Â PromptVerse Admin</title>
+<title>Analytics &mdash; PromptVerse Admin</title>
 <link rel="stylesheet" href="style.css?v=1778100000">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
@@ -79,7 +115,9 @@ canvas{max-height:280px}
   </nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars(
+        $_SESSION["profile_image"] ?? "",
+    ) ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
     <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
   </div>
 </header>
@@ -90,19 +128,25 @@ canvas{max-height:280px}
 
   <!-- Stat Cards -->
   <div class="stat-grid">
-    <div class="s-card a1"><div class="s-val"><?=$total_prompts?></div><div class="s-label">Total Prompts</div></div>
-    <div class="s-card a2"><div class="s-val"><?=number_format($total_likes)?></div><div class="s-label">Total Likes</div></div>
-    <div class="s-card a3"><div class="s-val"><?=$total_users?></div><div class="s-label">Total Users</div></div>
-    <div class="s-card a4"><div class="s-val">+<?=$weekly_p?></div><div class="s-label">Prompts</div><div class="s-sub">This Week</div></div>
-    <div class="s-card a5"><div class="s-val">+<?=$weekly_u?></div><div class="s-label">New Users</div><div class="s-sub">This Week</div></div>
-    <?php if($most_liked):?>
+    <div class="s-card a1"><div class="s-val"><?= $total_prompts ?></div><div class="s-label">Total Prompts</div></div>
+    <div class="s-card a2"><div class="s-val"><?= number_format(
+        $total_likes,
+    ) ?></div><div class="s-label">Total Likes</div></div>
+    <div class="s-card a3"><div class="s-val"><?= $total_users ?></div><div class="s-label">Total Users</div></div>
+    <div class="s-card a4"><div class="s-val">+<?= $weekly_p ?></div><div class="s-label">Prompts</div><div class="s-sub">This Week</div></div>
+    <div class="s-card a5"><div class="s-val">+<?= $weekly_u ?></div><div class="s-label">New Users</div><div class="s-sub">This Week</div></div>
+    <?php if ($most_liked): ?>
     <div class="s-card a6">
-      <div class="s-val" style="font-size:1.15rem;font-weight:900;"><i class="fa-solid fa-star"></i> <?=htmlspecialchars($most_liked['title'])?></div>
-      <div class="s-label">Top Performing Prompt &mdash; <?=$most_liked['likes_count']?> <i class="fa-solid fa-heart"></i></div>
+      <div class="s-val" style="font-size:1.15rem;font-weight:900;"><i class="fa-solid fa-star"></i> <?= htmlspecialchars(
+          $most_liked["title"],
+      ) ?></div>
+      <div class="s-label">Top Performing Prompt &mdash; <?= $most_liked[
+          "likes_count"
+      ] ?> <i class="fa-solid fa-heart"></i></div>
     </div>
-    <?php endif;?>
-    <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?=$monthly_p?></div><div class="s-label">Prompts</div><div class="s-sub">This Month</div></div>
-    <div class="s-card" style="background:#e8f9ef"><div class="s-val">+<?=$monthly_u?></div><div class="s-label">New Users</div><div class="s-sub">This Month</div></div>
+    <?php endif; ?>
+    <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?= $monthly_p ?></div><div class="s-label">Prompts</div><div class="s-sub">This Month</div></div>
+    <div class="s-card" style="background:#e8f9ef"><div class="s-val">+<?= $monthly_u ?></div><div class="s-label">New Users</div><div class="s-sub">This Month</div></div>
   </div>
 
   <!-- Charts -->
@@ -129,36 +173,36 @@ document.addEventListener('DOMContentLoaded', () => {
   Chart.defaults.font.weight = '700';
   Chart.defaults.color = '#2D2A35';
 
-  // Bar "Ã¢â‚¬Å“ Likes per prompt
+  // Bar — Likes per prompt
   new Chart(document.getElementById('barChart'), {
     type: 'bar',
     data: {
-      labels: <?=$bar_labels?>,
-      datasets: [{ label: 'Likes', data: <?=$bar_data?>,
+      labels: <?= $bar_labels ?>,
+      datasets: [{ label: 'Likes', data: <?= $bar_data ?>,
         backgroundColor: ['#E6D7FF','#FFF1B8','#d4eaff','#ffe3f0','#d9f5e5','#C6ADFA','#FFE066','#b3d9ff','#ffb3cc','#a3e8c2'],
         borderColor: '#2D2A35', borderWidth: 2, borderRadius: 10 }]
     },
     options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1}, grid:{color:'#EAE3F2'} }, x:{ grid:{display:false}, ticks:{maxRotation:30} } } }
   });
 
-  // Line "Ã¢â‚¬Å“ User Growth
+  // Line — User Growth
   new Chart(document.getElementById('userLineChart'), {
     type: 'line',
     data: {
-      labels: <?=$ug_labels?>,
-      datasets: [{ label:'New Users', data:<?=$ug_data?>,
+      labels: <?= $ug_labels ?>,
+      datasets: [{ label:'New Users', data:<?= $ug_data ?>,
         borderColor:'#C6ADFA', backgroundColor:'rgba(198,173,250,.18)', borderWidth:3,
         pointBackgroundColor:'#C6ADFA', pointRadius:5, pointHoverRadius:7, fill:true, tension:.4 }]
     },
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#EAE3F2'}}, x:{grid:{display:false}} } }
   });
 
-  // Line "Ã¢â‚¬Å“ Prompt Growth
+  // Line — Prompt Growth
   new Chart(document.getElementById('promptLineChart'), {
     type: 'line',
     data: {
-      labels: <?=$pg_labels?>,
-      datasets: [{ label:'Prompts Uploaded', data:<?=$pg_data?>,
+      labels: <?= $pg_labels ?>,
+      datasets: [{ label:'Prompts Uploaded', data:<?= $pg_data ?>,
         borderColor:'#FFE066', backgroundColor:'rgba(255,224,102,.2)', borderWidth:3,
         pointBackgroundColor:'#FFE066', pointRadius:5, pointHoverRadius:7, fill:true, tension:.4 }]
     },
@@ -167,11 +211,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body></html>
-
-
-
-
-
-
-
-

@@ -1,10 +1,11 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
 // Protect page (Admin Only)
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    $_SESSION['error_msg'] = "You do not have permission to access the upload page.";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    $_SESSION["error_msg"] =
+        "You do not have permission to access the upload page.";
     header("Location: index.php");
     exit();
 }
@@ -65,21 +66,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
     <div class="dashboard-wrap">
         <h1 class="dash-page-title"><i class="fa-solid fa-upload" style="color:var(--primary-color);"></i> Upload Prompt</h1>
-        
-        <?php if(isset($_SESSION['success_msg'])): ?>
+
+        <?php if (isset($_SESSION["success_msg"])): ?>
             <div style="background:#d9f5e5;color:#2a7a4b;padding:16px;border-radius:12px;font-weight:700;margin-bottom:20px;border:2px solid #2a7a4b;">
-                <i class="fa-solid fa-check-circle"></i> <?= $_SESSION['success_msg'] ?>
+                <i class="fa-solid fa-check-circle"></i> <?= $_SESSION[
+                    "success_msg"
+                ] ?>
             </div>
-            <?php unset($_SESSION['success_msg']); ?>
+            <?php unset($_SESSION["success_msg"]); ?>
         <?php endif; ?>
 
-        <?php if(isset($_SESSION['error_msg'])): ?>
+        <?php if (isset($_SESSION["error_msg"])): ?>
             <div style="background:#ffe3e3;color:#d03030;padding:16px;border-radius:12px;font-weight:700;margin-bottom:20px;border:2px solid #d03030;">
-                <i class="fa-solid fa-circle-xmark"></i> <?= $_SESSION['error_msg'] ?>
+                <i class="fa-solid fa-circle-xmark"></i> <?= $_SESSION[
+                    "error_msg"
+                ] ?>
             </div>
-            <?php unset($_SESSION['error_msg']); ?>
+            <?php unset($_SESSION["error_msg"]); ?>
         <?php endif; ?>
-        
+
         <div class="dash-card">
             <form method="POST" action="upload.php" enctype="multipart/form-data">
 
@@ -124,26 +129,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                         <input type="text" id="tag-input-field" placeholder="secret, couple, neon..." style="border:none; outline:none; background:transparent; flex-grow:1; min-width:150px; font-family:var(--font-main); font-size:1rem; padding:4px;">
                     </div>
                     <input type="hidden" id="tag" name="tag">
-                    
+
                     <div id="tag-suggestions" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
                         <!-- Suggestions will be injected via PHP/JS -->
                         <?php
-                            $stmt = $pdo->query("SELECT tag FROM prompts");
-                            $all_tags = [];
-                            while($row = $stmt->fetch()) {
-                                $tarr = explode(',', $row['tag']);
-                                foreach($tarr as $t) {
-                                    $t = trim($t);
-                                    if(!empty($t)) $all_tags[] = strtolower($t);
+                        $stmt = $pdo->query("SELECT tag FROM prompts");
+                        $all_tags = [];
+                        while ($row = $stmt->fetch()) {
+                            $tarr = explode(",", $row["tag"]);
+                            foreach ($tarr as $t) {
+                                $t = trim($t);
+                                if (!empty($t)) {
+                                    $all_tags[] = strtolower($t);
                                 }
                             }
-                            $unique_tags = array_unique($all_tags);
-                            // Ensure the core tags are always suggested
-                            $core_tags = ['secret', 'unreleased', 'viral'];
-                            $unique_tags = array_unique(array_merge($core_tags, $unique_tags));
-                            foreach($unique_tags as $ut) {
-                                echo '<span class="tag-suggestion" onclick="addTag(\''.htmlspecialchars($ut).'\')" style="background:var(--secondary-color); padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:800; cursor:pointer; border:2px solid var(--text-color);">+'.htmlspecialchars($ut).'</span>';
-                            }
+                        }
+                        $unique_tags = array_unique($all_tags);
+                        // Ensure the core tags are always suggested
+                        $core_tags = [];
+                        $unique_tags = array_unique(
+                            array_merge($core_tags, $unique_tags),
+                        );
+                        foreach ($unique_tags as $ut) {
+                            echo '<span class="tag-suggestion" onclick="addTag(\'' .
+                                htmlspecialchars($ut) .
+                                '\')" style="background:var(--secondary-color); padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:800; cursor:pointer; border:2px solid var(--text-color);">+' .
+                                htmlspecialchars($ut) .
+                                "</span>";
+                        }
                         ?>
                     </div>
                 </div>
@@ -192,7 +205,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         const hiddenTagInput = document.getElementById('tag');
         const codeGroup = document.getElementById('unlock-code-group');
         const codeInput = document.getElementById('unlock_code');
-        
+
         let tags = [];
 
         // --- Prompt Type Logic ---
@@ -297,4 +310,3 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     </script>
 </body>
 </html>
-

@@ -1,27 +1,31 @@
 <?php
 session_start();
-require_once 'db.php';
-if (isset($_SESSION['user_id']) && empty($_SESSION['onboarding_complete'])) {
-    header("Location: onboarding.php"); exit();
+require_once "db.php";
+if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
+    header("Location: onboarding.php");
+    exit();
 }
 
 // Fetch Insta Viral prompts by prompt_type
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked
-        FROM prompts p 
-        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ? 
+        FROM prompts p
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         WHERE p.prompt_type = 'insta_viral'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
     $insta_viral = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $insta_viral = $pdo->query("SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $insta_viral = $pdo
+        ->query(
+            "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC",
+        )
+        ->fetchAll(PDO::FETCH_ASSOC);
 }
-
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,12 +150,45 @@ if (isset($_SESSION['user_id'])) {
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
         <div class="nav-dropdown">
             <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-            <?php $curPage = basename($_SERVER['PHP_SELF']); ?>
+            <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
             <div class="nav-dropdown-menu">
-                <a href="secret_code.php" <?= $curPage == 'secret_code.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts['secret_code']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'secret_code.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="unreleased.php" <?= $curPage == 'unreleased.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts['unreleased']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'unreleased.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="insta_viral.php" <?= $curPage == 'insta_viral.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts['insta_viral']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'insta_viral.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
-                <a href="already_uploaded.php" <?= $curPage == 'already_uploaded.php' ? 'style="background:var(--primary-color)"' : '' ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == 'already_uploaded.php' ? '<span class="dd-tag">ACTIVE</span>' : '') ?></a>
+                <a href="secret_code.php" <?= $curPage == "secret_code.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
+    $nav_counts["secret_code"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "secret_code.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="unreleased.php" <?= $curPage == "unreleased.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
+    $nav_counts["unreleased"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "unreleased.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
+    $nav_counts["insta_viral"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "insta_viral.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
+                <a href="already_uploaded.php" <?= $curPage ==
+                "already_uploaded.php"
+                    ? 'style="background:var(--primary-color)"'
+                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+    $nav_counts["already_uploaded"]
+)
+    ? '<span class="dd-tag soon">SOON</span>'
+    : ($curPage == "already_uploaded.php"
+        ? '<span class="dd-tag">ACTIVE</span>'
+        : "") ?></a>
             </div>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
@@ -161,11 +198,19 @@ if (isset($_SESSION['user_id'])) {
     </nav>
     <div class="header-right">
         <div class="header-divider"></div>
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <?php if($_SESSION['role']==='admin'): ?>
-                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Admin') ?></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
+        <?php if (isset($_SESSION["user_id"])): ?>
+            <?php if ($_SESSION["role"] === "admin"): ?>
+                <div style="display:flex;align-items:center;gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
+                    $_SESSION["profile_image"] ?? "",
+                    "admin-avatar",
+                    "Admin",
+                ) ?></a><a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a></div>
             <?php else: ?>
-                <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION['profile_image']??'', 'admin-avatar', 'Profile') ?></a>
+                <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar(
+                    $_SESSION["profile_image"] ?? "",
+                    "admin-avatar",
+                    "Profile",
+                ) ?></a>
             <?php endif; ?>
             <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
         <?php else: ?>
@@ -174,7 +219,7 @@ if (isset($_SESSION['user_id'])) {
     </div>
 </header>
 
-<?php if(empty($insta_viral)): ?>
+<?php if (empty($insta_viral)): ?>
 <div class="coming-soon-wrap">
     <div class="cs-icon"><i class="fa-brands fa-instagram" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
@@ -189,7 +234,12 @@ if (isset($_SESSION['user_id'])) {
         </a>
     </div>
 </div>
-<?php else: ?>
+<?php
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    else: ?>
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
         <div class="badge" style="margin:0;transform:rotate(-1deg);background:linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);color:white;border-color:white;"><i class="fa-brands fa-instagram"></i> INSTA VIRAL</div>
@@ -197,56 +247,72 @@ if (isset($_SESSION['user_id'])) {
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:20px;">Solve the Math Challenge to unlock the viral prompt!</p>
     <?php
-    // Collect sub-tags (excluding 'viral' itself)
     $iv_sub_tags = [];
-    foreach($insta_viral as $ivp) {
-        $tarr2 = array_map('trim', explode(',', strtolower($ivp['tag'])));
-        foreach($tarr2 as $t) {
-            if(!empty($t) && $t !== 'viral') $iv_sub_tags[] = $t;
+    foreach ($insta_viral as $ivp) {
+        $tarr2 = array_map("trim", explode(",", strtolower($ivp["tag"])));
+        foreach ($tarr2 as $t) {
+            if (!empty($t) && $t !== "viral") {
+                $iv_sub_tags[] = $t;
+            }
         }
     }
     $iv_sub_tags = array_unique($iv_sub_tags);
     sort($iv_sub_tags);
     ?>
-    <?php if(!empty($iv_sub_tags)): ?>
+    <?php if (!empty($iv_sub_tags)): ?>
     <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 28px;">
         <button class="iv-filter-btn active" data-tag="all" style="background:linear-gradient(135deg,#f09433,#dc2743);color:white;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
-        <?php foreach($iv_sub_tags as $t): ?>
-            <button class="iv-filter-btn" data-tag="<?= htmlspecialchars($t) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(ucfirst($t)) ?></button>
+        <?php foreach ($iv_sub_tags as $t): ?>
+            <button class="iv-filter-btn" data-tag="<?= htmlspecialchars(
+                $t,
+            ) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(
+    ucfirst($t),
+) ?></button>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 
     <div class="gallery-grid" id="iv-grid">
-        <?php foreach($insta_viral as $p):
-            $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
-        ?>
+        <?php foreach ($insta_viral as $p):
+            $tags_arr = array_map(
+                "trim",
+                explode(",", strtolower($p["tag"])),
+            ); ?>
         <div class="card"
-             data-id="<?= $p['id'] ?>"
-             data-image="<?= htmlspecialchars($p['image_path']) ?>"
-             data-title="<?= htmlspecialchars($p['title']) ?>"
-             data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
+             data-id="<?= $p["id"] ?>"
+             data-image="<?= htmlspecialchars($p["image_path"]) ?>"
+             data-title="<?= htmlspecialchars($p["title"]) ?>"
+             data-reel="<?= htmlspecialchars($p["reel_link"] ?? "") ?>"
              data-unlocked="false"
              data-prompt-type="insta_viral"
-             data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>">
+             data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>">
 
-            <img src="<?= htmlspecialchars($p['image_path']) ?>" class="card-bg-image" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
+            <img src="<?= htmlspecialchars(
+                $p["image_path"],
+            ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
+    $p["title"],
+) ?>" loading="lazy">
             <div class="card-type-badge ivp">IVP</div>
 
             <div class="card-content">
-                <h3 class="card-title"><?= htmlspecialchars($p['title']) ?></h3>
+                <h3 class="card-title"><?= htmlspecialchars($p["title"]) ?></h3>
                 <div class="card-footer">
                     <div class="card-like-display"
-                         data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>"
-                         data-prompt-id="<?= $p['id'] ?>">
-                        <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                        <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                         data-liked="<?= $p["is_liked"] ? "true" : "false" ?>"
+                         data-prompt-id="<?= $p["id"] ?>">
+                        <i class="fa-solid fa-heart <?= $p["is_liked"]
+                            ? "liked-heart"
+                            : "" ?>"></i>
+                        <span class="like-count"><?= (int) $p[
+                            "likes_count"
+                        ] ?></span>
                     </div>
                     <button class="lock-icon" title="Unlock Prompt"><i class="fa-solid fa-lock"></i></button>
                 </div>
             </div>
         </div>
-        <?php endforeach; ?>
+        <?php
+        endforeach; ?>
     </div>
 </div>
 <?php endif; ?>
@@ -273,7 +339,7 @@ if (isset($_SESSION['user_id'])) {
                     <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
                     <button class="save-prompt-btn" id="modal-save-btn" data-prompt-id="" style="flex:1;min-width:120px;padding:12px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-bookmark"></i> SAVE</button>
                 </div>
-                <?php if(isset($_SESSION['user_id'])): ?>
+                <?php if (isset($_SESSION["user_id"])): ?>
                 <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
                     <i class="fa-solid fa-heart"></i>
                     <span id="modal-like-count">0</span>
@@ -300,7 +366,9 @@ if (isset($_SESSION['user_id'])) {
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script>const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;</script>
+<script>const isLoggedIn = <?= isset($_SESSION["user_id"])
+    ? "true"
+    : "false" ?>;</script>
 <script src="script.js?v=2026051205"></script>
 <script>
 // Scrolling background
@@ -316,8 +384,7 @@ if (bgLayers.length > 0) {
         });
     });
 }
-
-
+</script>
 <script>
 // Insta Viral filter
 document.querySelectorAll('.iv-filter-btn').forEach(btn => {
@@ -338,9 +405,3 @@ document.querySelectorAll('.iv-filter-btn').forEach(btn => {
     });
 });
 </script></body></html>
-
-
-
-
-
-

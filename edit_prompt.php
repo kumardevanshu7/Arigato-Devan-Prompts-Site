@@ -1,54 +1,91 @@
 <?php
 session_start();
-require_once 'db.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Location: index.php"); exit(); }
-$id = (int)($_GET['id'] ?? 0);
-if (!$id) { header("Location: dashboard.php"); exit(); }
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title        = trim($_POST['title'] ?? '');
-    $tag          = trim($_POST['tag'] ?? '');
-    $prompt_text  = trim($_POST['prompt_text'] ?? '');
-    $reel_link    = trim($_POST['reel_link'] ?? '');
-    
-    $tags_arr = array_map('trim', explode(',', strtolower($tag)));
-    $is_secret = in_array('secret', $tags_arr);
-
-    // Only validate code for secret tag
-    if ($is_secret) {
-        $unlock_code = strtoupper(trim($_POST['unlock_code'] ?? ''));
-        if (!$title || !$tag || !$prompt_text || strlen($unlock_code) !== 6) {
-            $_SESSION['edit_error'] = "All fields required. Code must be 6 chars.";
-            header("Location: edit_prompt.php?id=$id"); exit();
-        }
-    } else {
-        $unlock_code = 'XXXXXX'; // dummy placeholder for non-code types
-        if (!$title || !$tag || !$prompt_text) {
-            $_SESSION['edit_error'] = "Title, tags and prompt text are required.";
-            header("Location: edit_prompt.php?id=$id"); exit();
-        }
-    }
-
-    $image_path = $_POST['current_image'];
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $fn  = 'uploads/' . uniqid('prompt_') . '.' . $ext;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $fn)) $image_path = $fn;
-    }
-
-    $pdo->prepare("UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=? WHERE id=?")
-        ->execute([$title, $tag, $prompt_text, $unlock_code, $reel_link, $image_path, $id]);
-
-    $_SESSION['success_msg'] = '<i class="fa-solid fa-check"></i> Prompt updated!';
-    header("Location: dashboard.php"); exit();
+require_once "db.php";
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    header("Location: index.php");
+    exit();
+}
+$id = (int) ($_GET["id"] ?? 0);
+if (!$id) {
+    header("Location: dashboard.php");
+    exit();
 }
 
-$stmt = $pdo->prepare("SELECT * FROM prompts WHERE id=?"); $stmt->execute([$id]);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $title = trim($_POST["title"] ?? "");
+    $tag = trim($_POST["tag"] ?? "");
+    $prompt_text = trim($_POST["prompt_text"] ?? "");
+    $reel_link = trim($_POST["reel_link"] ?? "");
+
+    $prompt_type = trim($_POST["prompt_type"] ?? "secret");
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
+    if (!in_array($prompt_type, $valid_types)) {
+        $prompt_type = "secret";
+    }
+    $is_secret = $prompt_type === "secret";
+
+    // Only validate code for secret type
+    if ($is_secret) {
+        $unlock_code = strtoupper(trim($_POST["unlock_code"] ?? ""));
+        if (!$title || !$tag || !$prompt_text || strlen($unlock_code) !== 6) {
+            $_SESSION["edit_error"] =
+                "All fields required. Code must be 6 chars.";
+            header("Location: edit_prompt.php?id=$id");
+            exit();
+        }
+    } else {
+        $unlock_code = "XXXXXX"; // dummy placeholder for non-code types
+        if (!$title || !$tag || !$prompt_text) {
+            $_SESSION["edit_error"] =
+                "Title, tags and prompt text are required.";
+            header("Location: edit_prompt.php?id=$id");
+            exit();
+        }
+    }
+
+    $image_path = $_POST["current_image"];
+    if (
+        isset($_FILES["image"]) &&
+        $_FILES["image"]["error"] === UPLOAD_ERR_OK
+    ) {
+        $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+        $fn = "uploads/" . uniqid("prompt_") . "." . $ext;
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
+            $image_path = $fn;
+        }
+    }
+
+    $pdo->prepare(
+        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=? WHERE id=?",
+    )->execute([
+        $title,
+        $tag,
+        $prompt_text,
+        $unlock_code,
+        $reel_link,
+        $image_path,
+        $prompt_type,
+        $id,
+    ]);
+
+    $_SESSION["success_msg"] =
+        '<i class="fa-solid fa-check"></i> Prompt updated!';
+    header("Location: dashboard.php");
+    exit();
+}
+
+$stmt = $pdo->prepare("SELECT * FROM prompts WHERE id=?");
+$stmt->execute([$id]);
 $p = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$p) { header("Location: dashboard.php"); exit(); }
-$edit_error = $_SESSION['edit_error'] ?? ''; unset($_SESSION['edit_error']);
-$current_tags = array_map('trim', explode(',', strtolower($p['tag'])));
-$is_secret = in_array('secret', $current_tags);
+if (!$p) {
+    header("Location: dashboard.php");
+    exit();
+}
+$edit_error = $_SESSION["edit_error"] ?? "";
+unset($_SESSION["edit_error"]);
+$current_tags = array_map("trim", explode(",", strtolower($p["tag"])));
+$is_secret = $p["prompt_type"] === "secret";
+$current_prompt_type = $p["prompt_type"] ?? "secret";
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
@@ -79,6 +116,14 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 .type-info-box.unreleased{background:#fff8e0;border-color:#f0c040;color:#7a5c00}
 .type-info-box.viral{background:#e8f9ef;border-color:#5cb85c;color:#1a5c30}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:22px 18px}}
+.type-selector{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.e-type-card{flex:1;min-width:100px;border:var(--border-width) solid var(--text-color);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;font-family:var(--font-main);font-weight:800;font-size:.85rem;transition:all .2s;background:#fff;position:relative}
+.e-type-card:hover{transform:translateY(-2px);box-shadow:4px 4px 0 var(--text-color)}
+.e-type-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.e-type-card.sel-secret{background:#ffe3e3;border-color:#d03030;color:#d03030;box-shadow:4px 4px 0 #d03030}
+.e-type-card.sel-unreleased{background:#fff4cc;border-color:#e6a800;color:#7a5800;box-shadow:4px 4px 0 #e6a800}
+.e-type-card.sel-viral{background:#e3f7ff;border-color:#007ab8;color:#004f7a;box-shadow:4px 4px 0 #007ab8}
+.e-type-card.sel-uploaded{background:#e6f2ff;border-color:#00509e;color:#00509e;box-shadow:4px 4px 0 #00509e}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -101,7 +146,9 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
     <div class="header-divider"></div>
     <div style="display:flex; align-items:center; gap:8px;">
       <a href="profile.php" title="Edit Profile">
-        <img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '') ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
+        <img src="<?= htmlspecialchars(
+            $_SESSION["profile_image"] ?? "",
+        ) ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
       </a>
       <a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a>
     </div>
@@ -113,65 +160,141 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
 <div class="edit-wrap">
   <div class="edit-page-title"><i class="fa-solid fa-pencil"></i> Edit Prompt</div>
-  <div class="edit-page-sub">Editing: <strong><?=htmlspecialchars($p['title'])?></strong></div>
-  <?php if($edit_error):?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?=htmlspecialchars($edit_error)?></div><?php endif;?>
+  <div class="edit-page-sub">Editing: <strong><?= htmlspecialchars(
+      $p["title"],
+  ) ?></strong></div>
+  <?php if (
+      $edit_error
+  ): ?><div class="flash-error"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars(
+    $edit_error,
+) ?></div><?php endif; ?>
   <div class="edit-card">
     <h2>Prompt Details</h2>
-    <form method="POST" action="edit_prompt.php?id=<?=$id?>" enctype="multipart/form-data">
-      <input type="hidden" name="current_image" value="<?=htmlspecialchars($p['image_path'])?>">
+    <form method="POST" action="edit_prompt.php?id=<?= $id ?>" enctype="multipart/form-data">
+      <input type="hidden" name="current_image" value="<?= htmlspecialchars(
+          $p["image_path"],
+      ) ?>">
+
+      <!-- Prompt Type Selector -->
+      <div class="form-group">
+        <label>Prompt Type</label>
+        <div class="type-selector">
+          <label class="e-type-card <?= $current_prompt_type === "secret"
+              ? "sel-secret"
+              : "" ?>" id="e-card-secret">
+            <input type="radio" name="prompt_type" value="secret" <?= $current_prompt_type ===
+            "secret"
+                ? "checked"
+                : "" ?> onchange="onEditTypeChange('secret')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🔒</span><span>Secret Code</span>
+          </label>
+          <label class="e-type-card <?= $current_prompt_type === "unreleased"
+              ? "sel-unreleased"
+              : "" ?>" id="e-card-unreleased">
+            <input type="radio" name="prompt_type" value="unreleased" <?= $current_prompt_type ===
+            "unreleased"
+                ? "checked"
+                : "" ?> onchange="onEditTypeChange('unreleased')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🌙</span><span>Unreleased</span>
+          </label>
+          <label class="e-type-card <?= $current_prompt_type === "insta_viral"
+              ? "sel-viral"
+              : "" ?>" id="e-card-viral">
+            <input type="radio" name="prompt_type" value="insta_viral" <?= $current_prompt_type ===
+            "insta_viral"
+                ? "checked"
+                : "" ?> onchange="onEditTypeChange('insta_viral')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🔥</span><span>Insta Viral</span>
+          </label>
+          <label class="e-type-card <?= $current_prompt_type ===
+          "already_uploaded"
+              ? "sel-uploaded"
+              : "" ?>" id="e-card-uploaded">
+            <input type="radio" name="prompt_type" value="already_uploaded" <?= $current_prompt_type ===
+            "already_uploaded"
+                ? "checked"
+                : "" ?> onchange="onEditTypeChange('already_uploaded')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">📤</span><span>Already Uploaded</span>
+          </label>
+        </div>
+      </div>
 
       <div class="form-row">
-        <div class="form-group" style="flex:1;"><label for="e-title">Title *</label><input type="text" id="e-title" name="title" value="<?=htmlspecialchars($p['title'])?>" required></div>
+        <div class="form-group" style="flex:1;"><label for="e-title">Title *</label><input type="text" id="e-title" name="title" value="<?= htmlspecialchars(
+            $p["title"],
+        ) ?>" required></div>
       </div>
-      
+
       <div class="form-group">
           <label>Tags (Type and press Enter, comma, or click a suggestion)</label>
           <div class="tag-input-container" style="display:flex; flex-wrap:wrap; gap:8px; padding:10px; border:var(--border-width) solid var(--text-color); border-radius:12px; background:#fff; min-height:50px; cursor:text;" onclick="document.getElementById('tag-input-field').focus()">
               <input type="text" id="tag-input-field" placeholder="secret, couple, neon..." style="border:none; outline:none; background:transparent; flex-grow:1; min-width:150px; font-family:var(--font-main); font-size:1rem; padding:4px;">
           </div>
-          <input type="hidden" id="e-tag" name="tag" value="<?=htmlspecialchars($p['tag'])?>" required>
-          
+          <input type="hidden" id="e-tag" name="tag" value="<?= htmlspecialchars(
+              $p["tag"],
+          ) ?>" required>
+
           <div id="tag-suggestions" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
               <?php
-                  $stmt = $pdo->query("SELECT tag FROM prompts");
-                  $all_tags = [];
-                  while($row = $stmt->fetch()) {
-                      $tarr = explode(',', $row['tag']);
-                      foreach($tarr as $t) {
-                          $t = trim($t);
-                          if(!empty($t)) $all_tags[] = strtolower($t);
+              $stmt = $pdo->query("SELECT tag FROM prompts");
+              $all_tags = [];
+              while ($row = $stmt->fetch()) {
+                  $tarr = explode(",", $row["tag"]);
+                  foreach ($tarr as $t) {
+                      $t = trim($t);
+                      if (!empty($t)) {
+                          $all_tags[] = strtolower($t);
                       }
                   }
-                  $unique_tags = array_unique($all_tags);
-                  $core_tags = ['secret', 'unreleased', 'viral'];
-                  $unique_tags = array_unique(array_merge($core_tags, $unique_tags));
-                  foreach($unique_tags as $ut) {
-                      echo '<span class="tag-suggestion" onclick="addTag(\''.htmlspecialchars($ut).'\')" style="background:var(--secondary-color); padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:800; cursor:pointer; border:2px solid var(--text-color);">+'.htmlspecialchars($ut).'</span>';
-                  }
+              }
+              $unique_tags = array_unique($all_tags);
+              $core_tags = [];
+              $unique_tags = array_unique(
+                  array_merge($core_tags, $unique_tags),
+              );
+              foreach ($unique_tags as $ut) {
+                  echo '<span class="tag-suggestion" onclick="addTag(\'' .
+                      htmlspecialchars($ut) .
+                      '\')" style="background:var(--secondary-color); padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:800; cursor:pointer; border:2px solid var(--text-color);">+' .
+                      htmlspecialchars($ut) .
+                      "</span>";
+              }
               ?>
           </div>
       </div>
 
-      <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?=htmlspecialchars($p['prompt_text'])?></textarea></div>
+      <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?= htmlspecialchars(
+          $p["prompt_text"],
+      ) ?></textarea></div>
 
       <!-- Code field &mdash; only shown for secret -->
-      <div class="form-row" id="code-field-row" style="<?= $is_secret ? '' : 'display:none;' ?>">
+      <div class="form-row" id="code-field-row" style="<?= $is_secret
+          ? ""
+          : "display:none;" ?>">
         <div class="form-group">
           <label for="e-code">Access Code (6 chars) *</label>
-          <input type="text" id="e-code" name="unlock_code" maxlength="6" value="<?=htmlspecialchars($p['unlock_code']??'')?>" style="text-transform:uppercase;letter-spacing:3px;font-weight:900" <?= $is_secret ? 'required' : '' ?>>
+          <input type="text" id="e-code" name="unlock_code" maxlength="6" value="<?= htmlspecialchars(
+              $p["unlock_code"] ?? "",
+          ) ?>" style="text-transform:uppercase;letter-spacing:3px;font-weight:900" <?= $is_secret
+    ? "required"
+    : "" ?>>
         </div>
       </div>
 
       <!-- Reel link standalone -->
       <div class="form-group">
         <label for="e-reel">Reel Link (optional)</label>
-        <input type="url" id="e-reel" name="reel_link" value="<?=htmlspecialchars($p['reel_link']??'')?>" placeholder="https://instagram.com/reel/...">
+        <input type="url" id="e-reel" name="reel_link" value="<?= htmlspecialchars(
+            $p["reel_link"] ?? "",
+        ) ?>" placeholder="https://instagram.com/reel/...">
       </div>
 
       <div class="form-group">
         <label>Cover Image (leave blank to keep current)</label>
         <div class="img-preview">
-          <img src="<?=htmlspecialchars($p['image_path'])?>" alt="Current cover">
+          <img src="<?= htmlspecialchars(
+              $p["image_path"],
+          ) ?>" alt="Current cover">
           <span>Current cover image</span>
         </div>
         <div class="file-upload-wrapper">
@@ -197,7 +320,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         const hiddenTagInput = document.getElementById('e-tag');
         const codeRow = document.getElementById('code-field-row');
         const codeInput = document.getElementById('e-code');
-        
+
         // Initialize from PHP
         let tags = <?= json_encode(array_values($current_tags)) ?>;
 
@@ -238,8 +361,21 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             }
         });
 
+        function onEditTypeChange(type) {
+            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded'};
+            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded'};
+            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = 'e-type-card';
+            });
+            const card = document.getElementById(idMap[type]);
+            if (card) card.classList.add(classMap[type]);
+            checkSecretTag();
+        }
+
         function checkSecretTag() {
-            if (tags.includes('secret')) {
+            const selectedType = document.querySelector('input[name="prompt_type"]:checked')?.value;
+            if (selectedType === 'secret') {
                 codeRow.style.display = 'flex';
                 codeInput.required = true;
                 codeInput.disabled = false;
