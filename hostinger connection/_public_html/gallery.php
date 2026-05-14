@@ -79,6 +79,10 @@ function sessionAvatar()
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Gallery","item":"https://arigatodevan.com/gallery.php"}]}
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-gallery">
@@ -203,6 +207,22 @@ function sessionAvatar()
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
         <?php
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
+            // Extract all unique tags
+            // Map DB prompt_type → UI ptype key
             // Extract all unique tags
             // Map DB prompt_type → UI ptype key
             // Extract all unique tags

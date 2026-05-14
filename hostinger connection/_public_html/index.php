@@ -96,6 +96,23 @@ try {
                 "\n";
         }
     } ?>
+    <!-- WebSite Schema — homepage only -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Arigato Devan Prompts",
+      "url": "https://arigatodevan.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://arigatodevan.com/gallery.php?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
@@ -613,6 +630,22 @@ try {
             <?php if (count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key
                 // Map DB prompt_type → JS/UI ptype key

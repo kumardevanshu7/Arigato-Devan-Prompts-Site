@@ -40,6 +40,10 @@ if (isset($_SESSION["user_id"])) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Already Uploaded Prompts","item":"https://arigatodevan.com/already_uploaded.php"}]}
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
@@ -155,6 +159,14 @@ if (isset($_SESSION["user_id"])) {
             <p style="color:#888;font-weight:600;">Already uploaded reels will appear here when the admin adds them!</p>
         </div>
     <?php
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)
         // Collect sub-tags (excluding 'already_uploaded' itself)

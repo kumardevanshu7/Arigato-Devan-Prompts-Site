@@ -126,6 +126,10 @@ if (isset($_SESSION["user_id"])) {
 }
 </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Insta Viral Prompts","item":"https://arigatodevan.com/insta_viral.php"}]}
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-gallery">
@@ -240,6 +244,38 @@ if (isset($_SESSION["user_id"])) {
     </div>
 </div>
 <?php
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
+    // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)
     // Collect sub-tags (excluding 'viral' itself)

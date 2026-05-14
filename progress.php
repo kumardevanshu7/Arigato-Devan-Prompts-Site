@@ -207,6 +207,10 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 .size-sm .polaroid,.size-md .polaroid,.size-lg .polaroid{width:240px}
 }
 </style>
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Our Journey","item":"https://arigatodevan.com/progress.php"}]}
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
