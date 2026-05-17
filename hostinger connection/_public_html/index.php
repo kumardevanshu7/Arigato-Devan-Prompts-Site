@@ -29,25 +29,47 @@ if (isset($_SESSION["user_id"])) {
 
 // Featured Prompt of the Day
 $featuredPrompt = null;
+$featuredIsCustom = false;
 try {
-    if (isset($_SESSION["user_id"])) {
-        $fStmt = $pdo->prepare("
-            SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
-                   IF(l.id IS NOT NULL, 1, 0) as is_liked
-            FROM prompts p
-            LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
-            LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
-            WHERE p.is_featured = 1
-            LIMIT 1
-        ");
-        $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
-    } else {
-        $fStmt = $pdo->query(
-            "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE is_featured = 1 LIMIT 1",
-        );
+    // 1. Check for active custom POTD first
+    $customPotd = $pdo->query("SELECT * FROM potd_custom WHERE is_active = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($customPotd) {
+        $featuredPrompt = [
+            'id' => 0,
+            'title' => $customPotd['title'],
+            'prompt_text' => $customPotd['prompt_text'],
+            'image_path' => $customPotd['image_url'] ?: 'https://placehold.co/400x400/7c3aed/fff?text=POTD',
+            'prompt_type' => 'secret',
+            'likes_count' => 0,
+            'reel_link' => '',
+            'is_unlocked' => 1,
+            'is_liked' => 0,
+        ];
+        $featuredIsCustom = true;
     }
-    $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
-    // Fallback: most liked prompt
+
+    // 2. If no custom POTD, check existing prompts with is_featured=1
+    if (!$featuredPrompt) {
+        if (isset($_SESSION["user_id"])) {
+            $fStmt = $pdo->prepare("
+                SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+                       IF(l.id IS NOT NULL, 1, 0) as is_liked
+                FROM prompts p
+                LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
+                LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+                WHERE p.is_featured = 1
+                LIMIT 1
+            ");
+            $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
+        } else {
+            $fStmt = $pdo->query(
+                "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE is_featured = 1 LIMIT 1",
+            );
+        }
+        $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // 3. Fallback: most liked prompt
     if (!$featuredPrompt) {
         if (isset($_SESSION["user_id"])) {
             $fStmt = $pdo->prepare("

@@ -519,6 +519,20 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             </div>
         </a>
 
+        <!-- Prompt of the Day Manager Card -->
+        <a href="potd_manager.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:#fff3cd;transition:all .2s;cursor:pointer;margin-top:0;align-self:start;" onmouseover="this.style.transform='translateY(-4px) rotate(1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="display:flex;align-items:center;gap:18px;">
+                <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-star" style="font-size:1.6rem;color:#f0c040;"></i>
+                </div>
+                <div>
+                    <h2 style="font-size:1.4rem;margin-bottom:4px;">Prompt of the Day</h2>
+                    <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Manage featured daily prompts with toggle controls</p>
+                </div>
+                <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
+            </div>
+        </a>
+
         <!-- PLACEHOLDER for old section start - will be removed below -->
         <div class="dash-card" style="display:none;margin-top:28px;grid-column:1/-1;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;flex-wrap:wrap;gap:12px;">
