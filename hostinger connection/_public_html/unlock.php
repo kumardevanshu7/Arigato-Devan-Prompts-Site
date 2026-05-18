@@ -220,7 +220,7 @@ if ($action === "already_uploaded") {
         exit();
     }
 
-    $stmt = $pdo->prepare("SELECT prompt_text FROM prompts WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT prompt_text FROM prompts WHERE id = ? AND prompt_type = 'already_uploaded'");
     $stmt->execute([$prompt_id]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
 
