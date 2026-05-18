@@ -100,6 +100,15 @@ try {
     $featuredPrompt = null;
 }
 
+// Count of new prompts dropped in last 48 hours (for "NEW DROP" banner)
+$new_drop_count = 0;
+try {
+    $newStmt = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= NOW() - INTERVAL 48 HOUR");
+    $new_drop_count = (int) $newStmt->fetchColumn();
+} catch (PDOException $e) {
+    $new_drop_count = 0;
+}
+
 // Generate state token for CSRF if not exists
 ?>
 <!DOCTYPE html>
@@ -518,6 +527,20 @@ try {
     <?php else: ?>
     <!-- ============ LOGGED IN HERO ============ -->
     <div class="hero hero-logged-in">
+        <?php if ($new_drop_count > 0): ?>
+        <!-- 🔥 NEW DROP BANNER -->
+        <a href="gallery.php" class="new-drop-banner" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:linear-gradient(90deg,#ff6b9d,#fb923c);color:#fff;border:var(--border-width) solid var(--text-color);border-radius:999px;font-weight:900;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;margin-bottom:18px;animation:newDropPulse 1.6s ease-in-out infinite;">
+            <span style="font-size:1.1rem;">🔥</span>
+            <span><?= $new_drop_count ?> NEW <?= $new_drop_count === 1 ? "PROMPT" : "PROMPTS" ?> DROPPED!</span>
+            <span style="font-size:1.1rem;">→</span>
+        </a>
+        <style>
+            @keyframes newDropPulse {
+                0%, 100% { transform: scale(1); box-shadow: var(--shadow-comic); }
+                50% { transform: scale(1.04); box-shadow: 6px 6px 0 var(--text-color); }
+            }
+        </style>
+        <?php endif; ?>
         <div class="badge">
             <svg style="vertical-align: middle; margin-right: 5px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             FRESH DROPS!
@@ -527,6 +550,15 @@ try {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" placeholder="SEARCH PROMPTS...">
         </div>
+        <!-- 🎲 Surprise Me Button -->
+        <a href="surprise_me.php" class="surprise-me-btn" style="display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:14px 26px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;transition:all .15s ease;">
+            <span style="font-size:1.2rem;">🎲</span>
+            <span>SURPRISE ME</span>
+        </a>
+        <style>
+            .surprise-me-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--text-color); }
+            .surprise-me-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--text-color); }
+        </style>
     </div>
     <?php endif; ?>
 
@@ -717,6 +749,7 @@ try {
                         : "card-next" ?>"
                          data-index="<?= $index ?>"
                          data-id="<?= $p["id"] ?>"
+                         data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
                          data-image="<?= htmlspecialchars($p["image_path"]) ?>"
                          data-title="<?= htmlspecialchars($p["title"]) ?>"
                          data-reel="<?= htmlspecialchars(

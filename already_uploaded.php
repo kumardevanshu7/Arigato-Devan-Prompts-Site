@@ -218,6 +218,7 @@ if (isset($_SESSION["user_id"])) {
                 ?>
             <div class="card"
                  data-id="<?= $aup["id"] ?>"
+                 data-created="<?= htmlspecialchars($aup["created_at"] ?? "") ?>"
                  data-image="<?= htmlspecialchars($aup["image_path"]) ?>"
                  data-title="<?= htmlspecialchars($aup["title"]) ?>"
                  data-prompt-type="already_uploaded"

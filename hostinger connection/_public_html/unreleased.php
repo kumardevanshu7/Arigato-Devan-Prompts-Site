@@ -227,6 +227,7 @@ if (isset($_SESSION["user_id"])) {
                 ?>
             <div class="card"
                  data-id="<?= $ur["id"] ?>"
+                 data-created="<?= htmlspecialchars($ur["created_at"] ?? "") ?>"
                  data-image="<?= htmlspecialchars($ur["image_path"]) ?>"
                  data-title="<?= htmlspecialchars($ur["title"]) ?>"
                  data-prompt-type="unreleased"

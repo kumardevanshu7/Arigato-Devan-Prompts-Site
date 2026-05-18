@@ -299,6 +299,7 @@ function sessionAvatar()
                 ?>
                     <div class="card"
                          data-id="<?= $p["id"] ?>"
+                         data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
                          data-image="<?= htmlspecialchars($p["image_path"]) ?>"
                          data-title="<?= htmlspecialchars($p["title"]) ?>"
                          data-reel="<?= htmlspecialchars(

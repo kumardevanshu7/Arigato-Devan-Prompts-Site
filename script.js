@@ -1,5 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
   const cards = document.querySelectorAll(".card");
+
+  // ── ✨ NEW Sparkle Badge — for prompts created in last 48 hours ──
+  (function markNewCards() {
+    const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    if (!document.getElementById("new-badge-styles")) {
+      const st = document.createElement("style");
+      st.id = "new-badge-styles";
+      st.textContent =
+        "@keyframes newBadgePulse{0%,100%{transform:scale(1) rotate(-8deg)}50%{transform:scale(1.1) rotate(-8deg)}}" +
+        "@keyframes newBadgeSparkle{0%,100%{opacity:1;transform:rotate(0)}50%{opacity:.6;transform:rotate(20deg)}}" +
+        ".new-spark-badge{position:absolute;top:10px;left:10px;z-index:10;display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:linear-gradient(135deg,#ff6b9d,#fb923c);color:#fff;font-family:var(--font-main,'Outfit',sans-serif);font-weight:900;font-size:.7rem;letter-spacing:.5px;border:2px solid var(--text-color,#2d2a35);border-radius:999px;box-shadow:2px 2px 0 var(--text-color,#2d2a35);text-transform:uppercase;pointer-events:none;animation:newBadgePulse 1.5s ease-in-out infinite;}" +
+        ".new-spark-badge .spark{display:inline-block;animation:newBadgeSparkle 1s ease-in-out infinite}";
+      document.head.appendChild(st);
+    }
+
+    document.querySelectorAll(".card[data-created]").forEach((card) => {
+      const created = card.dataset.created;
+      if (!created) return;
+      // MySQL "YYYY-MM-DD HH:MM:SS" → ISO-ish so JS can parse
+      const ts = new Date(created.replace(" ", "T")).getTime();
+      if (isNaN(ts)) return;
+      if (now - ts > FORTY_EIGHT_HOURS) return;
+      if (card.querySelector(".new-spark-badge")) return;
+
+      // Ensure card has positioned context for absolute badge
+      if (window.getComputedStyle(card).position === "static") {
+        card.style.position = "relative";
+      }
+
+      const badge = document.createElement("div");
+      badge.className = "new-spark-badge";
+      badge.innerHTML = '<span class="spark">✨</span><span>NEW</span>';
+      card.appendChild(badge);
+    });
+  })();
+
   const modalOverlay = document.getElementById("unlock-modal");
   const closeModalBtn = document.querySelector(".close-modal");
   const submitCodeBtn = document.getElementById("submit-code");
@@ -689,6 +727,8 @@ document.addEventListener("DOMContentLoaded", () => {
               500,
             );
           }
+          // \ud83c\udf89 Confetti burst on every unlock
+          triggerConfetti();
           // First unlock celebration
           if (typeof checkFirstUnlock === "function") checkFirstUnlock();
         } else {
@@ -824,6 +864,8 @@ document.addEventListener("DOMContentLoaded", () => {
             currentCardElement.dataset.unlocked = "true";
             currentCardElement.dataset.promptText = data.prompt_text;
           }
+          // \ud83c\udf89 Confetti burst on every unlock
+          triggerConfetti();
           // First unlock celebration
           if (typeof checkFirstUnlock === "function") checkFirstUnlock();
         } else {
@@ -841,6 +883,106 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => h.remove(), 2000);
     }
   }
+
+  // ── Confetti Burst on Unlock ──
+  function triggerConfetti(count = 60) {
+    if (!document.getElementById("confetti-keyframes")) {
+      const st = document.createElement("style");
+      st.id = "confetti-keyframes";
+      st.textContent =
+        "@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:.85}}";
+      document.head.appendChild(st);
+    }
+    const colors = [
+      "#ff6b9d",
+      "#7c3aed",
+      "#fbbf24",
+      "#34d399",
+      "#60a5fa",
+      "#f87171",
+      "#fb923c",
+      "#e879f9",
+    ];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const size = 8 + Math.random() * 6;
+      p.style.cssText = `position:fixed;z-index:99999;pointer-events:none;width:${size}px;height:${size * 0.4}px;background:${color};left:${Math.random() * 100}vw;top:-20px;animation:confettiFall ${1.8 + Math.random() * 1.5}s ${Math.random() * 0.4}s ease-in forwards;border-radius:2px;`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 4000);
+    }
+  }
+
+  // ── Share Current Prompt ──
+  function shareCurrentPrompt() {
+    const id = currentPromptId;
+    if (!id) return;
+    const card = currentCardElement;
+    const title = (card && card.dataset.title) || "AI Couple Prompt";
+    const url = `${window.location.origin}/card.php?id=${id}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: `Arigato Devan Prompts \u2014 ${title}`,
+          text: `Check out this AI couple prompt: ${title}`,
+          url: url,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch (e) {}
+      ta.remove();
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => showComicAlert("Share link copied! \ud83d\udd17", "success"))
+        .catch(() => {
+          fallbackCopy(url);
+          showComicAlert("Share link copied! \ud83d\udd17", "success");
+        });
+    } else {
+      fallbackCopy(url);
+      showComicAlert("Share link copied! \ud83d\udd17", "success");
+    }
+  }
+
+  // Inject Share button into modal action area (once per page)
+  (function injectShareButton() {
+    const saveBtn = document.getElementById("modal-save-btn");
+    if (!saveBtn || document.getElementById("modal-share-btn")) return;
+    const shareBtn = document.createElement("button");
+    shareBtn.id = "modal-share-btn";
+    shareBtn.type = "button";
+    shareBtn.title = "Share this prompt";
+    shareBtn.innerHTML = '<i class="fa-solid fa-share-nodes"></i>';
+    shareBtn.style.cssText =
+      "flex-shrink:0;min-width:54px;padding:12px 0;background:#a7f3d0;color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;box-shadow:var(--shadow-comic);transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-size:1.05rem;";
+    shareBtn.addEventListener("click", shareCurrentPrompt);
+    shareBtn.addEventListener("mousedown", () => {
+      shareBtn.style.transform = "translate(2px,2px)";
+      shareBtn.style.boxShadow = "2px 2px 0 var(--text-color)";
+    });
+    const reset = () => {
+      shareBtn.style.transform = "";
+      shareBtn.style.boxShadow = "var(--shadow-comic)";
+    };
+    shareBtn.addEventListener("mouseup", reset);
+    shareBtn.addEventListener("mouseleave", reset);
+    saveBtn.parentNode.insertBefore(shareBtn, saveBtn.nextSibling);
+  })();
 
   function unlockAlreadyUploaded(promptId) {
     const formData = new FormData();
@@ -880,6 +1022,8 @@ document.addEventListener("DOMContentLoaded", () => {
               currentCardElement.dataset.saved === "true";
             applySaveBtnState(saveBtn, isSaved);
           }
+          // \ud83c\udf89 Confetti burst on every unlock
+          triggerConfetti();
         } else {
           showComicAlert("Could not unlock. Please try again later.");
         }
@@ -931,6 +1075,8 @@ document.addEventListener("DOMContentLoaded", () => {
             currentCardElement.dataset.promptText = data.prompt_text;
           }
           triggerEmojiRain("❤️", 10);
+          // \ud83c\udf89 Confetti burst on every unlock
+          triggerConfetti();
           // First unlock celebration
           if (typeof checkFirstUnlock === "function") checkFirstUnlock();
         } else {
