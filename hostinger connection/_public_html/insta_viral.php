@@ -10,19 +10,21 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
 if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
-               IF(l.id IS NOT NULL, 1, 0) as is_liked
+               IF(l.id IS NOT NULL, 1, 0) as is_liked,
+               IF(sv.id IS NOT NULL, 1, 0) as is_saved
         FROM prompts p
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+        LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
         WHERE p.prompt_type = 'insta_viral'
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
     $insta_viral = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     $insta_viral = $pdo
         ->query(
-            "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC",
+            "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='insta_viral' ORDER BY created_at DESC",
         )
         ->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -354,6 +356,7 @@ if (isset($_SESSION["user_id"])) {
              data-reel="<?= htmlspecialchars($p["reel_link"] ?? "") ?>"
              data-unlocked="false"
              data-prompt-type="insta_viral"
+             data-saved="<?= !empty($p["is_saved"]) ? "true" : "false" ?>"
              data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>">
 
             <img src="<?= htmlspecialchars(

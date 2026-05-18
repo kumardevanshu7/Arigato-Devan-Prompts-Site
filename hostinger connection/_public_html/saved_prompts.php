@@ -16,16 +16,16 @@ if (empty($_SESSION["onboarding_complete"])) {
 
 $user_id = (int) $_SESSION["user_id"];
 
-// Fetch all prompts this user has saved/unlocked
+// Fetch all prompts this user has explicitly saved
 $stmt = $pdo->prepare("
     SELECT p.id, p.title, p.image_path, p.prompt_type, p.likes_count,
            p.tag, p.prompt_text,
            IF(l.id IS NOT NULL, 1, 0) as is_liked
-    FROM unlocked_prompts up
-    JOIN prompts p ON p.id = up.prompt_id
+    FROM saved_prompts sp
+    JOIN prompts p ON p.id = sp.prompt_id
     LEFT JOIN likes l ON l.prompt_id = p.id AND l.user_id = :uid
-    WHERE up.user_id = :uid2
-    ORDER BY up.created_at DESC
+    WHERE sp.user_id = :uid2
+    ORDER BY sp.created_at DESC
 ");
 $stmt->execute([":uid" => $user_id, ":uid2" => $user_id]);
 $saved = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -152,12 +152,13 @@ $type_map = [
             $tinfo = $type_map[$pt] ?? $type_map["secret"];
             $tags = array_map("trim", explode(",", strtolower($p["tag"])));
             ?>
-        <div class="card"
+        <div class="card sp-card"
              data-id="<?= $p["id"] ?>"
              data-image="<?= htmlspecialchars($p["image_path"]) ?>"
              data-title="<?= htmlspecialchars($p["title"]) ?>"
              data-prompt-type="<?= htmlspecialchars($pt) ?>"
              data-unlocked="true"
+             data-saved="true"
              data-prompt-text="<?= htmlspecialchars($p["prompt_text"]) ?>"
              data-tags="<?= htmlspecialchars(implode(",", $tags)) ?>"
              data-reel="">
@@ -219,6 +220,7 @@ $type_map = [
                 <p id="modal-unlocked-text" class="unlocked-text" style="word-break:break-word;"></p>
                 <div class="modal-action-buttons" style="display:flex;gap:10px;flex-wrap:wrap;">
                     <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
+                    <button id="modal-sp-remove-btn" data-prompt-id="" style="flex:1;padding:12px;background:#ffd6d6;color:#a01515;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;font-family:var(--font-main);box-shadow:var(--shadow-comic);transition:all 0.2s;"><i class="fa-solid fa-trash-can"></i> REMOVE</button>
                 </div>
                 <?php if (isset($_SESSION["user_id"])): ?>
                 <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
@@ -236,9 +238,163 @@ $type_map = [
     <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
+<!-- Remove-Saved Confirm Popup -->
+<div id="sp-confirm-remove" style="display:none;position:fixed;inset:0;background:rgba(45,42,53,.5);backdrop-filter:blur(8px);z-index:3500;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:32px 28px;max-width:400px;width:90%;box-shadow:8px 8px 0 var(--text-color);text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:12px;color:#dc2743;"><i class="fa-solid fa-trash-can"></i></div>
+        <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:10px;">Remove this prompt?</h3>
+        <p style="font-weight:600;color:#555;margin-bottom:24px;">This will remove it from your saved list. You can save it again later.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button id="sp-cancel-btn" style="flex:1;padding:14px;background:var(--bg-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);">Cancel</button>
+            <button id="sp-confirm-btn" style="flex:1;padding:14px;background:#ffd6d6;border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);color:#a01515;">Yes, Remove</button>
+        </div>
+    </div>
+</div>
+
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
 <script defer src="script.js?v=2026051206"></script>
+<script>
+(function () {
+    const popup = document.getElementById('sp-confirm-remove');
+    const cancelBtn = document.getElementById('sp-cancel-btn');
+    const confirmBtn = document.getElementById('sp-confirm-btn');
+    const grid = document.querySelector('.sp-grid');
+    const wrap = document.querySelector('.sp-wrap');
+    const subEl = document.querySelector('.sp-sub');
+
+    let pendingPromptId = null;
+    let pendingCard = null;
+
+    function closePopup() {
+        popup.style.display = 'none';
+        pendingPromptId = null;
+        pendingCard = null;
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Yes, Remove';
+    }
+
+    function updateCounter() {
+        if (!subEl) return;
+        const remaining = grid ? grid.querySelectorAll('.sp-card').length : 0;
+        subEl.textContent = "All prompts you've saved \u2014 " + remaining + " saved so far";
+        if (remaining === 0 && wrap) {
+            // Render empty state inline
+            const emptyHtml = '<div class="sp-empty">'
+                + '<div class="sp-empty-icon">\ud83d\udd16</div>'
+                + '<h2>No Saved Prompts Yet</h2>'
+                + '<p>Unlock prompts on the site and save them \u2014 they\'ll appear here!</p>'
+                + '<a href="index.php" class="comic-btn-small"><i class="fa-solid fa-arrow-left"></i> Browse Prompts</a>'
+                + '</div>';
+            if (grid) grid.remove();
+            const container = document.createElement('div');
+            container.innerHTML = emptyHtml;
+            wrap.appendChild(container.firstElementChild);
+        }
+    }
+
+    // Long-press logic for Mobile (Unsave)
+    let pressTimer;
+    document.querySelectorAll('.sp-card').forEach(function(card) {
+        card.addEventListener('touchstart', function(e) {
+            // Don't trigger if they are clicking a button like the like button inside the card (if any)
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            
+            pressTimer = setTimeout(function() {
+                pendingPromptId = card.dataset.id;
+                pendingCard = card;
+                if (navigator.vibrate) navigator.vibrate(50);
+                popup.style.display = 'flex';
+            }, 600); // 600ms hold
+        }, {passive: true});
+
+        card.addEventListener('touchend', function(e) {
+            clearTimeout(pressTimer);
+        });
+        card.addEventListener('touchmove', function(e) {
+            clearTimeout(pressTimer);
+        });
+        
+        // Disable context menu on long press on mobile to prevent default image save popup
+        card.addEventListener('contextmenu', function(e) {
+            if (window.innerWidth <= 900) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Sync modal remove button promptId when any sp-card is clicked
+    document.querySelectorAll('.sp-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            const modalRemoveBtn = document.getElementById('modal-sp-remove-btn');
+            if (modalRemoveBtn) modalRemoveBtn.dataset.promptId = this.dataset.id;
+        });
+    });
+
+    // Modal Remove button
+    const modalRemoveBtn = document.getElementById('modal-sp-remove-btn');
+    if (modalRemoveBtn) {
+        modalRemoveBtn.addEventListener('click', function() {
+            const promptId = this.dataset.promptId;
+            if (!promptId) return;
+            pendingPromptId = promptId;
+            pendingCard = document.querySelector('.sp-card[data-id="' + promptId + '"]');
+            // Close the modal first
+            const modal = document.getElementById('unlock-modal');
+            if (modal) modal.style.display = 'none';
+            popup.style.display = 'flex';
+        });
+    }
+
+    if (cancelBtn) cancelBtn.addEventListener('click', closePopup);
+    popup.addEventListener('click', function (e) {
+        if (e.target === popup) closePopup();
+    });
+
+    if (confirmBtn) confirmBtn.addEventListener('click', function () {
+        if (!pendingPromptId || !pendingCard) { closePopup(); return; }
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Removing...';
+
+        const fd = new FormData();
+        fd.append('action', 'unsave');
+        fd.append('prompt_id', pendingPromptId);
+
+        fetch('save_prompt.php', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success && data.saved === false) {
+                    const card = pendingCard;
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(function () {
+                        card.remove();
+                        updateCounter();
+                    }, 300);
+                    closePopup();
+                } else {
+                    if (typeof showComicAlert === 'function') {
+                        showComicAlert(data.message || 'Could not remove. Try again.', 'error');
+                    } else {
+                        alert(data.message || 'Could not remove. Try again.');
+                    }
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Yes, Remove';
+                }
+            })
+            .catch(function () {
+                if (typeof showComicAlert === 'function') {
+                    showComicAlert('Network error. Try again.', 'error');
+                } else {
+                    alert('Network error. Try again.');
+                }
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Yes, Remove';
+            });
+    });
+})();
+</script>
 </body>
 </html>

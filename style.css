@@ -3899,3 +3899,23 @@ footer {
         height: 32px;
     }
 }
+
+/* Saved Prompt Button States */
+.save-btn-saved {
+    background: #e1ffe1 !important;
+    color: #1a5e1a !important;
+    border-color: #1a5e1a !important;
+    cursor: default !important;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+/* Saved Prompt Button States */
+.save-btn-saved {
+    background: #e1ffe1 !important;
+    color: #1a5e1a !important;
+    border-color: #1a5e1a !important;
+    cursor: default !important;
+    pointer-events: none;
+    opacity: 0.9;
+}

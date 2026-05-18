@@ -11,17 +11,19 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
 if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
-               IF(l.id IS NOT NULL, 1, 0) as is_liked
+               IF(l.id IS NOT NULL, 1, 0) as is_liked,
+               IF(sv.id IS NOT NULL, 1, 0) as is_saved
         FROM prompts p
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+        LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
         ORDER BY p.created_at DESC
     ");
-    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"]]);
+    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     $stmt = $pdo->query(
-        "SELECT *, 0 as is_unlocked, 0 as is_liked FROM prompts ORDER BY created_at DESC",
+        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts ORDER BY created_at DESC",
     );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -305,6 +307,9 @@ function sessionAvatar()
                          data-unlocked="<?= $p["is_unlocked"]
                              ? "true"
                              : "false" ?>"
+                         data-saved="<?= !empty($p["is_saved"])
+                             ? "true"
+                             : "false" ?>"
                          data-prompt-type="<?= htmlspecialchars($ptype) ?>"
                          data-tags="<?= htmlspecialchars(
                              implode(",", $tags_arr),
@@ -457,44 +462,7 @@ function sessionAvatar()
             });
         }
 
-        // Save Prompt Logic
-        document.addEventListener('click', function(e) {
-            const saveBtn = e.target.closest('.save-prompt-btn');
-            if (!saveBtn) return;
-            const promptId = saveBtn.dataset.promptId;
-            if (!promptId) return;
-
-            if (!isLoggedIn) {
-                document.getElementById('login-save-popup').style.display = 'flex';
-                return;
-            }
-
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-            fetch('save_prompt.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: 'prompt_id=' + encodeURIComponent(promptId)
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED!';
-                    saveBtn.style.background = 'var(--success-color, #d9f5e5)';
-                    saveBtn.style.color = 'var(--text-color)';
-                    saveBtn.classList.add('btn-success-pop');
-                } else {
-                    saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-                    saveBtn.disabled = false;
-                }
-            })
-            .catch(() => {
-                saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-                saveBtn.disabled = false;
-            });
-        });
-
-        // Update save-btn promptId when modal opens
+        // Update save-btn promptId when modal opens (script.js handles save logic)
         document.addEventListener('modalOpened', function(e) {
             const btn = document.getElementById('modal-save-btn');
             if (btn && e.detail && e.detail.promptId) btn.dataset.promptId = e.detail.promptId;

@@ -41,6 +41,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2500);
   }
 
+  // Apply visual SAVE / SAVED state to the modal save button.
+  // When `isSaved` is true the button is rendered as the disabled "SAVED" pill,
+  // signalling the user can only unsave from the Saved Prompts page.
+  function applySaveBtnState(saveBtn, isSaved) {
+    if (!saveBtn) return;
+    if (isSaved) {
+      saveBtn.classList.add("save-btn-saved");
+      saveBtn.disabled = true;
+      saveBtn.dataset.saved = "true";
+      saveBtn.title = "Manage from Saved Prompts page";
+      saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED';
+    } else {
+      saveBtn.classList.remove("save-btn-saved");
+      saveBtn.disabled = false;
+      saveBtn.dataset.saved = "false";
+      saveBtn.title = "";
+      saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
+      saveBtn.style.background = "";
+      saveBtn.style.color = "";
+    }
+  }
+  window.applySaveBtnState = applySaveBtnState;
+
   // --- Swipe Stack Logic ---
   const cardStack = document.getElementById("card-stack");
   const prevBtn = document.getElementById("swipe-left-btn");
@@ -302,9 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (modalTitle) modalTitle.textContent = card.dataset.title;
       if (saveBtn) {
         saveBtn.dataset.promptId = card.dataset.id;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-        saveBtn.style.background = "";
+        applySaveBtnState(saveBtn, card.dataset.saved === "true");
       }
       // Populate modal like button
       if (modalLikeBtn) {
@@ -647,9 +668,10 @@ document.addEventListener("DOMContentLoaded", () => {
           // Set save button promptId
           if (saveBtn) {
             saveBtn.dataset.promptId = currentPromptId;
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-            saveBtn.style.background = "";
+            const isSaved =
+              currentCardElement &&
+              currentCardElement.dataset.saved === "true";
+            applySaveBtnState(saveBtn, isSaved);
           }
 
           // Update card lock icon
@@ -780,9 +802,10 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           if (saveBtn) {
             saveBtn.dataset.promptId = promptId;
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-            saveBtn.style.background = "";
+            const isSaved =
+              currentCardElement &&
+              currentCardElement.dataset.saved === "true";
+            applySaveBtnState(saveBtn, isSaved);
           }
 
           if (currentCardElement) {
@@ -849,20 +872,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (lockIcon) lockIcon.remove();
           }
 
-          // Check if already saved
+          // Reflect persisted saved state on the SAVE button
           if (saveBtn) {
-            const formDataCheck = new FormData();
-            formDataCheck.append("action", "check");
-            formDataCheck.append("prompt_id", promptId);
-            fetch("like.php", { method: "POST", body: formDataCheck })
-              .then((r) => r.json())
-              .then((d) => {
-                if (d.saved) {
-                  saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED';
-                  saveBtn.style.background = "#4CAF50";
-                  saveBtn.style.color = "white";
-                }
-              });
+            saveBtn.dataset.promptId = promptId;
+            const isSaved =
+              currentCardElement &&
+              currentCardElement.dataset.saved === "true";
+            applySaveBtnState(saveBtn, isSaved);
           }
         } else {
           showComicAlert("Could not unlock. Please try again later.");
@@ -893,9 +909,10 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           if (saveBtn) {
             saveBtn.dataset.promptId = promptId;
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> SAVE';
-            saveBtn.style.background = "";
+            const isSaved =
+              currentCardElement &&
+              currentCardElement.dataset.saved === "true";
+            applySaveBtnState(saveBtn, isSaved);
           }
           if (currentCardElement) {
             const lockIcon =
@@ -1226,6 +1243,57 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "gallery.php?search=" + encodeURIComponent(query);
     }
   }
+
+  // ===========================================================
+  // SAVE PROMPT — unified click handler (modal SAVE button only)
+  // Unsave is intentionally NOT handled here; it lives only on
+  // the Saved Prompts page (saved_prompts.php).
+  // ===========================================================
+  document.addEventListener("click", function (e) {
+    const saveBtn = e.target.closest(".save-prompt-btn");
+    if (!saveBtn) return;
+    if (saveBtn.disabled || saveBtn.dataset.saved === "true") return;
+
+    const promptId = saveBtn.dataset.promptId;
+    if (!promptId) return;
+
+    if (typeof isLoggedIn !== "undefined" && !isLoggedIn) {
+      const popup = document.getElementById("login-save-popup");
+      if (popup) popup.style.display = "flex";
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+    const fd = new FormData();
+    fd.append("action", "save");
+    fd.append("prompt_id", promptId);
+
+    fetch("save_prompt.php", { method: "POST", body: fd })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.saved) {
+          applySaveBtnState(saveBtn, true);
+          // Reflect on the originating card so subsequent modal opens
+          // see the saved state without a refresh.
+          if (currentCardElement) {
+            currentCardElement.dataset.saved = "true";
+          }
+          const card = document.querySelector(
+            '.card[data-id="' + promptId + '"]',
+          );
+          if (card) card.dataset.saved = "true";
+        } else {
+          applySaveBtnState(saveBtn, false);
+          showComicAlert(data.message || "Could not save prompt.", "error");
+        }
+      })
+      .catch(() => {
+        applySaveBtnState(saveBtn, false);
+        showComicAlert("Network error. Try again.", "error");
+      });
+  });
 });
 
 /* =========================================================
