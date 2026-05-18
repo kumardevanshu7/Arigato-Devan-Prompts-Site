@@ -216,18 +216,19 @@ $type_map = [
             <h2 id="modal-title">PROMPT</h2>
             <div id="modal-want-code" style="display:none;"><p>Get the code from our Instagram reel!</p><a id="modal-reel-link" href="#" target="_blank"><i class="fa-brands fa-instagram"></i> View Reel</a></div>
             <div id="modal-unlock-area" style="display:none;"></div>
-            <div id="modal-unlocked-area" style="display:none;flex-direction:column;gap:12px;">
-                <p id="modal-unlocked-text" class="unlocked-text" style="word-break:break-word;"></p>
-                <div class="modal-action-buttons" style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;font-family:var(--font-main);"><i class="fa-solid fa-copy"></i> COPY</button>
-                    <button id="modal-sp-remove-btn" data-prompt-id="" style="flex:1;padding:12px;background:#ffd6d6;color:#a01515;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;font-family:var(--font-main);box-shadow:var(--shadow-comic);transition:all 0.2s;"><i class="fa-solid fa-trash-can"></i> REMOVE</button>
+            <div id="modal-unlocked-area" style="display:none;flex-direction:column;text-align:left;height:100%;">
+                <h3 style="margin-bottom:10px;color:var(--text-color);font-size:1rem;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3>
+                <div class="unlocked-text" id="modal-unlocked-text" style="font-family:monospace;font-size:0.95rem;font-weight:500;background:var(--bg-color);padding:15px;border-radius:12px;border:var(--border-width) solid var(--text-color);flex-grow:1;margin-bottom:15px;overflow-y:auto;max-height:200px;white-space:pre-wrap;word-break:break-word;color:var(--text-color);box-shadow:var(--shadow-comic);"></div>
+                <div style="display:flex;gap:10px;flex-wrap:nowrap;width:100%;">
+                    <button class="copy-btn" id="modal-copy-btn" style="flex:1;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
+                    <button id="modal-sp-remove-btn" data-prompt-id="" style="flex:1;padding:12px;background:#ffd6d6;color:#a01515;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-trash-can"></i> REMOVE</button>
+                    <?php if (isset($_SESSION["user_id"])): ?>
+                    <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="flex-shrink:0;min-width:70px;padding:12px 0;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;cursor:pointer;box-shadow:var(--shadow-comic);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fa-solid fa-heart" style="font-size:1.1rem;color:#FF4444;"></i>
+                        <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
+                    </button>
+                    <?php endif; ?>
                 </div>
-                <?php if (isset($_SESSION["user_id"])): ?>
-                <button class="modal-like-btn" id="modal-like-btn" data-prompt-id="" style="margin-top:12px;">
-                    <i class="fa-solid fa-heart"></i>
-                    <span id="modal-like-count">0</span>
-                </button>
-                <?php endif; ?>
             </div>
         </div>
     </div>
