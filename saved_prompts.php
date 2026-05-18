@@ -31,6 +31,19 @@ $stmt->execute([":uid" => $user_id, ":uid2" => $user_id]);
 $saved = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $total = count($saved);
 
+$stats = [
+    "secret" => 0,
+    "unreleased" => 0,
+    "insta_viral" => 0,
+    "already_uploaded" => 0
+];
+foreach ($saved as $p) {
+    $pt = $p["prompt_type"] ?? "secret";
+    if (isset($stats[$pt])) {
+        $stats[$pt]++;
+    }
+}
+
 $type_map = [
     "secret" => [
         "emoji" => "🔒",
@@ -73,29 +86,216 @@ $type_map = [
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        body { background: var(--bg-color); }
-        .sp-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 100px; }
-        .sp-hero { margin-bottom: 28px; }
-        .sp-title { font-size: 2rem; font-weight: 900; display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-        .sp-sub { color: #7D7887; font-weight: 600; font-size: .9rem; }
+        body { background: transparent; } /* Let the overlay handle it */
+        .sp-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 100px; position: relative; z-index: 1; }
+        
+        .sp-hero { 
+            margin-bottom: 50px; 
+            background: #FFDE59; 
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35); 
+            border-radius: 24px; 
+            padding: 30px; 
+            box-shadow: 12px 12px 0 var(--text-color, #2d2a35);
+            position: relative;
+            z-index: 1;
+            transform: rotate(-1deg);
+            background-image: radial-gradient(var(--text-color, #2d2a35) 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        .sp-hero-inner {
+            background: var(--card-bg, #fff);
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+            border-radius: 16px;
+            padding: 40px 20px;
+            box-shadow: inset 0 0 0 4px #ffe6e6, 8px 8px 0 rgba(45, 42, 53, 0.1);
+            position: relative;
+            z-index: 2;
+            transform: rotate(1deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .sp-comic-badge {
+            position: absolute;
+            top: -25px;
+            right: 20px;
+            background: #FF3B30;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 900;
+            padding: 10px 20px;
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+            border-radius: 30px;
+            transform: rotate(10deg);
+            box-shadow: 4px 4px 0 var(--text-color, #2d2a35);
+            z-index: 3;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .sp-title { 
+            font-size: 3rem; 
+            font-weight: 900; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 16px; 
+            margin-bottom: 20px; 
+            text-transform: uppercase;
+            color: var(--text-color, #2d2a35);
+            letter-spacing: -1px;
+            text-shadow: 2px 2px 0px #fff;
+        }
+        .sp-title-icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: #00E5FF;
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+            border-radius: 16px;
+            box-shadow: 4px 4px 0 var(--text-color, #2d2a35);
+            transform: rotate(-10deg);
+        }
+        .sp-title-icon-wrap i {
+            color: var(--text-color, #2d2a35);
+            font-size: 2rem;
+        }
+        .sp-sub { 
+            color: var(--text-color, #2d2a35); 
+            font-weight: 800; 
+            font-size: 1.1rem; 
+            background: #E8F5E9; 
+            padding: 12px 24px; 
+            border-radius: 16px; 
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+            display: inline-block;
+            box-shadow: 5px 5px 0 var(--text-color, #2d2a35);
+            margin-bottom: 20px;
+        }
+        
+        .sp-filters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .sp-pill {
+            background: #fff;
+            color: var(--text-color, #2d2a35);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0 var(--text-color, #2d2a35);
+            border: var(--border-width, 3px) solid var(--text-color, #2d2a35);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        .sp-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 5px 5px 0 var(--text-color, #2d2a35);
+        }
+        .sp-pill.active {
+            background: var(--text-color, #2d2a35);
+            color: #fff;
+        }
+
+        .bg-four-cols {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            display: flex;
+            z-index: -5;
+            background: var(--bg-color, #f8f9fa);
+        }
+        .bg-col {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(0,0,0,0.03);
+        }
+        .bg-col:last-child { border-right: none; }
+        .bg-col-img {
+            position: absolute;
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: colCrossfade 24s infinite linear;
+            filter: blur(3px) grayscale(20%);
+        }
+
+        @keyframes colCrossfade {
+            0%   { opacity: 0; transform: scale(1); }
+            8%   { opacity: 0.25; transform: scale(1.02); }
+            25%  { opacity: 0.25; transform: scale(1.08); }
+            33%  { opacity: 0; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .bg-four-cols { flex-direction: row; }
+            .bg-col { border-right: 1px solid rgba(0,0,0,0.03); border-bottom: none; }
+        }
+
         .sp-empty { text-align: center; padding: 80px 20px; }
-        .sp-empty-icon { font-size: 4rem; margin-bottom: 16px; }
-        .sp-empty h2 { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
-        .sp-empty p { color: #888; font-weight: 600; margin-bottom: 24px; }
+        .sp-empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.8; }
+        .sp-empty h2 { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; color: var(--text-color, #2d2a35); }
+        .sp-empty p { color: #555; font-weight: 600; margin-bottom: 24px; }
         .sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        @media (max-width: 600px) { .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .sp-wrap { padding: 20px 14px 80px; } }
+        
+        @media (max-width: 768px) {
+            .sp-wrap { padding: 30px 16px 80px; }
+            .sp-hero { padding: 15px; margin-bottom: 40px; box-shadow: 8px 8px 0 var(--text-color, #2d2a35); transform: rotate(0deg); }
+            .sp-hero-inner { padding: 25px 15px; transform: rotate(0deg); box-shadow: inset 0 0 0 3px #ffe6e6, 4px 4px 0 rgba(45, 42, 53, 0.1); }
+            .sp-comic-badge { top: -20px; right: 10px; font-size: 0.9rem; padding: 6px 12px; transform: rotate(5deg); }
+            .sp-title { font-size: 2rem; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; text-shadow: none; }
+            .sp-title-icon-wrap { width: 45px; height: 45px; }
+            .sp-title-icon-wrap i { font-size: 1.4rem; }
+            .sp-sub { font-size: 0.95rem; padding: 8px 16px; margin-bottom: 15px; }
+            .sp-pill { font-size: 0.85rem; padding: 4px 12px; }
+        }
+        @media (max-width: 600px) { .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
     </style>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
-<!-- Background -->
-<div class="scroll-bg-container" aria-hidden="true">
-    <?php for ($i = 1; $i <= 4; $i++): ?>
-    <div class="bg-layer" style="background-image:url('landingpics/lan<?= $i ?>.webp');"></div>
-    <?php endfor; ?>
+<div class="bg-four-cols" aria-hidden="true">
+    <div class="bg-col">
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/1200x/d1/23/59/d1235986fe6bfb8121fd0e534357a88c.jpg'); animation-delay: 0s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/b0/e1/d5/b0e1d571157b14de3dd695368e1d8f6e.jpg'); animation-delay: 6s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/90/03/87/9003879b29ad758a116371e53f4084a5.jpg'); animation-delay: 12s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/736x/50/88/1f/50881f30c009e39875270aa8152db3e6.jpg'); animation-delay: 18s;"></div>
+    </div>
+    <div class="bg-col">
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/b0/e1/d5/b0e1d571157b14de3dd695368e1d8f6e.jpg'); animation-delay: -2s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/90/03/87/9003879b29ad758a116371e53f4084a5.jpg'); animation-delay: 4s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/736x/50/88/1f/50881f30c009e39875270aa8152db3e6.jpg'); animation-delay: 10s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/1200x/d1/23/59/d1235986fe6bfb8121fd0e534357a88c.jpg'); animation-delay: 16s;"></div>
+    </div>
+    <div class="bg-col">
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/90/03/87/9003879b29ad758a116371e53f4084a5.jpg'); animation-delay: -4s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/736x/50/88/1f/50881f30c009e39875270aa8152db3e6.jpg'); animation-delay: 2s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/1200x/d1/23/59/d1235986fe6bfb8121fd0e534357a88c.jpg'); animation-delay: 8s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/b0/e1/d5/b0e1d571157b14de3dd695368e1d8f6e.jpg'); animation-delay: 14s;"></div>
+    </div>
+    <div class="bg-col">
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/736x/50/88/1f/50881f30c009e39875270aa8152db3e6.jpg'); animation-delay: -6s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i1-e.pinimg.com/1200x/d1/23/59/d1235986fe6bfb8121fd0e534357a88c.jpg'); animation-delay: 0s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/b0/e1/d5/b0e1d571157b14de3dd695368e1d8f6e.jpg'); animation-delay: 6s;"></div>
+        <div class="bg-col-img" style="background-image:url('https://i.pinimg.com/736x/90/03/87/9003879b29ad758a116371e53f4084a5.jpg'); animation-delay: 12s;"></div>
+    </div>
 </div>
-<div class="bg-creamy-overlay" aria-hidden="true"></div>
 
 <header>
     <div class="logo-area" id="logo-container" style="cursor:pointer;">
@@ -128,13 +328,22 @@ $type_map = [
 
 <div class="sp-wrap">
     <div class="sp-hero">
-        <div class="sp-title">
-            <i class="fa-solid fa-bookmark" style="color:var(--primary-dark);"></i>
-            Saved Prompts
+        <div class="sp-comic-badge">BAM!</div>
+        <div class="sp-hero-inner">
+            <div class="sp-title">
+                <div class="sp-title-icon-wrap">
+                    <i class="fa-solid fa-bookmark"></i>
+                </div>
+                Saved Prompts
+            </div>
+            <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
+            <div class="sp-filters">
+                <?php if($stats['secret'] > 0): ?><span class="sp-pill">🔒 Secret <?= $stats['secret'] ?></span><?php endif; ?>
+                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">🔥 Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
+                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">🌙 Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
+                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">📤 Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
+            </div>
         </div>
-        <p class="sp-sub">
-            All prompts you've unlocked — <?= $total ?> saved so far
-        </p>
     </div>
 
     <?php if ($total === 0): ?>
@@ -263,7 +472,7 @@ $type_map = [
     const confirmBtn = document.getElementById('sp-confirm-btn');
     const grid = document.querySelector('.sp-grid');
     const wrap = document.querySelector('.sp-wrap');
-    const subEl = document.querySelector('.sp-sub');
+    const subEl = document.getElementById('sp-counter');
 
     let pendingPromptId = null;
     let pendingCard = null;
@@ -279,7 +488,7 @@ $type_map = [
     function updateCounter() {
         if (!subEl) return;
         const remaining = grid ? grid.querySelectorAll('.sp-card').length : 0;
-        subEl.textContent = "All prompts you've saved \u2014 " + remaining + " saved so far";
+        subEl.textContent = remaining;
         if (remaining === 0 && wrap) {
             // Render empty state inline
             const emptyHtml = '<div class="sp-empty">'
