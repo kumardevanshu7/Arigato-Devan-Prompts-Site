@@ -27,6 +27,8 @@ Disallow: /user_data.php
 Disallow: /db.php
 Disallow: /uploads/
 Disallow: /profiledp/
+Disallow: /surprise_me.php
+Disallow: /webp_updater.php
 
 # Sitemap location
 Sitemap: https://arigatodevan.com/sitemap.xml

@@ -1,3 +1,6 @@
+# ─── Custom Error Pages ──────────────────────────────────────────────────────
+ErrorDocument 404 /404.php
+
 # Block direct access to sensitive PHP files
 <FilesMatch "^(db\.php)$">
     Order Allow,Deny

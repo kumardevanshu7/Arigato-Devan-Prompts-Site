@@ -439,7 +439,17 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             <div class="flash-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <div class="dash-page-title"><i class="fa-solid fa-chart-simple"></i> Admin Dashboard</div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:30px;">
+            <div class="dash-page-title" style="margin-bottom:0;"><i class="fa-solid fa-chart-simple"></i> Admin Dashboard</div>
+            <a href="404.php" target="_blank"
+               style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#ff6b6b;color:#fff;border:3px solid var(--text-color);border-radius:999px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:3px 3px 0 var(--text-color);transition:transform .12s ease,box-shadow .12s ease;white-space:nowrap;"
+               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='5px 5px 0 var(--text-color)'"
+               onmouseout="this.style.transform='';this.style.boxShadow='3px 3px 0 var(--text-color)'"
+               onmousedown="this.style.transform='translate(2px,2px)';this.style.boxShadow='1px 1px 0 var(--text-color)'"
+               onmouseup="this.style.transform='translateY(-2px)';this.style.boxShadow='5px 5px 0 var(--text-color)'">
+                <i class="fa-solid fa-triangle-exclamation"></i> Preview 404 Page
+            </a>
+        </div>
 
         <!-- Analytics Grid -->
         <div class="analytics-grid">
