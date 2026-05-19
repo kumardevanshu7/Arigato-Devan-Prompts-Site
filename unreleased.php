@@ -41,12 +41,12 @@ if (isset($_SESSION["user_id"])) {
 <meta property="og:site_name" content="Arigato Devan Prompts">
 <meta property="og:title" content="Unreleased Prompts — Arigato Devan">
 <meta property="og:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
-<meta property="og:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+<meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/unreleased.php">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Unreleased Prompts — Arigato Devan">
 <meta name="twitter:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
-<meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+<meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

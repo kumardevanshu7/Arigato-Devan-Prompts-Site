@@ -45,12 +45,12 @@ arsort($all_tags);
 <meta property="og:site_name" content="Arigato Devan Prompts">
 <meta property="og:title" content="Blogs — Arigato Devan Prompts">
 <meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
-<meta property="og:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+<meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
 <meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
-<meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+<meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=1778100000">
 <style>
 /* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */

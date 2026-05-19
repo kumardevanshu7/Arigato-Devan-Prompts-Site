@@ -123,12 +123,12 @@ try {
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="Arigato Devan Prompts — Premium AI Couple Prompts">
     <meta property="og:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
-    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Arigato Devan Prompts — Premium AI Couple Prompts">
     <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
-    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -292,7 +292,7 @@ try {
                 <div class="filmstrip-track">
                     <?php
                     $strip_imgs = [
-                        "landingpics/lan1.webp",
+                        "landingpics/lan9.webp",
                         "landingpics/lan2.webp",
                         "landingpics/lan3.webp",
                         "landingpics/lan4.webp",

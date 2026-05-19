@@ -16,7 +16,7 @@ $error = $_SESSION["error_msg"] ?? "";
 unset($_SESSION["error_msg"]);
 
 $strip_imgs = [
-    "landingpics/lan1.webp",
+    "landingpics/lan9.webp",
     "landingpics/lan2.webp",
     "landingpics/lan3.webp",
     "landingpics/lan4.webp",

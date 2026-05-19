@@ -57,12 +57,12 @@ function sessionAvatar()
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
     <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
-    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/gallery.php">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
     <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
-    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="stylesheet" href="style.css?v=2026051205">
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
