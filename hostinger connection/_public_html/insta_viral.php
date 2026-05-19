@@ -33,7 +33,18 @@ if (isset($_SESSION["user_id"])) {
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="Insta Viral Reels &mdash; Coming Soon on PromptVerse.">
+<meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<!-- Open Graph & Twitter Card -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Arigato Devan Prompts">
+<meta property="og:title" content="Insta Viral Reels Prompts — Arigato Devan">
+<meta property="og:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<meta property="og:image" content="https://arigatodevan.com/landingpics/lan1.webp">
+<meta property="og:url" content="https://arigatodevan.com/insta_viral.php">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Insta Viral Reels Prompts — Arigato Devan">
+<meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan1.webp">
 <link rel="stylesheet" href="style.css?v=2026051205">
 <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
