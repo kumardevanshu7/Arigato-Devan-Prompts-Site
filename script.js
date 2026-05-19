@@ -959,29 +959,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Inject Share button into modal action area (once per page)
+  // Inject Share button as floating top-left button on modal
+  // (visible on both locked and unlocked cards — works on mobile too)
   (function injectShareButton() {
-    const saveBtn = document.getElementById("modal-save-btn");
-    if (!saveBtn || document.getElementById("modal-share-btn")) return;
+    const modalContent = document.querySelector("#unlock-modal .modal-content");
+    if (!modalContent || document.getElementById("modal-share-btn")) return;
+
+    // Inject stylesheet ONCE — uses !important to beat .modal-content button rules
+    if (!document.getElementById("adp-share-btn-styles")) {
+      const st = document.createElement("style");
+      st.id = "adp-share-btn-styles";
+      st.textContent =
+        "#modal-share-btn{" +
+        "position:absolute !important;" +
+        "top:12px !important;" +
+        "left:12px !important;" +
+        "right:auto !important;" +
+        "bottom:auto !important;" +
+        "z-index:9999 !important;" +
+        "width:42px !important;" +
+        "height:42px !important;" +
+        "min-width:42px !important;" +
+        "max-width:42px !important;" +
+        "padding:0 !important;" +
+        "margin:0 !important;" +
+        "background:#a7f3d0 !important;" +
+        "color:var(--text-color) !important;" +
+        "border:2px solid var(--text-color) !important;" +
+        "border-radius:50% !important;" +
+        "cursor:pointer !important;" +
+        "box-shadow:3px 3px 0 var(--text-color) !important;" +
+        "display:flex !important;" +
+        "align-items:center !important;" +
+        "justify-content:center !important;" +
+        "font-family:var(--font-main) !important;" +
+        "font-size:0.95rem !important;" +
+        "font-weight:800 !important;" +
+        "line-height:1 !important;" +
+        "transform:none !important;" +
+        "transition:transform .12s ease, box-shadow .12s ease !important;" +
+        "box-sizing:border-box !important;" +
+        "-webkit-tap-highlight-color:transparent !important;" +
+        "}" +
+        "#modal-share-btn:hover{transform:none !important;background:#86efac !important;box-shadow:4px 4px 0 var(--text-color) !important;}" +
+        "#modal-share-btn:active,#modal-share-btn.is-pressed{transform:translate(2px,2px) !important;box-shadow:1px 1px 0 var(--text-color) !important;}";
+      document.head.appendChild(st);
+    }
+
+    // Ensure modal-content is positioned so absolute child anchors correctly
+    if (window.getComputedStyle(modalContent).position === "static") {
+      modalContent.style.position = "relative";
+    }
+
     const shareBtn = document.createElement("button");
     shareBtn.id = "modal-share-btn";
     shareBtn.type = "button";
     shareBtn.title = "Share this prompt";
+    shareBtn.setAttribute("aria-label", "Share this prompt");
     shareBtn.innerHTML = '<i class="fa-solid fa-share-nodes"></i>';
-    shareBtn.style.cssText =
-      "flex-shrink:0;min-width:54px;padding:12px 0;background:#a7f3d0;color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;box-shadow:var(--shadow-comic);transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-size:1.05rem;";
-    shareBtn.addEventListener("click", shareCurrentPrompt);
-    shareBtn.addEventListener("mousedown", () => {
-      shareBtn.style.transform = "translate(2px,2px)";
-      shareBtn.style.boxShadow = "2px 2px 0 var(--text-color)";
+    shareBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      shareCurrentPrompt();
     });
-    const reset = () => {
-      shareBtn.style.transform = "";
-      shareBtn.style.boxShadow = "var(--shadow-comic)";
-    };
-    shareBtn.addEventListener("mouseup", reset);
-    shareBtn.addEventListener("mouseleave", reset);
-    saveBtn.parentNode.insertBefore(shareBtn, saveBtn.nextSibling);
+
+    modalContent.appendChild(shareBtn);
   })();
 
   function unlockAlreadyUploaded(promptId) {
