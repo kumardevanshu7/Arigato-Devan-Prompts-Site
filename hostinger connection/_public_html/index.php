@@ -134,10 +134,14 @@ try {
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
         <link rel="stylesheet" href="style.css?v=2026051205">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
+    <!-- Preload first 3 filmstrip images — LCP candidates -->
+    <link rel="preload" as="image" href="landingpics/lan1.webp" type="image/webp">
+    <link rel="preload" as="image" href="landingpics/lan2.webp" type="image/webp">
+    <link rel="preload" as="image" href="landingpics/lan3.webp" type="image/webp">
     <!-- Preload first 3 prompt images for faster perceived loading -->
     <?php if (isset($prompts) && is_array($prompts)) {
         for ($i = 0; $i < min(3, count($prompts)); $i++) {
@@ -184,10 +188,10 @@ try {
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Arigato Devan Logo" id="profile-logo">
+                    <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo">
                 </div>
                 <div class="logo-back">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt="Logo Alt">
+                    <img src="toplogo/logo02.webp" alt="Logo Alt">
                 </div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -312,6 +316,7 @@ try {
                     ];
                     // Duplicate for seamless loop
                     $all = array_merge($strip_imgs, $strip_imgs);
+                    $strip_idx = 0;
                     foreach ($all as $img): ?>
                     <div class="filmstrip-frame">
                         <picture>
@@ -320,10 +325,10 @@ try {
                                 ".webp",
                                 ".png",
                                 $img,
-                            ) ?>" alt="" loading="lazy" width="200" height="356">
+                            ) ?>" alt="" <?= $strip_idx === 0 ? 'fetchpriority="high"' : ($strip_idx < 5 ? '' : 'loading="lazy"') ?> width="200" height="356">
                         </picture>
                     </div>
-                    <?php endforeach;
+                    <?php $strip_idx++; endforeach;
                     ?>
                 </div>
             </div>
@@ -337,6 +342,7 @@ try {
                         $middle_imgs,
                         array_slice($strip_imgs, 0, 8),
                     );
+                    $mid_idx = 0;
                     foreach (
                         array_merge($middle_imgs, $middle_imgs)
                         as $img
@@ -348,17 +354,17 @@ try {
                                 ".webp",
                                 ".png",
                                 $img,
-                            ) ?>" alt="" loading="lazy">
+                            ) ?>" alt="" <?= $mid_idx < 5 ? '' : 'loading="lazy"' ?>>
                         </picture>
                     </div>
-                    <?php endforeach;
+                    <?php $mid_idx++; endforeach;
                     ?>
                 </div>
             </div>
             <!-- Row 3: left scroll (bottom row) -->
             <div class="filmstrip-row row-3">
                 <div class="filmstrip-track">
-                    <?php foreach (
+                    <?php $bot_idx = 0; foreach (
                         array_merge(
                             array_reverse($strip_imgs),
                             array_reverse($strip_imgs),
@@ -372,7 +378,7 @@ try {
                                 ".webp",
                                 ".png",
                                 $img,
-                            ) ?>" alt="" loading="lazy">
+                            ) ?>" alt="" <?= $bot_idx < 5 ? '' : 'loading="lazy"' ?>>  <?php $bot_idx++; ?>
                         </picture>
                     </div>
                     <?php endforeach; ?>

@@ -34,8 +34,8 @@ sort($all_mgr_tags);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Prompts - Admin</title>
     <link rel="stylesheet" href="style.css?v=1778100000">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <style>
         body { background: var(--bg-color); }
         .dashboard-wrap { max-width: 1000px; margin: 0 auto; padding: 30px 40px 100px; }
@@ -54,7 +54,7 @@ sort($all_mgr_tags);
         .delete-btn { background: #ffe3e3; color: #d03030; }
         .delete-btn:hover { background: #ffc9c9; transform: translateY(-2px); }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
 </head>
 <body>

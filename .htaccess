@@ -31,17 +31,17 @@ ErrorDocument 404 /404.php
 <IfModule mod_expires.c>
     ExpiresActive On
 
-    # Images — 30 days
-    ExpiresByType image/webp             "access plus 30 days"
-    ExpiresByType image/jpeg             "access plus 30 days"
-    ExpiresByType image/png              "access plus 30 days"
-    ExpiresByType image/gif              "access plus 30 days"
-    ExpiresByType image/svg+xml          "access plus 30 days"
+    # Images — 1 year
+    ExpiresByType image/webp             "access plus 1 year"
+    ExpiresByType image/jpeg             "access plus 1 year"
+    ExpiresByType image/png              "access plus 1 year"
+    ExpiresByType image/gif              "access plus 1 year"
+    ExpiresByType image/svg+xml         "access plus 1 year"
 
-    # CSS + JS — 7 days
-    ExpiresByType text/css               "access plus 7 days"
-    ExpiresByType application/javascript "access plus 7 days"
-    ExpiresByType text/javascript        "access plus 7 days"
+    # CSS + JS — 1 year (versioned URLs used, safe)
+    ExpiresByType text/css               "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript        "access plus 1 year"
 
     # Fonts — 30 days
     ExpiresByType font/woff2             "access plus 30 days"
@@ -52,10 +52,10 @@ ErrorDocument 404 /404.php
 # ─── Cache-Control Headers ───────────────────────────────────────────────────
 <IfModule mod_headers.c>
     <FilesMatch "\.(webp|jpg|jpeg|png|gif|svg)$">
-        Header set Cache-Control "max-age=2592000, public"
+        Header set Cache-Control "max-age=31536000, public, immutable"
     </FilesMatch>
     <FilesMatch "\.(css|js)$">
-        Header set Cache-Control "max-age=604800, public"
+        Header set Cache-Control "max-age=31536000, public, immutable"
     </FilesMatch>
     <FilesMatch "\.(woff2|woff)$">
         Header set Cache-Control "max-age=2592000, public"

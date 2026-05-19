@@ -4,7 +4,7 @@ require_once "db.php";
 $curPage = basename($_SERVER["PHP_SELF"]);
 $milestones = [
     [
-        "file" => "progress01.png",
+        "file" => "progress01.jpg",
         "count" => "693",
         "label" => "The Beginning",
         "sub" => "Where it all started",
@@ -12,7 +12,7 @@ $milestones = [
         "size" => "sm",
     ],
     [
-        "file" => "progress02.png",
+        "file" => "progress02.jpg",
         "count" => "1,000+",
         "label" => "First 1K!",
         "sub" => "First major milestone",
@@ -20,7 +20,7 @@ $milestones = [
         "size" => "sm",
     ],
     [
-        "file" => "progress03.png",
+        "file" => "progress03.jpg",
         "count" => "1,500+",
         "label" => "Growing Strong",
         "sub" => "Momentum building",
@@ -28,7 +28,7 @@ $milestones = [
         "size" => "sm",
     ],
     [
-        "file" => "progress04.png",
+        "file" => "progress04.jpg",
         "count" => "2,000+",
         "label" => "2K Family",
         "sub" => "The community grows",
@@ -36,7 +36,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress05.png",
+        "file" => "progress05.jpg",
         "count" => "3,000+",
         "label" => "3K & Climbing",
         "sub" => "Growth accelerating",
@@ -44,7 +44,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress06.png",
+        "file" => "progress06.jpg",
         "count" => "4,000+",
         "label" => "Almost 5K",
         "sub" => "Something big is coming...",
@@ -52,7 +52,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress07.png",
+        "file" => "progress07.jpg",
         "count" => "1M Views",
         "label" => "1 Million Views 🚀",
         "sub" => "The viral moment that changed everything",
@@ -60,7 +60,7 @@ $milestones = [
         "size" => "hero",
     ],
     [
-        "file" => "progress08.png",
+        "file" => "progress08.jpg",
         "count" => "5,000+",
         "label" => "5K Unlocked",
         "sub" => "Post-viral surge",
@@ -68,7 +68,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress09.png",
+        "file" => "progress09.jpg",
         "count" => "6,000+",
         "label" => "6K Strong",
         "sub" => "Consistent growth",
@@ -76,7 +76,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress10.png",
+        "file" => "progress10.jpg",
         "count" => "7,000+",
         "label" => "7K Family",
         "sub" => "Growing every day",
@@ -84,7 +84,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress11.png",
+        "file" => "progress11.jpg",
         "count" => "8,000+",
         "label" => "8K & Rising",
         "sub" => "Nearly at the goal",
@@ -92,7 +92,7 @@ $milestones = [
         "size" => "md",
     ],
     [
-        "file" => "progress12.png",
+        "file" => "progress12.jpg",
         "count" => "9,500+",
         "label" => "So Close...",
         "sub" => "The final stretch",
@@ -100,7 +100,7 @@ $milestones = [
         "size" => "lg",
     ],
     [
-        "file" => "progress13.png",
+        "file" => "progress13.jpg",
         "count" => "10,000+",
         "label" => "10K Achieved 🌟",
         "sub" => "From 693 to 10K &mdash; The Journey Complete",
@@ -115,8 +115,8 @@ $milestones = [
 <title>Growth Journey &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
 <link rel="stylesheet" href="style.css?v=1778100000">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
@@ -219,8 +219,8 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 <header>
     <div class="logo-area"  style="cursor:pointer">
         <div class="logo-flipper">
-            <div class="logo-front"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9eBlF-H7pQKHB7MV3TrjiL8Fm6HS753UjgtMroNDpSfMt_dmrqGoqAq_Bkhq1iSg1Iuflg_k6GHKXcuNXFEh0EmM0DyKY0XelSyShPXkzDX2u74APxyrIuY62s4bxL2JGRRqUBu9y1C_3SwrvCnqEmkJjJWs2v95MOHRkkLeQ08w2U_xMZvykuxtZeYj-/s1260/DP.png" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPksk2I-7a-EOSKAOstvbTPvuQ1DT8-pUI70DyiKNKitbp1lSaZoRRIH1eLK79gIYRUgRa5uW_yqTWkz4vOeq1f3hpdH8kQ6a4DVLDKfy2KYXZB5wjF_nTQjrIvQKW4Db0kAZRepIZ3OYHAAYW-T7oPKjNS09hvHifH54IQJ_ZeZTu06XeCfQIT-nS2fCW/s690/67af64fe-c73c-426c-85db-ca1fccdc2978-modified.png" alt=""></div>
+            <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
+            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>

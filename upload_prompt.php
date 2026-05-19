@@ -17,8 +17,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Prompt - Admin</title>
     <link rel="stylesheet" href="style.css?v=1778100000">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
     <style>
         body { background: var(--bg-color); }
@@ -52,7 +52,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .type-card.selected-viral { background: #e3f7ff; border-color: #007ab8; color: #004f7a; box-shadow: 4px 4px 0 #007ab8; }
         .type-card.selected-uploaded { background: #e6f2ff; border-color: #00509e; color: #00509e; box-shadow: 4px 4px 0 #00509e; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
