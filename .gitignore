@@ -2,7 +2,6 @@ google_config.php
 db.php
 secret_code.php
 firebase_auth.php
-/hostinger connection/
 /private/
 *.log
 .DS_Store
