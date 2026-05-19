@@ -26,3 +26,4 @@
   gtag('js', new Date());
   gtag('config', 'G-1B4V97JP7T');
 </script>
+<?php if (file_exists(__DIR__ . '/fcm_init.php')) include_once __DIR__ . '/fcm_init.php'; ?>

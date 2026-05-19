@@ -109,6 +109,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $_SESSION["success_msg"] =
                 "Prompt successfully added to the Verse!";
+
+            // Send FCM push notification to all subscribers
+            if (file_exists(__DIR__ . '/fcm_notify.php')) {
+                require_once __DIR__ . '/fcm_notify.php';
+                @sendFCMNotification(
+                    '✨ New Prompt: ' . $title,
+                    'A new AI couple prompt just dropped! Tap to check it out. 💫',
+                    'https://arigatodevan.com'
+                );
+            }
         } catch (PDOException $e) {
             $_SESSION["error_msg"] = "Database error: " . $e->getMessage();
         }
