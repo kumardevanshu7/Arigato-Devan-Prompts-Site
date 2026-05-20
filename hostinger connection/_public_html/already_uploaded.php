@@ -237,6 +237,7 @@ if (isset($_SESSION["user_id"])) {
                  data-unlocked="<?= $is_unlocked ? "true" : "false" ?>"
                  data-saved="<?= !empty($aup["is_saved"]) ? "true" : "false" ?>"
                  data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
+                 data-best-works-in="<?= htmlspecialchars($aup['best_works_in'] ?? '') ?>"
                  <?= $is_unlocked
                      ? 'data-prompt-text="' .
                          htmlspecialchars($aup["prompt_text"]) .
@@ -283,6 +284,7 @@ if (isset($_SESSION["user_id"])) {
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">PROMPT LOCKED</h2>
+                <div id="modal-bwi-badge" style="margin:4px 0 10px;"></div>
 
                 <div class="want-code-section" id="modal-want-code" style="display:none;">
                     <p class="want-code-text">Want Code?</p>

@@ -361,6 +361,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       if (modalTitle) modalTitle.textContent = card.dataset.title;
+      // Best Works In badge
+      const bwiBadge = document.getElementById('modal-bwi-badge');
+      if (bwiBadge) {
+        const bwi = card.dataset.bestWorksIn || '';
+        if (bwi === 'nano_banana') {
+          bwiBadge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;background:#ffe066;border:2px solid #2d2a35;border-radius:20px;padding:4px 14px;font-size:.78rem;font-weight:900;box-shadow:2px 2px 0 #2d2a35;">🍌 Best in Nano Banana</span>';
+        } else if (bwi === 'chatgpt') {
+          bwiBadge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;background:#10a37f;color:#fff;border:2px solid #2d2a35;border-radius:20px;padding:4px 14px;font-size:.78rem;font-weight:900;box-shadow:2px 2px 0 #2d2a35;">✦ Best in ChatGPT</span>';
+        } else {
+          bwiBadge.innerHTML = '';
+        }
+      }
       if (saveBtn) {
         saveBtn.dataset.promptId = card.dataset.id;
         applySaveBtnState(saveBtn, card.dataset.saved === "true");

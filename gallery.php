@@ -326,6 +326,7 @@ function sessionAvatar()
                          data-tags="<?= htmlspecialchars(
                              implode(",", $tags_arr),
                          ) ?>"
+                         data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
                          <?= $p["is_unlocked"]
                              ? 'data-prompt-text="' .
                                  htmlspecialchars($p["prompt_text"]) .
@@ -400,6 +401,7 @@ function sessionAvatar()
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">PROMPT LOCKED</h2>
+                <div id="modal-bwi-badge" style="margin:4px 0 10px;"></div>
 
                 <div class="want-code-section" id="modal-want-code" style="display:none;">
                     <p class="want-code-text">Want Code?</p>

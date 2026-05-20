@@ -51,6 +51,14 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .type-card.selected-unreleased { background: #fff4cc; border-color: #e6a800; color: #7a5800; box-shadow: 4px 4px 0 #e6a800; }
         .type-card.selected-viral { background: #e3f7ff; border-color: #007ab8; color: #004f7a; box-shadow: 4px 4px 0 #007ab8; }
         .type-card.selected-uploaded { background: #e6f2ff; border-color: #00509e; color: #00509e; box-shadow: 4px 4px 0 #00509e; }
+        /* Best Works In */
+        .bwi-selector{display:flex;gap:12px;flex-wrap:wrap;}
+        .bwi-btn{display:inline-flex;align-items:center;gap:8px;border:var(--border-width) solid var(--text-color);border-radius:14px;padding:12px 22px;cursor:pointer;font-family:var(--font-main);font-weight:900;font-size:1rem;transition:all .2s;user-select:none;}
+        .bwi-btn input[type=radio]{display:none;}
+        .bwi-banana-opt{background:#fffaed;color:#7a5800;}
+        .bwi-banana-opt.bwi-selected{background:#ffe066;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
+        .bwi-chatgpt-opt{background:#f0faf7;color:#10a37f;}
+        .bwi-chatgpt-opt.bwi-selected{background:#10a37f;color:#fff;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
     </style>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -159,6 +167,20 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                                 "</span>";
                         }
                         ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — which AI gives best results with this prompt)</span></label>
+                    <div class="bwi-selector">
+                        <label class="bwi-btn bwi-banana-opt" onclick="setBwi('nano_banana',this)">
+                            <input type="radio" name="best_works_in" value="nano_banana">
+                            🍌 Nano Banana
+                        </label>
+                        <label class="bwi-btn bwi-chatgpt-opt" onclick="setBwi('chatgpt',this)">
+                            <input type="radio" name="best_works_in" value="chatgpt">
+                            ✦ ChatGPT
+                        </label>
                     </div>
                 </div>
 
@@ -333,6 +355,12 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             // Make sure hidden tag input is updated
             hiddenTagInput.value = tags.join(',');
         });
+
+        function setBwi(val, el) {
+            document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));
+            el.classList.add('bwi-selected');
+            el.querySelector('input[type=radio]').checked = true;
+        }
     </script>
 </body>
 </html>

@@ -14,6 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $prompt_text = trim($_POST["prompt_text"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
     $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'insta_viral'
+    $bwi_raw = trim($_POST["best_works_in"] ?? "");
+    $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
 
     // Validate prompt_type
     $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
@@ -95,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Insert into DB
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -105,6 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $target_file,
                 $reel_link,
                 $prompt_type,
+                $best_works_in,
             ]);
 
             $_SESSION["success_msg"] =

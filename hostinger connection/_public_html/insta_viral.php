@@ -370,7 +370,8 @@ if (isset($_SESSION["user_id"])) {
              data-unlocked="false"
              data-prompt-type="insta_viral"
              data-saved="<?= !empty($p["is_saved"]) ? "true" : "false" ?>"
-             data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>">
+             data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
+             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>">
 
             <img src="<?= htmlspecialchars(
                 $p["image_path"],
@@ -411,6 +412,7 @@ if (isset($_SESSION["user_id"])) {
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">UNLOCK THE VIRAL PROMPT</h2>
+                <div id="modal-bwi-badge" style="margin:4px 0 10px;"></div>
 
                 <div class="modal-unlock-area" id="modal-unlock-area">
                 </div>

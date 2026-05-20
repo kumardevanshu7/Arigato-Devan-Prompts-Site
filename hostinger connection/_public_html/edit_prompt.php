@@ -16,6 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text = trim($_POST["prompt_text"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
+    $bwi_raw = trim($_POST["best_works_in"] ?? "");
+    $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
 
     $prompt_type = trim($_POST["prompt_type"] ?? "secret");
     $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
@@ -56,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $pdo->prepare(
-        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=? WHERE id=?",
+        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=? WHERE id=?",
     )->execute([
         $title,
         $tag,
@@ -65,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $reel_link,
         $image_path,
         $prompt_type,
+        $best_works_in,
         $id,
     ]);
 
@@ -86,6 +89,7 @@ unset($_SESSION["edit_error"]);
 $current_tags = array_map("trim", explode(",", strtolower($p["tag"])));
 $is_secret = $p["prompt_type"] === "secret";
 $current_prompt_type = $p["prompt_type"] ?? "secret";
+$current_bwi = $p["best_works_in"] ?? "";
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
@@ -102,6 +106,13 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--primary-dark);box-shadow:var(--shadow-comic-hover);transform:translateY(-1px)}
 .form-group textarea{resize:vertical;min-height:110px}
 .img-preview{display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-color);border:2px dashed var(--border-color);border-radius:12px;margin-bottom:10px}
+.bwi-selector{display:flex;gap:12px;flex-wrap:wrap;}
+.bwi-btn{display:inline-flex;align-items:center;gap:8px;border:var(--border-width) solid var(--text-color);border-radius:14px;padding:12px 22px;cursor:pointer;font-family:var(--font-main);font-weight:900;font-size:1rem;transition:all .2s;user-select:none;}
+.bwi-btn input[type=radio]{display:none;}
+.bwi-banana-opt{background:#fffaed;color:#7a5800;}
+.bwi-banana-opt.bwi-selected{background:#ffe066;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
+.bwi-chatgpt-opt{background:#f0faf7;color:#10a37f;}
+.bwi-chatgpt-opt.bwi-selected{background:#10a37f;color:#fff;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
 .img-preview img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--text-color)}
 .img-preview span{font-size:.85rem;font-weight:600;color:#7D7887}
 .file-upload-wrapper{display:flex;align-items:center;gap:14px;background:var(--bg-color);padding:10px 15px;border:var(--border-width) solid var(--text-color);border-radius:12px;box-shadow:var(--shadow-comic)}
@@ -264,6 +275,20 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
           </div>
       </div>
 
+      <div class="form-group">
+        <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional)</span></label>
+        <div class="bwi-selector">
+          <label class="bwi-btn bwi-banana-opt <?= $current_bwi === 'nano_banana' ? 'bwi-selected' : '' ?>" onclick="setBwi('nano_banana',this)">
+            <input type="radio" name="best_works_in" value="nano_banana" <?= $current_bwi === 'nano_banana' ? 'checked' : '' ?>>
+            🍌 Nano Banana
+          </label>
+          <label class="bwi-btn bwi-chatgpt-opt <?= $current_bwi === 'chatgpt' ? 'bwi-selected' : '' ?>" onclick="setBwi('chatgpt',this)">
+            <input type="radio" name="best_works_in" value="chatgpt" <?= $current_bwi === 'chatgpt' ? 'checked' : '' ?>>
+            ✦ ChatGPT
+          </label>
+        </div>
+      </div>
+
       <div class="form-group"><label for="e-prompt">Prompt Text *</label><textarea id="e-prompt" name="prompt_text" rows="6" required><?= htmlspecialchars(
           $p["prompt_text"],
       ) ?></textarea></div>
@@ -403,5 +428,11 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
         // Initial render
         renderTags();
+
+        function setBwi(val, el) {
+            document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));
+            el.classList.add('bwi-selected');
+            el.querySelector('input[type=radio]').checked = true;
+        }
 </script>
 </body></html>
