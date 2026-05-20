@@ -18,6 +18,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $reel_link = trim($_POST["reel_link"] ?? "");
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
+    $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
+    $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
+    $asset_images_json = $_POST["current_asset_images"] ?? null;
+    if (!$has_assets) { $asset_images_json = null; }
+    if ($has_assets && isset($_FILES["asset_images"]) && !empty($_FILES["asset_images"]["name"][0])) {
+        $asset_dir = "uploads/assets/";
+        if (!is_dir($asset_dir)) { mkdir($asset_dir, 0755, true); }
+        $asset_paths = [];
+        $allowed_ext = ["jpg","jpeg","png","gif","webp"];
+        foreach ($_FILES["asset_images"]["tmp_name"] as $i => $tmp) {
+            if ($i >= 2) break;
+            if ($_FILES["asset_images"]["error"][$i] !== UPLOAD_ERR_OK) continue;
+            $ext = strtolower(pathinfo($_FILES["asset_images"]["name"][$i], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowed_ext)) continue;
+            $afname = "uploads/assets/" . uniqid("asset_") . "." . $ext;
+            if (move_uploaded_file($tmp, $afname)) { $asset_paths[] = $afname; }
+        }
+        if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
+    }
 
     $prompt_type = trim($_POST["prompt_type"] ?? "secret");
     $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
@@ -58,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $pdo->prepare(
-        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=? WHERE id=?",
+        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=? WHERE id=?",
     )->execute([
         $title,
         $tag,
@@ -68,6 +87,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $image_path,
         $prompt_type,
         $best_works_in,
+        $asset_title,
+        $asset_images_json,
         $id,
     ]);
 
@@ -90,6 +111,9 @@ $current_tags = array_map("trim", explode(",", strtolower($p["tag"])));
 $is_secret = $p["prompt_type"] === "secret";
 $current_prompt_type = $p["prompt_type"] ?? "secret";
 $current_bwi = $p["best_works_in"] ?? "";
+$current_asset_title = $p["asset_title"] ?? "";
+$current_asset_images = $p["asset_images"] ?? "";
+$has_current_assets = !empty($current_asset_title) || !empty($current_asset_images);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
@@ -127,6 +151,13 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 .type-info-box.unreleased{background:#fff8e0;border-color:#f0c040;color:#7a5c00}
 .type-info-box.viral{background:#e8f9ef;border-color:#5cb85c;color:#1a5c30}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:22px 18px}}
+.assets-toggle-label{display:inline-flex;align-items:center;gap:10px;cursor:pointer;background:#f0f7ff;padding:12px 20px;border-radius:12px;border:2px dashed #5b9bd5;color:#1a4f8a;font-weight:900;font-size:.95rem;transition:all .2s;user-select:none;}
+.assets-toggle-label:hover{background:#dceeff;}
+.assets-toggle-label input[type=checkbox]{width:18px!important;height:18px!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important;accent-color:#1a4f8a;cursor:pointer;flex-shrink:0;}
+.assets-fields-box{background:#f8fbff;border:2px solid #5b9bd5;border-radius:16px;padding:20px;margin-top:14px;}
+.asset-previews{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.asset-preview-thumb{width:80px;height:80px;border-radius:10px;overflow:hidden;border:2px solid var(--text-color);}
+.asset-preview-thumb img{width:100%;height:100%;object-fit:cover;}
 .type-selector{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap}
 .e-type-card{flex:1;min-width:100px;border:var(--border-width) solid var(--text-color);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;font-family:var(--font-main);font-weight:800;font-size:.85rem;transition:all .2s;background:#fff;position:relative}
 .e-type-card:hover{transform:translateY(-2px);box-shadow:4px 4px 0 var(--text-color)}
@@ -319,6 +350,45 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
     : "" ?>>
       </div>
 
+      <!-- Assets Toggle -->
+      <div class="form-group">
+        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — reference images shown after unlock)</span></label>
+        <label class="assets-toggle-label" id="assets-toggle-label">
+            <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)" <?= $has_current_assets ? 'checked' : '' ?>>
+            <span>📎 Include Assets</span>
+        </label>
+        <div id="assets-fields" style="<?= $has_current_assets ? 'display:block;' : 'display:none;' ?>">
+            <div class="assets-fields-box">
+                <input type="hidden" name="current_asset_images" value="<?= htmlspecialchars($current_asset_images) ?>">
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label style="margin-top:0;">Assets Title</label>
+                    <input type="text" name="asset_title" id="edit-asset-title" value="<?= htmlspecialchars($current_asset_title) ?>" placeholder="e.g. Reference Photos">
+                </div>
+                <?php if (!empty($current_asset_images)): ?>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:.8rem;color:#888;font-weight:700;text-transform:uppercase;">Current Assets</label>
+                    <div class="asset-previews">
+                        <?php foreach (json_decode($current_asset_images, true) ?? [] as $aimg): ?>
+                        <div class="asset-preview-thumb"><img src="<?= htmlspecialchars($aimg) ?>" alt="asset"></div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Replace Images <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current, max 2)</span></label>
+                    <div class="file-upload-wrapper">
+                        <label for="e-asset-images" class="file-upload-btn" style="background:var(--secondary-color);">
+                            <i class="fa-solid fa-paperclip"></i> Choose Files
+                        </label>
+                        <span class="file-upload-name" id="e-asset-fname">No files chosen</span>
+                        <input type="file" id="e-asset-images" name="asset_images[]" accept="image/*" multiple style="display:none;" onchange="handleEditAssetFiles(this)">
+                    </div>
+                    <div class="asset-previews" id="e-asset-previews"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Cover Image (leave blank to keep current)</label>
         <div class="img-preview">
@@ -433,6 +503,30 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));
             el.classList.add('bwi-selected');
             el.querySelector('input[type=radio]').checked = true;
+        }
+
+        function toggleAssets(cb) {
+            document.getElementById('assets-fields').style.display = cb.checked ? 'block' : 'none';
+            document.getElementById('assets-toggle-label').style.background = cb.checked ? '#dceeff' : '';
+        }
+        // Init toggle visual
+        (function(){ const cb = document.getElementById('has_assets'); if(cb && cb.checked) document.getElementById('assets-toggle-label').style.background='#dceeff'; })();
+
+        function handleEditAssetFiles(input) {
+            const files = Array.from(input.files).slice(0, 2);
+            document.getElementById('e-asset-fname').textContent = files.map(f=>f.name).join(', ') || 'No files chosen';
+            const prev = document.getElementById('e-asset-previews');
+            prev.innerHTML = '';
+            files.forEach(f => {
+                const r = new FileReader();
+                r.onload = e => {
+                    const d = document.createElement('div');
+                    d.className = 'asset-preview-thumb';
+                    d.innerHTML = `<img src="${e.target.result}">`;
+                    prev.appendChild(d);
+                };
+                r.readAsDataURL(f);
+            });
         }
 </script>
 </body></html>

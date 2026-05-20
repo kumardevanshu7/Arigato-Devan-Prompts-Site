@@ -16,6 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'insta_viral'
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
+    $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
+    $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
+    $asset_images_json = null;
 
     // Validate prompt_type
     $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
@@ -94,10 +97,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $target_file = $upload_dir . $new_filename;
 
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+        // Handle asset images upload (max 2)
+        if ($has_assets && isset($_FILES["asset_images"]) && !empty($_FILES["asset_images"]["name"][0])) {
+            $asset_dir = "uploads/assets/";
+            if (!is_dir($asset_dir)) {
+                if (!mkdir($asset_dir, 0755, true)) {
+                    $_SESSION["error_msg"] = "Asset folder could not be created. Please create 'uploads/assets/' directory on the server.";
+                    header("Location: upload_prompt.php");
+                    exit();
+                }
+            }
+            $asset_paths = [];
+            $allowed_asset_ext = ["jpg", "jpeg", "png", "gif", "webp"];
+            foreach ($_FILES["asset_images"]["tmp_name"] as $i => $tmp) {
+                if ($i >= 2) break;
+                if ($_FILES["asset_images"]["error"][$i] !== UPLOAD_ERR_OK) continue;
+                $aext = strtolower(pathinfo($_FILES["asset_images"]["name"][$i], PATHINFO_EXTENSION));
+                if (!in_array($aext, $allowed_asset_ext)) continue;
+                $afname = "uploads/assets/" . uniqid("asset_") . "." . $aext;
+                if (move_uploaded_file($tmp, $afname)) { $asset_paths[] = $afname; }
+            }
+            if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
+        }
+
         // Insert into DB
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -108,6 +134,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $reel_link,
                 $prompt_type,
                 $best_works_in,
+                $asset_title,
+                $asset_images_json,
             ]);
 
             $_SESSION["success_msg"] =

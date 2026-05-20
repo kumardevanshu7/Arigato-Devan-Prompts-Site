@@ -373,6 +373,32 @@ document.addEventListener("DOMContentLoaded", () => {
           bwiBadge.innerHTML = '';
         }
       }
+      // Assets section
+      const assetsArea = document.getElementById('modal-assets-area');
+      if (assetsArea) {
+        const aTitle = card.dataset.assetTitle || '';
+        let aImages = [];
+        try { aImages = JSON.parse(card.dataset.assetImages || '[]'); } catch(e) {}
+        if (aTitle || aImages.length > 0) {
+          const aTitleEl = document.getElementById('modal-asset-title');
+          if (aTitleEl) aTitleEl.textContent = aTitle || 'Assets';
+          const aImgContainer = document.getElementById('modal-asset-images');
+          if (aImgContainer) {
+            aImgContainer.innerHTML = aImages.map((src, i) =>
+              `<div style="position:relative;flex:1;min-width:100px;max-width:160px;">
+                <img src="${src}" alt="Asset ${i+1}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:var(--border-width,3px) solid var(--text-color,#2d2a35);display:block;">
+                <a href="${src}" download="asset_${i+1}" style="position:absolute;bottom:8px;right:8px;background:var(--text-color,#2d2a35);color:var(--bg-color,#fdfbf7);border-radius:10px;padding:6px 10px;font-size:.72rem;font-weight:900;text-decoration:none;display:flex;align-items:center;gap:5px;box-shadow:2px 2px 0 rgba(0,0,0,.3);font-family:var(--font-main);">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4v-2h14v2H5z"/></svg> Save
+                </a>
+              </div>`
+            ).join('');
+          }
+          assetsArea.style.display = 'block';
+        } else {
+          assetsArea.style.display = 'none';
+        }
+      }
+
       if (saveBtn) {
         saveBtn.dataset.promptId = card.dataset.id;
         applySaveBtnState(saveBtn, card.dataset.saved === "true");

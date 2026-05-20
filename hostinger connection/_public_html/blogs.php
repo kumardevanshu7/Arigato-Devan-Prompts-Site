@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -551,7 +551,7 @@ arsort($all_tags);
   </div>
 </footer>
 
-<script defer src="script.js?v=1778000000"></script>
+<script defer src="script.js?v=20260521b"></script>
 <script>
 function filterByTag(tag, btn) {
   // Update active pill

@@ -657,6 +657,8 @@ try {
                          ? "true"
                          : "false" ?>"
                      data-best-works-in="<?= htmlspecialchars($featuredPrompt['best_works_in'] ?? '') ?>"
+                     data-asset-title="<?= htmlspecialchars($featuredPrompt['asset_title'] ?? '') ?>"
+                     data-asset-images="<?= htmlspecialchars($featuredPrompt['asset_images'] ?? '[]') ?>"
                      <?= $featuredPrompt["is_unlocked"]
                          ? 'data-prompt-text="' .
                              htmlspecialchars($featuredPrompt["prompt_text"]) .
@@ -791,6 +793,8 @@ try {
                              ? "true"
                              : "false" ?>"
                          data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
+                         data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
+                         data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
                          <?= $p["is_unlocked"]
                              ? 'data-prompt-text="' .
                                  htmlspecialchars($p["prompt_text"]) .
@@ -907,6 +911,11 @@ try {
                             <span id="modal-like-count" style="font-weight:900;color:#FF4444;font-size:0.95rem;">0</span>
                         </button>
                     </div>
+                </div>
+                <!-- Assets Section -->
+                <div id="modal-assets-area" style="display:none;margin-top:16px;border-top:var(--border-width) solid var(--text-color);padding-top:14px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:900;font-size:.9rem;color:var(--text-color);"><i class="fa-solid fa-paperclip"></i> <span id="modal-asset-title">Assets</span></div>
+                    <div id="modal-asset-images" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
                 </div>
             </div>
         </div>

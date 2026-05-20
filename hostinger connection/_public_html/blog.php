@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 $slug = $_GET["slug"] ?? "";
@@ -372,7 +372,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script defer src="script.js?v=1778000000"></script>
+<script defer src="script.js?v=20260521b"></script>
 <script>
 // Blog Like
 function showToast(msg) {

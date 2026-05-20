@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -371,7 +371,9 @@ if (isset($_SESSION["user_id"])) {
              data-prompt-type="insta_viral"
              data-saved="<?= !empty($p["is_saved"]) ? "true" : "false" ?>"
              data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
-             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>">
+             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
+             data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
+             data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>">
 
             <img src="<?= htmlspecialchars(
                 $p["image_path"],
@@ -437,6 +439,11 @@ if (isset($_SESSION["user_id"])) {
                 </button>
                 <?php endif; ?>
             </div>
+            <!-- Assets Section -->
+            <div id="modal-assets-area" style="display:none;margin-top:16px;border-top:var(--border-width) solid var(--text-color);padding-top:14px;padding:14px 20px 0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:900;font-size:.9rem;color:var(--text-color);"><i class="fa-solid fa-paperclip"></i> <span id="modal-asset-title">Assets</span></div>
+                <div id="modal-asset-images" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+            </div>
         </div>
     </div>
 
@@ -455,7 +462,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026051205"></script>
+<script defer src="script.js?v=20260521b"></script>
 <script>
 // Scrolling background
 const bgLayers = document.querySelectorAll('.bg-layer');

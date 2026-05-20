@@ -59,6 +59,14 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .bwi-banana-opt.bwi-selected{background:#ffe066;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
         .bwi-chatgpt-opt{background:#f0faf7;color:#10a37f;}
         .bwi-chatgpt-opt.bwi-selected{background:#10a37f;color:#fff;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
+        /* Assets Toggle */
+        .assets-toggle-label{display:inline-flex;align-items:center;gap:10px;cursor:pointer;background:#f0f7ff;padding:12px 20px;border-radius:12px;border:2px dashed #5b9bd5;color:#1a4f8a;font-weight:900;font-size:.95rem;transition:all .2s;user-select:none;}
+        .assets-toggle-label:hover{background:#dceeff;}
+        .assets-toggle-label input[type=checkbox]{width:18px!important;height:18px!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important;accent-color:#1a4f8a;cursor:pointer;flex-shrink:0;}
+        .assets-fields-box{background:#f8fbff;border:2px solid #5b9bd5;border-radius:16px;padding:20px;margin-top:14px;}
+        .asset-previews{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+        .asset-preview-thumb{position:relative;width:80px;height:80px;border-radius:10px;overflow:hidden;border:2px solid var(--text-color);}
+        .asset-preview-thumb img{width:100%;height:100%;object-fit:cover;}
     </style>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -193,6 +201,35 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 <div class="form-group" id="unlock-code-group" style="display:block;">
                     <label for="unlock_code"><i class="bx bx-key"></i> Access Code (6 chars)</label>
                     <input type="text" id="unlock_code" name="unlock_code" maxlength="6" pattern="[A-Za-z0-9]{6}" title="Exactly 6 alphanumeric characters" placeholder="e.g. MAGIC1" style="text-transform:uppercase; letter-spacing: 4px; font-weight: 900; font-size: 1.1rem;" required>
+                </div>
+
+                <!-- Assets Toggle -->
+                <div class="form-group">
+                    <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — attach reference images shown after unlock)</span></label>
+                    <label class="assets-toggle-label" id="assets-toggle-label">
+                        <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)">
+                        <span>📎 Include Assets</span>
+                    </label>
+                    <div id="assets-fields" style="display:none;">
+                        <div class="assets-fields-box">
+                            <div class="form-group" style="margin-bottom:14px;">
+                                <label for="asset_title" style="margin-top:0;">Assets Title <span style="font-weight:600;color:#888;text-transform:none;">(e.g. Reference Photos)</span></label>
+                                <input type="text" id="asset_title" name="asset_title" placeholder="e.g. Reference Photos, Pose Examples">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Upload Images <span style="font-weight:600;color:#888;text-transform:none;">(max 2 images)</span></label>
+                                <div class="file-upload-wrapper" style="flex-wrap:wrap;gap:10px;">
+                                    <label for="asset_images" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;">
+                                        <i class="fa-solid fa-paperclip"></i> Choose Files
+                                    </label>
+                                    <span class="file-upload-name" id="asset-file-display">No files chosen</span>
+                                    <input type="file" id="asset_images" name="asset_images[]" accept="image/*" multiple style="display:none;" onchange="handleAssetFiles(this)">
+                                </div>
+                                <div class="asset-previews" id="asset-previews"></div>
+                                <p style="font-size:.8rem;color:#888;margin-top:6px;font-weight:600;"><i class="fa-solid fa-circle-info"></i> Max 2 images. Supported: JPG, PNG, WebP.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Cover Image + Reel Link — side by side -->
@@ -360,6 +397,34 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));
             el.classList.add('bwi-selected');
             el.querySelector('input[type=radio]').checked = true;
+        }
+
+        function toggleAssets(cb) {
+            const box = document.getElementById('assets-fields');
+            const lbl = document.getElementById('assets-toggle-label');
+            box.style.display = cb.checked ? 'block' : 'none';
+            lbl.style.background = cb.checked ? '#dceeff' : '';
+        }
+
+        function handleAssetFiles(input) {
+            const files = Array.from(input.files).slice(0, 2);
+            if (input.files.length > 2) {
+                alert('Max 2 images allowed. Only first 2 will be used.');
+            }
+            const display = document.getElementById('asset-file-display');
+            display.textContent = files.map(f => f.name).join(', ') || 'No files chosen';
+            const previews = document.getElementById('asset-previews');
+            previews.innerHTML = '';
+            files.forEach(f => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div');
+                    div.className = 'asset-preview-thumb';
+                    div.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                    previews.appendChild(div);
+                };
+                reader.readAsDataURL(f);
+            });
         }
     </script>
 </body>
