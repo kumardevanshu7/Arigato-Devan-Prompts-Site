@@ -164,7 +164,7 @@ if (isset($_SESSION["user_id"])) {
         Explore the collection of prompts previously shared on Instagram. <br>Tap just <strong>9 times</strong> to unlock them!
         <i class="bx bxs-pointer"></i>
     </p>
-    <?php include_once 'steps_guide.php'; ?>
+    <?php $_steps_page = 'already_uploaded'; include_once 'steps_guide.php'; ?>
 
     <?php if (empty($uploaded_prompts)): ?>
         <div style="text-align:center;padding:80px 20px;">

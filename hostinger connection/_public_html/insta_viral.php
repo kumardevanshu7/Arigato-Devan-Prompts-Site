@@ -328,7 +328,7 @@ if (isset($_SESSION["user_id"])) {
         <h1 style="font-size:2rem;font-weight:900;">Trending <span class="highlight">Now</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:16px;">Solve the Math Challenge to unlock the viral prompt!</p>
-    <?php include_once 'steps_guide.php'; ?>
+    <?php $_steps_page = 'insta_viral'; include_once 'steps_guide.php'; ?>
     <?php
     $iv_sub_tags = [];
     foreach ($insta_viral as $ivp) {

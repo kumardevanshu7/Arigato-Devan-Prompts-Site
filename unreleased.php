@@ -171,7 +171,7 @@ if (isset($_SESSION["user_id"])) {
             <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>
         <?php endif; ?>
     </p>
-    <?php include_once 'steps_guide.php'; ?>
+    <?php $_steps_page = 'unreleased'; include_once 'steps_guide.php'; ?>
 
     <?php if (empty($unreleased)): ?>
         <div style="text-align:center;padding:80px 20px;">
