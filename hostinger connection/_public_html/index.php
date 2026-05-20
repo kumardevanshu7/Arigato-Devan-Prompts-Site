@@ -421,6 +421,12 @@ try {
                 </a>
             </div>
 
+            <!-- How It Works Steps -->
+            <div style="max-width:700px;margin:32px auto 0;padding:0 20px;">
+                <p style="text-align:center;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:2px;font-family:var(--font-main);">&#9472;&#9472; How It Works &#9472;&#9472;</p>
+                <?php $_steps_page = 'homepage'; include_once 'steps_guide.php'; ?>
+            </div>
+
             <?php if ($featuredPrompt): ?>
             <div style="max-width:480px;margin:32px auto;padding:0 20px;">
                 <div style="background:var(--secondary-color);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:20px;box-shadow:var(--shadow-comic);text-align:center;">
