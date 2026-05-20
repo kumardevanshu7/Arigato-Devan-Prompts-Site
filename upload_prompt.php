@@ -141,7 +141,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                             foreach ($tarr as $t) {
                                 $t = trim($t);
                                 if (!empty($t)) {
-                                    $all_tags[] = strtolower($t);
+                                    $all_tags[] = $t;
                                 }
                             }
                         }
@@ -268,7 +268,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         }
 
         function addTag(tag) {
-            tag = tag.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            tag = tag.trim().replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ');
+            tag = tag.replace(/\b\w/g, c => c.toUpperCase());
             if (tag && !tags.includes(tag)) {
                 tags.push(tag);
                 renderTags();

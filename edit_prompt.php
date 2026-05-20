@@ -345,7 +345,8 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         }
 
         function addTag(tag) {
-            tag = tag.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            tag = tag.trim().replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ');
+            tag = tag.replace(/\b\w/g, c => c.toUpperCase());
             if (tag && !tags.includes(tag)) {
                 tags.push(tag);
                 renderTags();
