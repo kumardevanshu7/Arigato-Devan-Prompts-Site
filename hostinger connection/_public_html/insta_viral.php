@@ -412,7 +412,6 @@ if (isset($_SESSION["user_id"])) {
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">UNLOCK THE VIRAL PROMPT</h2>
-                <div id="modal-bwi-badge" style="margin:4px 0 10px;"></div>
 
                 <div class="modal-unlock-area" id="modal-unlock-area">
                 </div>
@@ -420,7 +419,7 @@ if (isset($_SESSION["user_id"])) {
                 <!-- Revealed Prompt Area -->
                 <div id="modal-unlocked-area" style="display:none;flex-direction:column;text-align:left;">
                     <div style="background:linear-gradient(135deg,#f09433,#dc2743);color:white;padding:8px 14px;border-radius:10px;font-weight:800;font-size:0.8rem;margin-bottom:12px;display:inline-block;"><i class="fa-brands fa-instagram"></i> VIRAL PROMPT UNLOCKED!</div>
-                    <h3 style="margin-bottom:10px;color:var(--text-color);font-size:1rem;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;"><h3 style="color:var(--text-color);font-size:1rem;margin:0;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3><div id="modal-bwi-badge"></div></div>
                     <div class="unlocked-text" id="modal-unlocked-text" style="font-family:monospace;font-size:0.95rem;font-weight:500;background:var(--bg-color);padding:15px;border-radius:12px;border:var(--border-width) solid var(--text-color);flex-grow:1;margin-bottom:15px;overflow-y:auto;max-height:200px;white-space:pre-wrap;word-break:break-all;color:var(--text-color);box-shadow:var(--shadow-comic);"></div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;">
                     <button class="copy-btn" id="modal-copy-btn" style="flex:1;min-width:120px;padding:12px;background:var(--primary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:var(--shadow-comic);transition:all 0.2s;font-family:var(--font-main);white-space:nowrap;"><i class="fa-solid fa-copy"></i> COPY</button>
