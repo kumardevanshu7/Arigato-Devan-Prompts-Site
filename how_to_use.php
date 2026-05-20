@@ -136,8 +136,8 @@ $cats = [
 .htu-lang-btn:hover{background:var(--primary-color);transform:translateY(-2px);box-shadow:3px 5px 0 var(--text-color);}
 
 /* ── Sticky Tabs ─────────────────────────────────────────────────────────── */
-.htu-tabs-bar{position:sticky;top:0;z-index:200;background:var(--bg-color);border-bottom:var(--border-width) solid var(--border-color);padding:10px 20px;}
-.htu-tabs{display:flex;gap:10px;overflow-x:auto;max-width:1260px;margin:0 auto;scrollbar-width:none;}
+.htu-tabs-bar{position:sticky;top:0;z-index:200;background:var(--bg-color);border-bottom:var(--border-width) solid var(--border-color);padding:6px 20px 0;}
+.htu-tabs{display:flex;gap:10px;overflow-x:auto;overflow-y:visible;max-width:1260px;margin:0 auto;scrollbar-width:none;padding:6px 2px 12px;}
 .htu-tabs::-webkit-scrollbar{display:none;}
 .htu-tab{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;padding:9px 22px;background:var(--card-bg);border:2px solid var(--border-color);border-radius:40px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;transition:all .18s;color:var(--text-color);}
 .htu-tab:hover{border-color:var(--text-color);transform:translateY(-2px);box-shadow:3px 3px 0 var(--text-color);}
