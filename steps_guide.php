@@ -63,7 +63,8 @@ $_last  = count($_steps) - 1;
 .sg-detail-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 20px;background:var(--card-bg);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:40px;font-family:var(--font-main);font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;box-shadow:3px 3px 0 var(--text-color);transition:all .18s;margin-top:4px;max-width:calc(100vw - 40px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sg-detail-btn:hover{transform:translateY(-2px);box-shadow:3px 5px 0 var(--text-color);background:var(--secondary-color);}
 @keyframes sg-pop{from{opacity:0;transform:scale(.85) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-@media(max-width:500px){.sg-box{width:82px;padding:10px 8px 10px;}.sg-arr svg{width:20px;}.sg-icon-wrap{width:34px;height:34px;}.sg-icon-wrap i{font-size:.8rem;}}
+@media(max-width:540px){.sg-box{width:68px;padding:10px 6px 10px;border-radius:14px;}.sg-arr{padding:0 2px;}.sg-arr svg{width:16px;height:12px;}.sg-icon-wrap{width:32px;height:32px;border-radius:10px;}.sg-icon-wrap i{font-size:.78rem;}.sg-title{font-size:.6rem;letter-spacing:0;}.sg-sub{font-size:.54rem;}}
+@media(max-width:390px){.sg-box{width:60px;padding:8px 4px 8px;border-radius:12px;}.sg-arr svg{width:13px;height:10px;}.sg-icon-wrap{width:28px;height:28px;}.sg-icon-wrap i{font-size:.68rem;}.sg-title{font-size:.55rem;}.sg-badge{width:20px;height:20px;font-size:.55rem;}}
 </style>
 <div class="sg-outer">
   <div class="sg-wrap">
