@@ -1018,15 +1018,20 @@ header {
 
 .card-title {
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.25;
     flex: 1;
     text-shadow: 2px 2px 0px var(--text-color);
     word-break: break-word;
     overflow-wrap: break-word;
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+    -ms-hyphens: none !important;
     min-width: 0;
     margin-right: 12px;
+    max-height: calc(1.25em * 4);
+    overflow: hidden;
 }
 
 /* ── Card static like display (non-clickable) ── */
@@ -3071,6 +3076,34 @@ footer {
     .gallery-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+    }
+    .card-content-overlay {
+        padding: 40px 10px 10px;
+    }
+    .card-title {
+        font-size: 0.78rem !important;
+        margin-right: 6px !important;
+        max-height: calc(1.25em * 4) !important;
+    }
+    .card-like-display {
+        padding: 4px 8px !important;
+        font-size: 0.75rem !important;
+        flex-shrink: 0;
+    }
+}
+@media (max-width: 420px) {
+    .card-content-overlay {
+        padding: 30px 8px 8px;
+    }
+    .card-title {
+        font-size: 0.65rem !important;
+        margin-right: 4px !important;
+        line-height: 1.2 !important;
+    }
+    .card-like-display {
+        padding: 3px 6px !important;
+        gap: 3px !important;
+        font-size: 0.68rem !important;
     }
 }
 

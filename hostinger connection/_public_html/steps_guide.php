@@ -46,7 +46,7 @@ $_steps = $_all_steps[$_sp] ?? $_all_steps['generic'];
 $_last  = count($_steps) - 1;
 ?>
 <style>
-.sg-outer{overflow-x:auto;margin-bottom:28px;padding:14px 14px 6px;scrollbar-width:none;text-align:center;}
+.sg-outer{overflow-x:auto;margin-bottom:28px;padding:14px 14px 6px;scrollbar-width:none;text-align:center;width:100%;box-sizing:border-box;max-width:100%;}
 .sg-outer::-webkit-scrollbar{display:none;}
 .sg-wrap{display:inline-flex;align-items:center;gap:0;padding:0 2px 8px;}
 .sg-box{flex-shrink:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:18px;padding:14px 16px 12px;width:110px;text-align:center;box-shadow:4px 4px 0 var(--text-color);transition:transform .18s,box-shadow .18s;}
@@ -60,9 +60,10 @@ $_last  = count($_steps) - 1;
 .sg-sub{font-size:.58rem;color:#777;font-weight:700;margin-top:4px;line-height:1.25;font-family:var(--font-main);}
 .sg-last .sg-sub{color:#555;}
 .sg-arr{flex-shrink:0;display:flex;align-items:center;padding:0 4px;margin-top:-6px;}
-.sg-detail-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 20px;background:var(--card-bg);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:40px;font-family:var(--font-main);font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;box-shadow:3px 3px 0 var(--text-color);transition:all .18s;margin-top:4px;}
+.sg-detail-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 20px;background:var(--card-bg);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:40px;font-family:var(--font-main);font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;box-shadow:3px 3px 0 var(--text-color);transition:all .18s;margin-top:4px;max-width:calc(100vw - 40px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sg-detail-btn:hover{transform:translateY(-2px);box-shadow:3px 5px 0 var(--text-color);background:var(--secondary-color);}
 @keyframes sg-pop{from{opacity:0;transform:scale(.85) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@media(max-width:500px){.sg-box{width:82px;padding:10px 8px 10px;}.sg-arr svg{width:20px;}.sg-icon-wrap{width:34px;height:34px;}.sg-icon-wrap i{font-size:.8rem;}}
 </style>
 <div class="sg-outer">
   <div class="sg-wrap">
