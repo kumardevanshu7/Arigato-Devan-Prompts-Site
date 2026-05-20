@@ -160,10 +160,11 @@ if (isset($_SESSION["user_id"])) {
         <div class="badge" style="margin:0;transform:rotate(-1deg);background:#e6f2ff;color:#00509e;"><i class="bx bx-history"></i> ALREADY UPLOADED</div>
         <h1 style="font-size:2rem;font-weight:900;">Already <span class="highlight">Uploaded</span></h1>
     </div>
-    <p style="color:#666;font-weight:600;margin-bottom:30px;">
+    <p style="color:#666;font-weight:600;margin-bottom:16px;">
         Explore the collection of prompts previously shared on Instagram. <br>Tap just <strong>9 times</strong> to unlock them!
         <i class="bx bxs-pointer"></i>
     </p>
+    <?php include_once 'steps_guide.php'; ?>
 
     <?php if (empty($uploaded_prompts)): ?>
         <div style="text-align:center;padding:80px 20px;">

@@ -114,11 +114,11 @@ arsort($all_tags);
     transform: translateY(-1px);
 }
 
-/* &mdash;&ndash;&mdash;&ndash;&mdash; Blog Grid &mdash;&ndash;&mdash;&ndash;&mdash; */
+/* &mdash;&mdash;&mdash;&mdash;&mdash; Blog Grid &mdash;&mdash;&mdash;&mdash;&mdash; */
 .blogs-wrap {
-    max-width: 1300px;
+    max-width: 1500px;
     margin: 0 auto;
-    padding: 0 40px 100px;
+    padding: 0 28px 100px;
 }
 
 /* Featured Post (First post, wider) */
@@ -214,12 +214,16 @@ arsort($all_tags);
 }
 .blog-author-name { color: var(--text-color); font-weight: 800; }
 
-/* &mdash;&ndash;&mdash;&ndash;&mdash; Normal Grid &mdash;&ndash;&mdash;&ndash;&mdash; */
+/* &mdash;&mdash;&mdash;&mdash;&mdash; Normal Grid — Pinterest Masonry &mdash;&mdash;&mdash;&mdash;&mdash; */
 .blogs-grid {
-    column-count: 3;
-    column-gap: 26px;
+    column-count: 5;
+    column-gap: 18px;
     margin-top: 20px;
 }
+@media(max-width:1400px){.blogs-grid{column-count:4;}}
+@media(max-width:1024px){.blogs-grid{column-count:3;}}
+@media(max-width:640px){.blogs-grid{column-count:3;column-gap:12px;}}
+@media(max-width:400px){.blogs-grid{column-count:2;column-gap:10;}}
 .blog-card {
     break-inside: avoid;
     margin-bottom: 26px;
@@ -240,27 +244,24 @@ arsort($all_tags);
 }
 .blog-card-img {
     width: 100%;
+    height: auto;
     display: block;
-    object-fit: cover;
     border-bottom: var(--border-width) solid var(--text-color);
 }
-.blog-card-img.ratio-16-9 { aspect-ratio: 16 / 9; }
-.blog-card-img.ratio-9-16 { aspect-ratio: 9 / 16; }
 
 .blog-card-img-placeholder {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 3 / 4;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
     border-bottom: var(--border-width) solid var(--text-color);
 }
-.blog-card-img-placeholder.ratio-16-9 { aspect-ratio: 16 / 9; }
-.blog-card-img-placeholder.ratio-9-16 { aspect-ratio: 9 / 16; }
 
-.blog-card-body { padding: 20px 18px 18px; }
+.blog-card-body { padding: 14px 14px 14px; }
+@media(max-width:640px){.blog-card-body{padding:10px 10px 12px;}}
 .blog-card-tag {
     display: inline-block;
     background: var(--secondary-color);

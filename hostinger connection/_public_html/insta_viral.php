@@ -327,7 +327,8 @@ if (isset($_SESSION["user_id"])) {
         <div class="badge" style="margin:0;transform:rotate(-1deg);background:linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);color:white;border-color:white;"><i class="fa-brands fa-instagram"></i> INSTA VIRAL</div>
         <h1 style="font-size:2rem;font-weight:900;">Trending <span class="highlight">Now</span></h1>
     </div>
-    <p style="color:#666;font-weight:600;margin-bottom:20px;">Solve the Math Challenge to unlock the viral prompt!</p>
+    <p style="color:#666;font-weight:600;margin-bottom:16px;">Solve the Math Challenge to unlock the viral prompt!</p>
+    <?php include_once 'steps_guide.php'; ?>
     <?php
     $iv_sub_tags = [];
     foreach ($insta_viral as $ivp) {

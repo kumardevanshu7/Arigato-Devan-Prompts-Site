@@ -163,7 +163,7 @@ if (isset($_SESSION["user_id"])) {
         <div class="badge" style="margin:0;transform:rotate(-1deg);"><i class="fa-solid fa-lock"></i> UNRELEASED</div>
         <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
     </div>
-    <p style="color:#666;font-weight:600;margin-bottom:30px;">
+    <p style="color:#666;font-weight:600;margin-bottom:16px;">
         Show some love to unlock &mdash; tap the Love Bar
         <strong><?= isset($_SESSION["user_id"]) ? "20" : "90" ?></strong> times!
         <i class="fa-solid fa-heart"></i>
@@ -171,6 +171,7 @@ if (isset($_SESSION["user_id"])) {
             <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>
         <?php endif; ?>
     </p>
+    <?php include_once 'steps_guide.php'; ?>
 
     <?php if (empty($unreleased)): ?>
         <div style="text-align:center;padding:80px 20px;">

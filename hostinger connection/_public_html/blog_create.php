@@ -94,8 +94,14 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 .editor-area:focus{border-color:var(--primary-dark)}
 .editor-area h1,.editor-area h2,.editor-area h3{font-weight:800;color:var(--text-color);}
 .editor-area p{margin-bottom:1rem;}
-.editor-area img{max-width:100%;height:auto;border-radius:8px;cursor:pointer;border:2px solid transparent;}
+.editor-area img{max-width:100%;height:auto;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:border .15s;}
 .editor-area img:hover{border-color:var(--primary-dark);}
+.editor-area img.img-selected{border-color:var(--primary-dark);box-shadow:0 0 0 3px rgba(124,58,237,.18);}
+#img-toolbar{display:none;position:fixed;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;padding:6px 10px;box-shadow:var(--shadow-comic);z-index:9999;gap:5px;flex-wrap:wrap;align-items:center;max-width:320px;}
+#img-toolbar button{padding:4px 10px;background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;font-family:var(--font-main);font-weight:800;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+#img-toolbar button:hover{background:var(--primary-color);border-color:var(--text-color);}
+#img-toolbar .tb-sep{width:1px;height:20px;background:var(--border-color);margin:0 2px;flex-shrink:0;}
+#img-toolbar .tb-label{font-size:.68rem;font-weight:900;color:#999;text-transform:uppercase;letter-spacing:.5px;}
 .editor-area blockquote{border-left:4px solid var(--primary-dark);padding:12px 18px;margin:16px 0;background:var(--primary-color);border-radius:0 10px 10px 0}
 /* Font style buttons */
 .font-style-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -229,6 +235,85 @@ const input  = document.getElementById('blog-content-input');
 document.querySelector('form').addEventListener('submit', () => { input.value = editor.innerHTML; });
 
 function fmt(cmd) { document.execCommand(cmd, false, null); editor.focus(); }
+
+// ─── Image Resize & Align Toolbar ───────────────────────────────────────────
+const imgToolbar = document.createElement('div');
+imgToolbar.id = 'img-toolbar';
+imgToolbar.style.display = 'none';
+imgToolbar.innerHTML = `
+  <span class="tb-label">Width:</span>
+  <button onclick="resizeImg(25)">S</button>
+  <button onclick="resizeImg(50)">M</button>
+  <button onclick="resizeImg(75)">L</button>
+  <button onclick="resizeImg(100)">Full</button>
+  <div class="tb-sep"></div>
+  <span class="tb-label">Align:</span>
+  <button onclick="alignImg('left')" title="Float Left">&#8676; Left</button>
+  <button onclick="alignImg('center')" title="Center">&#8596; Center</button>
+  <button onclick="alignImg('right')" title="Float Right">Right &#8677;</button>
+  <div class="tb-sep"></div>
+  <button onclick="removeImg()" style="color:#c00;">&#10005;</button>
+`;
+imgToolbar.style.cssText = 'display:none;position:fixed;background:var(--card-bg);border:3px solid #2d2a35;border-radius:12px;padding:6px 10px;box-shadow:5px 5px 0 #2d2a35;z-index:9999;display:none;gap:5px;flex-wrap:wrap;align-items:center;';
+document.body.appendChild(imgToolbar);
+
+let selectedImg = null;
+
+function showImgToolbar(img, e) {
+  selectedImg = img;
+  document.querySelectorAll('.editor-area img').forEach(i => i.classList.remove('img-selected'));
+  img.classList.add('img-selected');
+  const rect = img.getBoundingClientRect();
+  const top = Math.max(8, rect.top - 60);
+  const left = Math.min(window.innerWidth - 330, rect.left);
+  imgToolbar.style.top = top + 'px';
+  imgToolbar.style.left = left + 'px';
+  imgToolbar.style.display = 'flex';
+}
+
+function resizeImg(pct) {
+  if (!selectedImg) return;
+  selectedImg.style.width = pct + '%';
+  selectedImg.style.height = 'auto';
+  selectedImg.style.maxWidth = '100%';
+}
+
+function alignImg(dir) {
+  if (!selectedImg) return;
+  selectedImg.style.float = 'none';
+  selectedImg.style.display = 'block';
+  selectedImg.style.marginLeft = '0';
+  selectedImg.style.marginRight = '0';
+  if (dir === 'left') { selectedImg.style.float = 'left'; selectedImg.style.marginRight = '12px'; selectedImg.style.marginBottom = '8px'; }
+  else if (dir === 'right') { selectedImg.style.float = 'right'; selectedImg.style.marginLeft = '12px'; selectedImg.style.marginBottom = '8px'; }
+  else { selectedImg.style.marginLeft = 'auto'; selectedImg.style.marginRight = 'auto'; }
+}
+
+function removeImg() {
+  if (!selectedImg) return;
+  selectedImg.parentNode.removeChild(selectedImg);
+  selectedImg = null;
+  imgToolbar.style.display = 'none';
+}
+
+editor.addEventListener('click', e => {
+  if (e.target.tagName === 'IMG') {
+    e.preventDefault();
+    showImgToolbar(e.target, e);
+  } else {
+    imgToolbar.style.display = 'none';
+    document.querySelectorAll('.editor-area img').forEach(i => i.classList.remove('img-selected'));
+    selectedImg = null;
+  }
+});
+
+document.addEventListener('scroll', () => {
+  if (selectedImg && imgToolbar.style.display !== 'none') {
+    const rect = selectedImg.getBoundingClientRect();
+    imgToolbar.style.top = Math.max(8, rect.top - 60) + 'px';
+  }
+}, true);
+// ────────────────────────────────────────────────────────────────────────────
 function fmtBlock(tag) { document.execCommand('formatBlock', false, '<' + tag + '>'); editor.focus(); }
 function applyFontStyle(cls) {
   const sel = window.getSelection();
