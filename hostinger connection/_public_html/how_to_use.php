@@ -184,6 +184,25 @@ $cats = [
   .htu-step-card:hover{transform:none;}
 }
 </style>
+<script type="application/ld+json">
+[
+<?php foreach ($cats as $key => $cat):
+  $steps_json = [];
+  foreach ($cat['steps'] as $i => $step) {
+    $steps_json[] = '{"@type":"HowToStep","position":' . ($i+1) . ',"name":' . json_encode($step[1]) . ',"text":' . json_encode($step[3]) . '}';
+  }
+?>
+{
+  "@context":"https://schema.org",
+  "@type":"HowTo",
+  "name":<?= json_encode('How to Use ' . $cat['label'] . ' Prompts on Arigato Devan') ?>,
+  "description":<?= json_encode($cat['tag_en']) ?>,
+  "image":"https://arigatodevan.com/favicon/android-chrome-512x512.png",
+  "step":[<?= implode(',', $steps_json) ?>]
+}<?= $key !== array_key_last($cats) ? ',' : '' ?>
+<?php endforeach; ?>
+]
+</script>
 </head>
 <body>
 <header>

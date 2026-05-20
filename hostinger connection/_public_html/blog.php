@@ -27,6 +27,19 @@ if (isset($_SESSION["user_id"])) {
     $user_liked = (bool) $lk->fetch();
 }
 
+// Reactions
+$reaction_counts = ['heart'=>0,'fire'=>0,'wow'=>0];
+$my_reactions = [];
+try {
+    $rk = isset($_SESSION['user_id']) ? 'u'.$_SESSION['user_id'] : 'ip'.md5($_SERVER['REMOTE_ADDR']);
+    $rc = $pdo->prepare("SELECT reaction, COUNT(*) as cnt FROM blog_reactions WHERE blog_id=? GROUP BY reaction");
+    $rc->execute([$blog['id']]);
+    foreach ($rc->fetchAll() as $r) $reaction_counts[$r['reaction']] = (int)$r['cnt'];
+    $mr = $pdo->prepare("SELECT reaction FROM blog_reactions WHERE blog_id=? AND reactor_key=?");
+    $mr->execute([$blog['id'], $rk]);
+    $my_reactions = array_column($mr->fetchAll(), 'reaction');
+} catch(Exception $e) {}
+
 // Comments
 $comments = $pdo->prepare(
     "SELECT bc.*, u.username, u.avatar as profile_image FROM blog_comments bc LEFT JOIN users u ON bc.user_id=u.id WHERE bc.blog_id=? ORDER BY bc.created_at ASC",
@@ -112,6 +125,14 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 .login-to-comment{padding:18px;background:var(--primary-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-weight:700;text-align:center}
 .login-to-comment a{color:var(--primary-dark);font-weight:900;text-decoration:none}
 @media(max-width:600px){.blog-detail-wrap{padding:28px 16px 80px}.blog-action-bar{flex-wrap:wrap}}
+/* Reactions */
+.blog-reactions{display:flex;align-items:center;gap:12px;padding:18px 0 4px;flex-wrap:wrap;}
+.react-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--bg-color);border:2px solid var(--border-color);border-radius:40px;font-family:var(--font-main);font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;}
+.react-btn:hover{border-color:var(--text-color);transform:translateY(-2px) scale(1.05);box-shadow:3px 3px 0 var(--text-color);}
+.react-btn.reacted{background:var(--secondary-color);border-color:var(--text-color);box-shadow:3px 3px 0 var(--text-color);}
+.react-btn .r-emoji{font-size:1.1rem;}
+.react-btn .r-count{font-size:.85rem;color:#666;font-weight:700;}
+.react-btn.reacted .r-count{color:var(--text-color);}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -280,6 +301,16 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 /* HTML stored from editor "&ndash; safe because only admin writes it */
 ?></div>
 
+  <!-- Reactions -->
+  <div class="blog-reactions" id="blog-reactions">
+    <?php foreach (['heart'=>'❤️','fire'=>'🔥','wow'=>'😮'] as $rtype=>$remoji): ?>
+    <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
+      <span class="r-emoji"><?= $remoji ?></span>
+      <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
+    </button>
+    <?php endforeach; ?>
+  </div>
+
   <!-- Like + action bar -->
   <div class="blog-action-bar">
     <button class="blog-like-btn <?= $user_liked
@@ -402,6 +433,39 @@ if (submitBtn) {
       });
   });
 }
+
+// Blog Reactions
+document.querySelectorAll('.react-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var fd = new FormData();
+    fd.append('blog_id', btn.dataset.blog);
+    fd.append('reaction', btn.dataset.reaction);
+    // Optimistic toggle
+    var wasReacted = btn.classList.contains('reacted');
+    btn.classList.toggle('reacted', !wasReacted);
+    var countEl = btn.querySelector('.r-count');
+    countEl.textContent = parseInt(countEl.textContent||0) + (wasReacted ? -1 : 1);
+    fetch('react.php', {method:'POST', body:fd})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.ok && d.counts){
+          Object.keys(d.counts).forEach(function(r){
+            var el = document.getElementById('rc-'+r);
+            if(el) el.textContent = d.counts[r];
+          });
+          document.querySelectorAll('.react-btn').forEach(function(b){
+            if(b.dataset.reaction === d.reaction){
+              b.classList.toggle('reacted', d.active);
+            }
+          });
+        }
+      }).catch(function(){
+        // revert on error
+        btn.classList.toggle('reacted', wasReacted);
+        countEl.textContent = parseInt(countEl.textContent||0) + (wasReacted ? 1 : -1);
+      });
+  });
+});
 </script>
 <script>
         // Background Scroll Logic
