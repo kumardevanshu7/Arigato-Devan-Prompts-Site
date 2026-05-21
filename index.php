@@ -398,6 +398,43 @@ try {
                 <div class="sticker sticker-ai"><i class="fa-solid fa-robot"></i> AI-POWERED</div>
             </div>
 
+            <!-- Comic Guest Note -->
+            <div id="hero-comic-note" style="position:relative;margin:18px auto 18px;max-width:460px;background:#fffbe6;border:3px solid var(--text-color,#2d2a35);border-radius:18px;padding:16px 22px 16px;box-shadow:4px 4px 0 var(--text-color,#2d2a35);text-align:center;">
+                <div style="position:absolute;top:-12px;left:20px;background:#ffec99;border:2.5px solid var(--text-color,#2d2a35);border-radius:999px;padding:2px 12px;font-family:var(--font-main);font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text-color,#2d2a35);">📌 Note</div>
+                <p id="comic-note-text" style="font-family:var(--font-main);font-size:.9rem;font-weight:700;color:var(--text-color,#2d2a35);line-height:1.6;margin:8px 0 14px;">No need to login &mdash; you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts 😊</p>
+                <a href="gallery.php" style="display:inline-flex;align-items:center;gap:7px;background:var(--secondary-color,#c8b4f8);color:var(--text-color,#2d2a35);border:2.5px solid var(--text-color,#2d2a35);border-radius:999px;padding:10px 24px;font-family:var(--font-main);font-weight:900;font-size:.88rem;text-decoration:none;box-shadow:3px 3px 0 var(--text-color,#2d2a35);transition:transform .15s;" onmouseover="this.style.transform='translate(-2px,-2px)'" onmouseout="this.style.transform=''">&#x1F9ED; Explore Prompts &rarr;</a>
+                <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <svg id="hero-arrow-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-color,#2d2a35)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="animation:heroNoteArrow 1.1s ease-in-out infinite;"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="6 15 12 21 18 15"/></svg>
+                    <span style="font-family:var(--font-main);font-size:.85rem;font-weight:900;color:var(--text-color,#2d2a35);text-transform:uppercase;letter-spacing:1.2px;">Go Down For <span style="display:inline-block;border:2px solid var(--text-color,#2d2a35);border-radius:6px;padding:0 7px;background:#ffb3c6;color:var(--text-color,#2d2a35);font-weight:900;">Login</span></span>
+                </div>
+            </div>
+            <style>
+            @keyframes heroNoteArrow {
+                0%,100% { transform:translateY(0); }
+                50% { transform:translateY(8px); }
+            }
+            </style>
+            <script>
+            (function(){
+                var msgs = [
+                    'No need to login &mdash; you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts \u{1F60A}',
+                    'Login ki zaroorat nahi &mdash; bina login ke bhi koi bhi prompt copy kar sakte ho! Bas <strong>Explore</strong> click karo. Login sirf like &amp; save ke liye hai \u{1F604}'
+                ];
+                var i = 0;
+                var el = document.getElementById('comic-note-text');
+                if (!el) return;
+                setInterval(function(){
+                    el.style.transition = 'opacity .3s';
+                    el.style.opacity = '0';
+                    setTimeout(function(){
+                        i = (i+1) % msgs.length;
+                        el.innerHTML = msgs[i];
+                        el.style.opacity = '1';
+                    }, 320);
+                }, 7000);
+            })();
+            </script>
+
             <!-- Main Heading -->
             <h1 class="landing-comic-h1">
                 Create Viral<br>
