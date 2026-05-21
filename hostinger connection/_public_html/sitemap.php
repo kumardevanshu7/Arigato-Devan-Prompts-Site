@@ -13,7 +13,7 @@ $static_pages = [
         "url" => "/",
         "priority" => "1.0",
         "changefreq" => "daily",
-        "lastmod" => "2026-05-20",
+        "lastmod" => "2026-05-22",
     ],
     [
         "url" => "/gallery.php",
@@ -67,25 +67,25 @@ $static_pages = [
         "url" => "/login.php",
         "priority" => "0.4",
         "changefreq" => "monthly",
-        "lastmod" => "2025-01-15",
+        "lastmod" => "2026-05-22",
     ],
     [
         "url" => "/terms.php",
         "priority" => "0.2",
         "changefreq" => "monthly",
-        "lastmod" => "2025-01-15",
+        "lastmod" => "2026-05-22",
     ],
     [
         "url" => "/disclaimer.php",
         "priority" => "0.2",
         "changefreq" => "monthly",
-        "lastmod" => "2025-01-18",
+        "lastmod" => "2026-05-22",
     ],
     [
         "url" => "/privacy.php",
         "priority" => "0.2",
         "changefreq" => "monthly",
-        "lastmod" => "2025-01-20",
+        "lastmod" => "2026-05-22",
     ],
 ];
 
