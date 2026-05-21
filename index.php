@@ -135,13 +135,8 @@ try {
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
         <link rel="stylesheet" href="style.css?v=2026051205">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
 
-    <!-- Preload first 3 filmstrip images — LCP candidates -->
-    <link rel="preload" as="image" href="landingpics/lan1.webp" type="image/webp">
-    <link rel="preload" as="image" href="landingpics/lan2.webp" type="image/webp">
-    <link rel="preload" as="image" href="landingpics/lan3.webp" type="image/webp">
     <!-- Preload first 3 prompt images for faster perceived loading -->
     <?php if (isset($prompts) && is_array($prompts)) {
         for ($i = 0; $i < min(3, count($prompts)); $i++) {
@@ -172,17 +167,6 @@ try {
 </head>
 <body>
 
-<?php if (isset($_SESSION["user_id"])): ?>
-    <!-- Scrollable Wallpaper Background -->
-    <div class="scroll-bg-container" id="scroll-bg-container">
-        <div class="bg-layer active" style="background-image: url('https://i.pinimg.com/736x/4d/e2/71/4de271ae9997273cf3fdd47098fa69a3.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/76/50/aa/7650aa986d34ca65bb52f261f954149b.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/64/c4/c5/64c4c528ee5812610d58ee2c98bbb76f.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/f9/fd/75/f9fd75e5aa551b89ac88a863921f2f75.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/a5/15/6a/a5156a264e06ebb47997cf59e66bee31.jpg')"></div>
-        <div class="bg-creamy-overlay"></div>
-    </div>
-<?php endif; ?>
 
     <header>
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
@@ -235,7 +219,7 @@ try {
                 <a href="already_uploaded.php" <?= $curPage ==
                 "already_uploaded.php"
                     ? 'style="background:var(--primary-color)"'
-                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
+                    : "" ?>><i class="fa-solid fa-clock-rotate-left"></i> Already Uploaded <?= empty(
     $nav_counts["already_uploaded"]
 )
     ? '<span class="dd-tag soon">SOON</span>'
@@ -287,106 +271,62 @@ try {
 
     <?php if (!isset($_SESSION["user_id"])): ?>
     <!-- ============ LANDING PAGE (LOGGED OUT) ============ -->
-    <div class="landing-page-root">
+    <div class="landing-page-root" style="background:transparent;">
 
-        <!-- Film Strip Background Layer -->
-        <div class="filmstrip-bg" aria-hidden="true">
-            <!-- Row 1: left scroll -->
-            <div class="filmstrip-row row-1">
-                <div class="filmstrip-track">
-                    <?php
-                    $strip_imgs = [
-                        "landingpics/lan9.webp",
-                        "landingpics/lan2.webp",
-                        "landingpics/lan3.webp",
-                        "landingpics/lan4.webp",
-                        "landingpics/lan5.webp",
-                        "landingpics/lan6.webp",
-                        "landingpics/lan7.webp",
-                        "landingpics/lan8.webp",
-                        "landingpics/lan9.webp",
-                        "landingpics/lan10.webp",
-                        "landingpics/lan11.webp",
-                        "landingpics/lan12.webp",
-                        "landingpics/lan13.webp",
-                        "landingpics/lan14.webp",
-                        "landingpics/lan15.webp",
-                        "landingpics/lan16.webp",
-                        "landingpics/lan17.webp",
-                    ];
-                    // Duplicate for seamless loop
-                    $all = array_merge($strip_imgs, $strip_imgs);
-                    $strip_idx = 0;
-                    foreach ($all as $img): ?>
-                    <div class="filmstrip-frame">
-                        <picture>
-                            <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace(
-                                ".webp",
-                                ".png",
-                                $img,
-                            ) ?>" alt="" <?= $strip_idx === 0 ? 'fetchpriority="high"' : ($strip_idx < 5 ? '' : 'loading="lazy"') ?> width="200" height="356">
-                        </picture>
-                    </div>
-                    <?php $strip_idx++; endforeach;
-                    ?>
-                </div>
-            </div>
-            <!-- Row 2: right scroll (reversed, middle row, larger) -->
-            <div class="filmstrip-row row-2">
-                <div class="filmstrip-track track-reverse">
-                    <?php
-                    // Shift array for variety in middle row
-                    $middle_imgs = array_slice($strip_imgs, 8);
-                    $middle_imgs = array_merge(
-                        $middle_imgs,
-                        array_slice($strip_imgs, 0, 8),
-                    );
-                    $mid_idx = 0;
-                    foreach (
-                        array_merge($middle_imgs, $middle_imgs)
-                        as $img
-                    ): ?>
-                    <div class="filmstrip-frame frame-large">
-                        <picture>
-                            <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace(
-                                ".webp",
-                                ".png",
-                                $img,
-                            ) ?>" alt="" <?= $mid_idx < 5 ? '' : 'loading="lazy"' ?>>
-                        </picture>
-                    </div>
-                    <?php $mid_idx++; endforeach;
-                    ?>
-                </div>
-            </div>
-            <!-- Row 3: left scroll (bottom row) -->
-            <div class="filmstrip-row row-3">
-                <div class="filmstrip-track">
-                    <?php $bot_idx = 0; foreach (
-                        array_merge(
-                            array_reverse($strip_imgs),
-                            array_reverse($strip_imgs),
-                        )
-                        as $img
-                    ): ?>
-                    <div class="filmstrip-frame">
-                        <picture>
-                            <source srcset="<?= $img ?>" type="image/webp">
-                            <img src="<?= str_replace(
-                                ".webp",
-                                ".png",
-                                $img,
-                            ) ?>" alt="" <?= $bot_idx < 5 ? '' : 'loading="lazy"' ?>>  <?php $bot_idx++; ?>
-                        </picture>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <!-- Gradient overlay for readability -->
-            <div class="filmstrip-overlay"></div>
+        <!-- Aurora Mesh Gradient Background -->
+        <div class="aurora-bg" aria-hidden="true">
+            <div class="aurora-blob blob1"></div>
+            <div class="aurora-blob blob2"></div>
+            <div class="aurora-blob blob3"></div>
+            <div class="aurora-blob blob4"></div>
         </div>
+        <style>
+        .aurora-bg {
+            position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+            background:#fdf6ff;
+        }
+        .aurora-blob {
+            position:absolute;border-radius:50%;filter:blur(90px);opacity:0.55;
+        }
+        .blob1 {
+            width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);
+            top:-15%;left:-10%;
+            animation:auroraFloat1 12s ease-in-out infinite;
+        }
+        .blob2 {
+            width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);
+            bottom:-20%;right:-10%;
+            animation:auroraFloat2 15s ease-in-out infinite;
+        }
+        .blob3 {
+            width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);
+            top:30%;right:5%;
+            animation:auroraFloat3 10s ease-in-out infinite;
+        }
+        .blob4 {
+            width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);
+            bottom:10%;left:10%;
+            animation:auroraFloat4 13s ease-in-out infinite;
+        }
+        @keyframes auroraFloat1 {
+            0%,100%{transform:translate(0,0) scale(1);}
+            33%{transform:translate(6%,8%) scale(1.08);}
+            66%{transform:translate(-4%,5%) scale(0.95);}
+        }
+        @keyframes auroraFloat2 {
+            0%,100%{transform:translate(0,0) scale(1);}
+            33%{transform:translate(-8%,-6%) scale(1.06);}
+            66%{transform:translate(5%,-3%) scale(0.97);}
+        }
+        @keyframes auroraFloat3 {
+            0%,100%{transform:translate(0,0) scale(1);}
+            50%{transform:translate(-10%,8%) scale(1.1);}
+        }
+        @keyframes auroraFloat4 {
+            0%,100%{transform:translate(0,0) scale(1);}
+            50%{transform:translate(8%,-10%) scale(1.05);}
+        }
+        </style>
 
         <!-- Center Hero Content -->
         <div class="landing-center">

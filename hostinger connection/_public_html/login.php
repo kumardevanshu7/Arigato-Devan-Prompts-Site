@@ -15,25 +15,6 @@ if (isset($_SESSION["user_id"])) {
 $error = $_SESSION["error_msg"] ?? "";
 unset($_SESSION["error_msg"]);
 
-$strip_imgs = [
-    "landingpics/lan9.webp",
-    "landingpics/lan2.webp",
-    "landingpics/lan3.webp",
-    "landingpics/lan4.webp",
-    "landingpics/lan5.webp",
-    "landingpics/lan6.webp",
-    "landingpics/lan7.webp",
-    "landingpics/lan8.webp",
-    "landingpics/lan9.webp",
-    "landingpics/lan10.webp",
-    "landingpics/lan11.webp",
-    "landingpics/lan12.webp",
-    "landingpics/lan13.webp",
-    "landingpics/lan14.webp",
-    "landingpics/lan15.webp",
-    "landingpics/lan16.webp",
-    "landingpics/lan17.webp",
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -547,8 +528,6 @@ $strip_imgs = [
         }
     </style>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
@@ -556,53 +535,27 @@ $strip_imgs = [
 </head>
 
 <body>
-    <div class="login-root">
-
-        <!-- Film Strip Background (lighter) -->
-        <div class="login-filmstrip" aria-hidden="true">
-            <div class="filmstrip-row row-1">
-                <div class="filmstrip-track">
-                    <?php foreach (
-                        array_merge($strip_imgs, $strip_imgs)
-                        as $img
-                    ): ?>
-                        <div class="filmstrip-frame">
-                            <picture>
-                                <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace(
-                                    ".webp",
-                                    ".png",
-                                    $img,
-                                ) ?>" alt="" loading="lazy">
-                            </picture>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="filmstrip-row row-2">
-                <div class="filmstrip-track track-reverse">
-                    <?php foreach (
-                        array_merge(
-                            array_reverse($strip_imgs),
-                            array_reverse($strip_imgs),
-                        )
-                        as $img
-                    ): ?>
-                        <div class="filmstrip-frame">
-                            <picture>
-                                <source srcset="<?= $img ?>" type="image/webp">
-                                <img src="<?= str_replace(
-                                    ".webp",
-                                    ".png",
-                                    $img,
-                                ) ?>" alt="" loading="lazy">
-                            </picture>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
+    <div class="login-root" style="background:transparent;">
+        <!-- Aurora Background -->
+        <div class="aurora-bg" aria-hidden="true">
+            <div class="aurora-blob blob1"></div>
+            <div class="aurora-blob blob2"></div>
+            <div class="aurora-blob blob3"></div>
+            <div class="aurora-blob blob4"></div>
         </div>
-        <div class="login-filmstrip-overlay"></div>
+        <style>
+        .aurora-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#fdf6ff;}
+        .aurora-blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.55;}
+        .blob1{width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;}
+        .blob2{width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;}
+        .blob3{width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;}
+        .blob4{width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);bottom:10%;left:10%;animation:auroraFloat4 13s ease-in-out infinite;}
+        @keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
+        @keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
+        @keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
+        @keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-10%) scale(1.05);}}
+        .login-root>*:not(.aurora-bg){position:relative;z-index:1;}
+        </style>
 
         <!-- Header -->
         <header class="login-header">

@@ -1,7 +1,7 @@
-google_config.php
 db.php
 secret_code.php
 firebase_auth.php
+google_config.php
 /private/
 *.log
 .DS_Store
