@@ -80,7 +80,7 @@ if ($action === "verify") {
     checkRateLimit($prompt_id);
 
     $stmt = $pdo->prepare(
-        "SELECT prompt_text FROM prompts WHERE id = ? AND LOWER(unlock_code) = LOWER(?)",
+        "SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND LOWER(unlock_code) = LOWER(?)",
     );
     $stmt->execute([$prompt_id, $code]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -98,8 +98,9 @@ if ($action === "verify") {
             }
         }
         echo json_encode([
-            "success" => true,
-            "prompt_text" => $prompt["prompt_text"],
+            "success"       => true,
+            "prompt_text"   => $prompt["prompt_text"],
+            "extra_prompts" => json_decode($prompt["extra_prompts"] ?? '[]', true) ?: [],
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Invalid code"]);
@@ -141,7 +142,7 @@ if ($action === "insta_viral") {
     unset($_SESSION[$challenge_key]);
 
     $stmt = $pdo->prepare(
-        "SELECT prompt_text FROM prompts WHERE id = ? AND prompt_type = 'insta_viral'",
+        "SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND prompt_type = 'insta_viral'",
     );
     $stmt->execute([$prompt_id]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -156,8 +157,9 @@ if ($action === "insta_viral") {
             }
         }
         echo json_encode([
-            "success" => true,
-            "prompt_text" => $prompt["prompt_text"],
+            "success"       => true,
+            "prompt_text"   => $prompt["prompt_text"],
+            "extra_prompts" => json_decode($prompt["extra_prompts"] ?? '[]', true) ?: [],
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Prompt not found"]);
@@ -189,7 +191,7 @@ if ($action === "unreleased") {
     // If session key missing (e.g. session expired), allow gracefully — don't break UX
 
     $stmt = $pdo->prepare(
-        "SELECT prompt_text FROM prompts WHERE id = ? AND prompt_type = 'unreleased'",
+        "SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND prompt_type = 'unreleased'",
     );
     $stmt->execute([$prompt_id]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -204,8 +206,9 @@ if ($action === "unreleased") {
             }
         }
         echo json_encode([
-            "success" => true,
-            "prompt_text" => $prompt["prompt_text"],
+            "success"       => true,
+            "prompt_text"   => $prompt["prompt_text"],
+            "extra_prompts" => json_decode($prompt["extra_prompts"] ?? '[]', true) ?: [],
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Prompt not found"]);
@@ -220,7 +223,7 @@ if ($action === "already_uploaded") {
         exit();
     }
 
-    $stmt = $pdo->prepare("SELECT prompt_text FROM prompts WHERE id = ? AND prompt_type = 'already_uploaded'");
+    $stmt = $pdo->prepare("SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND prompt_type = 'already_uploaded'");
     $stmt->execute([$prompt_id]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -234,8 +237,9 @@ if ($action === "already_uploaded") {
             }
         }
         echo json_encode([
-            "success" => true,
-            "prompt_text" => $prompt["prompt_text"],
+            "success"       => true,
+            "prompt_text"   => $prompt["prompt_text"],
+            "extra_prompts" => json_decode($prompt["extra_prompts"] ?? '[]', true) ?: [],
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Prompt not found"]);

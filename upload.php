@@ -120,12 +120,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
         }
 
+        // Handle extra prompts (2 and 3)
+        $extra_prompts_data = [];
+        for ($ep = 2; $ep <= 3; $ep++) {
+            $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
+            if (empty($ep_text)) continue;
+            $ep_image_path = null;
+            if (isset($_FILES["extra_prompt_{$ep}_image"]) && $_FILES["extra_prompt_{$ep}_image"]["error"] === UPLOAD_ERR_OK) {
+                $ep_ext = strtolower(pathinfo($_FILES["extra_prompt_{$ep}_image"]["name"], PATHINFO_EXTENSION));
+                if (in_array($ep_ext, $allowed_ext)) {
+                    $ep_fname = "uploads/" . uniqid("ep_") . "." . $ep_ext;
+                    if (move_uploaded_file($_FILES["extra_prompt_{$ep}_image"]["tmp_name"], $ep_fname)) {
+                        $ep_image_path = $ep_fname;
+                    }
+                }
+            }
+            $extra_prompts_data[] = ['prompt_text' => $ep_text, 'image_path' => $ep_image_path];
+        }
+        $extra_prompts_json = !empty($extra_prompts_data) ? json_encode($extra_prompts_data) : null;
+
         // Insert into DB
         require_once "slug_helper.php";
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -139,6 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $best_works_in,
                 $asset_title,
                 $asset_images_json,
+                $extra_prompts_json,
             ]);
 
             $_SESSION["success_msg"] =

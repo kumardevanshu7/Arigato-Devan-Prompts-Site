@@ -67,6 +67,12 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         .asset-previews{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
         .asset-preview-thumb{position:relative;width:80px;height:80px;border-radius:10px;overflow:hidden;border:2px solid var(--text-color);}
         .asset-preview-thumb img{width:100%;height:100%;object-fit:cover;}
+        .extra-prompt-box{background:#faf6ff;border:2px dashed #c084fc;border-radius:16px;padding:20px;margin-top:10px;margin-bottom:10px;}
+        .extra-prompt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+        .extra-prompt-num{font-weight:900;color:#7c3aed;font-size:.95rem;}
+        .extra-remove-btn{background:#ffe3e3;border:2px solid #d03030;color:#d03030;border-radius:8px;padding:5px 12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--font-main);}
+        .extra-add-btn{display:inline-flex;align-items:center;gap:6px;background:#f0f7ff;border:2px dashed #5b9bd5;color:#1a4f8a;border-radius:12px;padding:10px 20px;font-weight:900;font-size:.9rem;cursor:pointer;margin-top:10px;font-family:var(--font-main);transition:background .2s;}
+        .extra-add-btn:hover{background:#dceeff;}
     </style>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -195,6 +201,57 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 <div class="form-group">
                     <label for="prompt_text">Prompt Preview / Prompt Text</label>
                     <textarea id="prompt_text" name="prompt_text" rows="5" placeholder="A cinematic photo of a couple at golden hour..." required></textarea>
+                </div>
+
+                <!-- Extra Prompts (Optional) -->
+                <div class="form-group">
+                    <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — add up to 2 more prompt variants for this card)</span></label>
+
+                    <div id="ep2-section" style="display:none;">
+                        <div class="extra-prompt-box">
+                            <div class="extra-prompt-header">
+                                <span class="extra-prompt-num">✦ Prompt 2</span>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(2)">✕ Remove</button>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>Prompt 2 Text</label>
+                                <textarea name="extra_prompt_2_text" id="ep2_text" rows="4" placeholder="Second prompt variant..."></textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Prompt 2 Image <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+                                <div class="file-upload-wrapper">
+                                    <label for="ep2_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> Choose Image</label>
+                                    <span class="file-upload-name" id="ep2-fname">No file chosen</span>
+                                    <input type="file" id="ep2_image" name="extra_prompt_2_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep2-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ep3-section" style="display:none;">
+                        <div class="extra-prompt-box">
+                            <div class="extra-prompt-header">
+                                <span class="extra-prompt-num">✦ Prompt 3</span>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>Prompt 3 Text</label>
+                                <textarea name="extra_prompt_3_text" id="ep3_text" rows="4" placeholder="Third prompt variant..."></textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Prompt 3 Image <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+                                <div class="file-upload-wrapper">
+                                    <label for="ep3_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> Choose Image</label>
+                                    <span class="file-upload-name" id="ep3-fname">No file chosen</span>
+                                    <input type="file" id="ep3_image" name="extra_prompt_3_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep3-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ep-add-btns">
+                        <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)">➕ Add Prompt 2</button>
+                    </div>
                 </div>
 
                 <!-- Access Code — full width, only shows for Secret Code type -->
@@ -392,6 +449,29 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             // Make sure hidden tag input is updated
             hiddenTagInput.value = tags.join(',');
         });
+
+        function addEP(num) {
+            document.getElementById('ep'+num+'-section').style.display = 'block';
+            document.getElementById('ep-add'+num+'-btn').style.display = 'none';
+            if (num === 2) {
+                const addBtns = document.getElementById('ep-add-btns');
+                const btn = document.createElement('button');
+                btn.type = 'button'; btn.id = 'ep-add3-btn'; btn.className = 'extra-add-btn';
+                btn.innerHTML = '➕ Add Prompt 3';
+                btn.onclick = function(){ addEP(3); };
+                addBtns.appendChild(btn);
+            }
+        }
+
+        function removeEP(num) {
+            document.getElementById('ep'+num+'-section').style.display = 'none';
+            document.getElementById('ep'+num+'_text').value = '';
+            document.getElementById('ep'+num+'_image').value = '';
+            document.getElementById('ep'+num+'-fname').textContent = 'No file chosen';
+            const addBtn = document.getElementById('ep-add'+num+'-btn');
+            if (addBtn) addBtn.style.display = '';
+            if (num === 2) { removeEP(3); const b = document.getElementById('ep-add3-btn'); if(b) b.remove(); }
+        }
 
         function setBwi(val, el) {
             document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));

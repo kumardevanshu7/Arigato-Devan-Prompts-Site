@@ -78,9 +78,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
+    // Handle extra prompts (2 and 3)
+    $extra_prompts_data = [];
+    $allowed_ext_ep = ["jpg","jpeg","png","gif","webp"];
+    for ($ep = 2; $ep <= 3; $ep++) {
+        $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
+        if (empty($ep_text)) continue;
+        $ep_image_path = trim($_POST["extra_prompt_{$ep}_current_image"] ?? '');
+        if (isset($_FILES["extra_prompt_{$ep}_image"]) && $_FILES["extra_prompt_{$ep}_image"]["error"] === UPLOAD_ERR_OK) {
+            $ep_ext = strtolower(pathinfo($_FILES["extra_prompt_{$ep}_image"]["name"], PATHINFO_EXTENSION));
+            if (in_array($ep_ext, $allowed_ext_ep)) {
+                $ep_fname = "uploads/" . uniqid("ep_") . "." . $ep_ext;
+                if (move_uploaded_file($_FILES["extra_prompt_{$ep}_image"]["tmp_name"], $ep_fname)) {
+                    $ep_image_path = $ep_fname;
+                }
+            }
+        }
+        $extra_prompts_data[] = ['prompt_text' => $ep_text, 'image_path' => $ep_image_path ?: null];
+    }
+    $extra_prompts_json = !empty($extra_prompts_data) ? json_encode($extra_prompts_data) : null;
+
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, extra_prompts=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -94,6 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $asset_title,
         $asset_images_json,
         $description ?: null,
+        $extra_prompts_json,
         $id,
     ]);
 
@@ -119,6 +140,9 @@ $current_bwi = $p["best_works_in"] ?? "";
 $current_asset_title = $p["asset_title"] ?? "";
 $current_asset_images = $p["asset_images"] ?? "";
 $has_current_assets = !empty($current_asset_title) || !empty($current_asset_images);
+$current_extra_arr  = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
+$ep2_data = $current_extra_arr[0] ?? null;
+$ep3_data = $current_extra_arr[1] ?? null;
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=2026052201">
@@ -171,6 +195,12 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 .e-type-card.sel-unreleased{background:#fff4cc;border-color:#e6a800;color:#7a5800;box-shadow:4px 4px 0 #e6a800}
 .e-type-card.sel-viral{background:#e3f7ff;border-color:#007ab8;color:#004f7a;box-shadow:4px 4px 0 #007ab8}
 .e-type-card.sel-uploaded{background:#e6f2ff;border-color:#00509e;color:#00509e;box-shadow:4px 4px 0 #00509e}
+.extra-prompt-box{background:#faf6ff;border:2px dashed #c084fc;border-radius:16px;padding:20px;margin-top:10px;margin-bottom:10px;}
+.extra-prompt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.extra-prompt-num{font-weight:900;color:#7c3aed;font-size:.95rem;}
+.extra-remove-btn{background:#ffe3e3;border:2px solid #d03030;color:#d03030;border-radius:8px;padding:5px 12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--font-main);}
+.extra-add-btn{display:inline-flex;align-items:center;gap:6px;background:#f0f7ff;border:2px dashed #5b9bd5;color:#1a4f8a;border-radius:12px;padding:10px 20px;font-weight:900;font-size:.9rem;cursor:pointer;margin-top:10px;font-family:var(--font-main);transition:background .2s;}
+.extra-add-btn:hover{background:#dceeff;}
 </style>
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
@@ -333,6 +363,68 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
+      </div>
+
+      <!-- Extra Prompts -->
+      <div class="form-group">
+        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 2 more variants for this card)</span></label>
+
+        <div id="ep2-section" style="<?= $ep2_data ? '' : 'display:none;' ?>">
+          <div class="extra-prompt-box">
+            <div class="extra-prompt-header">
+              <span class="extra-prompt-num">✦ Prompt 2</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(2)">✕ Remove</button>
+            </div>
+            <input type="hidden" name="extra_prompt_2_current_image" value="<?= htmlspecialchars($ep2_data['image_path'] ?? '') ?>">
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Prompt 2 Text</label>
+              <textarea name="extra_prompt_2_text" id="ep2_text" rows="4"><?= htmlspecialchars($ep2_data['prompt_text'] ?? '') ?></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Prompt 2 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
+              <?php if (!empty($ep2_data['image_path'])): ?>
+              <div style="margin-bottom:8px;"><img src="<?= htmlspecialchars($ep2_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
+              <?php endif; ?>
+              <div class="file-upload-wrapper">
+                <label for="ep2_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep2_data ? 'Change' : 'Choose' ?> Image</label>
+                <span class="file-upload-name" id="ep2-fname">No file chosen</span>
+                <input type="file" id="ep2_image" name="extra_prompt_2_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep2-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ep3-section" style="<?= $ep3_data ? '' : 'display:none;' ?>">
+          <div class="extra-prompt-box">
+            <div class="extra-prompt-header">
+              <span class="extra-prompt-num">✦ Prompt 3</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
+            </div>
+            <input type="hidden" name="extra_prompt_3_current_image" value="<?= htmlspecialchars($ep3_data['image_path'] ?? '') ?>">
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Prompt 3 Text</label>
+              <textarea name="extra_prompt_3_text" id="ep3_text" rows="4"><?= htmlspecialchars($ep3_data['prompt_text'] ?? '') ?></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Prompt 3 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
+              <?php if (!empty($ep3_data['image_path'])): ?>
+              <div style="margin-bottom:8px;"><img src="<?= htmlspecialchars($ep3_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
+              <?php endif; ?>
+              <div class="file-upload-wrapper">
+                <label for="ep3_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep3_data ? 'Change' : 'Choose' ?> Image</label>
+                <span class="file-upload-name" id="ep3-fname">No file chosen</span>
+                <input type="file" id="ep3_image" name="extra_prompt_3_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep3-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ep-add-btns">
+          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)">➕ Add Prompt 2</button>
+          <?php if ($ep2_data): ?>
+          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)">➕ Add Prompt 3</button>
+          <?php endif; ?>
+        </div>
       </div>
 
       <!-- Code field &mdash; only shown for secret -->
@@ -527,6 +619,29 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         document.getElementById('e-desc').addEventListener('input', function() {
             document.getElementById('desc-char-count').textContent = this.value.length;
         });
+
+        function addEP(num) {
+            document.getElementById('ep'+num+'-section').style.display = 'block';
+            document.getElementById('ep-add'+num+'-btn').style.display = 'none';
+            if (num === 2) {
+                const addBtns = document.getElementById('ep-add-btns');
+                let b3 = document.getElementById('ep-add3-btn');
+                if (!b3) {
+                    b3 = document.createElement('button');
+                    b3.type='button'; b3.id='ep-add3-btn'; b3.className='extra-add-btn';
+                    b3.innerHTML='➕ Add Prompt 3'; b3.onclick=function(){ addEP(3); };
+                    addBtns.appendChild(b3);
+                } else { b3.style.display=''; }
+            }
+        }
+        function removeEP(num) {
+            document.getElementById('ep'+num+'-section').style.display='none';
+            const t=document.getElementById('ep'+num+'_text'); if(t) t.value='';
+            const im=document.getElementById('ep'+num+'_image'); if(im) im.value='';
+            const fn=document.getElementById('ep'+num+'-fname'); if(fn) fn.textContent='No file chosen';
+            const ab=document.getElementById('ep-add'+num+'-btn'); if(ab) ab.style.display='';
+            if(num===2){ removeEP(3); const b3=document.getElementById('ep-add3-btn'); if(b3) b3.style.display='none'; }
+        }
 
         function handleEditAssetFiles(input) {
             const files = Array.from(input.files).slice(0, 2);

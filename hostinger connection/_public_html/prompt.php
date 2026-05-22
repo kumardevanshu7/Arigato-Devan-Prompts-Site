@@ -52,7 +52,9 @@ $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $is_unlocked  = (bool)$p["is_unlocked"];
 $asset_images = json_decode($p['asset_images'] ?? '[]', true) ?: [];
-$tags_arr     = array_filter(array_map('trim', explode(',', $p['tag'] ?? '')));
+$tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? '')));
+$extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
+$total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
 $page_title   = htmlspecialchars($p["title"]) . " — AI Prompt | Arigato Devan";
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
@@ -136,6 +138,11 @@ function sessionAvatar() {
         .pp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
         .pp-tag { font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--bg-color); border: 2px solid var(--text-color); text-transform: capitalize; }
         .pp-like-mini { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-weight: 800; font-size: 0.9rem; color: #888; }
+        .pp-multi-badge { display:inline-flex; align-items:center; gap:8px; background:#fff1b8; color:#7a5c00; border:2.5px solid #e6a800; border-radius:14px; padding:8px 18px; font-weight:900; font-size:.88rem; margin-bottom:14px; box-shadow:3px 3px 0 #e6a800; letter-spacing:.03em; }
+        .pp-extra-section { margin-top:28px; border-top:2px dashed var(--border-color); padding-top:24px; }
+        .pp-extra-num { font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.12em; color:#888; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .pp-extra-num::after { content:''; flex:1; height:2px; background:var(--border-color); }
+        .pp-extra-img { width:100%; max-width:160px; aspect-ratio:9/16; object-fit:cover; border-radius:14px; border:var(--border-width) solid var(--text-color); box-shadow:var(--shadow-comic); margin-bottom:14px; display:block; }
         .pp-info-col { flex: 1; min-width: 0; }
         .pp-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
         /* ── Task Card ── */
@@ -269,6 +276,9 @@ function sessionAvatar() {
 
             <!-- Info Column -->
             <div class="pp-info-col">
+                <?php if ($total_prompts > 1): ?>
+                <div class="pp-multi-badge">🎯 <?= $total_prompts ?> Prompts Inside!</div>
+                <?php endif; ?>
                 <h1 class="pp-title"><?= htmlspecialchars($p['title']) ?></h1>
 
                 <!-- ── TASK SECTION (shown when locked) ── -->
@@ -372,6 +382,25 @@ function sessionAvatar() {
                         </div>
                     </div>
                     <?php endif; ?>
+
+                    <?php foreach ($extra_prompts_arr as $ep_i => $ep): ?>
+                    <div class="pp-extra-section" id="pp-extra-<?= $ep_i ?>">
+                        <div class="pp-extra-num">✦ Prompt <?= $ep_i + 2 ?></div>
+                        <?php if (!empty($ep['image_path'])): ?>
+                        <img src="<?= htmlspecialchars($ep['image_path']) ?>" class="pp-extra-img" alt="Prompt <?= $ep_i + 2 ?>">
+                        <?php endif; ?>
+                        <div class="pp-code-block">
+                            <div class="pp-code-header">
+                                <div class="pp-code-header-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
+                                <span>PROMPT <?= $ep_i + 2 ?>.txt</span>
+                            </div>
+                            <div class="pp-prompt-text" id="pp-extra-text-<?= $ep_i ?>"><?= $is_unlocked ? htmlspecialchars($ep['prompt_text']) : '' ?></div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <button class="pp-btn pp-copy-btn" onclick="copyExtra(<?= $ep_i ?>, this)"><i class="fa-solid fa-copy"></i> COPY</button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -414,7 +443,7 @@ function sessionAvatar() {
     }
 
     // ── Reveal content after unlock ──
-    function revealPrompt(text) {
+    function revealPrompt(text, extraPrompts) {
         const task = document.getElementById('pp-task');
         const content = document.getElementById('pp-content');
         const imgCol = document.getElementById('pp-img-col');
@@ -423,7 +452,22 @@ function sessionAvatar() {
         if (imgCol) imgCol.classList.remove('blurred');
         const mainImg = document.getElementById('pp-main-img');
         if (mainImg) mainImg.style.filter = '';
+        if (extraPrompts && Array.isArray(extraPrompts)) {
+            extraPrompts.forEach(function(ep, i) {
+                const el = document.getElementById('pp-extra-text-' + i);
+                if (el) el.textContent = ep.prompt_text || '';
+            });
+        }
         content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function copyExtra(idx, btn) {
+        const el = document.getElementById('pp-extra-text-' + idx);
+        if (!el || !el.textContent.trim()) return;
+        navigator.clipboard.writeText(el.textContent.trim()).then(function() {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
+            setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-copy"></i> COPY', 2000);
+        });
     }
 
     // ── SECRET CODE ──
@@ -437,7 +481,7 @@ function sessionAvatar() {
             const fd = new FormData();
             fd.append('action', 'verify'); fd.append('prompt_id', promptId); fd.append('code', code);
             const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-            if (res.success) { revealPrompt(res.prompt_text); }
+            if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
             else { showError(res.message || 'Wrong code! Watch the reel to get it.'); this.disabled = false; this.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt'; }
         });
     }
@@ -462,7 +506,7 @@ function sessionAvatar() {
                 this.disabled = true;
                 const fd = new FormData(); fd.append('action', 'unreleased'); fd.append('prompt_id', promptId);
                 const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-                if (res.success) { revealPrompt(res.prompt_text); }
+                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
                 else { tapCount = 0; document.getElementById('pp-tap-count').textContent = '0'; document.getElementById('pp-progress-fill').style.width = '0%'; this.disabled = false; showError(res.message); }
             }
         });
@@ -483,7 +527,7 @@ function sessionAvatar() {
                 this.disabled = true;
                 const fd = new FormData(); fd.append('action', 'already_uploaded'); fd.append('prompt_id', promptId);
                 const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-                if (res.success) { revealPrompt(res.prompt_text); }
+                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
                 else { tapCountAu = 0; document.getElementById('pp-tap-count-au').textContent = '0'; document.getElementById('pp-progress-fill-au').style.width = '0%'; this.disabled = false; showError(res.message); }
             }
         });
@@ -503,7 +547,7 @@ function sessionAvatar() {
             this.disabled = true;
             const fd = new FormData(); fd.append('action', 'insta_viral'); fd.append('prompt_id', promptId); fd.append('user_answer', ans);
             const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-            if (res.success) { revealPrompt(res.prompt_text); }
+            if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
             else { showError(res.message || 'Wrong answer! Try again.'); this.disabled = false; mathQ.textContent = 'Loading...'; initMath(); }
         });
     }
