@@ -21,3 +21,39 @@
 - Test locally, deploy manually.
 - Ask for permission before touching the production (`hostinger connection`) directory.
 - Maintain data integrity at all costs. No more accidental overwrites!
+
+## 5. Environment-Specific Code Differences
+
+### Local (XAMPP)
+- **Path:** `C:\xampp\htdocs\Arigato Development Site\`
+- **URL:** `localhost/Arigato%20Development%20Site/...`
+- **Card click URLs:** `prompt.php?id=X` — NO slug-based URLs locally
+- **prompt.php base href:** `'/Arigato%20Development%20Site/'` on localhost (detected via `$_SERVER['HTTP_HOST'] === 'localhost'`)
+- **Root htdocs .htaccess:** `c:\xampp\htdocs\.htaccess` — for local `/prompts/slug` routing
+
+### Hostinger Mirror
+- **Path:** `C:\xampp\htdocs\Arigato Development Site\hostinger connection\_public_html\`
+- **Card click URLs:** `/prompts/slug` — clean SEO URLs
+- **prompt.php base href:** `/`
+- **User uploads:** copy-paste from mirror folder to FTP directly — never say "go to FTP"
+
+## 6. Safe Files to Upload vs Never Touch
+
+| File | Rule |
+|------|------|
+| `db.php` | NEVER overwrite on Hostinger |
+| `firebase_auth.php` | NEVER overwrite on Hostinger |
+| `secret_code.php` | Safe to upload |
+| `google_config.php` | Safe to upload |
+
+---
+
+## IMPORTANT — Read This Every Time Before Working
+
+The user has two separate environments — Local (XAMPP) and Hostinger (live site). These are completely different systems and should NEVER be mixed up.
+
+The user edits and tests everything locally first. The `hostinger connection\_public_html\` folder is a mirror of the live site — the user copy-pastes files from there directly to Hostinger FTP. That is his upload process. Do NOT touch that folder unless he explicitly says so.
+
+Do NOT auto-sync, do NOT assume "I'll just update both", do NOT say "go to FTP and upload". Just edit the local files, and when he asks which files to copy — list them from the hostinger mirror folder only.
+
+The user has scolded multiple times for mixing up environments and making changes without being asked. Do not repeat that mistake. Only do what is asked — nothing more, nothing less.

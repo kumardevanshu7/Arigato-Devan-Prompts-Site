@@ -449,8 +449,7 @@ function sessionAvatar()
                 if (trigger) {
                     trigger.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        var slug = card.dataset.slug;
-                        var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+                        var url = 'prompt.php?id=' + card.dataset.id;
                         document.body.style.transition = 'opacity 0.15s ease';
                         document.body.style.opacity = '0';
                         setTimeout(function() { window.location.href = url; }, 150);
@@ -458,9 +457,9 @@ function sessionAvatar()
                 }
                 // Prefetch on hover
                 card.addEventListener('mouseenter', function() {
-                    var slug = card.dataset.slug;
-                    if (!slug) return;
-                    var url = '/prompts/' + slug;
+                    var id = card.dataset.id;
+                    if (!id) return;
+                    var url = 'prompt.php?id=' + id;
                     if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
                         var link = document.createElement('link');
                         link.rel = 'prefetch'; link.href = url;

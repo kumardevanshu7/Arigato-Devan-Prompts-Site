@@ -68,7 +68,7 @@ function sessionAvatar() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/">
+    <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
     <title><?= $page_title ?></title>
     <meta name="description" content="Unlock this exclusive AI couple prompt on Arigato Devan PromptVerse. <?= htmlspecialchars($p['title']) ?> — <?= htmlspecialchars($tinfo['label']) ?>">
     <meta property="og:type" content="article">
