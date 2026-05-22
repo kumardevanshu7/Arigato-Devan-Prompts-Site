@@ -21,7 +21,7 @@ if (!$id) {
 }
 
 // Fetch enough fields to build a rich preview
-$stmt = $pdo->prepare("SELECT id, title, image_path, prompt_type, tag FROM prompts WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, slug, title, image_path, prompt_type, tag FROM prompts WHERE id = ?");
 $stmt->execute([$id]);
 $p = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -29,15 +29,6 @@ if (!$p) {
     header("Location: index.php");
     exit();
 }
-
-// Map prompt_type → correct category page (same as before)
-$page_map = [
-    'secret'           => 'secret_code.php',
-    'unreleased'       => 'unreleased.php',
-    'insta_viral'      => 'insta_viral.php',
-    'already_uploaded' => 'already_uploaded.php',
-];
-$target = $page_map[$p['prompt_type']] ?? 'gallery.php';
 
 // Build absolute base URL (works on local XAMPP and on Hostinger)
 $proto    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -68,8 +59,8 @@ $title       = $p['title'] ?: 'AI Couple Prompt';
 $ogTitle     = $title . ' \u2014 Arigato Devan Prompts';
 $description = "\xF0\x9F\x92\x95 Unlock this dreamy {$type_label} AI couple prompt on Arigato Devan \xE2\x80\x94 perfect for Gemini Nano 2 & Pro. Tap to reveal the magic!";
 
-$shareUrl    = $baseUrl . '/card.php?id=' . $p['id'];
-$redirectUrl = $baseUrl . '/' . $target . '?open=' . $p['id'];
+$shareUrl    = !empty($p['slug']) ? $baseUrl . '/prompts/' . $p['slug'] : $baseUrl . '/prompt.php?id=' . $p['id'];
+$redirectUrl = $shareUrl;
 
 /**
  * Detect social-media crawlers / preview bots.
@@ -115,6 +106,7 @@ if (!$isBot) {
 <!-- Standard meta -->
 <meta name="description" content="<?= htmlspecialchars($description) ?>">
 <link rel="canonical" href="<?= htmlspecialchars($shareUrl) ?>">
+<meta http-equiv="refresh" content="0;url=<?= htmlspecialchars($shareUrl) ?>">
 </head>
 <body>
     <h1><?= htmlspecialchars($title) ?></h1>

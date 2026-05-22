@@ -11,6 +11,8 @@ ErrorDocument 404 /404.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
+    # ─── Clean prompt URLs: /prompts/kiss-in-rain → prompt.php?slug=kiss-in-rain
+    RewriteRule ^prompts/([a-z0-9-]+)/?$ prompt.php?slug=$1 [L,QSA]
 </IfModule>
 
 # ─── Gzip / Deflate Compression ─────────────────────────────────────────────

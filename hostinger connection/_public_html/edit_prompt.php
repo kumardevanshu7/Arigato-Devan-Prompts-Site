@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+require_once "slug_helper.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     header("Location: index.php");
     exit();
@@ -76,10 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
+    $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=? WHERE id=?",
     )->execute([
         $title,
+        $updated_slug,
         $tag,
         $prompt_text,
         $unlock_code,

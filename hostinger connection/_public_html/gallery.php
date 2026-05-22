@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 // Guard: if logged in but onboarding not done, force setup
@@ -7,24 +7,46 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     exit();
 }
 
-// Fetch prompts with unlocked status
+// Pagination + tag filter
+$page       = max(1, (int)($_GET['page'] ?? 1));
+$per_page   = 20;
+$tag_filter = trim(strtolower($_GET['tag'] ?? ''));
+$tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . $tag_filter . '%' : null;
+$offset     = ($page - 1) * $per_page;
+
+// Count total for pagination
+$count_sql  = $tag_param ? "SELECT COUNT(*) FROM prompts WHERE LOWER(tag) LIKE ?" : "SELECT COUNT(*) FROM prompts";
+$count_stmt = $pdo->prepare($count_sql);
+$count_stmt->execute($tag_param ? [$tag_param] : []);
+$total       = (int)$count_stmt->fetchColumn();
+$total_pages = max(1, (int)ceil($total / $per_page));
+
+// All unique tags for filter buttons (separate query, not paginated)
+$all_tags_raw = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != ''") ->fetchAll(PDO::FETCH_COLUMN);
+$all_tags = [];
+foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $all_tags[] = $t; } }
+$all_tags = array_unique($all_tags); sort($all_tags);
+
+// Fetch prompts with unlocked status (LIMIT/OFFSET interpolated as int — safe, no user input)
+$tag_where = $tag_param ? " AND LOWER(p.tag) LIKE ?" : "";
 if (isset($_SESSION["user_id"])) {
-    $stmt = $pdo->prepare("
-        SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+    $sql = "SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked,
                IF(sv.id IS NOT NULL, 1, 0) as is_saved
         FROM prompts p
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        ORDER BY p.created_at DESC
-    ");
-    $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
+        WHERE 1=1{$tag_where}
+        ORDER BY p.created_at DESC LIMIT {$per_page} OFFSET {$offset}";
+    $params = [$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]];
+    if ($tag_param) $params[] = $tag_param;
+    $stmt = $pdo->prepare($sql); $stmt->execute($params);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query(
-        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts ORDER BY created_at DESC",
-    );
+    $sql = "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE 1=1{$tag_where} ORDER BY created_at DESC LIMIT {$per_page} OFFSET {$offset}";
+    $params = []; if ($tag_param) $params[] = $tag_param;
+    $stmt = $pdo->prepare($sql); $stmt->execute($params);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -69,7 +91,6 @@ function sessionAvatar()
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
         <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
     <style>
         .gallery-header {
@@ -91,7 +112,6 @@ function sessionAvatar()
             box-shadow: 2px 2px 0px var(--text-color);
         }
     </style>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Gallery","item":"https://arigatodevan.com/gallery.php"}]}
@@ -99,16 +119,6 @@ function sessionAvatar()
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-gallery">
-    <!-- Scrollable Wallpaper Background -->
-    <div class="scroll-bg-container" id="scroll-bg-container">
-        <div class="bg-layer active" style="background-image: url('https://i.pinimg.com/736x/4d/e2/71/4de271ae9997273cf3fdd47098fa69a3.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/76/50/aa/7650aa986d34ca65bb52f261f954149b.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/64/c4/c5/64c4c528ee5812610d58ee2c98bbb76f.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/f9/fd/75/f9fd75e5aa551b89ac88a863921f2f75.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/a5/15/6a/a5156a264e06ebb47997cf59e66bee31.jpg')"></div>
-        <div class="bg-creamy-overlay"></div>
-    </div>
-
     <header>
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
@@ -214,67 +224,16 @@ function sessionAvatar()
     <div class="container" style="padding-top:40px;">
         <div class="gallery-header">
             <h1 class="gallery-title">All Prompts <span class="highlight">Gallery</span></h1>
-            <div class="gallery-count"><?= count($prompts) ?> Prompts</div>
+            <div class="gallery-count"><?= $total ?> Prompts</div>
         </div>
 
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
-        <?php
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            // Extract all unique tags
-            // Map DB prompt_type → UI ptype key
-            else: ?>
-            <?php
-            $all_tags = [];
-            foreach ($prompts as $p) {
-                $tarr = explode(",", $p["tag"]);
-                foreach ($tarr as $t) {
-                    $t = trim(strtolower($t));
-                    if (!empty($t)) {
-                        $all_tags[] = $t;
-                    }
-                }
-            }
-            $unique_tags = array_unique($all_tags);
-            sort($unique_tags);
-            ?>
+        <?php else: ?>
             <div class="tag-filter-container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:30px;">
-                <button class="tag-filter-btn active" data-tag="all" style="background:var(--primary-color); padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s;">All</button>
-                <?php foreach ($unique_tags as $t): ?>
-                    <button class="tag-filter-btn" data-tag="<?= htmlspecialchars(
-                        $t,
-                    ) ?>" style="background:var(--bg-color); padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-transform:capitalize;"><?= htmlspecialchars(
-    ucfirst($t),
-) ?></button>
+                <a href="gallery.php" class="tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" style="background:<?= !$tag_filter || $tag_filter === 'all' ? 'var(--primary-color)' : 'var(--bg-color)' ?>; padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-decoration:none; color:var(--text-color);">All</a>
+                <?php foreach ($all_tags as $t): ?>
+                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>; padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-transform:capitalize; text-decoration:none; color:var(--text-color);"><?= htmlspecialchars(ucfirst($t)) ?></a>
                 <?php endforeach; ?>
             </div>
 
@@ -310,6 +269,7 @@ function sessionAvatar()
                 ?>
                     <div class="card"
                          data-id="<?= $p["id"] ?>"
+                         data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
                          data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
                          data-image="<?= htmlspecialchars($p["image_path"]) ?>"
                          data-title="<?= htmlspecialchars($p["title"]) ?>"
@@ -383,6 +343,21 @@ function sessionAvatar()
                     <?php
             endforeach; ?>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:40px;padding-bottom:20px;">
+                <?php if ($page > 1): ?>
+                <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>" style="padding:10px 18px;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;font-family:var(--font-main);text-decoration:none;color:var(--text-color);box-shadow:var(--shadow-comic);">&larr; Prev</a>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>" style="padding:10px 18px;background:<?= $i === $page ? 'var(--primary-color)' : 'var(--card-bg)' ?>;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;font-family:var(--font-main);text-decoration:none;color:var(--text-color);box-shadow:var(--shadow-comic);"><?= $i ?></a>
+                <?php endfor; ?>
+                <?php if ($page < $total_pages): ?>
+                <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>" style="padding:10px 18px;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;font-family:var(--font-main);text-decoration:none;color:var(--text-color);box-shadow:var(--shadow-comic);">Next &rarr;</a>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 
@@ -464,85 +439,23 @@ function sessionAvatar()
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
         ? "true"
         : "false" ?>;</script>
-        <script defer src="script.js?v=20260521b"></script>
+        <script defer src="script.js?v=2026051205"></script>
         <script>
 
-        // Background Scroll Logic
-        const bgLayers = document.querySelectorAll('.bg-layer');
-        if (bgLayers.length > 0) {
-            window.addEventListener('scroll', () => {
-                const scrollPos = window.scrollY;
-                const pixelsPerLayer = 500;
-                let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
-                if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
-                bgLayers.forEach((layer, index) => {
-                    if (index === activeIndex) layer.classList.add('active');
-                    else layer.classList.remove('active');
-                });
+        // Card click → navigate to clean prompt URL
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.gallery-grid .card').forEach(function(card) {
+                var trigger = card.querySelector('.card-click-trigger');
+                if (trigger) {
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var slug = card.dataset.slug;
+                        window.location.href = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+                    });
+                }
             });
-        }
-
-        // Update save-btn promptId when modal opens (script.js handles save logic)
-        document.addEventListener('modalOpened', function(e) {
-            const btn = document.getElementById('modal-save-btn');
-            if (btn && e.detail && e.detail.promptId) btn.dataset.promptId = e.detail.promptId;
         });
     </script>
-<script>
-document.querySelectorAll('.tag-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.tag-filter-btn').forEach(b => {
-            b.classList.remove('active');
-            b.style.background = 'var(--bg-color)';
-        });
-        btn.classList.add('active');
-        btn.style.background = 'var(--primary-color)';
-
-        const filterTag = btn.dataset.tag;
-        document.querySelectorAll('.gallery-grid .card').forEach(card => {
-            if (filterTag === 'all') {
-                card.style.display = 'flex';
-                return;
-            }
-            const cardTags = card.dataset.tags.split(',').map(t => t.trim());
-            if (cardTags.includes(filterTag)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    });
-});
-
-// Smart Search Read Logic
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    if (searchQuery) {
-        const query = searchQuery.toLowerCase().trim();
-        document.querySelectorAll('.gallery-grid .card').forEach(card => {
-            const title = (card.dataset.title || '').toLowerCase();
-            const tags = (card.dataset.tags || '').toLowerCase();
-            if (title.includes(query) || tags.includes(query)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-
-        const titleEl = document.querySelector('.gallery-title');
-        if(titleEl) {
-            titleEl.innerHTML = `Search: <span class="highlight">"` + searchQuery + `"</span>`;
-        }
-
-        // Remove active class from "All" button
-        document.querySelectorAll('.tag-filter-btn').forEach(b => {
-            b.classList.remove('active');
-            b.style.background = 'var(--bg-color)';
-        });
-    }
-});
-</script>
 
 <!-- Wrong Code Comic Popup -->
 <div id="wrong-code-popup">

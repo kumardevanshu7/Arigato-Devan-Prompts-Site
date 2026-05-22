@@ -1,8 +1,16 @@
+# ── Sensitive / environment files ─────────────────────────────────────────────
 db.php
-secret_code.php
 firebase_auth.php
+secret_code.php
 google_config.php
-/private/
-*.log
+
+# ── Hostinger mirror folder (never commit this) ───────────────────────────────
+hostinger connection/
+
+# ── Uploads (user content, can be large) ─────────────────────────────────────
+uploads/
+
+# ── OS / editor junk ──────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+.vscode/

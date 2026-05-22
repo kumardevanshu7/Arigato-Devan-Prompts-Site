@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
 $prompts = $pdo
     ->query(
-        "SELECT id, title, image_path, prompt_type, likes_count FROM prompts ORDER BY created_at DESC",
+        "SELECT id, slug, title, image_path, prompt_type, likes_count FROM prompts ORDER BY created_at DESC",
     )
     ->fetchAll(PDO::FETCH_ASSOC);
 $total = count($prompts);
@@ -205,7 +205,7 @@ $total = count($prompts);
             .pl-title-cell { max-width: 140px; }
         }
     </style>
-    <?php include_once 'gtag.php'; ?>
+    <?php include_once "gtag.php"; ?>
 </head>
 <body>
 
@@ -306,10 +306,11 @@ $total = count($prompts);
 
                 $pt = $p["prompt_type"] ?? "secret";
                 $tinfo = $type_map[$pt] ?? $type_map["secret"];
-                $title = htmlspecialchars($p["title"]);
-                $img = htmlspecialchars($p["image_path"]);
-                $id = (int) $p["id"];
-                $likes = (int) $p["likes_count"];
+                $title  = htmlspecialchars($p["title"]);
+                $img    = htmlspecialchars($p["image_path"]);
+                $id     = (int) $p["id"];
+                $pslug  = htmlspecialchars($p["slug"] ?? "");
+                $likes  = (int) $p["likes_count"];
                 ?>
             <tr data-search="<?= strtolower($title) ?>">
                 <td><img src="<?= $img ?>" class="pl-cover" alt="Cover"></td>
@@ -326,7 +327,7 @@ $total = count($prompts);
                 </td>
                 <td style="text-align:center;font-weight:800;color:#ff6b6b;"><?= $likes ?></td>
                 <td style="text-align:right;">
-                    <button class="copy-btn" onclick="copyLink(<?= $id ?>, this)">
+                    <button class="copy-btn" onclick="copyLink('<?= $pslug ?>', <?= $id ?>, this)">
                         <i class="fa-solid fa-copy"></i> Copy Link
                     </button>
                 </td>
@@ -342,8 +343,8 @@ $total = count($prompts);
 </div>
 
 <script>
-function copyLink(id, btn) {
-    var link = window.location.origin + '/card.php?id=' + id;
+function copyLink(slug, id, btn) {
+    var link = slug ? window.location.origin + '/prompts/' + slug : window.location.origin + '/prompt.php?id=' + id;
     navigator.clipboard.writeText(link).then(function() {
         btn.classList.add('copied');
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
@@ -352,7 +353,7 @@ function copyLink(id, btn) {
             btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy Link';
         }, 2500);
     }).catch(function() {
-        window.prompt('Copy this link:', window.location.origin + '/card.php?id=' + id);
+        window.prompt('Copy this link:', link);
     });
 }
 

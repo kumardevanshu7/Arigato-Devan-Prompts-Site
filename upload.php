@@ -121,12 +121,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         // Insert into DB
+        require_once "slug_helper.php";
+        $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
+                $new_slug,
                 $tag,
                 $prompt_text,
                 $unlock_code,
