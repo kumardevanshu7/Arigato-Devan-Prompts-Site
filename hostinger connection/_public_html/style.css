@@ -59,10 +59,18 @@ body::before {
     }
 }
 
+/* ── Page transition ── */
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+body { animation: pageIn 0.25s ease; }
+
 /* Header */
 header {
-    background-color: #fdfbf7;
-    backdrop-filter: blur(12px);
+    background-color: rgba(253, 251, 247, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: var(--border-width) solid var(--text-color);
     border-radius: 40px;
     margin: 16px auto;
@@ -1192,7 +1200,9 @@ footer {
     justify-content: space-between;
     font-weight: 600;
     font-size: 0.9rem;
-    background: var(--card-bg);
+    background: rgba(253, 251, 247, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     color: var(--text-color);
 }
 

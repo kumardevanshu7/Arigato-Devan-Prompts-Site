@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome &ndash; Set Up Your Profile | Arigato Devan Prompts</title>
     <meta name="description" content="Set up your PromptVerse profile before exploring exclusive AI prompts.">
-    <link rel="stylesheet" href="style.css?v=1778100000">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <style>
         body {
             min-height: 100vh;

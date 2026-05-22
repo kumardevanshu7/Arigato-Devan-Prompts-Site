@@ -59,7 +59,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard &ndash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.css?v=1778100000">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <style>
         body { background: var(--bg-color); }
 

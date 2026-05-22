@@ -114,7 +114,7 @@ $milestones = [
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Growth Journey &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 

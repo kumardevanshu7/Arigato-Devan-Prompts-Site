@@ -51,7 +51,7 @@ arsort($all_tags);
 <meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
 <meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <style>
 /* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-hero {

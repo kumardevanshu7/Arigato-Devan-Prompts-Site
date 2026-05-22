@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -28,7 +28,7 @@ if (empty($_SESSION["oauth_state"])) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Secret Code Reels &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="Unlock exclusive secret prompts on PromptVerse with a 6-character code.">
-<link rel="stylesheet" href="style.css?v=2026051206">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -151,7 +151,7 @@ if (empty($_SESSION["oauth_state"])) {
     <div class="cs-icon"><i class="fa-solid fa-lock" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
     <h1 class="cs-title">Secret Code<br><span class="highlight">Reels</span></h1>
-    <p class="cs-sub">Exclusive locked prompts are being prepared. Watch our reels to get the secret codes and unlock them first! 🔒</p>
+    <p class="cs-sub">Exclusive locked prompts are being prepared. Watch our reels to get the secret codes and unlock them first! ??</p>
     <div class="cs-notify-row">
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f09433,#dc2743);color:white;padding:12px 24px;border-radius:12px;border:var(--border-width) solid var(--text-color);font-weight:900;text-decoration:none;box-shadow:var(--shadow-comic);"><i class="fa-brands fa-instagram"></i> Follow @arigato.devan</a>
         <a href="gallery.php" class="comic-btn" style="text-decoration:none;padding:12px 22px;"><i class="fa-solid fa-arrow-left"></i> Explore Gallery</a>
@@ -199,6 +199,7 @@ if (empty($_SESSION["oauth_state"])) {
             ); ?>
         <div class="card"
              data-id="<?= $p["id"] ?>"
+             data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
              data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
              data-image="<?= htmlspecialchars($p["image_path"]) ?>"
              data-title="<?= htmlspecialchars($p["title"]) ?>"
@@ -407,7 +408,7 @@ function verifyCode(){
         .finally(()=>{submitBtn.disabled=false;submitBtn.innerHTML='<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt';});
 }
 
-function spawnEmojis(){const e=['🎉','✨','🔥','💡','⭐','🫶','🙸'];for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=e[Math.floor(Math.random()*e.length)];s.style.cssText=`position:fixed;top:-40px;left:${Math.random()*100}vw;font-size:${1.5+Math.random()*1.5}rem;pointer-events:none;z-index:9999;animation:fall ${1.5+Math.random()*2}s ease forwards;`;document.body.appendChild(s);setTimeout(()=>s.remove(),4000);}}
+function spawnEmojis(){const e=['??','?','??','??','?','??','??'];for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=e[Math.floor(Math.random()*e.length)];s.style.cssText=`position:fixed;top:-40px;left:${Math.random()*100}vw;font-size:${1.5+Math.random()*1.5}rem;pointer-events:none;z-index:9999;animation:fall ${1.5+Math.random()*2}s ease forwards;`;document.body.appendChild(s);setTimeout(()=>s.remove(),4000);}}
 
 // Copy
 if(copyBtn){copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(unlockedText.textContent).then(()=>{copyBtn.innerHTML='<i class="fa-solid fa-check"></i> COPIED!';setTimeout(()=>{copyBtn.innerHTML='<i class="fa-solid fa-copy"></i> COPY';},2000);});});}
@@ -415,15 +416,30 @@ if(copyBtn){copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(
 // Tag filter
 document.querySelectorAll('.sc-filter-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.sc-filter-btn').forEach(b=>{b.classList.remove('active');b.style.background='var(--bg-color)';b.style.color='var(--text-color)';});btn.classList.add('active');btn.style.background='var(--primary-color)';const tag=btn.dataset.tag;document.querySelectorAll('#sc-grid .card').forEach(card=>{const tags=(card.dataset.tags||'').split(',').map(t=>t.trim());card.style.display=(tag==='all'||tags.includes(tag))?'':'none';});});});
 
-// Auto-open card from shareable link (?open=ID)
-(function(){
-    var openId = new URLSearchParams(window.location.search).get('open');
-    if (!openId) return;
-    setTimeout(function(){
-        var card = document.querySelector('#sc-grid .card[data-id="' + openId + '"]');
-        if (card) card.click();
-    }, 400);
-})();
+// Card click → navigate to prompt page
+document.querySelectorAll('.card').forEach(function(card) {
+    var trigger = card.querySelector('.card-click-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var slug = card.dataset.slug;
+            var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+            document.body.style.transition = 'opacity 0.15s ease';
+            document.body.style.opacity = '0';
+            setTimeout(function() { window.location.href = url; }, 150);
+        });
+    }
+    card.addEventListener('mouseenter', function() {
+        var slug = card.dataset.slug;
+        if (!slug) return;
+        var url = '/prompts/' + slug;
+        if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch'; link.href = url;
+            document.head.appendChild(link);
+        }
+    }, { once: true });
+});
 </script>
 <style>
 @keyframes fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}

@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -39,21 +39,21 @@ arsort($all_tags);
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
-<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ğŸ’¡">
+<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs â€” Arigato Devan Prompts">
-<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ğŸ’¡">
+<meta property="og:title" content="Blogs — Arigato Devan Prompts">
+<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs â€” Arigato Devan Prompts">
-<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ğŸ’¡">
+<meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
+<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <style>
-/* &mdash;&ndash;Â&mdash;&ndash;Â&mdash; Blogs Page &mdash;&ndash;Â&mdash;&ndash;Â&mdash; */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */
 .blogs-hero {
     padding: 60px 40px 40px;
     max-width: 1300px;
@@ -77,7 +77,7 @@ arsort($all_tags);
     font-family: var(--font-blog-body);
 }
 
-/* &mdash;&ndash;Â&mdash;&ndash;Â&mdash; Tag Filter Pills &mdash;&ndash;Â&mdash;&ndash;Â&mdash; */
+/* &mdash;&ndash;&mdash;&ndash;&mdash; Tag Filter Pills &mdash;&ndash;&mdash;&ndash;&mdash; */
 .tag-filter-wrap {
     max-width: 1300px;
     margin: 0 auto 40px;
@@ -214,7 +214,7 @@ arsort($all_tags);
 }
 .blog-author-name { color: var(--text-color); font-weight: 800; }
 
-/* &mdash;&mdash;&mdash;&mdash;&mdash; Normal Grid â€” Pinterest Masonry &mdash;&mdash;&mdash;&mdash;&mdash; */
+/* &mdash;&mdash;&mdash;&mdash;&mdash; Normal Grid — Pinterest Masonry &mdash;&mdash;&mdash;&mdash;&mdash; */
 .blogs-grid {
     column-count: 5;
     column-gap: 18px;
@@ -537,7 +537,7 @@ arsort($all_tags);
   </div>
   <!-- No results message -->
   <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#7D7887;font-weight:700;font-size:1.1rem;">
-    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>Â
+    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>
   </div>
 
 </div>

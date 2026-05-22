@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -44,7 +44,7 @@ if (isset($_SESSION["user_id"])) {
 <meta name="twitter:title" content="Already Uploaded Prompts — Arigato Devan">
 <meta name="twitter:description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! 📱">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=2026051205">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -230,6 +230,7 @@ if (isset($_SESSION["user_id"])) {
                 ?>
             <div class="card"
                  data-id="<?= $aup["id"] ?>"
+                 data-slug="<?= htmlspecialchars($aup["slug"] ?? "") ?>"
                  data-created="<?= htmlspecialchars($aup["created_at"] ?? "") ?>"
                  data-image="<?= htmlspecialchars($aup["image_path"]) ?>"
                  data-title="<?= htmlspecialchars($aup["title"]) ?>"
@@ -344,7 +345,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=20260521b"></script>
+<script defer src="script.js?v=2026051205"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -387,13 +388,28 @@ document.querySelectorAll('.aup-filter-btn').forEach(btn => {
     });
 });
 
-// Auto-open card from shareable link (?open=ID)
-(function(){
-    var openId = new URLSearchParams(window.location.search).get('open');
-    if (!openId) return;
-    setTimeout(function(){
-        var card = document.querySelector('#card-stack .card[data-id="' + openId + '"]');
-        if (card) card.click();
-    }, 400);
-})();
+// Card click → navigate to prompt page
+document.querySelectorAll('.card').forEach(function(card) {
+    var trigger = card.querySelector('.card-click-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var slug = card.dataset.slug;
+            var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+            document.body.style.transition = 'opacity 0.15s ease';
+            document.body.style.opacity = '0';
+            setTimeout(function() { window.location.href = url; }, 150);
+        });
+    }
+    card.addEventListener('mouseenter', function() {
+        var slug = card.dataset.slug;
+        if (!slug) return;
+        var url = '/prompts/' + slug;
+        if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch'; link.href = url;
+            document.head.appendChild(link);
+        }
+    }, { once: true });
+});
 </script></body></html>

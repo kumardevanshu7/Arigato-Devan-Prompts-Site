@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $slug = $_GET["slug"] ?? "";
@@ -59,7 +59,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <?php if ($blog["tags"]): ?><meta name="keywords" content="<?= htmlspecialchars(
     $blog["tags"],
 ) ?>"><?php endif; ?>
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <style>
 .blog-detail-wrap{max-width:800px;margin:0 auto;padding:48px 32px 100px}
 .blog-detail-hero-img{width:100%;max-height:440px;object-fit:cover;border-radius:22px;border:var(--border-width) solid var(--text-color);box-shadow:var(--shadow-comic);margin-bottom:36px;display:block}
@@ -248,7 +248,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="blog-detail-wrap">
   <!-- Back link -->
-  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
+  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i>� Back to Blogs</a>
 
   <!-- Hero image -->
   <?php if ($blog["image_path"]): ?>
@@ -298,12 +298,12 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- Content -->
   <div class="blog-content"><?= $blog["content"]
-/* HTML stored from editor "&ndash; safe because only admin writes it */
+/* HTML stored from editor "&ndash;� safe because only admin writes it */
 ?></div>
 
   <!-- Reactions -->
   <div class="blog-reactions" id="blog-reactions">
-    <?php foreach (['heart'=>'❤️','fire'=>'🔥','wow'=>'😮'] as $rtype=>$remoji): ?>
+    <?php foreach (['heart'=>'??','fire'=>'??','wow'=>'??'] as $rtype=>$remoji): ?>
     <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
       <span class="r-emoji"><?= $remoji ?></span>
       <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
@@ -321,7 +321,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
           : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>� All Blogs</a>
   </div>
 
   <!-- Comments -->
@@ -386,7 +386,7 @@ const likeBtn = document.getElementById('blog-like-btn');
 if (likeBtn) {
   likeBtn.addEventListener('click', () => {
     <?php if (!isset($_SESSION["user_id"])): ?>
-    showToast('Login first to like! 💛'); return;
+    showToast('Login first to like! ??'); return;
     <?php endif; ?>
     const blogId = likeBtn.dataset.blogId;
     const fd = new FormData(); fd.append('blog_id', blogId);

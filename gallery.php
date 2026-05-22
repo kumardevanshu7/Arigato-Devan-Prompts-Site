@@ -442,7 +442,7 @@ function sessionAvatar()
         <script defer src="script.js?v=2026051205"></script>
         <script>
 
-        // Card click → navigate to clean prompt URL
+        // Card click → navigate to clean prompt URL (with fade-out)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.gallery-grid .card').forEach(function(card) {
                 var trigger = card.querySelector('.card-click-trigger');
@@ -450,9 +450,23 @@ function sessionAvatar()
                     trigger.addEventListener('click', function(e) {
                         e.stopPropagation();
                         var slug = card.dataset.slug;
-                        window.location.href = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+                        var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+                        document.body.style.transition = 'opacity 0.15s ease';
+                        document.body.style.opacity = '0';
+                        setTimeout(function() { window.location.href = url; }, 150);
                     });
                 }
+                // Prefetch on hover
+                card.addEventListener('mouseenter', function() {
+                    var slug = card.dataset.slug;
+                    if (!slug) return;
+                    var url = '/prompts/' + slug;
+                    if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+                        var link = document.createElement('link');
+                        link.rel = 'prefetch'; link.href = url;
+                        document.head.appendChild(link);
+                    }
+                }, { once: true });
             });
         });
     </script>

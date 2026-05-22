@@ -45,7 +45,7 @@ if (isset($_SESSION["user_id"])) {
 <meta name="twitter:title" content="Insta Viral Reels Prompts — Arigato Devan">
 <meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=2026051205">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -363,6 +363,7 @@ if (isset($_SESSION["user_id"])) {
             ); ?>
         <div class="card"
              data-id="<?= $p["id"] ?>"
+             data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
              data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
              data-image="<?= htmlspecialchars($p["image_path"]) ?>"
              data-title="<?= htmlspecialchars($p["title"]) ?>"
@@ -498,13 +499,28 @@ document.querySelectorAll('.iv-filter-btn').forEach(btn => {
     });
 });
 
-// Auto-open card from shareable link (?open=ID)
-(function(){
-    var openId = new URLSearchParams(window.location.search).get('open');
-    if (!openId) return;
-    setTimeout(function(){
-        var card = document.querySelector('#iv-grid .card[data-id="' + openId + '"]');
-        if (card) card.click();
-    }, 400);
-})();
+// Card click → navigate to prompt page
+document.querySelectorAll('.card').forEach(function(card) {
+    var trigger = card.querySelector('.card-click-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var slug = card.dataset.slug;
+            var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+            document.body.style.transition = 'opacity 0.15s ease';
+            document.body.style.opacity = '0';
+            setTimeout(function() { window.location.href = url; }, 150);
+        });
+    }
+    card.addEventListener('mouseenter', function() {
+        var slug = card.dataset.slug;
+        if (!slug) return;
+        var url = '/prompts/' + slug;
+        if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch'; link.href = url;
+            document.head.appendChild(link);
+        }
+    }, { once: true });
+});
 </script></body></html>

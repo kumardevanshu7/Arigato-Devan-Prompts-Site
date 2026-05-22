@@ -118,7 +118,7 @@ $cats = [
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>How to Use – Arigato Devan Prompts</title>
 <meta name="description" content="Complete step-by-step guide to unlocking and using AI prompts on Arigato Devan. Learn how to use Secret Code, Insta Viral, Unreleased, and Already Uploaded prompts.">
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <?php include_once "gtag.php"; ?>

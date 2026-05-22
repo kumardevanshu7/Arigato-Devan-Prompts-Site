@@ -119,7 +119,7 @@ $current_asset_images = $p["asset_images"] ?? "";
 $has_current_assets = !empty($current_asset_title) || !empty($current_asset_images);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=1778100000">
+<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=2026052201">
 <style>
 body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
 .edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}

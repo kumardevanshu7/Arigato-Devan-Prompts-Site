@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -46,25 +46,25 @@ foreach ($saved as $p) {
 
 $type_map = [
     "secret" => [
-        "emoji" => "🔒",
+        "emoji" => "??",
         "label" => "Secret Code",
         "bg" => "#ffe3e3",
         "color" => "#d03030",
     ],
     "unreleased" => [
-        "emoji" => "🌙",
+        "emoji" => "??",
         "label" => "Unreleased",
         "bg" => "#fff4cc",
         "color" => "#7a5800",
     ],
     "insta_viral" => [
-        "emoji" => "🔥",
+        "emoji" => "??",
         "label" => "Insta Viral",
         "bg" => "#e3f7ff",
         "color" => "#004f7a",
     ],
     "already_uploaded" => [
-        "emoji" => "📤",
+        "emoji" => "??",
         "label" => "Already Uploaded",
         "bg" => "#e6f2ff",
         "color" => "#00509e",
@@ -77,7 +77,7 @@ $type_map = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saved Prompts &mdash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.css?v=1778100000">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -336,19 +336,19 @@ $type_map = [
                 </div>
                 Saved Prompts
             </div>
-            <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
+            <div class="sp-sub">All prompts you've unlocked � <span id="sp-counter"><?= $total ?></span> saved so far</div>
             <div class="sp-filters">
-                <?php if($stats['secret'] > 0): ?><span class="sp-pill">🔒 Secret <?= $stats['secret'] ?></span><?php endif; ?>
-                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">🔥 Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
-                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">🌙 Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
-                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">📤 Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
+                <?php if($stats['secret'] > 0): ?><span class="sp-pill">?? Secret <?= $stats['secret'] ?></span><?php endif; ?>
+                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">?? Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
+                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">?? Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
+                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">?? Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
             </div>
         </div>
     </div>
 
     <?php if ($total === 0): ?>
     <div class="sp-empty">
-        <div class="sp-empty-icon">🔖</div>
+        <div class="sp-empty-icon">??</div>
         <h2>No Saved Prompts Yet</h2>
         <p>Unlock prompts on the site and they'll appear here!</p>
         <a href="index.php" class="comic-btn-small"><i class="fa-solid fa-arrow-left"></i> Browse Prompts</a>

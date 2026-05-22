@@ -11,7 +11,7 @@ require_once "db.php";
     <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="style.css?v=2026051301">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <style>
         .legal-wrap { max-width: 800px; margin: 0 auto; padding: 60px 24px 100px; position: relative; z-index: 2; }

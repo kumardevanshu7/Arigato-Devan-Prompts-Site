@@ -24,7 +24,7 @@ unset($_SESSION["error_msg"]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
-    <link rel="stylesheet" href="style.css?v=1778100000">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <style>
         /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Login Page Root &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
         html,

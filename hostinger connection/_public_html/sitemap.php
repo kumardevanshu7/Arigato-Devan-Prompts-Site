@@ -89,6 +89,17 @@ $static_pages = [
     ],
 ];
 
+// Fetch all prompts with slugs dynamically
+$prompts = [];
+try {
+    $stmt = $pdo->query(
+        "SELECT slug, id, created_at FROM prompts WHERE slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+    );
+    $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // silently skip if error
+}
+
 // Fetch all published blog posts dynamically
 $blogs = [];
 try {
@@ -110,6 +121,15 @@ $today = date("Y-m-d");
     <lastmod><?= $page["lastmod"] ?></lastmod>
     <changefreq><?= $page["changefreq"] ?></changefreq>
     <priority><?= $page["priority"] ?></priority>
+  </url>
+<?php endforeach; ?>
+
+<?php foreach ($prompts as $prompt): ?>
+  <url>
+    <loc><?= $base . "/prompts/" . htmlspecialchars($prompt["slug"]) ?></loc>
+    <lastmod><?= date("Y-m-d", strtotime($prompt["created_at"])) ?></lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 <?php endforeach; ?>
 

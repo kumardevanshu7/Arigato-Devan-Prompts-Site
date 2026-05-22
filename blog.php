@@ -59,7 +59,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 <?php if ($blog["tags"]): ?><meta name="keywords" content="<?= htmlspecialchars(
     $blog["tags"],
 ) ?>"><?php endif; ?>
-<link rel="stylesheet" href="style.css?v=1778100000">
+<link rel="stylesheet" href="style.css?v=2026052201">
 <style>
 .blog-detail-wrap{max-width:800px;margin:0 auto;padding:48px 32px 100px}
 .blog-detail-hero-img{width:100%;max-height:440px;object-fit:cover;border-radius:22px;border:var(--border-width) solid var(--text-color);box-shadow:var(--shadow-comic);margin-bottom:36px;display:block}
