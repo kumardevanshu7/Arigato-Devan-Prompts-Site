@@ -85,7 +85,7 @@ function sessionAvatar()
     <meta name="twitter:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
     <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <link rel="stylesheet" href="style.css?v=2026051205">
+    <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
