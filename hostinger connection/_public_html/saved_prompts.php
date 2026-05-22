@@ -18,7 +18,7 @@ $user_id = (int) $_SESSION["user_id"];
 
 // Fetch all prompts this user has explicitly saved
 $stmt = $pdo->prepare("
-    SELECT p.id, p.title, p.image_path, p.prompt_type, p.likes_count,
+    SELECT p.id, p.slug, p.title, p.image_path, p.prompt_type, p.likes_count,
            p.tag, p.prompt_text,
            IF(l.id IS NOT NULL, 1, 0) as is_liked
     FROM saved_prompts sp
@@ -46,25 +46,25 @@ foreach ($saved as $p) {
 
 $type_map = [
     "secret" => [
-        "emoji" => "??",
+        "emoji" => "🔒",
         "label" => "Secret Code",
         "bg" => "#ffe3e3",
         "color" => "#d03030",
     ],
     "unreleased" => [
-        "emoji" => "??",
+        "emoji" => "🌙",
         "label" => "Unreleased",
         "bg" => "#fff4cc",
         "color" => "#7a5800",
     ],
     "insta_viral" => [
-        "emoji" => "??",
+        "emoji" => "🔥",
         "label" => "Insta Viral",
         "bg" => "#e3f7ff",
         "color" => "#004f7a",
     ],
     "already_uploaded" => [
-        "emoji" => "??",
+        "emoji" => "📤",
         "label" => "Already Uploaded",
         "bg" => "#e6f2ff",
         "color" => "#00509e",
@@ -336,19 +336,19 @@ $type_map = [
                 </div>
                 Saved Prompts
             </div>
-            <div class="sp-sub">All prompts you've unlocked � <span id="sp-counter"><?= $total ?></span> saved so far</div>
+            <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
             <div class="sp-filters">
-                <?php if($stats['secret'] > 0): ?><span class="sp-pill">?? Secret <?= $stats['secret'] ?></span><?php endif; ?>
-                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">?? Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
-                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">?? Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
-                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">?? Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
+                <?php if($stats['secret'] > 0): ?><span class="sp-pill">🔒 Secret <?= $stats['secret'] ?></span><?php endif; ?>
+                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">🔥 Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
+                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">🌙 Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
+                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">📤 Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
             </div>
         </div>
     </div>
 
     <?php if ($total === 0): ?>
     <div class="sp-empty">
-        <div class="sp-empty-icon">??</div>
+        <div class="sp-empty-icon">🔖</div>
         <h2>No Saved Prompts Yet</h2>
         <p>Unlock prompts on the site and they'll appear here!</p>
         <a href="index.php" class="comic-btn-small"><i class="fa-solid fa-arrow-left"></i> Browse Prompts</a>
@@ -363,6 +363,7 @@ $type_map = [
             ?>
         <div class="card sp-card"
              data-id="<?= $p["id"] ?>"
+             data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
              data-image="<?= htmlspecialchars($p["image_path"]) ?>"
              data-title="<?= htmlspecialchars($p["title"]) ?>"
              data-prompt-type="<?= htmlspecialchars($pt) ?>"
@@ -464,7 +465,7 @@ $type_map = [
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=20260521b"></script>
+<script defer src="script.js?v=2026051206"></script>
 <script>
 (function () {
     const popup = document.getElementById('sp-confirm-remove');
@@ -605,6 +606,31 @@ $type_map = [
             });
     });
 })();
+
+// Card click → navigate to prompt page
+document.querySelectorAll('.card').forEach(function(card) {
+    var trigger = card.querySelector('.card-click-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var slug = card.dataset.slug;
+            var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+            document.body.style.transition = 'opacity 0.15s ease';
+            document.body.style.opacity = '0';
+            setTimeout(function() { window.location.href = url; }, 150);
+        });
+    }
+    card.addEventListener('mouseenter', function() {
+        var slug = card.dataset.slug;
+        if (!slug) return;
+        var url = '/prompts/' + slug;
+        if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch'; link.href = url;
+            document.head.appendChild(link);
+        }
+    }, { once: true });
+});
 </script>
 </body>
 </html>

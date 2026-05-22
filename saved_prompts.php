@@ -18,7 +18,7 @@ $user_id = (int) $_SESSION["user_id"];
 
 // Fetch all prompts this user has explicitly saved
 $stmt = $pdo->prepare("
-    SELECT p.id, p.title, p.image_path, p.prompt_type, p.likes_count,
+    SELECT p.id, p.slug, p.title, p.image_path, p.prompt_type, p.likes_count,
            p.tag, p.prompt_text,
            IF(l.id IS NOT NULL, 1, 0) as is_liked
     FROM saved_prompts sp
@@ -363,6 +363,7 @@ $type_map = [
             ?>
         <div class="card sp-card"
              data-id="<?= $p["id"] ?>"
+             data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
              data-image="<?= htmlspecialchars($p["image_path"]) ?>"
              data-title="<?= htmlspecialchars($p["title"]) ?>"
              data-prompt-type="<?= htmlspecialchars($pt) ?>"
@@ -605,6 +606,31 @@ $type_map = [
             });
     });
 })();
+
+// Card click → navigate to prompt page
+document.querySelectorAll('.card').forEach(function(card) {
+    var trigger = card.querySelector('.card-click-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var slug = card.dataset.slug;
+            var url = slug ? '/prompts/' + slug : 'prompt.php?id=' + card.dataset.id;
+            document.body.style.transition = 'opacity 0.15s ease';
+            document.body.style.opacity = '0';
+            setTimeout(function() { window.location.href = url; }, 150);
+        });
+    }
+    card.addEventListener('mouseenter', function() {
+        var slug = card.dataset.slug;
+        if (!slug) return;
+        var url = '/prompts/' + slug;
+        if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch'; link.href = url;
+            document.head.appendChild(link);
+        }
+    }, { once: true });
+});
 </script>
 </body>
 </html>
