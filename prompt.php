@@ -139,10 +139,15 @@ function sessionAvatar() {
         .pp-tag { font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--bg-color); border: 2px solid var(--text-color); text-transform: capitalize; }
         .pp-like-mini { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-weight: 800; font-size: 0.9rem; color: #888; }
         .pp-multi-badge { display:inline-flex; align-items:center; gap:8px; background:#fff1b8; color:#7a5c00; border:2.5px solid #e6a800; border-radius:14px; padding:8px 18px; font-weight:900; font-size:.88rem; margin-bottom:14px; box-shadow:3px 3px 0 #e6a800; letter-spacing:.03em; }
-        .pp-extra-section { margin-top:28px; border-top:2px dashed var(--border-color); padding-top:24px; }
-        .pp-extra-num { font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.12em; color:#888; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .pp-extra-section { margin-top:32px; border-top:2px dashed var(--border-color); padding-top:28px; }
+        .pp-extra-num { font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.12em; color:#888; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
         .pp-extra-num::after { content:''; flex:1; height:2px; background:var(--border-color); }
-        .pp-extra-img { width:100%; max-width:160px; aspect-ratio:9/16; object-fit:cover; border-radius:14px; border:var(--border-width) solid var(--text-color); box-shadow:var(--shadow-comic); margin-bottom:14px; display:block; }
+        .pp-extra-layout { display:flex; gap:32px; align-items:flex-start; }
+        .pp-extra-img-col { width:300px; flex-shrink:0; }
+        .pp-extra-img { width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:20px; border:var(--border-width) solid var(--text-color); box-shadow:var(--shadow-comic); display:block; }
+        .pp-extra-info { flex:1; min-width:0; }
+        .pp-extra-title { font-size:clamp(1.2rem,3vw,1.6rem); font-weight:900; margin-bottom:16px; line-height:1.2; }
+        @media(max-width:700px){.pp-extra-layout{flex-direction:column;} .pp-extra-img-col{width:100%;max-width:300px;}}
         .pp-info-col { flex: 1; min-width: 0; }
         .pp-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
         /* ── Task Card ── */
@@ -386,18 +391,27 @@ function sessionAvatar() {
                     <?php foreach ($extra_prompts_arr as $ep_i => $ep): ?>
                     <div class="pp-extra-section" id="pp-extra-<?= $ep_i ?>">
                         <div class="pp-extra-num">✦ Prompt <?= $ep_i + 2 ?></div>
-                        <?php if (!empty($ep['image_path'])): ?>
-                        <img src="<?= htmlspecialchars($ep['image_path']) ?>" class="pp-extra-img" alt="Prompt <?= $ep_i + 2 ?>">
-                        <?php endif; ?>
-                        <div class="pp-code-block">
-                            <div class="pp-code-header">
-                                <div class="pp-code-header-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
-                                <span>PROMPT <?= $ep_i + 2 ?>.txt</span>
+                        <div class="pp-extra-layout">
+                            <?php if (!empty($ep['image_path'])): ?>
+                            <div class="pp-extra-img-col">
+                                <img src="<?= htmlspecialchars($ep['image_path']) ?>" class="pp-extra-img" alt="Prompt <?= $ep_i + 2 ?>">
                             </div>
-                            <div class="pp-prompt-text" id="pp-extra-text-<?= $ep_i ?>"><?= $is_unlocked ? htmlspecialchars($ep['prompt_text']) : '' ?></div>
-                        </div>
-                        <div style="margin-top:10px;">
-                            <button class="pp-btn pp-copy-btn" onclick="copyExtra(<?= $ep_i ?>, this)"><i class="fa-solid fa-copy"></i> COPY</button>
+                            <?php endif; ?>
+                            <div class="pp-extra-info">
+                                <?php if (!empty($ep['title'])): ?>
+                                <h2 class="pp-extra-title"><?= htmlspecialchars($ep['title']) ?></h2>
+                                <?php endif; ?>
+                                <div class="pp-code-block">
+                                    <div class="pp-code-header">
+                                        <div class="pp-code-header-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
+                                        <span>PROMPT <?= $ep_i + 2 ?>.txt</span>
+                                    </div>
+                                    <div class="pp-prompt-text" id="pp-extra-text-<?= $ep_i ?>"><?= $is_unlocked ? htmlspecialchars($ep['prompt_text']) : '' ?></div>
+                                </div>
+                                <div style="margin-top:12px;">
+                                    <button class="pp-btn pp-copy-btn" onclick="copyExtra(<?= $ep_i ?>, this)"><i class="fa-solid fa-copy"></i> COPY</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <?php endforeach; ?>

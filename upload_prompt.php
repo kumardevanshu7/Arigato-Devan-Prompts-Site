@@ -214,6 +214,10 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                                 <button type="button" class="extra-remove-btn" onclick="removeEP(2)">✕ Remove</button>
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
+                                <label>Prompt 2 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+                                <input type="text" name="extra_prompt_2_title" placeholder="e.g. Rainy Day Version">
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 2 Text</label>
                                 <textarea name="extra_prompt_2_text" id="ep2_text" rows="4" placeholder="Second prompt variant..."></textarea>
                             </div>
@@ -233,6 +237,10 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                             <div class="extra-prompt-header">
                                 <span class="extra-prompt-num">✦ Prompt 3</span>
                                 <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>Prompt 3 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+                                <input type="text" name="extra_prompt_3_title" placeholder="e.g. Sunset Version">
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 3 Text</label>

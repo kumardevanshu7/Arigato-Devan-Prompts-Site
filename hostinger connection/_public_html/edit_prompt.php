@@ -84,6 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     for ($ep = 2; $ep <= 3; $ep++) {
         $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
         if (empty($ep_text)) continue;
+        $ep_title = trim($_POST["extra_prompt_{$ep}_title"] ?? '');
         $ep_image_path = trim($_POST["extra_prompt_{$ep}_current_image"] ?? '');
         if (isset($_FILES["extra_prompt_{$ep}_image"]) && $_FILES["extra_prompt_{$ep}_image"]["error"] === UPLOAD_ERR_OK) {
             $ep_ext = strtolower(pathinfo($_FILES["extra_prompt_{$ep}_image"]["name"], PATHINFO_EXTENSION));
@@ -94,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             }
         }
-        $extra_prompts_data[] = ['prompt_text' => $ep_text, 'image_path' => $ep_image_path ?: null];
+        $extra_prompts_data[] = ['title' => $ep_title ?: null, 'prompt_text' => $ep_text, 'image_path' => $ep_image_path ?: null];
     }
     $extra_prompts_json = !empty($extra_prompts_data) ? json_encode($extra_prompts_data) : null;
 
@@ -377,6 +378,10 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             </div>
             <input type="hidden" name="extra_prompt_2_current_image" value="<?= htmlspecialchars($ep2_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
+              <label>Prompt 2 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+              <input type="text" name="extra_prompt_2_title" value="<?= htmlspecialchars($ep2_data['title'] ?? '') ?>" placeholder="e.g. Rainy Day Version">
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
               <label>Prompt 2 Text</label>
               <textarea name="extra_prompt_2_text" id="ep2_text" rows="4"><?= htmlspecialchars($ep2_data['prompt_text'] ?? '') ?></textarea>
             </div>
@@ -401,6 +406,10 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
               <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
             </div>
             <input type="hidden" name="extra_prompt_3_current_image" value="<?= htmlspecialchars($ep3_data['image_path'] ?? '') ?>">
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Prompt 3 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+              <input type="text" name="extra_prompt_3_title" value="<?= htmlspecialchars($ep3_data['title'] ?? '') ?>" placeholder="e.g. Sunset Version">
+            </div>
             <div class="form-group" style="margin-bottom:12px;">
               <label>Prompt 3 Text</label>
               <textarea name="extra_prompt_3_text" id="ep3_text" rows="4"><?= htmlspecialchars($ep3_data['prompt_text'] ?? '') ?></textarea>

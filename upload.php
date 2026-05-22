@@ -135,7 +135,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     }
                 }
             }
-            $extra_prompts_data[] = ['prompt_text' => $ep_text, 'image_path' => $ep_image_path];
+            $ep_title = trim($_POST["extra_prompt_{$ep}_title"] ?? '');
+            $extra_prompts_data[] = ['title' => $ep_title ?: null, 'prompt_text' => $ep_text, 'image_path' => $ep_image_path];
         }
         $extra_prompts_json = !empty($extra_prompts_data) ? json_encode($extra_prompts_data) : null;
 
