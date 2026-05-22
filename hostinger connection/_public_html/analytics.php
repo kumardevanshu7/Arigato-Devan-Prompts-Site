@@ -37,6 +37,9 @@ $most_liked = $pdo
     )
     ->fetch(PDO::FETCH_ASSOC);
 
+// Total unlocks
+$total_unlocks = $pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn() ?: 0;
+
 // Bar chart: likes per prompt (top 10)
 $top_prompts = $pdo
     ->query(
@@ -45,6 +48,24 @@ $top_prompts = $pdo
     ->fetchAll(PDO::FETCH_ASSOC);
 $bar_labels = json_encode(array_column($top_prompts, "title"));
 $bar_data = json_encode(array_column($top_prompts, "likes_count"));
+
+// Bar chart: most unlocked prompts (top 10)
+$top_unlocked = $pdo
+    ->query(
+        "SELECT p.title, COUNT(u.id) as unlock_count FROM unlocked_prompts u JOIN prompts p ON p.id = u.prompt_id GROUP BY p.id, p.title ORDER BY unlock_count DESC LIMIT 10",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
+$ul_labels = json_encode(array_column($top_unlocked, "title"));
+$ul_data   = json_encode(array_column($top_unlocked, "unlock_count"));
+
+// Pie chart: prompt type breakdown
+$type_breakdown = $pdo
+    ->query(
+        "SELECT prompt_type, COUNT(*) as cnt FROM prompts GROUP BY prompt_type ORDER BY cnt DESC",
+    )
+    ->fetchAll(PDO::FETCH_ASSOC);
+$type_labels = json_encode(array_column($type_breakdown, "prompt_type"));
+$type_data   = json_encode(array_column($type_breakdown, "cnt"));
 
 // Line chart: users joined per day (last 30 days)
 $user_growth_raw = $pdo
@@ -148,6 +169,7 @@ canvas{max-height:280px}
     <?php endif; ?>
     <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?= $monthly_p ?></div><div class="s-label">Prompts</div><div class="s-sub">This Month</div></div>
     <div class="s-card" style="background:#e8f9ef"><div class="s-val">+<?= $monthly_u ?></div><div class="s-label">New Users</div><div class="s-sub">This Month</div></div>
+    <div class="s-card" style="background:#ffd6a5"><div class="s-val"><?= number_format($total_unlocks) ?></div><div class="s-label">Total Unlocks</div></div>
   </div>
 
   <!-- Charts -->
@@ -156,6 +178,10 @@ canvas{max-height:280px}
       <h3><i class="fa-solid fa-heart"></i> Likes per Prompt (Top 10)</h3>
       <canvas id="barChart"></canvas>
     </div>
+    <div class="chart-card chart-full">
+      <h3><i class="fa-solid fa-unlock"></i> Most Unlocked Prompts (Top 10)</h3>
+      <canvas id="unlockChart"></canvas>
+    </div>
     <div class="chart-card">
       <h3><i class="fa-solid fa-user"></i> User Growth (Last 30 Days)</h3>
       <canvas id="userLineChart"></canvas>
@@ -163,6 +189,10 @@ canvas{max-height:280px}
     <div class="chart-card">
       <h3><i class="fa-solid fa-box"></i> Prompt Uploads (Last 30 Days)</h3>
       <canvas id="promptLineChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3><i class="fa-solid fa-chart-pie"></i> Prompt Type Breakdown</h3>
+      <canvas id="typeChart"></canvas>
     </div>
   </div>
 </div>
@@ -196,6 +226,30 @@ document.addEventListener('DOMContentLoaded', () => {
         pointBackgroundColor:'#C6ADFA', pointRadius:5, pointHoverRadius:7, fill:true, tension:.4 }]
     },
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#EAE3F2'}}, x:{grid:{display:false}} } }
+  });
+
+  // Bar — Most Unlocked
+  new Chart(document.getElementById('unlockChart'), {
+    type: 'bar',
+    data: {
+      labels: <?= $ul_labels ?>,
+      datasets: [{ label: 'Unlocks', data: <?= $ul_data ?>,
+        backgroundColor: ['#ffd6a5','#ffc8a0','#ffba9b','#ffac96','#ff9e91','#ff908c','#ff8287','#ff7482','#ff667d','#ff5878'],
+        borderColor: '#2D2A35', borderWidth: 2, borderRadius: 10 }]
+    },
+    options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#EAE3F2'}}, x:{grid:{display:false},ticks:{maxRotation:30}} } }
+  });
+
+  // Pie — Prompt Type Breakdown
+  new Chart(document.getElementById('typeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: <?= $type_labels ?>,
+      datasets: [{ data: <?= $type_data ?>,
+        backgroundColor: ['#E6D7FF','#FFF1B8','#d4eaff','#d9f5e5'],
+        borderColor: '#2D2A35', borderWidth: 2 }]
+    },
+    options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ font:{family:'Outfit, sans-serif', weight:'700'}, padding:16 } } } }
   });
 
   // Line — Prompt Growth
