@@ -15,7 +15,8 @@ if (!$id) {
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = trim($_POST["title"] ?? "");
     $tag = trim($_POST["tag"] ?? "");
-    $prompt_text = trim($_POST["prompt_text"] ?? "");
+    $prompt_text  = trim($_POST["prompt_text"] ?? "");
+    $description   = trim($_POST["description"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
@@ -79,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -92,6 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $best_works_in,
         $asset_title,
         $asset_images_json,
+        $description ?: null,
         $id,
     ]);
 
@@ -327,6 +329,12 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
           $p["prompt_text"],
       ) ?></textarea></div>
 
+      <div class="form-group">
+        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
+        <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
+        <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
+      </div>
+
       <!-- Code field &mdash; only shown for secret -->
       <div class="form-row" id="code-field-row" style="<?= $is_secret
           ? ""
@@ -514,6 +522,11 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         }
         // Init toggle visual
         (function(){ const cb = document.getElementById('has_assets'); if(cb && cb.checked) document.getElementById('assets-toggle-label').style.background='#dceeff'; })();
+
+        // Description char counter
+        document.getElementById('e-desc').addEventListener('input', function() {
+            document.getElementById('desc-char-count').textContent = this.value.length;
+        });
 
         function handleEditAssetFiles(input) {
             const files = Array.from(input.files).slice(0, 2);

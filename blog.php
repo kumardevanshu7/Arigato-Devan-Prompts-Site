@@ -141,6 +141,21 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Article Schema -->
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'      => 'https://schema.org',
+        '@type'         => 'Article',
+        'headline'      => $blog['meta_title'] ?? $blog['title'],
+        'description'   => $blog['meta_description'] ?? ($blog['description'] ?? ''),
+        'image'         => !empty($blog['image_path']) ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/') : 'https://arigatodevan.com/landingpics/lan9.webp',
+        'url'           => 'https://arigatodevan.com/blog.php?slug=' . $blog['slug'],
+        'author'        => ['@type' => 'Person', 'name' => $blog['author_name'] ?? 'Arigato Devan'],
+        'publisher'     => ['@type' => 'Organization', 'name' => 'Arigato Devan', 'url' => 'https://arigatodevan.com'],
+        'datePublished' => date('c', strtotime($blog['created_at'])),
+        'inLanguage'    => 'en',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    </script>
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"},{"@type":"ListItem","position":3,"name":"<?= htmlspecialchars(

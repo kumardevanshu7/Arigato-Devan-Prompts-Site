@@ -56,6 +56,18 @@ $tags_arr     = array_filter(array_map('trim', explode(',', $p['tag'] ?? '')));
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
 $page_title   = htmlspecialchars($p["title"]) . " — AI Prompt | Arigato Devan";
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
+$tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
+$meta_desc    = !empty($p['description'])
+              ? htmlspecialchars($p['description'])
+              : htmlspecialchars($p['title']) . ' is a ' . $tinfo['label'] . ' AI couple prompt on Arigato Devan.'
+                . (!empty($tags_str) ? ' Perfect for ' . $tags_str . '.' : '')
+                . ' Copy and use instantly on ChatGPT or any AI tool.';
+$type_page    = match($ptype) {
+    'insta_viral'      => 'insta_viral.php',
+    'unreleased'       => 'unreleased.php',
+    'already_uploaded' => 'already_uploaded.php',
+    default            => 'gallery.php',
+};
 
 function sessionAvatar() {
     return !empty($_SESSION["profile_image"])
@@ -70,15 +82,42 @@ function sessionAvatar() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
     <title><?= $page_title ?></title>
-    <meta name="description" content="Unlock this exclusive AI couple prompt on Arigato Devan PromptVerse. <?= htmlspecialchars($p['title']) ?> — <?= htmlspecialchars($tinfo['label']) ?>">
+    <meta name="description" content="<?= $meta_desc ?>">
     <meta property="og:type" content="article">
     <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
-    <meta property="og:description" content="Unlock this exclusive AI couple prompt on Arigato Devan PromptVerse.">
+    <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
     <meta property="og:url" content="<?= $canonical ?>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="<?= $og_img ?>">
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'  => 'https://schema.org',
+        '@type'     => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',              'item' => 'https://arigatodevan.com'],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $tinfo['label'],     'item' => 'https://arigatodevan.com/' . $type_page],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $p['title'],         'item' => $canonical],
+        ],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    </script>
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'        => 'https://schema.org',
+        '@type'           => 'CreativeWork',
+        'name'            => $p['title'],
+        'description'     => $meta_desc,
+        'url'             => $canonical,
+        'image'           => $og_img,
+        'author'          => ['@type' => 'Organization', 'name' => 'Arigato Devan'],
+        'publisher'       => ['@type' => 'Organization', 'name' => 'Arigato Devan', 'url' => 'https://arigatodevan.com'],
+        'keywords'        => implode(', ', $tags_arr),
+        'genre'           => $tinfo['label'],
+        'datePublished'   => isset($p['created_at']) ? date('c', strtotime($p['created_at'])) : null,
+        'inLanguage'      => 'en',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    </script>
     <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

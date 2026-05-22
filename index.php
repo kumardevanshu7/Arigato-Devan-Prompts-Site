@@ -116,8 +116,8 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arigato Devan Prompts</title>
-    <meta name="description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
+    <title>Arigato Devan — AI Couple Prompts for Instagram Reels</title>
+    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts — use instantly on ChatGPT. Only on Arigato Devan.">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

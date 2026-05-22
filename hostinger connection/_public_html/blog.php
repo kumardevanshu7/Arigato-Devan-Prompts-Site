@@ -141,6 +141,21 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Article Schema -->
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'      => 'https://schema.org',
+        '@type'         => 'Article',
+        'headline'      => $blog['meta_title'] ?? $blog['title'],
+        'description'   => $blog['meta_description'] ?? ($blog['description'] ?? ''),
+        'image'         => !empty($blog['image_path']) ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/') : 'https://arigatodevan.com/landingpics/lan9.webp',
+        'url'           => 'https://arigatodevan.com/blog.php?slug=' . $blog['slug'],
+        'author'        => ['@type' => 'Person', 'name' => $blog['author_name'] ?? 'Arigato Devan'],
+        'publisher'     => ['@type' => 'Organization', 'name' => 'Arigato Devan', 'url' => 'https://arigatodevan.com'],
+        'datePublished' => date('c', strtotime($blog['created_at'])),
+        'inLanguage'    => 'en',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    </script>
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"},{"@type":"ListItem","position":3,"name":"<?= htmlspecialchars(
@@ -248,7 +263,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="blog-detail-wrap">
   <!-- Back link -->
-  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i>� Back to Blogs</a>
+  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
 
   <!-- Hero image -->
   <?php if ($blog["image_path"]): ?>
@@ -298,12 +313,12 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- Content -->
   <div class="blog-content"><?= $blog["content"]
-/* HTML stored from editor "&ndash;� safe because only admin writes it */
+/* HTML stored from editor "&ndash; safe because only admin writes it */
 ?></div>
 
   <!-- Reactions -->
   <div class="blog-reactions" id="blog-reactions">
-    <?php foreach (['heart'=>'??','fire'=>'??','wow'=>'??'] as $rtype=>$remoji): ?>
+    <?php foreach (['heart'=>'❤️','fire'=>'🔥','wow'=>'😮'] as $rtype=>$remoji): ?>
     <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
       <span class="r-emoji"><?= $remoji ?></span>
       <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
@@ -321,7 +336,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
           : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>� All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> All Blogs</a>
   </div>
 
   <!-- Comments -->
@@ -372,7 +387,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script defer src="script.js?v=20260521b"></script>
+<script defer src="script.js?v=1778000000"></script>
 <script>
 // Blog Like
 function showToast(msg) {
@@ -386,7 +401,7 @@ const likeBtn = document.getElementById('blog-like-btn');
 if (likeBtn) {
   likeBtn.addEventListener('click', () => {
     <?php if (!isset($_SESSION["user_id"])): ?>
-    showToast('Login first to like! ??'); return;
+    showToast('Login first to like! 💛'); return;
     <?php endif; ?>
     const blogId = likeBtn.dataset.blogId;
     const fd = new FormData(); fd.append('blog_id', blogId);
