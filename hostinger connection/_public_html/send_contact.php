@@ -21,13 +21,36 @@ $site_name   = 'Arigato Devan PromptVerse';
 
 // ── Email to Admin ──
 $admin_subject = "New Contact Message from {$name}";
-$admin_body = "You have received a new contact form submission.\n\n"
-    . "Name:  {$name}\n"
-    . "Email: {$email}\n"
-    . "Query:\n{$query}\n\n"
-    . "--\nSent from arigatodevan.com contact form";
+$admin_body = '<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+  body{font-family:"Outfit",Arial,sans-serif;background:#f8f4ff;margin:0;padding:0;}
+  .wrap{max-width:540px;margin:30px auto;background:#fff;border:3px solid #2d2a35;border-radius:20px;overflow:hidden;box-shadow:6px 6px 0 #2d2a35;}
+  .hdr{background:#2d2a35;padding:24px 30px;text-align:center;}
+  .hdr h1{color:#c084fc;font-size:1.3rem;font-weight:900;margin:0;}
+  .hdr p{color:#aaa;font-size:.8rem;margin:4px 0 0;}
+  .body{padding:28px 30px;}
+  .row{background:#f8f4ff;border:2px solid #2d2a35;border-radius:12px;padding:14px 18px;margin-bottom:14px;}
+  .row .lbl{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:4px;}
+  .row .val{font-size:.95rem;font-weight:700;color:#2d2a35;word-break:break-word;}
+  .reply-btn{display:inline-block;background:#c084fc;border:2.5px solid #2d2a35;border-radius:10px;padding:10px 24px;font-weight:900;font-size:.88rem;color:#2d2a35;text-decoration:none;box-shadow:3px 3px 0 #2d2a35;margin-top:6px;}
+  .ftr{background:#f0eeff;padding:14px 30px;text-align:center;border-top:2px dashed #c084fc;}
+  .ftr p{color:#888;font-size:.75rem;margin:0;}
+</style></head><body>
+<div class="wrap">
+  <div class="hdr"><h1>New Contact Message</h1><p>arigatodevan.com</p></div>
+  <div class="body">
+    <div class="row"><div class="lbl">Name</div><div class="val">' . htmlspecialchars($name) . '</div></div>
+    <div class="row"><div class="lbl">Email</div><div class="val"><a href="mailto:' . htmlspecialchars($email) . '" style="color:#7c3aed;">' . htmlspecialchars($email) . '</a></div></div>
+    <div class="row"><div class="lbl">Query</div><div class="val">' . nl2br(htmlspecialchars($query)) . '</div></div>
+    <a href="mailto:' . htmlspecialchars($email) . '" class="reply-btn">Reply to User</a>
+  </div>
+  <div class="ftr"><p>Sent from arigatodevan.com contact form &nbsp;&middot;&nbsp; ' . date('d M Y, h:i A') . ' IST</p></div>
+</div>
+</body></html>';
 
-$admin_headers  = "From: {$site_name} <{$from_domain}>\r\n";
+$admin_headers  = "MIME-Version: 1.0\r\n";
+$admin_headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+$admin_headers .= "From: {$site_name} <{$from_domain}>\r\n";
 $admin_headers .= "Reply-To: {$name} <{$email}>\r\n";
 $admin_headers .= "X-Mailer: PHP/" . phpversion();
 
