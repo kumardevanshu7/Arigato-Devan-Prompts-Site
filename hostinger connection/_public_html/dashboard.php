@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
 
 // Protect page (Admin Only)
@@ -712,10 +713,11 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         : "role-user" ?>"><?= htmlspecialchars(
     strtoupper($u["role"] ?? "user"),
 ) ?></span></td>
-                    <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?= date(
-                        "d M Y",
-                        strtotime($u["created_at"]),
-                    ) ?><br><span style="font-size:.75rem;color:#aaa;"><?= date("h:i A", strtotime($u["created_at"])) ?></span></td>
+                    <?php
+                    $joined_dt = new DateTime($u['created_at'], new DateTimeZone('UTC'));
+                    $joined_dt->setTimezone(new DateTimeZone('Asia/Kolkata'));
+                    ?>
+                    <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?= $joined_dt->format('d M Y') ?><br><span style="font-size:.75rem;color:#aaa;"><?= $joined_dt->format('h:i A') ?></span></td>
                     <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;transition:all .15s;"><i class="fa-solid fa-chart-simple"></i> See Activity</button></td>
                 </tr>
                 <?php endforeach; ?>
@@ -840,8 +842,8 @@ function openActivity(uid) {
             document.getElementById('act-avatar').src = av;
             document.getElementById('act-name').textContent = u.username || '—';
             document.getElementById('act-email').textContent = u.email || '—';
-            const la = u.last_active ? new Date(u.last_active) : null;
-            document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
+            const la = u.last_active ? new Date(u.last_active.replace(' ', 'T') + 'Z') : null;
+            document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN', {timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
             document.getElementById('act-unlocks').textContent = data.unlock_list.length;
             document.getElementById('act-saves').textContent = data.saves_count;
             document.getElementById('act-likes').textContent = data.likes_count;
