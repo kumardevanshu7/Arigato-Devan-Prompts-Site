@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Get in touch with Arigato Devan — we'd love to hear from you. Send us your queries, feedback, or suggestions.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="Contact Us — Arigato Devan PromptVerse">
+    <meta property="og:description" content="Have a question or feedback? Contact Arigato Devan — we reply within 24 hours.">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta property="og:url" content="https://arigatodevan.com/contact.php">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact Us — Arigato Devan PromptVerse">
+    <meta name="twitter:description" content="Have a question or feedback? Contact Arigato Devan — we reply within 24 hours.">
+    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <style>

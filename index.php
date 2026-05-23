@@ -129,6 +129,40 @@ try {
     <meta name="twitter:title" content="Arigato Devan Prompts — Premium AI Couple Prompts">
     <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <!-- Schema Markup: WebSite + Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "Arigato Devan Prompts",
+          "url": "https://arigatodevan.com",
+          "description": "Premium AI couple prompts for Instagram Reels. Unlock secret, viral and unreleased prompts on Arigato Devan.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://arigatodevan.com/gallery.php?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "name": "Arigato Devan",
+          "url": "https://arigatodevan.com",
+          "logo": "https://arigatodevan.com/toplogo/logo01.webp",
+          "sameAs": ["https://www.instagram.com/arigato.devan"],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "url": "https://arigatodevan.com/contact.php"
+          }
+        }
+      ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>

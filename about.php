@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse — a platform crafting beautiful AI prompts for couples and creative souls.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="About Us — Arigato Devan PromptVerse">
+    <meta property="og:description" content="Meet the creator of Arigato Devan — crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta property="og:url" content="https://arigatodevan.com/about.php">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Us — Arigato Devan PromptVerse">
+    <meta name="twitter:description" content="Meet the creator of Arigato Devan — crafting premium AI couple prompts for Instagram Reels.">
+    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="stylesheet" href="style.css?v=2026052201">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <style>
