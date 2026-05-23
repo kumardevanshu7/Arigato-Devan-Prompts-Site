@@ -83,9 +83,21 @@ $static_pages = [
     ],
     [
         "url" => "/privacy.php",
-        "priority" => "0.2",
+        "priority" => "0.3",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-22",
+        "lastmod" => "2026-05-24",
+    ],
+    [
+        "url" => "/about.php",
+        "priority" => "0.6",
+        "changefreq" => "monthly",
+        "lastmod" => "2026-05-24",
+    ],
+    [
+        "url" => "/contact.php",
+        "priority" => "0.5",
+        "changefreq" => "monthly",
+        "lastmod" => "2026-05-24",
     ],
 ];
 
