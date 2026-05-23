@@ -331,6 +331,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
               $unique_tags = array_unique(
                   array_merge($core_tags, $unique_tags),
               );
+              sort($unique_tags);
               foreach ($unique_tags as $ut) {
                   echo '<span class="tag-suggestion" onclick="addTag(\'' .
                       htmlspecialchars($ut) .

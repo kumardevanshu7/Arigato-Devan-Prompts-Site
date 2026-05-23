@@ -161,7 +161,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                         while ($row = $stmt->fetch()) {
                             $tarr = explode(",", $row["tag"]);
                             foreach ($tarr as $t) {
-                                $t = trim($t);
+                                $t = trim(strtolower($t));
                                 if (!empty($t)) {
                                     $all_tags[] = $t;
                                 }
@@ -173,6 +173,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                         $unique_tags = array_unique(
                             array_merge($core_tags, $unique_tags),
                         );
+                        sort($unique_tags);
                         foreach ($unique_tags as $ut) {
                             echo '<span class="tag-suggestion" onclick="addTag(\'' .
                                 htmlspecialchars($ut) .
