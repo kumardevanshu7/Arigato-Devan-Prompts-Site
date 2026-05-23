@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -446,7 +446,7 @@ $type_map = [
 
 <footer>
     <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <!-- Remove-Saved Confirm Popup -->

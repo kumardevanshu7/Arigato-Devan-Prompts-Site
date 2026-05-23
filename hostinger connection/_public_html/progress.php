@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 $curPage = basename($_SERVER["PHP_SELF"]);
@@ -379,7 +379,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 
 <footer style="margin-top:60px;">
     <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script>
