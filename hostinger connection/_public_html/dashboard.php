@@ -81,12 +81,12 @@ $prompts = $pdo
     ->fetchAll(PDO::FETCH_ASSOC);
 
 // Users list
+$total_users_count = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $users = $pdo
     ->query(
-        "SELECT id, username, email, avatar, gender, role, created_at FROM users ORDER BY created_at DESC",
+        "SELECT id, username, email, avatar, gender, role, created_at FROM users ORDER BY created_at DESC LIMIT 7",
     )
     ->fetchAll(PDO::FETCH_ASSOC);
-$total_users_count = count($users);
 
 // Flash messages
 $success = $_SESSION["success_msg"] ?? "";
@@ -728,6 +728,9 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             </table>
             </div>
             <?php endif; ?>
+            <div style="text-align:center;padding:18px 16px;border-top:2px dashed var(--border-color);">
+                <a href="user_management.php" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary-color);border:2px solid var(--text-color);border-radius:14px;padding:11px 28px;font-family:var(--font-main);font-weight:800;font-size:.92rem;text-decoration:none;color:var(--text-color);box-shadow:3px 3px 0 var(--text-color);transition:all .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='4px 4px 0 var(--text-color)'" onmouseout="this.style.transform='';this.style.boxShadow='3px 3px 0 var(--text-color)'"><i class="fa-solid fa-users"></i> View All <?= $total_users_count ?> Users &rarr;</a>
+            </div>
         </div>
     </div>
 
