@@ -44,9 +44,96 @@ $_gtag_canonical = 'https://arigatodevan.com' . strtok($_gtag_script, '?');
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-1B4V97JP7T');
+  // Instagram in-app browser detection — fix Unassigned traffic
+  (function(){
+    var ua = navigator.userAgent || '';
+    var isInsta = ua.indexOf('Instagram') > -1;
+    var isFB    = ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1;
+    if (isInsta || isFB) {
+      gtag('event', 'instagram_inapp_visit', {
+        'traffic_source' : isInsta ? 'instagram' : 'facebook',
+        'page_path'      : window.location.pathname
+      });
+    }
+  })();
 </script>
 <?php /* FCM disabled temporarily — re-enable by uncommenting: */ ?>
 <?php // if (file_exists(__DIR__ . '/fcm_init.php')) include_once __DIR__ . '/fcm_init.php'; ?>
+<!-- ── Open-in-Browser banner (Instagram / FB in-app) ── -->
+<style>
+#inapp-banner{display:none;position:fixed;bottom:16px;left:12px;right:12px;z-index:99999;background:var(--card-bg,#fff);border:3px solid #2d2a35;border-radius:20px;padding:16px 18px;font-family:'Outfit',sans-serif;box-shadow:5px 5px 0 #2d2a35;align-items:center;gap:14px;flex-wrap:wrap;}
+#inapp-banner .ib-icon{width:42px;height:42px;background:#ffe3fb;border:2.5px solid #2d2a35;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#7c3aed;flex-shrink:0;}
+#inapp-banner .ib-text{flex:1;min-width:160px;}
+#inapp-banner .ib-title{font-size:.95rem;font-weight:900;color:#2d2a35;line-height:1.2;}
+#inapp-banner .ib-sub{font-size:.78rem;font-weight:600;color:#7D7887;margin-top:2px;}
+#inapp-banner .ib-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.ib-btn{padding:9px 16px;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.ib-open{background:#c084fc;color:#2d2a35;border:2.5px solid #2d2a35;box-shadow:3px 3px 0 #2d2a35;}
+.ib-open:hover{transform:translateY(-1px);box-shadow:4px 4px 0 #2d2a35;}
+.ib-copy{background:var(--bg-color,#f8f4ff);color:#2d2a35;border:2.5px solid #2d2a35;box-shadow:3px 3px 0 #2d2a35;}
+.ib-copy:hover{transform:translateY(-1px);box-shadow:4px 4px 0 #2d2a35;}
+#ib-close-btn{background:none;border:none;font-size:1rem;cursor:pointer;color:#aaa;padding:4px;line-height:1;flex-shrink:0;}
+</style>
+<div id="inapp-banner">
+  <div class="ib-icon"><i class="fa-brands fa-instagram"></i></div>
+  <div class="ib-text">
+    <div class="ib-title">Instagram ka browser hai</div>
+    <div class="ib-sub">Apne default browser mein open karen</div>
+  </div>
+  <div class="ib-btns">
+    <button class="ib-btn ib-open" id="ib-open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Browser</button>
+    <button class="ib-btn ib-copy" id="ib-copy-btn"><i class="fa-solid fa-copy"></i> Copy Link</button>
+  </div>
+  <button id="ib-close-btn" onclick="document.getElementById('inapp-banner').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<script>
+(function(){
+  var ua = navigator.userAgent || '';
+  var isInsta = ua.indexOf('Instagram') > -1;
+  var isFB    = ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1;
+  if (!(isInsta || isFB)) return;
+  document.getElementById('inapp-banner').style.display = 'flex';
+  var url = window.location.href;
+  var isAndroid = /android/i.test(ua);
+  var isIOS = /iphone|ipad|ipod/i.test(ua);
+
+  document.getElementById('ib-open-btn').addEventListener('click', function(){
+    if (isAndroid) {
+      // Try Chrome first, fallback to default browser
+      var intentUrl = 'intent://' + url.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // iOS: try Chrome app, else copy + instruct
+      var chromeUrl = url.replace(/^https?:\/\//, 'googlechrome://');
+      var tryChrome = window.open(chromeUrl);
+      setTimeout(function(){
+        if (!tryChrome || tryChrome.closed) {
+          navigator.clipboard.writeText(url).catch(function(){});
+          alert('Link copy ho gaya! Safari address bar mein paste karke kholen.');
+        }
+      }, 800);
+    } else {
+      window.open(url, '_blank');
+    }
+  });
+
+  document.getElementById('ib-copy-btn').addEventListener('click', function(){
+    var btn = document.getElementById('ib-copy-btn');
+    navigator.clipboard.writeText(url).then(function(){
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+      btn.style.background = '#d9f5e5';
+      btn.style.borderColor = '#2a7a4b';
+      btn.style.boxShadow = '3px 3px 0 #2a7a4b';
+      setTimeout(function(){
+        btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy Link';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.boxShadow = '';
+      }, 2500);
+    }).catch(function(){ window.prompt('Copy karo:', url); });
+  });
+})();
+</script>
 <!-- ── Custom cursor + Sound effects ── -->
 <style>
 #cc-dot,#cc-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s,opacity .15s;}
