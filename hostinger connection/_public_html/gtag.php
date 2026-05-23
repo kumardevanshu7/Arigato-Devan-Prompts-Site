@@ -118,6 +118,11 @@ window.playUnlockSound=function(){
   }catch(e){}
 };
 
+/* ── Activity ping (last_active tracking) ── */
+<?php if (isset($_SESSION['user_id'])): ?>
+(function(){ fetch('activity_ping.php', {method:'POST', keepalive:true}); })();
+<?php endif; ?>
+
 /* ── Auto-detect prompt unlock on any page ── */
 document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('#modal-unlocked-area,.modal-unlocked-area').forEach(function(el){

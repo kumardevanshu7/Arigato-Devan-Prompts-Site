@@ -10,6 +10,33 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     exit();
 }
 
+// ── AJAX: user activity ──
+if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
+    header('Content-Type: application/json');
+    $uid = (int)$_GET['uid'];
+    $user = $pdo->prepare("SELECT id, username, email, avatar, gender, role, created_at, last_active FROM users WHERE id = ?");
+    $user->execute([$uid]);
+    $udata = $user->fetch(PDO::FETCH_ASSOC);
+    if (!$udata) { echo json_encode(['ok'=>false]); exit; }
+    $unlocks = $pdo->prepare("SELECT p.title, p.slug FROM unlocked_prompts up LEFT JOIN prompts p ON up.prompt_id = p.id WHERE up.user_id = ? ORDER BY up.unlocked_at DESC");
+    $unlocks->execute([$uid]);
+    $unlock_list = $unlocks->fetchAll(PDO::FETCH_ASSOC);
+    $saves = $pdo->prepare("SELECT COUNT(*) FROM saved_prompts WHERE user_id = ?");
+    $saves->execute([$uid]);
+    $saves_count = (int)$saves->fetchColumn();
+    $likes = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
+    $likes->execute([$uid]);
+    $likes_count = (int)$likes->fetchColumn();
+    echo json_encode([
+        'ok'          => true,
+        'user'        => $udata,
+        'unlock_list' => $unlock_list,
+        'saves_count' => $saves_count,
+        'likes_count' => $likes_count,
+    ]);
+    exit;
+}
+
 // --- Analytics Queries ---
 $total_prompts = $pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
 $total_likes =
@@ -648,7 +675,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                 else: ?>
             <div style="overflow-x:auto;">
             <table class="users-table">
-                <thead><tr><th>Avatar</th><th>Name / Email</th><th>Gender</th><th>Role</th><th>Joined</th></tr></thead>
+                <thead><tr><th>Avatar</th><th>Name / Email</th><th>Gender</th><th>Role</th><th>Joined</th><th>Activity</th></tr></thead>
                 <tbody>
                 <?php foreach ($users as $u): ?>
                 <tr>
@@ -677,12 +704,52 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         "d M Y",
                         strtotime($u["created_at"]),
                     ) ?><br><span style="font-size:.75rem;color:#aaa;"><?= date("h:i A", strtotime($u["created_at"])) ?></span></td>
+                    <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;transition:all .15s;">&#128202; See Activity</button></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
             </div>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- User Activity Modal -->
+    <div id="activity-modal" style="display:none;position:fixed;inset:0;background:rgba(45,42,53,.5);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeActivity()">
+        <div style="background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:32px;max-width:520px;width:100%;box-shadow:8px 8px 0 var(--text-color);max-height:88vh;overflow-y:auto;position:relative;">
+            <button onclick="closeActivity()" style="position:absolute;top:16px;right:16px;background:var(--bg-color);border:2px solid var(--text-color);border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;font-family:var(--font-main);font-weight:800;">&#10005;</button>
+            <div id="activity-loading" style="text-align:center;padding:40px 0;font-weight:700;color:#888;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+            <div id="activity-content" style="display:none;">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:2px dashed var(--border-color);">
+                    <img id="act-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--text-color);object-fit:cover;" alt="">
+                    <div>
+                        <div id="act-name" style="font-size:1.15rem;font-weight:900;"></div>
+                        <div id="act-email" style="font-size:.82rem;color:#7D7887;font-weight:600;"></div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
+                    <div style="background:#f8f4ff;border:2px solid #c084fc;border-radius:14px;padding:14px;text-align:center;">
+                        <div id="act-last-active" style="font-size:1rem;font-weight:900;color:#7c3aed;"></div>
+                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Last Active</div>
+                    </div>
+                    <div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:14px;padding:14px;text-align:center;">
+                        <div id="act-unlocks" style="font-size:1.6rem;font-weight:900;color:#b45309;"></div>
+                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Unlocked</div>
+                    </div>
+                    <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:14px;padding:14px;text-align:center;">
+                        <div id="act-saves" style="font-size:1.6rem;font-weight:900;color:#15803d;"></div>
+                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Saved</div>
+                    </div>
+                    <div style="background:#fff1f2;border:2px solid #f43f5e;border-radius:14px;padding:14px;text-align:center;">
+                        <div id="act-likes" style="font-size:1.6rem;font-weight:900;color:#be123c;"></div>
+                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Liked</div>
+                    </div>
+                </div>
+                <div id="act-unlock-list-wrap">
+                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:10px;">&#128274; Unlocked Prompts</div>
+                    <div id="act-unlock-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -745,6 +812,46 @@ function confirmBlogDelete(id, name) {
 document.getElementById('blog-delete-modal')?.addEventListener('click', function(e){
     if (e.target === this) this.style.display = 'none';
 });
+
+// User Activity Modal
+function openActivity(uid) {
+    const modal = document.getElementById('activity-modal');
+    modal.style.display = 'flex';
+    document.getElementById('activity-loading').style.display = 'block';
+    document.getElementById('activity-content').style.display = 'none';
+    fetch('dashboard.php?xhr=activity&uid=' + uid)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) return;
+            const u = data.user;
+            const av = u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(u.email || 'x');
+            document.getElementById('act-avatar').src = av;
+            document.getElementById('act-name').textContent = u.username || '—';
+            document.getElementById('act-email').textContent = u.email || '—';
+            const la = u.last_active ? new Date(u.last_active) : null;
+            document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
+            document.getElementById('act-unlocks').textContent = data.unlock_list.length;
+            document.getElementById('act-saves').textContent = data.saves_count;
+            document.getElementById('act-likes').textContent = data.likes_count;
+            const list = document.getElementById('act-unlock-list');
+            list.innerHTML = '';
+            if (data.unlock_list.length === 0) {
+                list.innerHTML = '<div style="color:#aaa;font-size:.82rem;font-weight:600;">No prompts unlocked yet.</div>';
+            } else {
+                data.unlock_list.forEach(p => {
+                    const d = document.createElement('div');
+                    d.style.cssText = 'background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;';
+                    d.textContent = '🔓 ' + (p.title || '—');
+                    list.appendChild(d);
+                });
+            }
+            document.getElementById('activity-loading').style.display = 'none';
+            document.getElementById('activity-content').style.display = 'block';
+        });
+}
+function closeActivity() {
+    document.getElementById('activity-modal').style.display = 'none';
+}
 
 // Copy prompt shareable link
 function copyPromptLink(id, btn) {

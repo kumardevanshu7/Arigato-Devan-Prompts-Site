@@ -51,6 +51,8 @@ $rel_stmt->execute([$db_type, $id]);
 $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $is_unlocked  = (bool)$p["is_unlocked"];
+// Track view
+$pdo->prepare("UPDATE prompts SET view_count = view_count + 1 WHERE id = ?")->execute([$id]);
 $asset_images = json_decode($p['asset_images'] ?? '[]', true) ?: [];
 $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? '')));
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
@@ -575,6 +577,8 @@ function sessionAvatar() {
             navigator.clipboard.writeText(text).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
                 setTimeout(() => this.innerHTML = '<i class="fa-solid fa-copy"></i> COPY', 2000);
+                const fd = new FormData(); fd.append('action','copy'); fd.append('prompt_id', promptId);
+                fetch('track.php', {method:'POST', body:fd});
             });
         });
     }
