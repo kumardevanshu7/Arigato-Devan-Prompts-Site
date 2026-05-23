@@ -134,7 +134,7 @@
                 <div class="ci-icon purple"><i class="fa-solid fa-envelope"></i></div>
                 <div class="ci-text">
                     <strong>Email</strong>
-                    <span>arigato.devan@gmail.com</span>
+                    <span>devansh.grow@gmail.com</span>
                 </div>
             </div>
             <div class="ci-item">

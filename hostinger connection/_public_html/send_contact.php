@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 header('Content-Type: application/json');
 
 $name  = trim(strip_tags($_POST['name']  ?? ''));
@@ -15,7 +15,7 @@ if (strlen($query) > 2000) {
     echo json_encode(['ok' => false, 'error' => 'Message too long.']); exit;
 }
 
-$admin_email = 'arigato.devan@gmail.com';
+$admin_email = 'devansh.grow@gmail.com';
 $from_domain = 'noreply@arigatodevan.com';
 $site_name   = 'Arigato Devan PromptVerse';
 
@@ -86,6 +86,6 @@ $user_sent = mail($email, $user_subject, $user_body_html, $user_headers);
 if ($admin_sent) {
     echo json_encode(['ok' => true]);
 } else {
-    echo json_encode(['ok' => false, 'error' => 'Failed to send message. Please try again or email us directly at arigato.devan@gmail.com']);
+    echo json_encode(['ok' => false, 'error' => 'Failed to send message. Please try again or email us directly at devansh.grow@gmail.com']);
 }
 ?>

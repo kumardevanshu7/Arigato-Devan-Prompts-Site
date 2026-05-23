@@ -128,7 +128,7 @@ require_once "db.php";
             <li><strong>Delete</strong> your account and all associated data</li>
             <li><strong>Withdraw consent</strong> at any time by deleting your account</li>
         </ul>
-        <p>To exercise these rights, contact us at: <a href="mailto:arigato.devan@gmail.com">arigato.devan@gmail.com</a></p>
+        <p>To exercise these rights, contact us at: <a href="mailto:devansh.grow@gmail.com">devansh.grow@gmail.com</a></p>
 
         <h2>11. Children's Privacy</h2>
         <p>This site is intended for users aged <strong>13 and above</strong>. We do not knowingly collect personal data from children under 13. If you believe a child under 13 has provided personal information, please contact us immediately.</p>
@@ -140,7 +140,7 @@ require_once "db.php";
         <p>We may update this Privacy Policy from time to time. The "Effective Date" at the top will reflect the latest revision. Continued use of the site after changes constitutes your acceptance of the updated policy.</p>
 
         <h2>14. Contact Us</h2>
-        <p>For privacy-related questions or requests, contact us via our <a href="contact.php">Contact page</a> or email us directly at: <a href="mailto:arigato.devan@gmail.com">arigato.devan@gmail.com</a></p>
+        <p>For privacy-related questions or requests, contact us via our <a href="contact.php">Contact page</a> or email us directly at: <a href="mailto:devansh.grow@gmail.com">devansh.grow@gmail.com</a></p>
         <p>Instagram: <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener">@arigato.devan</a></p>
     </div>
 </div>
