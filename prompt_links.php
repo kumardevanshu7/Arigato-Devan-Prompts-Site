@@ -199,6 +199,35 @@ $total = count($prompts);
             display: none;
         }
 
+        .pl-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 18px 16px;
+            border-top: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .pg-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--text-color);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: var(--font-main);
+            font-weight: 800;
+            font-size: .85rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 var(--text-color);
+            transition: all .15s;
+            color: var(--text-color);
+        }
+        .pg-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 3px 3px 0 var(--text-color); }
+        .pg-btn:disabled { opacity: .35; cursor: default; box-shadow: none; }
+        .pg-btn.pg-active { background: var(--primary-color); }
+        .pg-dots { font-weight: 800; color: #aaa; padding: 0 2px; line-height: 1; }
+        .pg-info { font-size: .78rem; font-weight: 700; color: #999; margin-left: 6px; }
+
         @media (max-width: 600px) {
             .pl-wrap { padding: 22px 16px 80px; }
             .pl-title { font-size: 1.6rem; }
@@ -267,6 +296,7 @@ $total = count($prompts);
         <table class="pl-table" id="pl-table">
             <thead>
                 <tr>
+                    <th style="width:36px;text-align:center;">#</th>
                     <th style="width:68px;">Cover</th>
                     <th>Title</th>
                     <th style="width:110px;">Type</th>
@@ -302,7 +332,7 @@ $total = count($prompts);
                     "color" => "#00509e",
                 ],
             ];
-            foreach ($prompts as $p):
+            foreach ($prompts as $i => $p):
 
                 $pt = $p["prompt_type"] ?? "secret";
                 $tinfo = $type_map[$pt] ?? $type_map["secret"];
@@ -313,6 +343,7 @@ $total = count($prompts);
                 $likes  = (int) $p["likes_count"];
                 ?>
             <tr data-search="<?= strtolower($title) ?>">
+                <td style="text-align:center;font-weight:900;font-size:.88rem;color:#aaa;"><?= $total - $i ?></td>
                 <td><img src="<?= $img ?>" class="pl-cover" alt="Cover"></td>
                 <td>
                     <div class="pl-title-cell"><?= $title ?></div>
@@ -338,11 +369,55 @@ $total = count($prompts);
             </tbody>
         </table>
         <p class="pl-empty" id="pl-empty">No prompts match your search.</p>
+        <div class="pl-pagination" id="pl-pagination"></div>
     </div>
 
 </div>
 
 <script>
+const PER_PAGE = 12;
+var currentPage = 1;
+var searchQuery = '';
+
+function getAllRows() {
+    return Array.from(document.querySelectorAll('#pl-table tbody tr'));
+}
+function getFilteredRows() {
+    return getAllRows().filter(function(row) {
+        return !searchQuery || (row.dataset.search || '').includes(searchQuery);
+    });
+}
+function renderPage(page) {
+    var filtered = getFilteredRows();
+    var totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+    var start = (currentPage - 1) * PER_PAGE;
+    getAllRows().forEach(function(row) { row.style.display = 'none'; });
+    filtered.slice(start, start + PER_PAGE).forEach(function(row) { row.style.display = ''; });
+    document.getElementById('pl-empty').style.display = filtered.length === 0 ? 'block' : 'none';
+    renderPagination(currentPage, totalPages, filtered.length);
+}
+function renderPagination(page, totalPages, totalRows) {
+    var el = document.getElementById('pl-pagination');
+    if (totalPages <= 1) { el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    var html = '';
+    html += '<button class="pg-btn" onclick="renderPage(' + (page-1) + ')"' + (page===1?' disabled':'') + '>&#8592;</button>';
+    for (var i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || Math.abs(i - page) <= 1) {
+            html += '<button class="pg-btn' + (i===page?' pg-active':'') + '" onclick="renderPage(' + i + ')">' + i + '</button>';
+        } else if (Math.abs(i - page) === 2) {
+            html += '<span class="pg-dots">&hellip;</span>';
+        }
+    }
+    html += '<button class="pg-btn" onclick="renderPage(' + (page+1) + ')"' + (page===totalPages?' disabled':'') + '>&#8594;</button>';
+    html += '<span class="pg-info">Showing ' + ((page-1)*PER_PAGE+1) + '&ndash;' + Math.min(page*PER_PAGE, totalRows) + ' of ' + totalRows + '</span>';
+    el.innerHTML = html;
+}
+function filterTable(query) {
+    searchQuery = query.toLowerCase().trim();
+    renderPage(1);
+}
 function copyLink(slug, id, btn) {
     var link = slug ? window.location.origin + '/prompts/' + slug : window.location.origin + '/prompt.php?id=' + id;
     navigator.clipboard.writeText(link).then(function() {
@@ -356,18 +431,7 @@ function copyLink(slug, id, btn) {
         window.prompt('Copy this link:', link);
     });
 }
-
-function filterTable(query) {
-    query = query.toLowerCase().trim();
-    var rows  = document.querySelectorAll('#pl-table tbody tr');
-    var found = 0;
-    rows.forEach(function(row) {
-        var match = (row.dataset.search || '').includes(query);
-        row.style.display = match ? '' : 'none';
-        if (match) found++;
-    });
-    document.getElementById('pl-empty').style.display = found === 0 ? 'block' : 'none';
-}
+document.addEventListener('DOMContentLoaded', function() { renderPage(1); });
 </script>
 </body>
 </html>

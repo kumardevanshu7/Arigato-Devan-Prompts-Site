@@ -664,7 +664,10 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <div class="dash-card" style="margin-top:40px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;">
                 <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-users"></i> User Management</h2>
-                <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;"><?= $total_users_count ?> Users</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;"><?= $total_users_count ?> Users</div>
+                    <a href="user_management.php" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:12px;padding:7px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Page</a>
+                </div>
             </div>
             <?php if (count($users) === 0): ?>
                 <p style="text-align:center;color:#7D7887;font-weight:600;padding:30px 0;">No users registered yet.</p>
