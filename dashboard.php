@@ -676,7 +676,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                     <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?= date(
                         "d M Y",
                         strtotime($u["created_at"]),
-                    ) ?></td>
+                    ) ?><br><span style="font-size:.75rem;color:#aaa;"><?= date("h:i A", strtotime($u["created_at"])) ?></span></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
