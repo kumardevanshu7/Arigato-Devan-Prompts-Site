@@ -13,27 +13,39 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 // ── AJAX: user activity ──
 if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
     header('Content-Type: application/json');
-    $uid = (int)$_GET['uid'];
-    $user = $pdo->prepare("SELECT id, username, email, avatar, gender, role, created_at, last_active FROM users WHERE id = ?");
-    $user->execute([$uid]);
-    $udata = $user->fetch(PDO::FETCH_ASSOC);
-    if (!$udata) { echo json_encode(['ok'=>false]); exit; }
-    $unlocks = $pdo->prepare("SELECT p.title, p.slug FROM unlocked_prompts up LEFT JOIN prompts p ON up.prompt_id = p.id WHERE up.user_id = ? ORDER BY up.unlocked_at DESC");
-    $unlocks->execute([$uid]);
-    $unlock_list = $unlocks->fetchAll(PDO::FETCH_ASSOC);
-    $saves = $pdo->prepare("SELECT COUNT(*) FROM saved_prompts WHERE user_id = ?");
-    $saves->execute([$uid]);
-    $saves_count = (int)$saves->fetchColumn();
-    $likes = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
-    $likes->execute([$uid]);
-    $likes_count = (int)$likes->fetchColumn();
-    echo json_encode([
-        'ok'          => true,
-        'user'        => $udata,
-        'unlock_list' => $unlock_list,
-        'saves_count' => $saves_count,
-        'likes_count' => $likes_count,
-    ]);
+    try {
+        $uid = (int)$_GET['uid'];
+        // Fetch user — last_active may not exist yet, fallback gracefully
+        try {
+            $user = $pdo->prepare("SELECT id, username, email, avatar, gender, role, created_at, last_active FROM users WHERE id = ?");
+            $user->execute([$uid]);
+        } catch (Exception $e) {
+            $user = $pdo->prepare("SELECT id, username, email, avatar, gender, role, created_at FROM users WHERE id = ?");
+            $user->execute([$uid]);
+        }
+        $udata = $user->fetch(PDO::FETCH_ASSOC);
+        if (!$udata) { echo json_encode(['ok'=>false,'error'=>'User not found']); exit; }
+        if (!isset($udata['last_active'])) $udata['last_active'] = null;
+        // Unlocks — order by id DESC (safe, always exists)
+        $unlocks = $pdo->prepare("SELECT p.title, p.slug FROM unlocked_prompts up LEFT JOIN prompts p ON up.prompt_id = p.id WHERE up.user_id = ? ORDER BY up.id DESC");
+        $unlocks->execute([$uid]);
+        $unlock_list = $unlocks->fetchAll(PDO::FETCH_ASSOC);
+        $saves = $pdo->prepare("SELECT COUNT(*) FROM saved_prompts WHERE user_id = ?");
+        $saves->execute([$uid]);
+        $saves_count = (int)$saves->fetchColumn();
+        $likes = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
+        $likes->execute([$uid]);
+        $likes_count = (int)$likes->fetchColumn();
+        echo json_encode([
+            'ok'          => true,
+            'user'        => $udata,
+            'unlock_list' => $unlock_list,
+            'saves_count' => $saves_count,
+            'likes_count' => $likes_count,
+        ]);
+    } catch (Exception $e) {
+        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    }
     exit;
 }
 
@@ -704,7 +716,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         "d M Y",
                         strtotime($u["created_at"]),
                     ) ?><br><span style="font-size:.75rem;color:#aaa;"><?= date("h:i A", strtotime($u["created_at"])) ?></span></td>
-                    <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;transition:all .15s;">&#128202; See Activity</button></td>
+                    <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;transition:all .15s;"><i class="fa-solid fa-chart-simple"></i> See Activity</button></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
