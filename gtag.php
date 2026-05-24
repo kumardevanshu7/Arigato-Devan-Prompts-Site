@@ -28,6 +28,11 @@ $_gtag_canonical = 'https://arigatodevan.com' . strtok($_gtag_script, '?');
   }
 ]
 </script>
+<!-- Google Fonts — non-blocking (preconnect + preload swap) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"></noscript>
 <!-- Favicons -->
 <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon/android-chrome-192x192.png">

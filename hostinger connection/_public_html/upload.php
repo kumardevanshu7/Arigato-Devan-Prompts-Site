@@ -2,6 +2,39 @@
 session_start();
 require_once "db.php";
 
+// ── Auto resize + convert to WebP on upload ──────────────────────────────────
+function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $quality = 82): string {
+    if (!file_exists($src)) return $src;
+    $info = @getimagesize($src);
+    if (!$info) return $src;
+    [$origW, $origH, $type] = [$info[0], $info[1], $info[2]];
+    $img = match($type) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
+        IMAGETYPE_PNG  => @imagecreatefrompng($src),
+        IMAGETYPE_WEBP => @imagecreatefromwebp($src),
+        IMAGETYPE_GIF  => @imagecreatefromgif($src),
+        default        => false,
+    };
+    if (!$img) return $src;
+    // Calculate new dimensions (maintain aspect ratio)
+    $ratio = min($maxW / $origW, $maxH / $origH, 1.0); // never upscale
+    $newW = (int)round($origW * $ratio);
+    $newH = (int)round($origH * $ratio);
+    $resized = imagecreatetruecolor($newW, $newH);
+    // Preserve transparency for PNG/WebP
+    imagealphablending($resized, false);
+    imagesavealpha($resized, true);
+    imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+    imagedestroy($img);
+    // Save as WebP, replace original
+    $dest = preg_replace('/\.[^.]+$/', '.webp', $src);
+    imagewebp($resized, $dest, $quality);
+    imagedestroy($resized);
+    // Remove original if different extension
+    if ($dest !== $src && file_exists($src)) @unlink($src);
+    return $dest;
+}
+
 // Protect endpoint — must be logged in AND be an admin
 if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
     header("Location: login.php");
@@ -97,6 +130,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $target_file = $upload_dir . $new_filename;
 
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+        $target_file = resizeToWebP($target_file);
+        $new_filename = basename($target_file);
         // Handle asset images upload (max 2)
         if ($has_assets && isset($_FILES["asset_images"]) && !empty($_FILES["asset_images"]["name"][0])) {
             $asset_dir = "uploads/assets/";
@@ -115,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $aext = strtolower(pathinfo($_FILES["asset_images"]["name"][$i], PATHINFO_EXTENSION));
                 if (!in_array($aext, $allowed_asset_ext)) continue;
                 $afname = "uploads/assets/" . uniqid("asset_") . "." . $aext;
-                if (move_uploaded_file($tmp, $afname)) { $asset_paths[] = $afname; }
+                if (move_uploaded_file($tmp, $afname)) { $afname = resizeToWebP($afname); $asset_paths[] = $afname; }
             }
             if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
         }
@@ -131,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if (in_array($ep_ext, $allowed_ext)) {
                     $ep_fname = "uploads/" . uniqid("ep_") . "." . $ep_ext;
                     if (move_uploaded_file($_FILES["extra_prompt_{$ep}_image"]["tmp_name"], $ep_fname)) {
-                        $ep_image_path = $ep_fname;
+                        $ep_image_path = resizeToWebP($ep_fname);
                     }
                 }
             }
