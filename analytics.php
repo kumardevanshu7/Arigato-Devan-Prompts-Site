@@ -116,7 +116,6 @@ canvas{max-height:280px}
 @media(max-width:900px){.charts-grid{grid-template-columns:1fr}.s-card.a6{grid-column:span 1}}
 @media(max-width:600px){.an-wrap{padding:22px 18px 80px}.an-title{font-size:1.6rem}}
 </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>

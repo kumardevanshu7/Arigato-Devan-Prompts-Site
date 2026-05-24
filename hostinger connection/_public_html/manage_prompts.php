@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -34,7 +34,6 @@ sort($all_mgr_tags);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Prompts - Admin</title>
     <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <style>
         body { background: var(--bg-color); }
@@ -125,7 +124,7 @@ sort($all_mgr_tags);
                 $item_js = addslashes(htmlspecialchars($p["title"]));
                 ?>
             <div class="prompt-item" data-title="<?= $item_title ?>" data-tags="<?= $item_tags ?>">
-                <img src="<?= $item_img ?>" class="prompt-item-img" alt="Cover">
+                <img loading="lazy" src="<?= $item_img ?>" class="prompt-item-img" alt="Cover">
                 <div class="prompt-item-details">
                     <div class="prompt-item-title">
                         <?= $item_name ?>

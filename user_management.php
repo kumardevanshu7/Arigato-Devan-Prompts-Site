@@ -82,7 +82,6 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management — Admin</title>
     <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
     <style>
         body { background: var(--bg-color); }

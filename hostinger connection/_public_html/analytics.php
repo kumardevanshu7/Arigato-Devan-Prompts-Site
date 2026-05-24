@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -116,7 +116,6 @@ canvas{max-height:280px}
 @media(max-width:900px){.charts-grid{grid-template-columns:1fr}.s-card.a6{grid-column:span 1}}
 @media(max-width:600px){.an-wrap{padding:22px 18px 80px}.an-title{font-size:1.6rem}}
 </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -126,7 +125,7 @@ canvas{max-height:280px}
   <div class="logo-area"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
     </div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
@@ -137,7 +136,7 @@ canvas{max-height:280px}
   </nav>
   <div class="header-right">
     <div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img src="<?= htmlspecialchars(
+    <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><img loading="lazy" src="<?= htmlspecialchars(
         $_SESSION["profile_image"] ?? "",
     ) ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''"></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
     <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>

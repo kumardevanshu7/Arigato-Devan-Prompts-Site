@@ -123,10 +123,7 @@ function sessionAvatar() {
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
     </script>
     <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <style>
         .pp-wrap { max-width: 1100px; margin: 0 auto; padding: 20px 20px 80px; }
         .pp-back { margin-bottom: 20px; }

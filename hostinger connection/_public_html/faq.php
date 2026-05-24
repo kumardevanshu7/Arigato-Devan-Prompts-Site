@@ -40,7 +40,6 @@
     }
     </script>
     <link rel="stylesheet" href="style.css?v=2026052401">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <style>
         .faq-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 100px; }
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -297,7 +297,6 @@ body { background: var(--bg-color); }
     .blog-item { flex-wrap: wrap; }
 }
 </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -308,7 +307,7 @@ body { background: var(--bg-color); }
     <div class="logo-area" id="logo-container"  style="cursor:pointer;">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -392,7 +391,7 @@ body { background: var(--bg-color); }
 
             <!-- Thumbnail -->
             <?php if ($bl["image_path"]): ?>
-            <img src="<?= htmlspecialchars(
+            <img loading="lazy" src="<?= htmlspecialchars(
                 $bl["image_path"],
             ) ?>" class="blog-item-img" alt="">
             <?php else: ?>

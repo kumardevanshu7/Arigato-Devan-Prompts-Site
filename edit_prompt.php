@@ -203,7 +203,6 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 .extra-add-btn{display:inline-flex;align-items:center;gap:6px;background:#f0f7ff;border:2px dashed #5b9bd5;color:#1a4f8a;border-radius:12px;padding:10px 20px;font-weight:900;font-size:.9rem;cursor:pointer;margin-top:10px;font-family:var(--font-main);transition:background .2s;}
 .extra-add-btn:hover{background:#dceeff;}
 </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">

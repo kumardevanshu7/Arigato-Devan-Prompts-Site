@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -17,7 +17,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Prompt - Admin</title>
     <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
     <style>
@@ -509,7 +508,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 reader.onload = e => {
                     const div = document.createElement('div');
                     div.className = 'asset-preview-thumb';
-                    div.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                    div.innerHTML = `<img loading="lazy" src="${e.target.result}" alt="preview">`;
                     previews.appendChild(div);
                 };
                 reader.readAsDataURL(f);

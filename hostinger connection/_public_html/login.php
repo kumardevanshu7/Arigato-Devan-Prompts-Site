@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 // Handle logout
 if (isset($_GET["logout"])) {
@@ -527,7 +527,6 @@ unset($_SESSION["error_msg"]);
             }
         }
     </style>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
@@ -595,7 +594,7 @@ unset($_SESSION["error_msg"]);
 
                 <!-- Google Sign-In -->
                 <button class="google-btn" id="google-login-btn">
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
                     Continue with Google
                 </button>
 
@@ -771,13 +770,13 @@ unset($_SESSION["error_msg"]);
                         window.location.href = 'index.php'; // PHP session created, go to home
                     } else {
                         alert("Login error: " + data.error);
-                        loginBtn.innerHTML = '<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
+                        loginBtn.innerHTML = '<img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
                         loginBtn.disabled = false;
                     }
                 })
                 .catch((error) => {
                     console.error("Firebase Auth Error:", error);
-                    loginBtn.innerHTML = '<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
+                    loginBtn.innerHTML = '<img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="Google"> Continue with Google';
                     loginBtn.disabled = false;
                     if(error.code !== 'auth/popup-closed-by-user') {
                         alert("Authentication failed. Please try again.");

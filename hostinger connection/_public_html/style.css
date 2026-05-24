@@ -2705,7 +2705,12 @@ footer {
     }
 
     .footer-links {
-        gap: 16px;
+        gap: 10px 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .footer-links a {
+        white-space: nowrap;
     }
 
     /* ─ Unreleased grid ─ */

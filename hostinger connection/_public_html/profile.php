@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -272,7 +272,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             .avatar-img-wrap { width: 52px; height: 52px; }
         }
     </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
@@ -286,7 +285,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <!-- Current Avatar Preview Header -->
             <div class="prof-header">
-                <img src="<?= htmlspecialchars(
+                <img loading="lazy" src="<?= htmlspecialchars(
                     $user["avatar"] ?:
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
                 ) ?>"
@@ -329,7 +328,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             ) ?>"
                                 <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars(
+                                <img loading="lazy" src="<?= htmlspecialchars(
                                     $av,
                                 ) ?>" alt="Avatar" loading="lazy">
                             </div>
@@ -346,7 +345,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             ) ?>"
                                 <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars(
+                                <img loading="lazy" src="<?= htmlspecialchars(
                                     $av,
                                 ) ?>" alt="Avatar" loading="lazy">
                             </div>

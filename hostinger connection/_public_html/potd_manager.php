@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -54,7 +54,6 @@ $type_map = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prompt of the Day Manager — Admin</title>
     <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { background: var(--bg-color); }
@@ -143,7 +142,7 @@ $type_map = [
                 <img src="toplogo/logo01.webp" alt="Logo">
             </div>
             <div class="logo-back">
-                <img src="toplogo/logo02.webp" alt="">
+                <img loading="lazy" src="toplogo/logo02.webp" alt="">
             </div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -210,7 +209,7 @@ $type_map = [
                 $is_on = $p["is_featured"] ? true : false;
             ?>
             <tr data-search="<?= strtolower($title) ?>" class="<?= $is_on ? 'row-active' : '' ?>" id="row-existing-<?= $id ?>">
-                <td><img src="<?= $img ?>" class="pm-cover" alt="Cover"></td>
+                <td><img loading="lazy" src="<?= $img ?>" class="pm-cover" alt="Cover"></td>
                 <td>
                     <div class="pm-title-cell"><?= $title ?></div>
                     <div class="pm-likes"><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:.75rem;"></i> <?= $likes ?> likes</div>
@@ -265,7 +264,7 @@ $type_map = [
             <tr data-search="<?= strtolower($c_title) ?>" class="<?= $c_on ? 'row-active' : '' ?>" id="row-custom-<?= $c_id ?>">
                 <td>
                     <?php if ($c_img): ?>
-                        <img src="<?= $c_img ?>" class="pm-cover" alt="Custom" onerror="this.style.display='none'">
+                        <img loading="lazy" src="<?= $c_img ?>" class="pm-cover" alt="Custom" onerror="this.style.display='none'">
                     <?php else: ?>
                         <div class="pm-cover" style="display:flex;align-items:center;justify-content:center;background:#f3e8ff;font-size:1.2rem;">✨</div>
                     <?php endif; ?>

@@ -427,8 +427,24 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             .dashboard-cols { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
         }
+        /* Fix card text cut-off on mobile */
+        .dash-card > a > div,
+        .dash-card > div[style*="display:flex"] {
+            flex-wrap: nowrap;
+        }
+        .dash-card [style*="display:flex"][style*="align-items:center"] > div:not([style*="width:64px"]):not([style*="width: 64px"]) {
+            flex: 1;
+            min-width: 0;
+        }
+        .dash-card p { word-break: break-word; }
+        @media (max-width: 480px) {
+            .dash-card { padding: 18px 16px; }
+            .dash-card h2 { font-size: 1.15rem; }
+            .dash-card p { font-size: .82rem; }
+            .dash-card [style*="width:64px"], .dash-card [style*="width: 64px"] { width: 48px !important; height: 48px !important; border-radius: 14px !important; flex-shrink: 0 !important; }
+            .dash-card [style*="width:64px"] i, .dash-card [style*="width: 64px"] i { font-size: 1.2rem !important; }
+        }
     </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>

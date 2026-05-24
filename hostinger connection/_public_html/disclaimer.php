@@ -20,7 +20,6 @@
         .legal-highlight { background: var(--secondary-color); border: var(--border-width) solid var(--text-color); border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-weight: 700; color: var(--text-color); box-shadow: 3px 3px 0px var(--text-color); }
         @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-card h1 { font-size: 1.8rem; } }
     </style>
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
 </head>
 <body>

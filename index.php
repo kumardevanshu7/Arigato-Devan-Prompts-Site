@@ -164,12 +164,9 @@ try {
       ]
     }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
         <link rel="stylesheet" href="style.css?v=2026052201">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -119,7 +119,6 @@ $cats = [
 <title>How to Use – Arigato Devan Prompts</title>
 <meta name="description" content="Complete step-by-step guide to unlocking and using AI prompts on Arigato Devan. Learn how to use Secret Code, Insta Viral, Unreleased, and Already Uploaded prompts.">
 <link rel="stylesheet" href="style.css?v=2026052201">
-<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <?php include_once "gtag.php"; ?>
 <style>
@@ -207,7 +206,7 @@ $cats = [
 <body>
 <header>
   <div class="logo-area" style="cursor:pointer" onclick="location.href='index.php'">
-    <div class="logo-flipper"><div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div><div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div></div>
+    <div class="logo-flipper"><div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div><div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div></div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
   <nav class="nav-links">
