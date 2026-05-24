@@ -164,17 +164,16 @@ try {
       ]
     }
     </script>
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-        <link rel="preconnect" href="https://unpkg.com" crossorigin>
         <link rel="stylesheet" href="style.css?v=2026052201">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->
     <?php if (isset($prompts) && is_array($prompts)) {
         for ($i = 0; $i < min(3, count($prompts)); $i++) {
+            $fp = $i === 0 ? ' fetchpriority="high"' : '';
             echo '<link rel="preload" as="image" href="' .
                 htmlspecialchars($prompts[$i]["image_path"]) .
-                '">' .
+                '"' . $fp . '>' .
                 "\n";
         }
     } ?>

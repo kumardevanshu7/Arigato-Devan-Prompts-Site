@@ -100,7 +100,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
         .um-filter { padding: 13px 18px; border: var(--border-width) solid var(--text-color); border-radius: 14px; font-family: var(--font-main); font-weight: 700; font-size: .92rem; background: var(--card-bg); color: var(--text-color); outline: none; box-shadow: var(--shadow-comic); cursor: pointer; }
 
         /* Table card */
-        .um-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; box-shadow: var(--shadow-comic); overflow: hidden; }
+        .um-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; box-shadow: var(--shadow-comic); overflow: clip; }
         .um-table { width: 100%; border-collapse: collapse; }
         .um-table thead tr { border-bottom: 2px solid var(--text-color); background: var(--bg-color); }
         .um-table th { padding: 14px 16px; font-size: .72rem; font-weight: 900; text-transform: uppercase; letter-spacing: .6px; text-align: left; }
@@ -160,8 +160,16 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
         @media (max-width: 700px) {
             .um-stats { grid-template-columns: 1fr 1fr; }
             .um-wrap  { padding: 20px 14px 80px; }
+            /* Hide: Gender(4), Role(5), Joined(6), Last Active(7) — keep #, Avatar, Name, Activity */
             .um-table th:nth-child(4), .um-table td:nth-child(4),
-            .um-table th:nth-child(5), .um-table td:nth-child(5) { display: none; }
+            .um-table th:nth-child(5), .um-table td:nth-child(5),
+            .um-table th:nth-child(6), .um-table td:nth-child(6),
+            .um-table th:nth-child(7), .um-table td:nth-child(7) { display: none; }
+            .um-card { overflow-x: auto; }
+            .um-table th, .um-table td { padding: 10px 10px; }
+            .um-name { font-size: .85rem; }
+            .um-email { font-size: .7rem; }
+            .um-avatar { width: 36px; height: 36px; }
         }
     </style>
     <?php include_once "gtag.php"; ?>
