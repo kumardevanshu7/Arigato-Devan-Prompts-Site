@@ -118,6 +118,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan — AI Couple Prompts for Instagram Reels</title>
     <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts — use instantly on ChatGPT. Only on Arigato Devan.">
+    <link rel="canonical" href="https://arigatodevan.com/">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -209,7 +210,7 @@ try {
                     <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo">
                 </div>
                 <div class="logo-back">
-                    <img src="toplogo/logo02.webp" alt="Logo Alt">
+                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
                 </div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -219,6 +220,7 @@ try {
             <a href="gallery.php">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
                 <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -424,7 +426,7 @@ try {
             <!-- CTA Buttons -->
             <div class="landing-comic-cta">
                 <a href="login.php" class="cta-btn cta-primary" id="hero-login-btn">
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="G">
+                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G">
                     Login with Google
                 </a>
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
@@ -443,7 +445,7 @@ try {
                 <div style="background:var(--secondary-color);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:20px;box-shadow:var(--shadow-comic);text-align:center;">
                     <div class="badge" style="margin:0 auto 12px;display:inline-flex;">&#11088; PROMPT OF THE DAY</div>
                     <div style="position:relative;border-radius:16px;overflow:hidden;border:3px solid var(--text-color);margin-bottom:14px;">
-                        <img src="<?= htmlspecialchars(
+                        <img loading="lazy" src="<?= htmlspecialchars(
                             $featuredPrompt["image_path"],
                         ) ?>" style="width:100%;height:180px;object-fit:cover;filter:blur(8px) brightness(0.7);" alt="Featured Prompt">
                         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
@@ -677,7 +679,7 @@ try {
                          : "" ?>>
                     <!-- Left: inset portrait image -->
                     <div class="potd-img-wrap">
-                        <img src="<?= htmlspecialchars(
+                        <img loading="lazy" src="<?= htmlspecialchars(
                             $featuredPrompt["image_path"],
                         ) ?>" alt="Prompt of the Day">
                         <div class="potd-lock-icon">
@@ -811,7 +813,7 @@ try {
                                  htmlspecialchars($p["prompt_text"]) .
                                  '"'
                              : "" ?>>
-                        <img src="<?= htmlspecialchars(
+                        <img loading="lazy" src="<?= htmlspecialchars(
                             $p["image_path"],
                         ) ?>" class="card-bg-image" alt="Prompt Image" <?= $index <
 3
@@ -880,7 +882,7 @@ try {
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 
     <!-- Unlock Modal - No longer restricted by session so guests can see the "login to save" features -->
@@ -888,7 +890,7 @@ try {
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
             <div class="modal-left">
-                <img src="" id="modal-image" alt="Prompt Preview">
+                <img loading="lazy" src="" id="modal-image" alt="Prompt Preview">
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">PROMPT LOCKED</h2>

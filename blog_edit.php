@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -108,7 +108,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
 </head><body>
 <header>
   <div class="logo-area"  style="cursor:pointer">
-    <div class="logo-flipper"><div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div><div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div></div>
+    <div class="logo-flipper"><div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div><div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div></div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
   <nav class="nav-links"><a href="index.php">HOME</a><a href="dashboard.php">DASHBOARD</a><a href="blog_admin.php" style="background:var(--primary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-pencil"></i> BLOGS</a></nav>
@@ -176,7 +176,7 @@ body{background:var(--bg-color)}.bc-wrap{max-width:900px;margin:0 auto;padding:3
     <div class="bc-card"><h2><i class="fa-solid fa-image"></i> Cover Image</h2>
       <?php if (
           $bl["image_path"]
-      ): ?><div class="img-preview"><img src="<?= htmlspecialchars(
+      ): ?><div class="img-preview"><img loading="lazy" src="<?= htmlspecialchars(
     $bl["image_path"],
 ) ?>" alt=""><span>Current image</span></div><?php endif; ?>
       <div class="file-upload-wrapper" style="margin-bottom:18px"><label for="e-img" class="file-upload-btn">Replace Image</label><span class="file-upload-name" id="e-fname">No file chosen</span><input type="file" id="e-img" name="image" accept="image/*" style="display:none" onchange="document.getElementById('e-fname').textContent=this.files[0]?.name||'No file chosen'"></div>

@@ -231,7 +231,7 @@ function sessionAvatar() {
         <div class="logo-area" id="logo-container" style="cursor:pointer;" onclick="window.location='index.php'">
             <div class="logo-flipper">
                 <div class="logo-front"><img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo"></div>
-                <div class="logo-back"><img src="toplogo/logo02.webp" alt="Logo Alt"></div>
+                <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt"></div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
@@ -249,7 +249,7 @@ function sessionAvatar() {
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;"> Login
+                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;"> Login
                 </a>
             <?php endif; ?>
         </div>
@@ -267,7 +267,7 @@ function sessionAvatar() {
                 <div class="pp-badge" style="background:<?= $tinfo['bg'] ?>;color:<?= $tinfo['color'] ?>;">
                     <?= $tinfo['label'] ?>
                 </div>
-                <img src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
+                <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
                 <div class="pp-like-mini">
                     <i class="fa-solid fa-heart" style="color:#ff6b6b;"></i>
                     <span id="pp-like-count-mini"><?= (int)$p['likes_count'] ?></span> likes
@@ -382,7 +382,7 @@ function sessionAvatar() {
                         <div class="pp-assets-grid">
                             <?php foreach ($asset_images as $i => $ai): ?>
                             <div style="position:relative;display:inline-flex;flex-direction:column;gap:6px;">
-                                <img src="<?= htmlspecialchars($ai) ?>" alt="Asset <?= $i+1 ?>">
+                                <img loading="lazy" src="<?= htmlspecialchars($ai) ?>" alt="Asset <?= $i+1 ?>">
                                 <a href="<?= htmlspecialchars($ai) ?>" download target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;background:var(--secondary-color);border:2px solid var(--text-color);border-radius:8px;padding:5px 8px;font-size:0.72rem;font-weight:800;font-family:var(--font-main);text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);transition:all .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''"><i class="fa-solid fa-download"></i> Download</a>
                             </div>
                             <?php endforeach; ?>
@@ -396,7 +396,7 @@ function sessionAvatar() {
                         <div class="pp-extra-layout">
                             <?php if (!empty($ep['image_path'])): ?>
                             <div class="pp-extra-img-col">
-                                <img src="<?= htmlspecialchars($ep['image_path']) ?>" class="pp-extra-img" alt="Prompt <?= $ep_i + 2 ?>">
+                                <img loading="lazy" src="<?= htmlspecialchars($ep['image_path']) ?>" class="pp-extra-img" alt="Prompt <?= $ep_i + 2 ?>">
                             </div>
                             <?php endif; ?>
                             <div class="pp-extra-info">
@@ -428,7 +428,7 @@ function sessionAvatar() {
             <div class="pp-rel-grid">
                 <?php foreach ($related as $r): ?>
                 <a href="<?= !empty($r['slug']) ? '/prompts/' . htmlspecialchars($r['slug']) : 'prompt.php?id=' . $r['id'] ?>" class="pp-rel-card">
-                    <img src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy">
+                    <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy">
                     <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
                 </a>
                 <?php endforeach; ?>
@@ -439,7 +439,7 @@ function sessionAvatar() {
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 
     <script>

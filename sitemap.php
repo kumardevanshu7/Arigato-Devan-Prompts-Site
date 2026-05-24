@@ -99,6 +99,12 @@ $static_pages = [
         "changefreq" => "monthly",
         "lastmod" => "2026-05-24",
     ],
+    [
+        "url" => "/faq.php",
+        "priority" => "0.7",
+        "changefreq" => "monthly",
+        "lastmod" => "2026-05-24",
+    ],
 ];
 
 // Fetch all prompts with slugs dynamically

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 require_once "slug_helper.php";
@@ -213,7 +213,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
   <div class="logo-area"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
     </div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
@@ -225,7 +225,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
     <div class="header-divider"></div>
     <div style="display:flex; align-items:center; gap:8px;">
       <a href="profile.php" title="Edit Profile">
-        <img src="<?= htmlspecialchars(
+        <img loading="lazy" src="<?= htmlspecialchars(
             $_SESSION["profile_image"] ?? "",
         ) ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
       </a>
@@ -389,7 +389,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             <div class="form-group" style="margin-bottom:0;">
               <label>Prompt 2 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
               <?php if (!empty($ep2_data['image_path'])): ?>
-              <div style="margin-bottom:8px;"><img src="<?= htmlspecialchars($ep2_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
+              <div style="margin-bottom:8px;"><img loading="lazy" src="<?= htmlspecialchars($ep2_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
               <?php endif; ?>
               <div class="file-upload-wrapper">
                 <label for="ep2_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep2_data ? 'Change' : 'Choose' ?> Image</label>
@@ -418,7 +418,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             <div class="form-group" style="margin-bottom:0;">
               <label>Prompt 3 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
               <?php if (!empty($ep3_data['image_path'])): ?>
-              <div style="margin-bottom:8px;"><img src="<?= htmlspecialchars($ep3_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
+              <div style="margin-bottom:8px;"><img loading="lazy" src="<?= htmlspecialchars($ep3_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
               <?php endif; ?>
               <div class="file-upload-wrapper">
                 <label for="ep3_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep3_data ? 'Change' : 'Choose' ?> Image</label>
@@ -482,7 +482,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                     <label style="font-size:.8rem;color:#888;font-weight:700;text-transform:uppercase;">Current Assets</label>
                     <div class="asset-previews">
                         <?php foreach (json_decode($current_asset_images, true) ?? [] as $aimg): ?>
-                        <div class="asset-preview-thumb"><img src="<?= htmlspecialchars($aimg) ?>" alt="asset"></div>
+                        <div class="asset-preview-thumb"><img loading="lazy" src="<?= htmlspecialchars($aimg) ?>" alt="asset"></div>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -505,7 +505,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
       <div class="form-group">
         <label>Cover Image (leave blank to keep current)</label>
         <div class="img-preview">
-          <img src="<?= htmlspecialchars(
+          <img loading="lazy" src="<?= htmlspecialchars(
               $p["image_path"],
           ) ?>" alt="Current cover">
           <span>Current cover image</span>
@@ -663,7 +663,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                 r.onload = e => {
                     const d = document.createElement('div');
                     d.className = 'asset-preview-thumb';
-                    d.innerHTML = `<img src="${e.target.result}">`;
+                    d.innerHTML = `<img loading="lazy" src="${e.target.result}">`;
                     prev.appendChild(d);
                 };
                 r.readAsDataURL(f);

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Get in touch with Arigato Devan — we'd love to hear from you. Send us your queries, feedback, or suggestions.">
+    <link rel="canonical" href="https://arigatodevan.com/contact.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="Contact Us — Arigato Devan PromptVerse">
@@ -104,7 +105,7 @@
     <div class="logo-area" style="cursor:pointer;" onclick="window.location='index.php'">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -219,7 +220,7 @@
 
 <footer>
     <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script>

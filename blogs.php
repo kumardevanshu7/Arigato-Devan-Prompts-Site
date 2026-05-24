@@ -40,6 +40,7 @@ arsort($all_tags);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+    <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -365,7 +366,7 @@ arsort($all_tags);
   <div class="logo-area" id="logo-container"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
     </div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
@@ -374,6 +375,7 @@ arsort($all_tags);
     <a href="gallery.php">GALLERY</a>
     <a href="blogs.php" class="active">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
                 <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -489,7 +491,7 @@ arsort($all_tags);
     <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
        data-tags="<?= htmlspecialchars(strtolower($b["tags"] ?? "")) ?>">
       <?php if ($b["image_path"]): ?>
-        <img src="<?= htmlspecialchars(
+        <img loading="lazy" src="<?= htmlspecialchars(
             $b["image_path"],
         ) ?>" class="blog-card-img <?= $ratio_class ?>" alt="<?= htmlspecialchars(
     $b["title"],
@@ -511,7 +513,7 @@ arsort($all_tags);
 
         <div class="blog-card-meta">
           <div class="blog-card-meta-left">
-            <img src="<?= htmlspecialchars(
+            <img loading="lazy" src="<?= htmlspecialchars(
                 $b["author_avatar"] ??
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=x",
             ) ?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
@@ -545,7 +547,7 @@ arsort($all_tags);
 
 <footer>
   <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-  <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+  <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script defer src="script.js?v=1778000000"></script>

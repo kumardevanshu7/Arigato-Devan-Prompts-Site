@@ -34,6 +34,7 @@ if (isset($_SESSION["user_id"])) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+    <link rel="canonical" href="https://arigatodevan.com/insta_viral.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -161,7 +162,7 @@ if (isset($_SESSION["user_id"])) {
     <div class="logo-area" id="logo-container"  style="cursor:pointer">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -170,6 +171,7 @@ if (isset($_SESSION["user_id"])) {
         <a href="gallery.php">GALLERY</a>
         <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
         <div class="nav-dropdown">
             <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
             <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -376,7 +378,7 @@ if (isset($_SESSION["user_id"])) {
              data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
              data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>">
 
-            <img src="<?= htmlspecialchars(
+            <img loading="lazy" src="<?= htmlspecialchars(
                 $p["image_path"],
             ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
     $p["title"],
@@ -411,7 +413,7 @@ if (isset($_SESSION["user_id"])) {
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
             <div class="modal-left">
-                <img src="" id="modal-image" alt="Prompt Preview">
+                <img loading="lazy" src="" id="modal-image" alt="Prompt Preview">
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">UNLOCK THE VIRAL PROMPT</h2>
@@ -457,7 +459,7 @@ if (isset($_SESSION["user_id"])) {
 
 <footer>
     <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])

@@ -114,6 +114,7 @@ $milestones = [
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Growth Journey &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
+    <link rel="canonical" href="https://arigatodevan.com/progress.php">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
@@ -220,7 +221,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
     <div class="logo-area"  style="cursor:pointer">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -229,6 +230,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
         <a href="gallery.php">GALLERY</a>
         <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Growth Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
         <div class="nav-dropdown">
             <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
             <div class="nav-dropdown-menu">
@@ -314,7 +316,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
                 <div class="hero-badge"><i class="fa-solid fa-fire"></i> VIRAL MILESTONE &mdash; 1M VIEWS</div>
                 <div class="polaroid" style="position:relative;">
                     <div class="pin"><svg width="24" height="36" viewBox="0 0 24 36"><circle cx="12" cy="8" r="7" fill="#dc2743" stroke="#fff" stroke-width="2"/><line x1="12" y1="15" x2="12" y2="36" stroke="#888" stroke-width="2"/></svg></div>
-                    <img src="progresspics/<?= $m[
+                    <img loading="lazy" src="progresspics/<?= $m[
                         "file"
                     ] ?>" alt="<?= htmlspecialchars(
     $m["label"],
@@ -336,7 +338,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
                 <div class="finale-badge"><i class="fa-solid fa-trophy"></i> FINAL ACHIEVEMENT &mdash; 10K+ FAMILY</div>
                 <div class="polaroid" style="position:relative;">
                     <div class="pin"><svg width="24" height="36" viewBox="0 0 24 36"><circle cx="12" cy="8" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/><line x1="12" y1="15" x2="12" y2="36" stroke="#888" stroke-width="2"/></svg></div>
-                    <img src="progresspics/<?= $m[
+                    <img loading="lazy" src="progresspics/<?= $m[
                         "file"
                     ] ?>" alt="<?= htmlspecialchars(
     $m["label"],
@@ -357,7 +359,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
             <div class="<?= "size-" . $m["size"] ?>">
                 <div class="polaroid" style="position:relative;">
                     <div class="pin"><svg width="18" height="28" viewBox="0 0 18 28"><circle cx="9" cy="6" r="5" fill="#2d2a35" stroke="#fff" stroke-width="1.5"/><line x1="9" y1="11" x2="9" y2="28" stroke="#888" stroke-width="1.5"/></svg></div>
-                    <img src="progresspics/<?= $m[
+                    <img loading="lazy" src="progresspics/<?= $m[
                         "file"
                     ] ?>" alt="<?= htmlspecialchars(
     $m["label"],
@@ -379,7 +381,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
 
 <footer style="margin-top:60px;">
     <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script>

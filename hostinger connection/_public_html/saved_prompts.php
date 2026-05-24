@@ -304,7 +304,7 @@ $type_map = [
                 <img src="toplogo/logo01.webp" alt="Logo" id="profile-logo">
             </div>
             <div class="logo-back">
-                <img src="toplogo/logo02.webp" alt="">
+                <img loading="lazy" src="toplogo/logo02.webp" alt="">
             </div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -373,7 +373,7 @@ $type_map = [
              data-tags="<?= htmlspecialchars(implode(",", $tags)) ?>"
              data-reel="">
 
-            <img src="<?= htmlspecialchars(
+            <img loading="lazy" src="<?= htmlspecialchars(
                 $p["image_path"],
             ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
     $p["title"],
@@ -420,7 +420,7 @@ $type_map = [
     <div class="modal-content split-view">
         <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
         <div class="modal-left">
-            <img id="modal-image" src="" alt="Prompt">
+            <img loading="lazy" id="modal-image" src="" alt="Prompt">
         </div>
         <div class="modal-right">
             <h2 id="modal-title">PROMPT</h2>
@@ -446,7 +446,7 @@ $type_map = [
 
 <footer>
     <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <!-- Remove-Saved Confirm Popup -->

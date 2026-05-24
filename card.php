@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * card.php — Universal shareable card link with rich OG previews
  * Usage: card.php?id=123
@@ -111,7 +111,7 @@ if (!$isBot) {
 <body>
     <h1><?= htmlspecialchars($title) ?></h1>
     <p><?= htmlspecialchars($description) ?></p>
-    <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($title) ?>" style="max-width:600px;">
+    <img loading="lazy" src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($title) ?>" style="max-width:600px;">
     <p><a href="<?= htmlspecialchars($redirectUrl) ?>">View on Arigato Devan</a></p>
 </body>
 </html>

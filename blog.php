@@ -180,7 +180,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
   <div class="logo-area" id="logo-container"  style="cursor:pointer">
     <div class="logo-flipper">
       <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
     </div>
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
@@ -189,6 +189,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
     <a href="gallery.php">GALLERY</a>
     <a href="blogs.php" class="active">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
                 <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -267,7 +268,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- Hero image -->
   <?php if ($blog["image_path"]): ?>
-  <img src="<?= htmlspecialchars(
+  <img loading="lazy" src="<?= htmlspecialchars(
       $blog["image_path"],
   ) ?>" class="blog-detail-hero-img" alt="<?= htmlspecialchars(
     $blog["title"],
@@ -280,7 +281,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- Meta -->
   <div class="blog-detail-meta">
-    <img src="<?= htmlspecialchars(
+    <img loading="lazy" src="<?= htmlspecialchars(
         !empty($blog["author_avatar"])
             ? $blog["author_avatar"]
             : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
@@ -384,7 +385,7 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 
 <footer>
   <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-  <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+  <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script defer src="script.js?v=1778000000"></script>
@@ -437,7 +438,7 @@ if (submitBtn) {
           let list = document.getElementById('comments-list');
           if(!list){ list = document.createElement('div'); list.id='comments-list'; submitBtn.closest('.comment-form').before(list); }
           const el = document.createElement('div'); el.className='comment-item';
-          el.innerHTML = `<img src="${d.avatar}" class="comment-avatar" alt=""><div class="comment-body"><div class="comment-name">${d.username}</div><div class="comment-text">${d.comment.replace(/\n/g,'<br>')}</div><div class="comment-time">${d.time}</div></div>`;
+          el.innerHTML = `<img loading="lazy" src="${d.avatar}" class="comment-avatar" alt=""><div class="comment-body"><div class="comment-name">${d.username}</div><div class="comment-text">${d.comment.replace(/\n/g,'<br>')}</div><div class="comment-time">${d.time}</div></div>`;
           list.appendChild(el);
           input.value='';
           // Update count

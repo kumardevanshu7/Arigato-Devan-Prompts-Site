@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -245,7 +245,7 @@ $total = count($prompts);
                 <img src="toplogo/logo01.webp" alt="Logo">
             </div>
             <div class="logo-back">
-                <img src="toplogo/logo02.webp" alt="">
+                <img loading="lazy" src="toplogo/logo02.webp" alt="">
             </div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -344,7 +344,7 @@ $total = count($prompts);
                 ?>
             <tr data-search="<?= strtolower($title) ?>">
                 <td style="text-align:center;font-weight:900;font-size:.88rem;color:#aaa;"><?= $total - $i ?></td>
-                <td><img src="<?= $img ?>" class="pl-cover" alt="Cover"></td>
+                <td><img loading="lazy" src="<?= $img ?>" class="pl-cover" alt="Cover"></td>
                 <td>
                     <div class="pl-title-cell"><?= $title ?></div>
                     <div class="pl-likes"><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:.75rem;"></i> <?= $likes ?> likes</div>

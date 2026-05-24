@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -308,7 +308,7 @@ body { background: var(--bg-color); }
     <div class="logo-area" id="logo-container"  style="cursor:pointer;">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -392,7 +392,7 @@ body { background: var(--bg-color); }
 
             <!-- Thumbnail -->
             <?php if ($bl["image_path"]): ?>
-            <img src="<?= htmlspecialchars(
+            <img loading="lazy" src="<?= htmlspecialchars(
                 $bl["image_path"],
             ) ?>" class="blog-item-img" alt="">
             <?php else: ?>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -441,7 +441,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                     <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo">
                 </div>
                 <div class="logo-back">
-                    <img src="toplogo/logo02.webp" alt="Logo Alt">
+                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
                 </div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -636,7 +636,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         <tr data-search="<?= strtolower(
                             $ltitle,
                         ) ?>" style="border-bottom:1px solid var(--border-color);transition:background .15s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background=''">
-                            <td style="padding:9px 12px;"><img src="<?= $limg ?>" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);display:block;"></td>
+                            <td style="padding:9px 12px;"><img loading="lazy" src="<?= $limg ?>" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);display:block;"></td>
                             <td style="padding:9px 12px;font-weight:700;font-size:.92rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= $ltitle ?></td>
                             <td style="padding:9px 12px;"><span style="background:<?= $linfo[
                                 "bg"
@@ -700,7 +700,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                     : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
                         urlencode(
                             $u["email"] ?? "x",
-                        ); ?><img src="<?= htmlspecialchars(
+                        ); ?><img loading="lazy" src="<?= htmlspecialchars(
     $u_avatar,
 ) ?>" class="user-avatar-sm" alt=""></td>
                     <td><div style="font-weight:800;font-size:.95rem;"><?= htmlspecialchars(
@@ -741,7 +741,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             <div id="activity-loading" style="text-align:center;padding:40px 0;font-weight:700;color:#888;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
             <div id="activity-content" style="display:none;">
                 <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:2px dashed var(--border-color);">
-                    <img id="act-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--text-color);object-fit:cover;" alt="">
+                    <img loading="lazy" id="act-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--text-color);object-fit:cover;" alt="">
                     <div>
                         <div id="act-name" style="font-size:1.15rem;font-weight:900;"></div>
                         <div id="act-email" style="font-size:.82rem;color:#7D7887;font-weight:600;"></div>

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse — a platform crafting beautiful AI prompts for couples and creative souls.">
+    <link rel="canonical" href="https://arigatodevan.com/about.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="About Us — Arigato Devan PromptVerse">
@@ -91,7 +92,7 @@
     <div class="logo-area" style="cursor:pointer;" onclick="window.location='index.php'">
         <div class="logo-flipper">
             <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo"></div>
-            <div class="logo-back"><img src="toplogo/logo02.webp" alt=""></div>
+            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
         </div>
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
@@ -118,10 +119,10 @@
             <div class="profile-flipper" id="profileFlipper" onclick="toggleFlip()" title="Click to flip">
                 <div class="profile-inner" id="profileInner">
                     <div class="pf-front">
-                        <img src="aboutmepics/new.webp" alt="Arigato Devan — Now">
+                        <img loading="lazy" src="aboutmepics/new.webp" alt="Arigato Devan — Now">
                     </div>
                     <div class="pf-back">
-                        <img src="aboutmepics/old.webp" alt="Arigato Devan — Then">
+                        <img loading="lazy" src="aboutmepics/old.webp" alt="Arigato Devan — Then">
                     </div>
                 </div>
             </div>
@@ -181,7 +182,7 @@
 
 <footer>
     <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 <script>

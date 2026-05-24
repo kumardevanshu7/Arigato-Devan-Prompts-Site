@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -286,7 +286,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <!-- Current Avatar Preview Header -->
             <div class="prof-header">
-                <img src="<?= htmlspecialchars(
+                <img loading="lazy" src="<?= htmlspecialchars(
                     $user["avatar"] ?:
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
                 ) ?>"
@@ -329,7 +329,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             ) ?>"
                                 <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars(
+                                <img loading="lazy" src="<?= htmlspecialchars(
                                     $av,
                                 ) ?>" alt="Avatar" loading="lazy">
                             </div>
@@ -346,7 +346,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             ) ?>"
                                 <?= $cur_avatar === $av ? "checked" : "" ?>>
                             <div class="avatar-img-wrap">
-                                <img src="<?= htmlspecialchars(
+                                <img loading="lazy" src="<?= htmlspecialchars(
                                     $av,
                                 ) ?>" alt="Avatar" loading="lazy">
                             </div>

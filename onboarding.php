@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -475,7 +475,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     <source srcset="<?= htmlspecialchars(
                                         $av,
                                     ) ?>" type="image/webp">
-                                    <img src="<?= htmlspecialchars(
+                                    <img loading="lazy" src="<?= htmlspecialchars(
                                         str_replace(".webp", ".png", $av),
                                     ) ?>" alt="Male Avatar <?= $i +
     1 ?>" loading="lazy">
@@ -500,7 +500,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     <source srcset="<?= htmlspecialchars(
                                         $av,
                                     ) ?>" type="image/webp">
-                                    <img src="<?= htmlspecialchars(
+                                    <img loading="lazy" src="<?= htmlspecialchars(
                                         str_replace(".webp", ".png", $av),
                                     ) ?>" alt="Female Avatar <?= $i +
     1 ?>" loading="lazy">

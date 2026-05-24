@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Terms of Service for Arigato Devan PromptVerse. Usage rules, ownership, and platform guidelines.">
+    <link rel="canonical" href="https://arigatodevan.com/terms.php">
     <link rel="stylesheet" href="style.css?v=2026052201">
     <style>
         .legal-wrap { max-width: 780px; margin: 40px auto; padding: 0 24px 100px; }
@@ -44,7 +45,7 @@
                     <img src="toplogo/logo01.webp" alt="Logo">
                 </div>
                 <div class="logo-back">
-                    <img src="toplogo/logo02.webp" alt="Logo Alt">
+                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
                 </div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN</div>
@@ -117,7 +118,7 @@
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 </body>
 </html>

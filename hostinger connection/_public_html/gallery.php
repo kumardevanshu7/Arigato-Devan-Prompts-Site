@@ -74,6 +74,7 @@ function sessionAvatar()
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan Prompts</title>
     <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
+    <link rel="canonical" href="https://arigatodevan.com/gallery.php">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -126,7 +127,7 @@ function sessionAvatar()
                     <img src="toplogo/logo01.webp" alt="Logo" id="profile-logo">
                 </div>
                 <div class="logo-back">
-                    <img src="toplogo/logo02.webp" alt="Logo Alt">
+                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
                 </div>
             </div>
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
@@ -136,6 +137,7 @@ function sessionAvatar()
             <a href="gallery.php" class="active">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
                 <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -214,7 +216,7 @@ function sessionAvatar()
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
+                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
                     Login
                 </a>
             <?php endif; ?>
@@ -299,7 +301,7 @@ function sessionAvatar()
                             $ptype === "unreleased" && !$p["is_unlocked"]
                                 ? "filter: blur(5px); transform: scale(1.1);"
                                 : ""; ?>
-                        <img src="<?= htmlspecialchars(
+                        <img loading="lazy" src="<?= htmlspecialchars(
                             $p["image_path"],
                         ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
     $p["title"],
@@ -363,7 +365,7 @@ function sessionAvatar()
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 
     <!-- Unlock Modal -->
@@ -371,7 +373,7 @@ function sessionAvatar()
         <div class="modal-content split-view">
             <button class="close-modal">&times;</button>
             <div class="modal-left">
-                <img src="" id="modal-image" alt="Prompt Preview">
+                <img loading="lazy" src="" id="modal-image" alt="Prompt Preview">
             </div>
             <div class="modal-right">
                 <h2 id="modal-title">PROMPT LOCKED</h2>

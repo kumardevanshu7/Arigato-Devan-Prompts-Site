@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -509,7 +509,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 reader.onload = e => {
                     const div = document.createElement('div');
                     div.className = 'asset-preview-thumb';
-                    div.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                    div.innerHTML = `<img loading="lazy" src="${e.target.result}" alt="preview">`;
                     previews.appendChild(div);
                 };
                 reader.readAsDataURL(f);

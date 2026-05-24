@@ -1,5 +1,67 @@
-# Arigato Devan — Performance Optimization Report
-**Date:** 22 May 2026  
+# Arigato Devan — Full Update History
+> All changes are dated and include reason for the change.
+
+---
+
+## 24 May 2026 — SEO, FAQ Page & Technical Improvements
+
+### What was done:
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | **Created `faq.php`** — comic design, English/Hinglish toggle, 19 Q&As across 5 categories | Google FAQ rich snippets = better CTR + AdSense support + user guidance |
+| 2 | **FAQ `?` icon added to navbar** — all 10 pages | Easy access + internal linking signal to Google |
+| 3 | **FAQ added to sitemap** (priority 0.7) | Google indexes FAQ page faster |
+| 4 | **FAQ added to all page footers** — now 6 footer links | Consistent navigation across entire site |
+| 5 | **Canonical tags added** — 13 static pages | Prevents duplicate content issues in Google Search |
+| 6 | **`loading="lazy"` added** — all images across 33 files | **Lazy loading** = image tab load hoti hai jab user scroll karke us tak pahunche. Bina iske page open hone pe saari images ek saath download hoti hain — slow. Isse LCP (Largest Contentful Paint) improve hota hai — Google Core Web Vitals ka direct ranking factor. |
+| 7 | **Schema markup (WebSite + Organization)** — `index.php` | Signals site structure to Google; increases sitelinks chances |
+| 8 | **OG tags added** — `about.php`, `contact.php` | Proper preview card when shared on WhatsApp/Instagram/Twitter |
+| 9 | **Admin email fixed** — `arigato.devan@gmail.com` → `devansh.grow@gmail.com` in `send_contact.php`, `contact.php`, `privacy.php` | Wrong email was hardcoded; real Gmail is `devansh.grow@gmail.com` |
+| 10 | **Admin email HTML redesign** — `send_contact.php` | Plain text email → styled HTML email with dark header, cards, Reply button |
+| 11 | **User Growth Chart** added to `user_management.php` — last 30 days bar graph (Chart.js) | Admin can see daily signups trend — helps track growth spikes from Instagram posts |
+| 12 | **Top Users leaderboard** added to `user_management.php` — top 10 users by prompts unlocked | Admin can identify most engaged users |
+
+---
+
+## 24 May 2026 — Email System Setup
+
+### What was done:
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | **Created `noreply@arigatodevan.com`** mailbox on Hostinger | Need a domain email to send contact form emails via PHP mail() |
+| 2 | **DKIM DNS records added** in Cloudflare (3 CNAME records) | Authorizes Hostinger mail servers; prevents emails going to spam |
+| 3 | **DMARC DNS record added** in Cloudflare (`_dmarc` TXT) | Proves emails are really from arigatodevan.com |
+| 4 | **All DNS verified** — MX, SPF, DKIM, DMARC all ✅ in Hostinger | Email deliverability confirmed |
+
+---
+
+## 24 May 2026 — AdSense & Legal Pages
+
+### What was done:
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | **Created `about.php`** — comic style, profile flip animation | AdSense requirement: site must have an About page showing who runs it |
+| 2 | **Created `contact.php`** — form with Sending/Success popup | AdSense requirement: contact information must be accessible |
+| 3 | **Created `send_contact.php`** — PHP mail() handler | Backend for contact form: sends notification to admin + confirmation to user |
+| 4 | **Privacy Policy rewritten** (`privacy.php`) — 14 sections | Old policy was too basic; AdSense needs full disclosure of Google Analytics, AdSense cookies, Cloudflare, data rights |
+| 5 | **Footer updated on 16 pages** — added ABOUT, CONTACT links | AdSense reviews every page footer for navigation links to legal/info pages |
+
+---
+
+## 23 May 2026 — Instagram In-App Browser Fix
+
+### What was done:
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | **Instagram in-app browser detection** added to `gtag.php` | Users clicking Instagram links stay inside Instagram browser — site behaves differently, some features may break |
+| 2 | **Comic-style banner** shown at bottom with "Open in Browser" + "Copy Link" buttons | Guides users to open in their real browser for better experience |
+| 3 | **Android Intent URL** for Chrome opening | Direct `intent://` URL opens Chrome on Android reliably |
+| 4 | **iOS Chrome fallback** + clipboard copy | iOS can't use intent URLs; copies link and shows instruction |
+| 5 | **GA4 custom event** `instagram_inapp_visit` fires | Tracks how many users come from Instagram in-app to measure impact |
+
+---
+
+## 22 May 2026 — Performance Optimization
 **Session:** Background overhaul, icon cleanup, mobile UI fixes
 
 ---
@@ -105,7 +167,7 @@
 | Minify `style.css` (4000+ lines) | ~30–40% CSS size | Medium |
 | Minify `script.js` | ~25–35% JS size | Medium |
 | Convert profile/upload images to WebP | Variable | Low per image |
-| Lazy load all non-critical images | FCP improvement | Low |
+| ~~Lazy load all non-critical images~~ | ~~FCP improvement~~ | ✅ Done — 24 May 2026 |
 | Add Cache-Control headers on Hostinger | Repeat visitor speed | Low |
 
 ---

@@ -9,6 +9,7 @@ require_once "db.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
+    <link rel="canonical" href="https://arigatodevan.com/privacy.php">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css?v=2026052201">
@@ -147,7 +148,7 @@ require_once "db.php";
 
 <footer>
     <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
 </body>
