@@ -88,6 +88,88 @@ $users = $pdo
     )
     ->fetchAll(PDO::FETCH_ASSOC);
 
+// ── Extended Analytics ──────────────────────────────────────────
+// Best signup day ever
+$best_day = $pdo->query("SELECT DATE(created_at) as day, COUNT(*) as cnt FROM users GROUP BY DATE(created_at) ORDER BY cnt DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+
+// Total saves
+$total_saves = (int)$pdo->query("SELECT COUNT(*) FROM saved_prompts")->fetchColumn();
+
+// Total blogs
+try { $total_blogs = (int)$pdo->query("SELECT COUNT(*) FROM blogs")->fetchColumn(); } catch(Exception $e) { $total_blogs = 0; }
+
+// Prev week comparison (users & prompts)
+$prev_week_users   = (int)$pdo->query("SELECT COUNT(*) FROM users   WHERE created_at >= DATE_SUB(NOW(),INTERVAL 14 DAY) AND created_at < DATE_SUB(NOW(),INTERVAL 7 DAY)")->fetchColumn();
+$prev_week_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 14 DAY) AND created_at < DATE_SUB(NOW(),INTERVAL 7 DAY)")->fetchColumn();
+$weekly_users_int  = (int)$weekly_users;
+$weekly_prompts_int= (int)$weekly_prompts;
+$users_trend   = $prev_week_users   > 0 ? round(($weekly_users_int   - $prev_week_users)   / $prev_week_users   * 100) : ($weekly_users_int   > 0 ? 100 : 0);
+$prompts_trend = $prev_week_prompts > 0 ? round(($weekly_prompts_int - $prev_week_prompts) / $prev_week_prompts * 100) : ($weekly_prompts_int > 0 ? 100 : 0);
+
+// Hourly signup heatmap (24 hours)
+$hourly_raw  = $pdo->query("SELECT HOUR(created_at) as hr, COUNT(*) as cnt FROM users GROUP BY HOUR(created_at)")->fetchAll(PDO::FETCH_ASSOC);
+$hourly_data = array_fill(0, 24, 0);
+foreach ($hourly_raw as $r) $hourly_data[(int)$r['hr']] = (int)$r['cnt'];
+$hourly_max  = max($hourly_data) ?: 1;
+
+// Top 3 users by activity score
+$top3_users = $pdo->query("
+    SELECT u.id, u.username, u.avatar, u.gender,
+        COALESCE((SELECT COUNT(*) FROM unlocked_prompts up WHERE up.user_id=u.id),0) +
+        COALESCE((SELECT COUNT(*) FROM saved_prompts   sp WHERE sp.user_id=u.id),0) +
+        COALESCE((SELECT COUNT(*) FROM likes           l  WHERE l.user_id=u.id), 0) as score
+    FROM users u WHERE u.role='user'
+    ORDER BY score DESC LIMIT 3
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Ghost users (no unlocks, saves, or likes at all)
+try {
+    $ghost_users = $pdo->query("
+        SELECT u.id, u.username, u.email, u.gender, u.created_at
+        FROM users u WHERE u.role='user'
+          AND NOT EXISTS (SELECT 1 FROM unlocked_prompts up WHERE up.user_id=u.id)
+          AND NOT EXISTS (SELECT 1 FROM saved_prompts   sp WHERE sp.user_id=u.id)
+          AND NOT EXISTS (SELECT 1 FROM likes            l  WHERE  l.user_id=u.id)
+        ORDER BY u.created_at DESC LIMIT 8
+    ")->fetchAll(PDO::FETCH_ASSOC);
+} catch(Exception $e) { $ghost_users = []; }
+
+// Platform breakdown (user_agent column — may not exist yet)
+try {
+    $mobile_count  = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE user_agent REGEXP 'Mobile|Android|iPhone'")->fetchColumn();
+    $desktop_count = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE user_agent IS NOT NULL AND user_agent NOT REGEXP 'Mobile|Android|iPhone'")->fetchColumn();
+} catch(Exception $e) { $mobile_count = 0; $desktop_count = 0; }
+
+// Admin greeting
+$admin_info  = $pdo->query("SELECT username, gender FROM users WHERE role='admin' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$admin_hour  = (int)date('H');
+$admin_gender = strtolower($admin_info['gender'] ?? 'male');
+$admin_name  = $admin_info['username'] ?? 'Admin';
+if ($admin_gender === 'female') {
+    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Sundari ☀️ Aaj bhi site shining hai teri tarah! 💖";
+    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Hey Beautiful 💕 Lunch break mein bhi admin grind? Queen hai tu! 🌸";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Babe 🌺 Afternoon check-in — sab smooth chal raha hai? 😊";
+    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Hey Gorgeous 🌙 Evening mein bhi site dekh rahi hai? Crown tujhe hi milega 👑";
+    else                                            $admin_greet = "Late night session, Babe ✨🌙 Thak gayi? Thoda rest bhi karo!";
+} else {
+    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Bhai ☀️ Fresh start — aaj kya plan hai? 🔥";
+    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Kya chal raha hai, King 👑 Lunch break admin session? Respect! 💪";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Afternoon hustle mode, Bhai 💥 Site grow ho rahi hai — check karo stats! 🚀";
+    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Evening check-in, Boss 🎯 Aaj ka kaam kaisa raha? Dekho numbers! 📊";
+    else                                            $admin_greet = "Late night grind, Bhai 🌙 Site ka khyal rakh raha hai — respect! 🔥";
+}
+
+// User growth milestones
+$milestone_goals = [50, 100, 250, 500, 1000, 2000, 5000, 10000];
+$next_milestone = null; $prev_milestone = 0;
+foreach ($milestone_goals as $g) {
+    if ($total_users_count < $g) { $next_milestone = $g; break; }
+    $prev_milestone = $g;
+}
+$milestone_pct = $next_milestone
+    ? min(100, round(($total_users_count - $prev_milestone) / ($next_milestone - $prev_milestone) * 100))
+    : 100;
+
 // Flash messages
 $success = $_SESSION["success_msg"] ?? "";
 $error = $_SESSION["error_msg"] ?? "";
@@ -444,6 +526,66 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             .dash-card [style*="width:64px"], .dash-card [style*="width: 64px"] { width: 48px !important; height: 48px !important; border-radius: 14px !important; flex-shrink: 0 !important; }
             .dash-card [style*="width:64px"] i, .dash-card [style*="width: 64px"] i { font-size: 1.2rem !important; }
         }
+
+        /* ── Greeting Bar ── */
+        .greeting-bar { background:linear-gradient(135deg,var(--primary-color),var(--secondary-color)); border:var(--border-width) solid var(--text-color); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow-comic); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .greeting-text { font-size:1.05rem; font-weight:800; color:var(--text-color); }
+        .greeting-time { font-size:.78rem; font-weight:700; color:var(--text-color); opacity:.7; }
+
+        /* ── Live Stats Bar ── */
+        .live-stats-bar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
+        .ls-pill { display:flex; align-items:center; gap:7px; background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:40px; padding:8px 18px; font-weight:800; font-size:.88rem; box-shadow:3px 3px 0 var(--text-color); white-space:nowrap; }
+        .ls-pill .ls-num { font-size:1.05rem; font-weight:900; }
+
+        /* ── Weekly Summary ── */
+        .weekly-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:28px; }
+        .wk-card { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:18px; padding:18px 20px; box-shadow:var(--shadow-comic); }
+        .wk-title { font-size:.7rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:#999; margin-bottom:6px; }
+        .wk-val { font-size:1.6rem; font-weight:900; line-height:1; }
+        .wk-trend { font-size:.78rem; font-weight:800; margin-top:4px; }
+        .trend-up { color:#22c55e; } .trend-dn { color:#ef4444; } .trend-flat { color:#aaa; }
+        @media(max-width:700px){ .weekly-row { grid-template-columns:1fr 1fr; } }
+
+        /* ── Milestones ── */
+        .milestone-bar-wrap { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:18px; padding:18px 22px; box-shadow:var(--shadow-comic); margin-bottom:28px; }
+        .ms-track { background:#eee; border-radius:40px; height:14px; overflow:hidden; margin:10px 0 6px; border:1.5px solid var(--text-color); }
+        .ms-fill  { height:100%; border-radius:40px; background:linear-gradient(90deg,var(--primary-color),var(--secondary-color)); transition:width .5s ease; }
+        .ms-labels { display:flex; justify-content:space-between; font-size:.75rem; font-weight:800; color:#aaa; }
+
+        /* ── Hourly Heatmap ── */
+        .heatmap-grid { display:grid; grid-template-columns:repeat(24,1fr); gap:4px; margin-top:14px; }
+        .hm-cell { aspect-ratio:1; border-radius:5px; cursor:default; transition:transform .15s; position:relative; }
+        .hm-cell:hover { transform:scale(1.3); z-index:2; }
+        .hm-cell::after { content:attr(data-tip); position:absolute; bottom:130%; left:50%; transform:translateX(-50%); background:#222; color:#fff; font-size:.65rem; font-weight:700; padding:3px 7px; border-radius:6px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s; }
+        .hm-cell:hover::after { opacity:1; }
+        .hm-labels { display:grid; grid-template-columns:repeat(24,1fr); gap:4px; margin-top:4px; }
+        .hm-label  { font-size:.55rem; font-weight:700; color:#aaa; text-align:center; }
+        @media(max-width:600px){ .heatmap-grid,.hm-labels { grid-template-columns:repeat(12,1fr); } }
+
+        /* ── Platform Breakdown ── */
+        .platform-bar { display:flex; height:18px; border-radius:40px; overflow:hidden; border:2px solid var(--text-color); margin:10px 0; }
+        .plat-mobile  { background:#a78bfa; }
+        .plat-desktop { background:#34d399; }
+
+        /* ── Top 3 Leaderboard ── */
+        .top3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
+        .top3-card { border:var(--border-width) solid var(--text-color); border-radius:16px; padding:16px 14px; text-align:center; box-shadow:var(--shadow-comic); transition:transform .15s; }
+        .top3-card:hover { transform:translateY(-3px); }
+        .top3-rank { font-size:1.5rem; margin-bottom:6px; }
+        .top3-av { width:52px; height:52px; border-radius:50%; border:3px solid var(--text-color); object-fit:cover; margin:0 auto 8px; display:block; }
+        .top3-av-ph { width:52px; height:52px; border-radius:50%; border:3px solid var(--text-color); background:var(--primary-color); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-weight:900; font-size:1.1rem; color:#fff; }
+        .top3-name { font-weight:800; font-size:.88rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .top3-score { font-size:.75rem; font-weight:700; color:var(--primary-color); margin-top:3px; }
+        @media(max-width:500px){ .top3-grid { grid-template-columns:1fr 1fr; } }
+
+        /* ── Ghost Users ── */
+        .ghost-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border-color); }
+        .ghost-row:last-child { border-bottom:none; }
+        .ghost-av-ph { width:36px; height:36px; border-radius:50%; border:2px solid var(--text-color); background:#eee; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem; flex-shrink:0; }
+
+        /* ── Dual section grid ── */
+        .dual-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
+        @media(max-width:800px){ .dual-grid { grid-template-columns:1fr; } }
     </style>
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -507,6 +649,21 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             </a>
         </div>
 
+        <!-- Greeting Bar -->
+        <div class="greeting-bar">
+            <div class="greeting-text"><?= htmlspecialchars($admin_greet) ?></div>
+            <div class="greeting-time"><?= date('D, d M Y — h:i A') ?> IST</div>
+        </div>
+
+        <!-- Live Stats Bar -->
+        <div class="live-stats-bar">
+            <div class="ls-pill"><span>👥</span> <span class="ls-num"><?= $total_users_count ?></span> Users</div>
+            <div class="ls-pill"><span>📦</span> <span class="ls-num"><?= $total_prompts ?></span> Prompts</div>
+            <div class="ls-pill"><span>❤️</span> <span class="ls-num"><?= number_format($total_likes) ?></span> Likes</div>
+            <div class="ls-pill"><span>🔖</span> <span class="ls-num"><?= $total_saves ?></span> Saves</div>
+            <div class="ls-pill"><span>📝</span> <span class="ls-num"><?= $total_blogs ?></span> Blogs</div>
+        </div>
+
         <!-- Analytics Grid -->
         <div class="analytics-grid">
             <div class="stat-card accent-1">
@@ -540,6 +697,150 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             </div>
             <?php endif; ?>
         </div>
+
+        <!-- Weekly Summary + Best Day + Milestones -->
+        <div class="weekly-row">
+            <?php
+            $u_arrow = $users_trend > 0 ? '↑' : ($users_trend < 0 ? '↓' : '→');
+            $u_cls   = $users_trend > 0 ? 'trend-up' : ($users_trend < 0 ? 'trend-dn' : 'trend-flat');
+            $p_arrow = $prompts_trend > 0 ? '↑' : ($prompts_trend < 0 ? '↓' : '→');
+            $p_cls   = $prompts_trend > 0 ? 'trend-up' : ($prompts_trend < 0 ? 'trend-dn' : 'trend-flat');
+            ?>
+            <div class="wk-card" style="background:var(--primary-color);">
+                <div class="wk-title">👥 New Users This Week</div>
+                <div class="wk-val">+<?= $weekly_users_int ?></div>
+                <div class="wk-trend <?= $u_cls ?>"><?= $u_arrow ?> <?= abs($users_trend) ?>% vs last week</div>
+            </div>
+            <div class="wk-card" style="background:var(--secondary-color);">
+                <div class="wk-title">📦 Prompts This Week</div>
+                <div class="wk-val">+<?= $weekly_prompts_int ?></div>
+                <div class="wk-trend <?= $p_cls ?>"><?= $p_arrow ?> <?= abs($prompts_trend) ?>% vs last week</div>
+            </div>
+            <?php if ($best_day && $best_day['cnt'] > 0): ?>
+            <div class="wk-card" style="background:#fff3cd;">
+                <div class="wk-title">🏆 Best Signup Day Ever</div>
+                <div class="wk-val"><?= $best_day['cnt'] ?> users</div>
+                <div class="wk-trend trend-flat"><?= date('d M Y', strtotime($best_day['day'])) ?></div>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- User Growth Milestones -->
+        <div class="milestone-bar-wrap">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;">🎯 User Milestone Progress</div>
+                <?php if ($next_milestone): ?>
+                <div style="font-size:.85rem;font-weight:800;"><?= $total_users_count ?> / <?= $next_milestone ?> users</div>
+                <?php else: ?>
+                <div style="font-size:.85rem;font-weight:800;color:#22c55e;">🎉 All milestones cleared!</div>
+                <?php endif; ?>
+            </div>
+            <div class="ms-track"><div class="ms-fill" style="width:<?= $milestone_pct ?>%;"></div></div>
+            <div class="ms-labels">
+                <span><?= $prev_milestone ?></span>
+                <span style="font-size:.8rem;font-weight:900;color:var(--primary-color);"><?= $milestone_pct ?>%</span>
+                <span><?= $next_milestone ?? '✓' ?></span>
+            </div>
+            <?php
+            $achieved = array_filter($milestone_goals, fn($g) => $total_users_count >= $g);
+            if (!empty($achieved)): ?>
+            <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+                <?php foreach ($achieved as $ag): ?>
+                <span style="background:var(--secondary-color);border:1.5px solid var(--text-color);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:900;">✅ <?= $ag ?></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Hourly Heatmap + Platform Breakdown (dual) -->
+        <div class="dual-grid">
+            <!-- Hourly Heatmap -->
+            <div class="dash-card" style="margin-bottom:0;">
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:4px;">⏰ Hourly Signup Heatmap</div>
+                <div style="font-size:.75rem;color:#aaa;font-weight:600;margin-bottom:8px;">When do users join? (hover for count)</div>
+                <div class="heatmap-grid">
+                    <?php foreach ($hourly_data as $hr => $cnt):
+                        $intensity = $hourly_max > 0 ? $cnt / $hourly_max : 0;
+                        $r = (int)(200 - $intensity * 100);
+                        $g = (int)(100 + $intensity * 120);
+                        $b = (int)(220 - $intensity * 150);
+                        $bg = "rgb($r,$g,$b)";
+                    ?>
+                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 — <?= $cnt ?> users"></div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="hm-labels">
+                    <?php for ($h=0;$h<24;$h++): ?>
+                    <div class="hm-label"><?= $h%6===0 ? $h : '' ?></div>
+                    <?php endfor; ?>
+                </div>
+            </div>
+
+            <!-- Platform Breakdown -->
+            <div class="dash-card" style="margin-bottom:0;">
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:8px;">📱 Platform Breakdown</div>
+                <?php $plat_total = $mobile_count + $desktop_count; ?>
+                <?php if ($plat_total > 0): ?>
+                <?php $mob_pct = round($mobile_count/$plat_total*100); $desk_pct = 100-$mob_pct; ?>
+                <div class="platform-bar">
+                    <div class="plat-mobile"  style="width:<?= $mob_pct ?>%;"></div>
+                    <div class="plat-desktop" style="width:<?= $desk_pct ?>%;"></div>
+                </div>
+                <div style="display:flex;gap:14px;font-size:.82rem;font-weight:800;margin-top:8px;">
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:3px;margin-right:5px;"></span>📱 Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#34d399;border-radius:3px;margin-right:5px;"></span>🖥 Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
+                </div>
+                <?php else: ?>
+                <div style="color:#aaa;font-size:.85rem;font-weight:600;padding:20px 0;text-align:center;">
+                    <i class="fa-solid fa-circle-info"></i> Data collection starting — will show after users log in
+                </div>
+                <?php endif; ?>
+
+                <!-- Top 3 Leaderboard inside platform card -->
+                <div style="margin-top:20px;border-top:2px dashed var(--border-color);padding-top:16px;">
+                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:10px;">🏆 Top 3 Most Active Users</div>
+                    <?php if (empty($top3_users)): ?>
+                    <div style="color:#aaa;font-size:.85rem;font-weight:600;text-align:center;padding:12px 0;">No activity data yet.</div>
+                    <?php else: ?>
+                    <div class="top3-grid" style="grid-template-columns:repeat(<?= count($top3_users) ?>,1fr);">
+                        <?php $crowns = ['🥇','🥈','🥉']; ?>
+                        <?php foreach ($top3_users as $i => $tu): ?>
+                        <div class="top3-card" style="background:<?= $i===0?'#fff3cd':($i===1?'#f1f5f9':'#fef6ee') ?>;">
+                            <div class="top3-rank"><?= $crowns[$i] ?? ($i+1) ?></div>
+                            <?php if (!empty($tu['avatar'])): ?>
+                            <img class="top3-av" src="<?= htmlspecialchars($tu['avatar']) ?>" alt="">
+                            <?php else: ?>
+                            <div class="top3-av-ph"><?= strtoupper(substr($tu['username']??'U',0,1)) ?></div>
+                            <?php endif; ?>
+                            <div class="top3-name"><?= htmlspecialchars($tu['username']??'User') ?></div>
+                            <div class="top3-score"><?= $tu['score'] ?> pts</div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ghost Users -->
+        <?php if (!empty($ghost_users)): ?>
+        <div class="dash-card" style="margin-bottom:28px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
+                <div style="font-size:1.1rem;font-weight:900;display:flex;align-items:center;gap:8px;">👻 Ghost Users <span style="font-size:.72rem;background:#ffe3e3;border:1.5px solid #d03030;color:#d03030;border-radius:20px;padding:2px 10px;font-weight:900;"><?= count($ghost_users) ?>+ joined, never interacted</span></div>
+                <a href="user_management.php" style="font-size:.78rem;font-weight:800;color:var(--primary-color);text-decoration:none;">View All →</a>
+            </div>
+            <?php foreach ($ghost_users as $gu): ?>
+            <div class="ghost-row">
+                <div class="ghost-av-ph"><?= strtoupper(substr($gu['username']??'U',0,1)) ?></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:800;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($gu['username']??'User') ?></div>
+                    <div style="font-size:.72rem;color:#aaa;font-weight:600;"><?= htmlspecialchars($gu['email']??'') ?></div>
+                </div>
+                <div style="font-size:.72rem;font-weight:700;color:#bbb;white-space:nowrap;"><?= date('d M Y', strtotime($gu['created_at'])) ?></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
 
         <!-- Quick Action Cards: Upload & Manage (now separate pages) -->
         <div class="dashboard-cols" style="gap:24px;">
@@ -681,7 +982,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;">
                 <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-users"></i> User Management</h2>
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;"><?= $total_users_count ?> Users</div>
+                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;width:fit-content;flex-shrink:0;"><?= $total_users_count ?> Users</div>
                     <a href="user_management.php" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:12px;padding:7px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Page</a>
                 </div>
             </div>

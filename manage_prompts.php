@@ -9,10 +9,40 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     exit();
 }
 
+// ── Bulk toggle (checkbox + publish/unpublish) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'], $_POST['selected_ids'])) {
+    $ids = array_map('intval', (array)$_POST['selected_ids']);
+    if (!empty($ids)) {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $new_type = $_POST['bulk_action'] === 'unreleased' ? 'unreleased' : $_POST['bulk_original_type'] ?? 'secret';
+        $stmt = $pdo->prepare("UPDATE prompts SET prompt_type = ? WHERE id IN ($placeholders)");
+        $stmt->execute(array_merge([$_POST['bulk_action']], $ids));
+    }
+    header('Location: manage_prompts.php'); exit;
+}
+
 $prompts = $pdo
     ->query("SELECT *, is_featured FROM prompts ORDER BY created_at DESC")
     ->fetchAll(PDO::FETCH_ASSOC);
 $total_prompts = count($prompts);
+
+// Performance table: top prompts by score (likes + saves)
+$perf_prompts = $pdo->query("
+    SELECT p.id, p.title, p.image_path, p.prompt_type, p.likes_count, p.slug,
+           COALESCE((SELECT COUNT(*) FROM saved_prompts sp WHERE sp.prompt_id=p.id),0) as saves_count
+    FROM prompts p
+    ORDER BY (p.likes_count + COALESCE((SELECT COUNT(*) FROM saved_prompts sp WHERE sp.prompt_id=p.id),0)) DESC
+    LIMIT 15
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Dead prompts (0 likes + 0 saves)
+$dead_prompts = $pdo->query("
+    SELECT p.id, p.title, p.image_path, p.prompt_type, p.created_at
+    FROM prompts p
+    WHERE p.likes_count = 0
+      AND NOT EXISTS (SELECT 1 FROM saved_prompts sp WHERE sp.prompt_id=p.id)
+    ORDER BY p.created_at ASC
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // Pre-build all tag list for filter dropdown
 $all_mgr_tags = [];
@@ -174,6 +204,108 @@ sort($all_mgr_tags);
     </div>
 </div>
 
+<!-- Prompt Performance Table -->
+<div class="dashboard-wrap" style="padding-top:0;">
+    <div class="dash-card" style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
+            <h2 style="margin:0;padding:0;border:none;font-size:1.2rem;"><i class="fa-solid fa-chart-bar" style="color:#3b82f6;"></i> Prompt Performance</h2>
+            <span style="font-size:.75rem;font-weight:800;color:#999;">Top 15 by Score (Likes + Saves)</span>
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:480px;">
+            <thead>
+                <tr style="border-bottom:2px solid var(--text-color);text-align:left;">
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">#</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">Prompt</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">❤️ Likes</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">🔖 Saves</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">🔥 Score</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($perf_prompts as $pi => $pp):
+                $score = $pp['likes_count'] + $pp['saves_count'];
+                $max_score = $perf_prompts[0]['likes_count'] + $perf_prompts[0]['saves_count'] ?: 1;
+                $bar_w = round($score / $max_score * 100);
+            ?>
+            <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:10px 12px;font-weight:900;color:#bbb;font-size:.82rem;"><?= $pi+1 ?></td>
+                <td style="padding:10px 12px;max-width:220px;">
+                    <div style="font-weight:800;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($pp['title']) ?></div>
+                    <div style="background:#eee;border-radius:4px;height:5px;margin-top:5px;overflow:hidden;">
+                        <div style="width:<?= $bar_w ?>%;height:100%;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));border-radius:4px;"></div>
+                    </div>
+                </td>
+                <td style="padding:10px 12px;text-align:center;font-weight:800;font-size:.88rem;color:#ef4444;"><?= $pp['likes_count'] ?></td>
+                <td style="padding:10px 12px;text-align:center;font-weight:800;font-size:.88rem;color:#3b82f6;"><?= $pp['saves_count'] ?></td>
+                <td style="padding:10px 12px;text-align:center;">
+                    <span style="background:<?= $pi===0?'#fff3cd':($pi<3?'#e0f2fe':'#f8f8f8') ?>;border:1.5px solid var(--text-color);border-radius:10px;padding:3px 10px;font-weight:900;font-size:.82rem;"><?= $score ?></span>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- Dead Prompts -->
+    <?php if (!empty($dead_prompts)): ?>
+    <div class="dash-card" style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
+            <h2 style="margin:0;padding:0;border:none;font-size:1.2rem;"><i class="fa-solid fa-skull" style="color:#ef4444;"></i> Dead Prompts <span style="font-size:.72rem;background:#ffe3e3;color:#d03030;border:1.5px solid #d03030;border-radius:20px;padding:2px 10px;font-weight:900;"><?= count($dead_prompts) ?> with 0 likes & 0 saves</span></h2>
+        </div>
+        <?php
+        $type_colors = ['secret'=>'#ffe3e3','unreleased'=>'#fff4cc','insta_viral'=>'#e3f7ff','already_uploaded'=>'#e6f2ff'];
+        foreach ($dead_prompts as $dp): ?>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--border-color);">
+            <img loading="lazy" src="<?= htmlspecialchars($dp['image_path']) ?>" style="width:42px;height:42px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);flex-shrink:0;" alt="">
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:800;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($dp['title']) ?></div>
+                <div style="font-size:.72rem;color:#aaa;font-weight:600;"><?= date('d M Y', strtotime($dp['created_at'])) ?></div>
+            </div>
+            <span style="background:<?= $type_colors[$dp['prompt_type']] ?? '#eee' ?>;border:1.5px solid var(--text-color);border-radius:8px;padding:3px 9px;font-size:.7rem;font-weight:900;white-space:nowrap;"><?= strtoupper($dp['prompt_type']) ?></span>
+            <a href="edit_prompt.php?id=<?= $dp['id'] ?>" style="background:#d4eaff;border:2px solid var(--text-color);border-radius:8px;padding:5px 11px;font-size:.75rem;font-weight:800;text-decoration:none;color:var(--text-color);white-space:nowrap;">✏️ Edit</a>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Bulk Publish/Unpublish -->
+    <div class="dash-card" style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
+            <h2 style="margin:0;padding:0;border:none;font-size:1.2rem;"><i class="fa-solid fa-check-double" style="color:#22c55e;"></i> Bulk Type Change</h2>
+            <span style="font-size:.75rem;font-weight:800;color:#999;">Select prompts → change type</span>
+        </div>
+        <form method="POST" id="bulk-form">
+            <input type="hidden" name="bulk_action" id="bulk-action-val" value="">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+                <?php foreach (['secret','unreleased','insta_viral','already_uploaded'] as $bt): ?>
+                <button type="button" onclick="setBulkAction('<?= $bt ?>')"
+                    style="background:<?= $type_colors[$bt]??'#eee' ?>;border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);transition:all .15s;"
+                    id="bulk-btn-<?= $bt ?>">
+                    Set → <?= strtoupper($bt) ?>
+                </button>
+                <?php endforeach; ?>
+                <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);">☑️ Select All</button>
+            </div>
+            <div id="bulk-list" style="max-height:320px;overflow-y:auto;border:2px solid var(--border-color);border-radius:14px;padding:8px;">
+                <?php foreach ($prompts as $bp): ?>
+                <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background=''">
+                    <input type="checkbox" name="selected_ids[]" value="<?= $bp['id'] ?>" style="width:18px;height:18px;accent-color:var(--primary-color);flex-shrink:0;">
+                    <img loading="lazy" src="<?= htmlspecialchars($bp['image_path']) ?>" style="width:36px;height:36px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);flex-shrink:0;" alt="">
+                    <span style="font-weight:800;font-size:.88rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($bp['title']) ?></span>
+                    <span style="font-size:.7rem;font-weight:900;background:<?= $type_colors[$bp['prompt_type']]??'#eee' ?>;border:1.5px solid var(--text-color);border-radius:8px;padding:2px 8px;white-space:nowrap;"><?= strtoupper($bp['prompt_type']) ?></span>
+                </label>
+                <?php endforeach; ?>
+            </div>
+            <div style="margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <button type="submit" id="bulk-submit" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:12px;padding:10px 22px;font-family:var(--font-main);font-weight:900;font-size:.9rem;cursor:pointer;box-shadow:3px 3px 0 var(--text-color);" disabled>Apply to Selected</button>
+                <span id="bulk-selected-count" style="font-size:.82rem;font-weight:700;color:#999;">0 selected</span>
+            </div>
+        </form>
+    </div>
+</div>
+
 <form id="delete-form" method="POST" action="delete_prompt.php" style="display:none;">
     <input type="hidden" name="prompt_id" id="delete-prompt-id">
 </form>
@@ -211,6 +343,34 @@ function confirmDelete(id, title) {
         document.getElementById('delete-form').submit();
     }
 }
+
+// Bulk action JS
+function setBulkAction(type) {
+    document.getElementById('bulk-action-val').value = type;
+    document.querySelectorAll('[id^="bulk-btn-"]').forEach(b => b.style.outline = 'none');
+    const btn = document.getElementById('bulk-btn-' + type);
+    if (btn) btn.style.outline = '3px solid var(--text-color)';
+    updateBulkSubmit();
+}
+function selectAllBulk() {
+    const cbs = document.querySelectorAll('#bulk-list input[type=checkbox]');
+    const allChecked = [...cbs].every(c => c.checked);
+    cbs.forEach(c => c.checked = !allChecked);
+    updateBulkSubmit();
+}
+function updateBulkSubmit() {
+    const checked = document.querySelectorAll('#bulk-list input[type=checkbox]:checked').length;
+    const action  = document.getElementById('bulk-action-val').value;
+    document.getElementById('bulk-selected-count').textContent = checked + ' selected';
+    document.getElementById('bulk-submit').disabled = !(checked > 0 && action);
+}
+document.querySelectorAll('#bulk-list input[type=checkbox]').forEach(cb => cb.addEventListener('change', updateBulkSubmit));
+document.getElementById('bulk-form').addEventListener('submit', function(e) {
+    const checked = document.querySelectorAll('#bulk-list input[type=checkbox]:checked').length;
+    const action  = document.getElementById('bulk-action-val').value;
+    if (!checked || !action) { e.preventDefault(); return; }
+    if (!confirm('Change ' + checked + ' prompt(s) to ' + action + '?')) e.preventDefault();
+});
 
 const searchInput = document.getElementById('prompt-search');
 const tagFilter   = document.getElementById('prompt-tag-filter');
