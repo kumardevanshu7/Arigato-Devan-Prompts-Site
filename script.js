@@ -280,6 +280,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((r) => r.json())
         .then((data) => {
           if (data.success) {
+            if (data.action === 'liked' && typeof gtag !== 'undefined') {
+              gtag('event', 'prompt_like', { prompt_id: promptId, prompt_title: (currentCardElement ? (currentCardElement.dataset.title || '') : '') });
+            }
             if (countSpan) countSpan.textContent = data.likes_count;
             if (cardCountSpan) cardCountSpan.textContent = data.likes_count;
             this.classList.toggle("liked-active", data.action === "liked");
@@ -728,6 +731,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          if (typeof gtag !== 'undefined') gtag('event', 'prompt_unlock', { method: 'secret_code', prompt_id: currentPromptId });
           // Update Modal UI
           const unlockArea = document.getElementById("modal-unlock-area");
           const unlockedArea = document.getElementById("modal-unlocked-area");
@@ -866,6 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          if (typeof gtag !== 'undefined') gtag('event', 'prompt_unlock', { method: 'insta_viral', prompt_id: promptId });
           const unlockArea = document.getElementById("modal-unlock-area");
           const unlockedArea = document.getElementById("modal-unlocked-area");
           const unlockedText = document.getElementById("modal-unlocked-text");
@@ -1072,6 +1077,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
+          if (typeof gtag !== 'undefined') gtag('event', 'prompt_unlock', { method: 'already_uploaded', prompt_id: promptId });
           const unlockArea = document.getElementById("modal-unlock-area");
           const unlockedArea = document.getElementById("modal-unlocked-area");
           const unlockedText = document.getElementById("modal-unlocked-text");
@@ -1118,6 +1124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
+          if (typeof gtag !== 'undefined') gtag('event', 'prompt_unlock', { method: 'unreleased', prompt_id: promptId });
           const unlockArea = document.getElementById("modal-unlock-area");
           const unlockedArea = document.getElementById("modal-unlocked-area");
           const unlockedText = document.getElementById("modal-unlocked-text");
@@ -1499,6 +1506,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((r) => r.json())
       .then((data) => {
         if (data.success && data.saved) {
+          if (typeof gtag !== 'undefined') gtag('event', 'prompt_save', { prompt_id: promptId });
           applySaveBtnState(saveBtn, true);
           // Reflect on the originating card so subsequent modal opens
           // see the saved state without a refresh.
