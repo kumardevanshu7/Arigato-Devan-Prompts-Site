@@ -22,6 +22,13 @@ $male_avatars = [
     "profiledp/b5.webp",
     "profiledp/b6.webp",
     "profiledp/b7.webp",
+    "profiledp/b8.webp",
+    "profiledp/b9.webp",
+    "profiledp/b10.webp",
+    "profiledp/b11.webp",
+    "profiledp/b12.webp",
+    "profiledp/b13.webp",
+    "profiledp/b14.webp",
 ];
 $female_avatars = [
     "profiledp/g1.webp",
@@ -31,6 +38,13 @@ $female_avatars = [
     "profiledp/g5.webp",
     "profiledp/g6.webp",
     "profiledp/g7.webp",
+    "profiledp/g8.webp",
+    "profiledp/g9.webp",
+    "profiledp/g10.webp",
+    "profiledp/g11.webp",
+    "profiledp/g12.webp",
+    "profiledp/g13.webp",
+    "profiledp/g14.webp",
 ];
 $all_avatars = array_merge($male_avatars, $female_avatars);
 

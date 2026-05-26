@@ -213,6 +213,16 @@ try {
     }
     </script>
     <?php include_once "gtag.php"; ?>
+    <style>
+    .pers-welcome{display:inline-flex;align-items:center;gap:10px;padding:8px 20px;border-radius:999px;margin-bottom:14px;backdrop-filter:blur(10px);}
+    .pers-female{background:rgba(255,182,210,0.22);border:1.5px solid rgba(255,150,190,0.5);}
+    .pers-male{background:rgba(120,160,255,0.18);border:1.5px solid rgba(100,140,255,0.45);}
+    .pers-alien{background:rgba(100,220,130,0.18);border:1.5px solid rgba(80,200,110,0.45);}
+    .pw-emoji{font-size:1.2rem;flex-shrink:0;}
+    .pw-text{display:flex;flex-direction:column;}
+    .pw-hi{font-size:.92rem;font-weight:900;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+    .pw-sub{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.7);margin-top:1px;}
+    </style>
 </head>
 <body>
 
@@ -336,14 +346,6 @@ try {
         .sp-num{font-size:1.35rem;font-weight:900;color:var(--text-color,#2d2a35);line-height:1;}
         .sp-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#888;}
         .sp-dot{font-size:.7rem;color:#ccc;font-weight:900;}
-        .pers-welcome{display:inline-flex;align-items:center;gap:12px;padding:12px 22px;border:var(--border-width,2px) solid var(--text-color,#2d2a35);border-radius:20px;margin-bottom:14px;box-shadow:var(--shadow-comic,4px 4px 0 #2d2a35);text-align:left;}
-        .pers-female{background:linear-gradient(135deg,#fff0f8,#fce4f4);}
-        .pers-male{background:linear-gradient(135deg,#f0f4ff,#e8f0fe);}
-        .pers-default{background:var(--secondary-color,#f3e5f5);}
-        .pw-emoji{font-size:1.7rem;flex-shrink:0;}
-        .pw-text{display:flex;flex-direction:column;}
-        .pw-hi{font-size:1rem;font-weight:900;color:var(--text-color,#2d2a35);}
-        .pw-sub{font-size:.75rem;font-weight:700;color:#666;margin-top:2px;}
         .aurora-bg {
             position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
             background:#fdf6ff;
@@ -620,11 +622,11 @@ try {
             </div>
         </div>
         <?php else: ?>
-        <div class="pers-welcome pers-default">
-            <span class="pw-emoji">👋</span>
+        <div class="pers-welcome pers-alien">
+            <span class="pw-emoji">�</span>
             <div class="pw-text">
-                <span class="pw-hi">Welcome back, <?= $uname ?>!</span>
-                <span class="pw-sub">Ready to create something viral today? ✨</span>
+                <span class="pw-hi">Greetings, <?= $uname ?>!</span>
+                <span class="pw-sub">Alien confirmed 👾 Abhi profile pe ja aur gender set kar!</span>
             </div>
         </div>
         <?php endif; ?>
