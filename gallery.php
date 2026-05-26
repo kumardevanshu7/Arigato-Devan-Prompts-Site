@@ -25,6 +25,8 @@ $total_pages = max(1, (int)ceil($total / $per_page));
 $all_tags_raw = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != ''") ->fetchAll(PDO::FETCH_COLUMN);
 $all_tags = [];
 foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $all_tags[] = $t; } }
+$tag_counts = [];
+foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $tag_counts[$t] = ($tag_counts[$t] ?? 0) + 1; } }
 $all_tags = array_unique($all_tags); sort($all_tags);
 
 // Fetch prompts with unlocked status (LIMIT/OFFSET interpolated as int — safe, no user input)
@@ -91,6 +93,18 @@ function sessionAvatar()
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
     <style>
+        .tag-ctrl-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+        .tag-ctrl-label{font-size:.82rem;font-weight:900;color:var(--text-color);letter-spacing:.5px;text-transform:uppercase;opacity:.7;}
+        .tag-ctrl-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .tag-sort-grp{display:flex;border:2px solid var(--text-color);border-radius:14px;overflow:hidden;}
+        .tag-sort-btn{padding:5px 12px;font-size:.72rem;font-weight:800;font-family:var(--font-main);background:var(--bg-color);color:var(--text-color);border:none;border-right:2px solid var(--text-color);cursor:pointer;transition:background .15s;white-space:nowrap;}
+        .tag-sort-btn:last-child{border-right:none;}
+        .tag-sort-btn.active{background:var(--primary-color);}
+        .tag-sort-btn:hover:not(.active){background:var(--card-bg);}
+        .tag-toggle-btn{display:flex;align-items:center;gap:6px;padding:5px 14px;font-size:.72rem;font-weight:800;font-family:var(--font-main);background:var(--card-bg);color:var(--text-color);border:2px solid var(--text-color);border-radius:14px;cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:2px 2px 0 var(--text-color);}
+        .tag-toggle-btn:hover{background:var(--primary-color);}
+        .tag-filter-container{transition:max-height .35s ease,opacity .3s ease,margin .3s ease;max-height:500px;opacity:1;overflow:hidden;}
+        .tag-filter-container.tags-hidden{max-height:0!important;opacity:0;margin-bottom:0!important;pointer-events:none;}
         .gallery-header {
             display: flex;
             align-items: center;
@@ -229,10 +243,26 @@ function sessionAvatar()
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
         <?php else: ?>
-            <div class="tag-filter-container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:30px;">
-                <a href="gallery.php" class="tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" style="background:<?= !$tag_filter || $tag_filter === 'all' ? 'var(--primary-color)' : 'var(--bg-color)' ?>; padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-decoration:none; color:var(--text-color);">All</a>
+            <!-- Tag Controls -->
+            <div class="tag-ctrl-bar">
+              <span class="tag-ctrl-label"><i class="fa-solid fa-tag" style="margin-right:5px;"></i>Filter by Tag</span>
+              <div class="tag-ctrl-right">
+                <div class="tag-sort-grp">
+                  <button class="tag-sort-btn active" data-sort="az">A &rarr; Z</button>
+                  <button class="tag-sort-btn" data-sort="za">Z &rarr; A</button>
+                  <button class="tag-sort-btn" data-sort="pop">Popular</button>
+                </div>
+                <button class="tag-toggle-btn" id="tag-toggle-btn">
+                  <i class="fa-solid fa-chevron-up" id="tag-toggle-icon"></i>
+                  <span id="tag-toggle-label">Hide</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="tag-filter-container" id="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:30px;">
+                <a href="gallery.php" class="tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" data-label="All" data-count="9999" style="background:<?= !$tag_filter || $tag_filter === 'all' ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-decoration:none;color:var(--text-color);">All</a>
                 <?php foreach ($all_tags as $t): ?>
-                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>; padding:8px 18px; border-radius:20px; font-weight:800; border:2px solid var(--text-color); cursor:pointer; font-family:var(--font-main); font-size:0.85rem; transition:all 0.2s; text-transform:capitalize; text-decoration:none; color:var(--text-color);"><?= htmlspecialchars(ucfirst($t)) ?></a>
+                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" data-label="<?= htmlspecialchars(ucfirst($t)) ?>" data-count="<?= $tag_counts[$t] ?? 0 ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;text-decoration:none;color:var(--text-color);"><?= htmlspecialchars(ucfirst($t)) ?></a>
                 <?php endforeach; ?>
             </div>
 
@@ -432,9 +462,55 @@ function sessionAvatar()
         </div>
     </div>
 
-    <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
-        ? "true"
-        : "false" ?>;</script>
+    <script>const isLoggedIn = <?= isset($_SESSION["user_id"]) ? "true" : "false" ?>;</script>
+    <script>
+    (function(){
+      var container = document.getElementById('tag-filter-container');
+      var toggleBtn = document.getElementById('tag-toggle-btn');
+      var toggleIcon = document.getElementById('tag-toggle-icon');
+      var toggleLabel = document.getElementById('tag-toggle-label');
+      var sortBtns = document.querySelectorAll('.tag-sort-btn');
+      if (!container || !toggleBtn) return;
+
+      function getTags() {
+        return Array.from(container.querySelectorAll('.tag-filter-btn:not([data-label="All"])'));
+      }
+
+      function sortTags(type) {
+        var tags = getTags();
+        tags.sort(function(a, b) {
+          if (type === 'az') return a.dataset.label.localeCompare(b.dataset.label);
+          if (type === 'za') return b.dataset.label.localeCompare(a.dataset.label);
+          if (type === 'pop') return (parseInt(b.dataset.count)||0) - (parseInt(a.dataset.count)||0);
+          return 0;
+        });
+        tags.forEach(function(t){ container.appendChild(t); });
+        sortBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.sort === type); });
+        try { localStorage.setItem('tagbar_sort', type); } catch(e){}
+      }
+
+      function applyHide(hidden) {
+        container.classList.toggle('tags-hidden', hidden);
+        toggleIcon.className = hidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up';
+        toggleLabel.textContent = hidden ? 'Show' : 'Hide';
+        try { localStorage.setItem('tagbar_hidden', hidden ? '1' : '0'); } catch(e){}
+      }
+
+      var savedSort = 'az';
+      try { savedSort = localStorage.getItem('tagbar_sort') || 'az'; } catch(e){}
+      sortTags(savedSort);
+      var wasHidden = false;
+      try { wasHidden = localStorage.getItem('tagbar_hidden') === '1'; } catch(e){}
+      if (wasHidden) applyHide(true);
+
+      sortBtns.forEach(function(btn){
+        btn.addEventListener('click', function(){ sortTags(btn.dataset.sort); });
+      });
+      toggleBtn.addEventListener('click', function(){
+        applyHide(!container.classList.contains('tags-hidden'));
+      });
+    })();
+    </script>
         <script defer src="script.js?v=2026051205"></script>
         <script>
 
