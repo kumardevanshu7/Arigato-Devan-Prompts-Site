@@ -688,6 +688,10 @@ document.addEventListener("DOMContentLoaded", () => {
           detail: { promptId: card.dataset.id },
         }),
       );
+
+      if (typeof gtag !== 'undefined') gtag('event', 'prompt_view', { prompt_id: card.dataset.id, prompt_title: card.dataset.title || '' });
+      const _vf = new FormData(); _vf.append('action','view'); _vf.append('prompt_id', card.dataset.id);
+      fetch('track_action.php', { method:'POST', body:_vf }).catch(()=>{});
     });
   });
 
@@ -841,6 +845,13 @@ document.addEventListener("DOMContentLoaded", () => {
         fallbackCopy(textToCopy);
       }
 
+      const _cpid = currentPromptId;
+      if (_cpid) {
+        if (typeof gtag !== 'undefined') gtag('event', 'prompt_copy', { prompt_id: _cpid });
+        const _cf = new FormData(); _cf.append('action','copy'); _cf.append('prompt_id', _cpid);
+        fetch('track_action.php', { method:'POST', body:_cf }).catch(()=>{});
+      }
+
       const originalHTML = btn.innerHTML;
       btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
       btn.style.backgroundColor = "#00ff66";
@@ -988,17 +999,25 @@ document.addEventListener("DOMContentLoaded", () => {
       ta.remove();
     }
 
+    const _trackShare = () => {
+      if (typeof gtag !== 'undefined') gtag('event', 'prompt_share', { prompt_id: id, prompt_title: title });
+      const _sf = new FormData(); _sf.append('action','share'); _sf.append('prompt_id', id);
+      fetch('track_action.php', { method:'POST', body:_sf }).catch(()=>{});
+    };
+
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard
         .writeText(url)
-        .then(() => showComicAlert("Share link copied! \ud83d\udd17", "success"))
+        .then(() => { showComicAlert("Share link copied! \ud83d\udd17", "success"); _trackShare(); })
         .catch(() => {
           fallbackCopy(url);
           showComicAlert("Share link copied! \ud83d\udd17", "success");
+          _trackShare();
         });
     } else {
       fallbackCopy(url);
       showComicAlert("Share link copied! \ud83d\udd17", "success");
+      _trackShare();
     }
   }
 
@@ -1472,6 +1491,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function executeSearch(query) {
       searchDropdown.style.display = "none";
+      if (query.trim() && typeof gtag !== 'undefined') gtag('event', 'search_performed', { search_term: query.trim() });
       window.location.href = "gallery.php?search=" + encodeURIComponent(query);
     }
   }
@@ -1737,4 +1757,20 @@ function checkFirstUnlock() {
       }
     })
     .catch(function () {});
+})();
+
+// ── Scroll Depth Tracking ──
+(function () {
+  if (typeof gtag === 'undefined') return;
+  const depths = [25, 50, 75, 90];
+  const fired = new Set();
+  window.addEventListener('scroll', function () {
+    const scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
+    depths.forEach(function (d) {
+      if (scrolled >= d && !fired.has(d)) {
+        fired.add(d);
+        gtag('event', 'scroll_depth', { depth_percent: d, page: window.location.pathname });
+      }
+    });
+  }, { passive: true });
 })();

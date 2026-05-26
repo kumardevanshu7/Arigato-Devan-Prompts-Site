@@ -17,6 +17,9 @@ if (!$blog) {
     exit();
 }
 
+// Increment view count
+try { $pdo->prepare("UPDATE blogs SET view_count = COALESCE(view_count,0) + 1 WHERE id = ?")->execute([$blog['id']]); } catch (Exception $e) {}
+
 // Has current user liked?
 $user_liked = false;
 if (isset($_SESSION["user_id"])) {
@@ -502,5 +505,9 @@ document.querySelectorAll('.react-btn').forEach(function(btn){
                 }
             });
         }
+
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'blog_read', { blog_slug: '<?= addslashes($blog["slug"]) ?>', blog_title: '<?= addslashes($blog["title"] ?? "") ?>' });
+    }
 </script>
 </body></html>

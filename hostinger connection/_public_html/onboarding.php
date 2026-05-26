@@ -87,7 +87,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["profile_image"] = $avatar;
         $_SESSION["onboarding_complete"] = 1;
 
-        header("Location: index.php");
+        // Fire GA4 event then redirect
+        ?><!DOCTYPE html><html><head><?php include_once "gtag.php"; ?></head><body>
+        <script>
+        if(typeof gtag!=='undefined') gtag('event','onboarding_complete',{user_id:<?= (int)$_SESSION["user_id"] ?>});
+        setTimeout(function(){ window.location.replace('index.php'); }, 300);
+        </script></body></html><?php
         exit();
     }
 }
