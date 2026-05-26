@@ -109,6 +109,24 @@ try {
     $new_drop_count = 0;
 }
 
+// Fetch user gender for personalized welcome
+$user_gender = null;
+if (isset($_SESSION['user_id'])) {
+    try {
+        $gRow = $pdo->prepare("SELECT gender FROM users WHERE id = ?");
+        $gRow->execute([$_SESSION['user_id']]);
+        $user_gender = strtolower(trim($gRow->fetchColumn() ?? ''));
+    } catch (Exception $e) { $user_gender = null; }
+}
+
+// Social proof counts (logged-out only)
+$sp_users = 0; $sp_prompts = 0; $sp_unlocks = 0;
+try {
+    $sp_users   = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    $sp_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
+    $sp_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
+} catch (Exception $e) {}
+
 // Generate state token for CSRF if not exists
 ?>
 <!DOCTYPE html>
@@ -313,6 +331,19 @@ try {
             <div class="aurora-blob blob4"></div>
         </div>
         <style>
+        .sp-strip{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:22px auto 0;padding:13px 26px;max-width:380px;background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);border:2.5px solid var(--text-color,#2d2a35);border-radius:28px;box-shadow:4px 4px 0 var(--text-color,#2d2a35);}
+        .sp-item{display:flex;flex-direction:column;align-items:center;gap:1px;}
+        .sp-num{font-size:1.35rem;font-weight:900;color:var(--text-color,#2d2a35);line-height:1;}
+        .sp-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#888;}
+        .sp-dot{font-size:.7rem;color:#ccc;font-weight:900;}
+        .pers-welcome{display:inline-flex;align-items:center;gap:12px;padding:12px 22px;border:var(--border-width,2px) solid var(--text-color,#2d2a35);border-radius:20px;margin-bottom:14px;box-shadow:var(--shadow-comic,4px 4px 0 #2d2a35);text-align:left;}
+        .pers-female{background:linear-gradient(135deg,#fff0f8,#fce4f4);}
+        .pers-male{background:linear-gradient(135deg,#f0f4ff,#e8f0fe);}
+        .pers-default{background:var(--secondary-color,#f3e5f5);}
+        .pw-emoji{font-size:1.7rem;flex-shrink:0;}
+        .pw-text{display:flex;flex-direction:column;}
+        .pw-hi{font-size:1rem;font-weight:900;color:var(--text-color,#2d2a35);}
+        .pw-sub{font-size:.75rem;font-weight:700;color:#666;margin-top:2px;}
         .aurora-bg {
             position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
             background:#fdf6ff;
@@ -428,6 +459,15 @@ try {
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
                     Explore Prompts →
                 </a>
+            </div>
+
+            <!-- Social Proof Strip -->
+            <div class="sp-strip">
+                <div class="sp-item"><span class="sp-num"><?= $sp_users ?>+</span><span class="sp-label">Happy Users</span></div>
+                <div class="sp-dot">✦</div>
+                <div class="sp-item"><span class="sp-num"><?= $sp_prompts ?>+</span><span class="sp-label">AI Prompts</span></div>
+                <div class="sp-dot">✦</div>
+                <div class="sp-item"><span class="sp-num"><?= $sp_unlocks ?>+</span><span class="sp-label">Unlocks</span></div>
             </div>
 
             <!-- How It Works Steps -->
@@ -560,6 +600,35 @@ try {
     <?php else: ?>
     <!-- ============ LOGGED IN HERO ============ -->
     <div class="hero hero-logged-in">
+        <!-- Personalized Welcome -->
+        <?php
+        $uname = htmlspecialchars($_SESSION['username'] ?? 'Friend');
+        if ($user_gender === 'female' || $user_gender === 'f'): ?>
+        <div class="pers-welcome pers-female">
+            <span class="pw-emoji">💕</span>
+            <div class="pw-text">
+                <span class="pw-hi">Hiiii <?= $uname ?>~ 🌸</span>
+                <span class="pw-sub">Aaj kaun sa reel banayenge? Chalo explore karte hain ✨</span>
+            </div>
+        </div>
+        <?php elseif ($user_gender === 'male' || $user_gender === 'm'): ?>
+        <div class="pers-welcome pers-male">
+            <span class="pw-emoji">💪</span>
+            <div class="pw-text">
+                <span class="pw-hi">Welcome back, <?= $uname ?>!</span>
+                <span class="pw-sub">Tera next viral reel ready hai — unlock karo! 🔥</span>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="pers-welcome pers-default">
+            <span class="pw-emoji">👋</span>
+            <div class="pw-text">
+                <span class="pw-hi">Welcome back, <?= $uname ?>!</span>
+                <span class="pw-sub">Ready to create something viral today? ✨</span>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php if ($new_drop_count > 0): ?>
         <!-- 🔥 NEW DROP BANNER -->
         <a href="gallery.php" class="new-drop-banner" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:linear-gradient(90deg,#ff6b9d,#fb923c);color:#fff;border:var(--border-width) solid var(--text-color);border-radius:999px;font-weight:900;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;margin-bottom:18px;animation:newDropPulse 1.6s ease-in-out infinite;">
