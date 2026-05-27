@@ -1,6 +1,5 @@
 google_config.php
 db.php
-secret_code.php
 firebase_auth.php
 /private/
 *.log

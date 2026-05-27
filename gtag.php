@@ -66,7 +66,7 @@ $_gtag_canonical = 'https://arigatodevan.com' . strtok($_gtag_script, '?');
     }
   })();
 </script>
-<?php /* FCM disabled temporarily — re-enable by uncommenting: */ ?>
+<?php /* FCM disabled temporarily */ ?>
 <?php // if (file_exists(__DIR__ . '/fcm_init.php')) include_once __DIR__ . '/fcm_init.php'; ?>
 <!-- ── Open-in-Browser banner (Instagram / FB in-app) ── -->
 <style>

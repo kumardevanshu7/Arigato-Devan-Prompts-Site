@@ -717,6 +717,7 @@ try {
                 <!-- Card -->
                 <div class="card potd-card"
                      data-id="<?= $featuredPrompt["id"] ?>"
+                     data-slug="<?= htmlspecialchars($featuredPrompt['slug'] ?? '') ?>"
                      data-image="<?= htmlspecialchars(
                          $featuredPrompt["image_path"],
                      ) ?>"
@@ -856,6 +857,7 @@ try {
                         : "card-next" ?>"
                          data-index="<?= $index ?>"
                          data-id="<?= $p["id"] ?>"
+                         data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
                          data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
                          data-image="<?= htmlspecialchars($p["image_path"]) ?>"
                          data-title="<?= htmlspecialchars($p["title"]) ?>"

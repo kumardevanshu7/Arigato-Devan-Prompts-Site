@@ -401,14 +401,14 @@ document.querySelectorAll('.card').forEach(function(card) {
     if (trigger) {
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
-            var url = 'prompt.php?id=' + card.dataset.id;
+            var url = card.dataset.slug ? ('/prompts/' + card.dataset.slug) : ('prompt.php?id=' + card.dataset.id);
             document.body.style.transition = 'opacity 0.15s ease';
             document.body.style.opacity = '0';
             setTimeout(function() { window.location.href = url; }, 150);
         });
     }
     card.addEventListener('mouseenter', function() {
-        var url = 'prompt.php?id=' + card.dataset.id;
+        var url = card.dataset.slug ? ('/prompts/' + card.dataset.slug) : ('prompt.php?id=' + card.dataset.id);
         if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
             var link = document.createElement('link');
             link.rel = 'prefetch'; link.href = url;

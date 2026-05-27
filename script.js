@@ -336,6 +336,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Navigate to prompt page
+      const _slug = card.dataset.slug;
+      if (_slug) {
+        window.location.href = '/prompts/' + _slug;
+        return;
+      }
+
       currentPromptId = card.dataset.id;
       currentCardElement = card;
 
