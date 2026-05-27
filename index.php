@@ -134,19 +134,19 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arigato Devan � AI Couple Prompts for Instagram Reels</title>
-    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts � use instantly on ChatGPT. Only on Arigato Devan.">
+    <title>Arigato Devan — AI Couple Prompts for Instagram Reels</title>
+    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts — use instantly on ChatGPT. Only on Arigato Devan.">
     <link rel="canonical" href="https://arigatodevan.com/">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Arigato Devan Prompts � Premium AI Couple Prompts">
-    <meta property="og:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts � only on Arigato Devan! ??">
+    <meta property="og:title" content="Arigato Devan Prompts — Premium AI Couple Prompts">
+    <meta property="og:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Arigato Devan Prompts � Premium AI Couple Prompts">
-    <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts � only on Arigato Devan! ??">
+    <meta name="twitter:title" content="Arigato Devan Prompts — Premium AI Couple Prompts">
+    <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts — only on Arigato Devan! 💜">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <!-- Schema Markup: WebSite + Organization -->
     <script type="application/ld+json">
@@ -195,7 +195,7 @@ try {
                 "\n";
         }
     } ?>
-    <!-- WebSite Schema � homepage only -->
+    <!-- WebSite Schema — homepage only -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -405,8 +405,8 @@ try {
 
             <!-- Comic Guest Note -->
             <div id="hero-comic-note" style="position:relative;margin:18px auto 18px;max-width:460px;background:#fffbe6;border:3px solid var(--text-color,#2d2a35);border-radius:18px;padding:16px 22px 16px;box-shadow:4px 4px 0 var(--text-color,#2d2a35);text-align:center;">
-                <div style="position:absolute;top:-12px;left:20px;background:#ffec99;border:2.5px solid var(--text-color,#2d2a35);border-radius:999px;padding:2px 12px;font-family:var(--font-main);font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text-color,#2d2a35);">?? Note</div>
-                <p id="comic-note-text" style="font-family:var(--font-main);font-size:.9rem;font-weight:700;color:var(--text-color,#2d2a35);line-height:1.6;margin:8px 0 14px;">No need to login &mdash; you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts ??</p>
+                <div style="position:absolute;top:-12px;left:20px;background:#ffec99;border:2.5px solid var(--text-color,#2d2a35);border-radius:999px;padding:2px 12px;font-family:var(--font-main);font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text-color,#2d2a35);">📌 Note</div>
+                <p id="comic-note-text" style="font-family:var(--font-main);font-size:.9rem;font-weight:700;color:var(--text-color,#2d2a35);line-height:1.6;margin:8px 0 14px;">No need to login &mdash; you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts 😊</p>
                 <a href="gallery.php" style="display:inline-flex;align-items:center;gap:7px;background:var(--secondary-color,#c8b4f8);color:var(--text-color,#2d2a35);border:2.5px solid var(--text-color,#2d2a35);border-radius:999px;padding:10px 24px;font-family:var(--font-main);font-weight:900;font-size:.88rem;text-decoration:none;box-shadow:3px 3px 0 var(--text-color,#2d2a35);transition:transform .15s;" onmouseover="this.style.transform='translate(-2px,-2px)'" onmouseout="this.style.transform=''">&#x1F9ED; Explore Prompts &rarr;</a>
                 <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <svg id="hero-arrow-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-color,#2d2a35)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="animation:heroNoteArrow 1.1s ease-in-out infinite;"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="6 15 12 21 18 15"/></svg>
@@ -459,16 +459,16 @@ try {
                     Login with Google
                 </a>
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
-                    Explore Prompts ?
+                    Explore Prompts →
                 </a>
             </div>
 
             <!-- Social Proof Strip -->
             <div class="sp-strip">
                 <div class="sp-item"><span class="sp-num"><?= $sp_users ?>+</span><span class="sp-label">Happy Users</span></div>
-                <div class="sp-dot">?</div>
+                <div class="sp-dot">✦</div>
                 <div class="sp-item"><span class="sp-num"><?= $sp_prompts ?>+</span><span class="sp-label">AI Prompts</span></div>
-                <div class="sp-dot">?</div>
+                <div class="sp-dot">✦</div>
                 <div class="sp-item"><span class="sp-num"><?= $sp_unlocks ?>+</span><span class="sp-label">Unlocks</span></div>
             </div>
 
@@ -607,36 +607,36 @@ try {
         $uname = htmlspecialchars($_SESSION['username'] ?? 'Friend');
         if ($user_gender === 'female' || $user_gender === 'f'): ?>
         <div class="pers-welcome pers-female">
-            <span class="pw-emoji">??</span>
+            <span class="pw-emoji">💕</span>
             <div class="pw-text">
-                <span class="pw-hi">Hiiii <?= $uname ?>~ ??</span>
-                <span class="pw-sub">Aaj kaun sa reel banayenge? Chalo explore karte hain ?</span>
+                <span class="pw-hi">Hiiii <?= $uname ?>~ 🌸</span>
+                <span class="pw-sub">Aaj kaun sa reel banayenge? Chalo explore karte hain ✨</span>
             </div>
         </div>
         <?php elseif ($user_gender === 'male' || $user_gender === 'm'): ?>
         <div class="pers-welcome pers-male">
-            <span class="pw-emoji">??</span>
+            <span class="pw-emoji">💪</span>
             <div class="pw-text">
                 <span class="pw-hi">Welcome back, <?= $uname ?>!</span>
-                <span class="pw-sub">Tera next viral reel ready hai � unlock karo! ??</span>
+                <span class="pw-sub">Tera next viral reel ready hai — unlock karo! 🔥</span>
             </div>
         </div>
         <?php else: ?>
         <div class="pers-welcome pers-alien">
-            <span class="pw-emoji">?</span>
+            <span class="pw-emoji">�</span>
             <div class="pw-text">
                 <span class="pw-hi">Greetings, <?= $uname ?>!</span>
-                <span class="pw-sub">Alien confirmed ?? Abhi profile pe ja aur gender set kar!</span>
+                <span class="pw-sub">Alien confirmed 👾 Abhi profile pe ja aur gender set kar!</span>
             </div>
         </div>
         <?php endif; ?>
 
         <?php if ($new_drop_count > 0): ?>
-        <!-- ?? NEW DROP BANNER -->
+        <!-- 🔥 NEW DROP BANNER -->
         <a href="gallery.php" class="new-drop-banner" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:linear-gradient(90deg,#ff6b9d,#fb923c);color:#fff;border:var(--border-width) solid var(--text-color);border-radius:999px;font-weight:900;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;margin-bottom:18px;animation:newDropPulse 1.6s ease-in-out infinite;">
-            <span style="font-size:1.1rem;">??</span>
+            <span style="font-size:1.1rem;">🔥</span>
             <span><?= $new_drop_count ?> NEW <?= $new_drop_count === 1 ? "PROMPT" : "PROMPTS" ?> DROPPED!</span>
-            <span style="font-size:1.1rem;">?</span>
+            <span style="font-size:1.1rem;">→</span>
         </a>
         <style>
             @keyframes newDropPulse {
@@ -654,9 +654,9 @@ try {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" placeholder="SEARCH PROMPTS...">
         </div>
-        <!-- ?? Surprise Me Button -->
+        <!-- 🎲 Surprise Me Button -->
         <a href="surprise_me.php" class="surprise-me-btn" style="display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:14px 26px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;transition:all .15s ease;">
-            <span style="font-size:1.2rem;">??</span>
+            <span style="font-size:1.2rem;">🎲</span>
             <span>SURPRISE ME</span>
         </a>
         <style>
@@ -696,24 +696,24 @@ try {
                 $fptype = "secret_code";
             }
             $potd_badges = [
-                "secret_code" => "?? SECRET",
-                "unreleased" => "?? UNRELEASED",
-                "insta_viral" => "?? VIRAL",
-                "already_uploaded" => "? UPLOADED",
+                "secret_code" => "🔐 SECRET",
+                "unreleased" => "🌙 UNRELEASED",
+                "insta_viral" => "🔥 VIRAL",
+                "already_uploaded" => "✅ UPLOADED",
             ];
-            $type_badge = $potd_badges[$fptype] ?? "?? SECRET";
+            $type_badge = $potd_badges[$fptype] ?? "🔐 SECRET";
             ?>
         <div class="potd-section" style="margin-bottom:36px;">
-            <div class="potd-label">? PROMPT OF THE DAY</div>
+            <div class="potd-label">⭐ PROMPT OF THE DAY</div>
             <div class="potd-wrapper">
                 <!-- Floating heart decorations -->
-                <span class="potd-heart ph1">?</span>
-                <span class="potd-heart ph2">?</span>
-                <span class="potd-heart ph3">?</span>
-                <span class="potd-heart ph4">?</span>
-                <span class="potd-heart ph5">?</span>
-                <span class="potd-heart ph6">?</span>
-                <span class="potd-heart ph7">?</span>
+                <span class="potd-heart ph1">❤</span>
+                <span class="potd-heart ph2">❤</span>
+                <span class="potd-heart ph3">❤</span>
+                <span class="potd-heart ph4">❤</span>
+                <span class="potd-heart ph5">❤</span>
+                <span class="potd-heart ph6">❤</span>
+                <span class="potd-heart ph7">❤</span>
                 <!-- Card -->
                 <div class="card potd-card"
                      data-id="<?= $featuredPrompt["id"] ?>"
@@ -771,8 +771,8 @@ try {
                         </div>
                         <div class="potd-type-badge"><?= $type_badge ?></div>
                         <div class="potd-cta"><?= $featuredPrompt["is_unlocked"]
-                            ? "View Prompt ?"
-                            : "Tap to Unlock ?" ?></div>
+                            ? "View Prompt →"
+                            : "Tap to Unlock →" ?></div>
                     </div>
                     <div class="card-click-trigger"></div>
                 </div>
@@ -792,7 +792,7 @@ try {
             <?php endforeach; ?>
         </div>
 
-        <!-- Mobile Swipe Hint � only visible on mobile via CSS, hidden on desktop -->
+        <!-- Mobile Swipe Hint — only visible on mobile via CSS, hidden on desktop -->
         <div class="swipe-hint-box" id="swipe-hint-box" aria-label="Swipe instruction">
             <i class="fa-solid fa-arrow-left swipe-hint-arrow"></i>
             <span>Swipe right or left to see the cards</span>
@@ -803,38 +803,38 @@ try {
             <?php if (count($prompts) === 0): ?>
                 <p style="text-align:center; width: 100%; font-weight: 700; font-size: 1.2rem; margin-top: 50px;">No content yet! Admins can log in to upload prompts.</p>
             <?php
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
-                // Map DB prompt_type ? JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
+                // Map DB prompt_type → JS/UI ptype key
                 else: ?>
                 <?php foreach ($prompts as $index => $p):
 
@@ -923,7 +923,7 @@ try {
                 <div class="card end-card card-next" id="end-card">
                     <div class="end-card-content">
                         <div class="end-card-heart"><i class="fa-solid fa-heart"></i></div>
-                        <h3>More prompts coming soon&ndash;�</h3>
+                        <h3>More prompts coming soon&ndash;¦</h3>
                         <p>stay tuned</p>
                     </div>
                 </div>

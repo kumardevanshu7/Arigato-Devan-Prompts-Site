@@ -33,18 +33,18 @@ if (isset($_SESSION["user_id"])) {
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ??">
+<meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
     <link rel="canonical" href="https://arigatodevan.com/insta_viral.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Insta Viral Reels Prompts � Arigato Devan">
-<meta property="og:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ??">
+<meta property="og:title" content="Insta Viral Reels Prompts — Arigato Devan">
+<meta property="og:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/insta_viral.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Insta Viral Reels Prompts � Arigato Devan">
-<meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ??">
+<meta name="twitter:title" content="Insta Viral Reels Prompts — Arigato Devan">
+<meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -497,7 +497,7 @@ document.querySelectorAll('.iv-filter-btn').forEach(btn => {
     });
 });
 
-// Card click ? navigate to prompt page
+// Card click → navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

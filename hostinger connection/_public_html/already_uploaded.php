@@ -32,18 +32,18 @@ if (isset($_SESSION["user_id"])) {
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Already Uploaded Prompts &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! ??">
+<meta name="description" content="Prompts already shared on Instagram by Arigato Devan â€” unlock with just 9 taps! ðŸ“±">
     <link rel="canonical" href="https://arigatodevan.com/already_uploaded.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Already Uploaded Prompts — Arigato Devan">
-<meta property="og:description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! ??">
+<meta property="og:title" content="Already Uploaded Prompts â€” Arigato Devan">
+<meta property="og:description" content="Prompts already shared on Instagram by Arigato Devan â€” unlock with just 9 taps! ðŸ“±">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/already_uploaded.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Already Uploaded Prompts — Arigato Devan">
-<meta name="twitter:description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! ??">
+<meta name="twitter:title" content="Already Uploaded Prompts â€” Arigato Devan">
+<meta name="twitter:description" content="Prompts already shared on Instagram by Arigato Devan â€” unlock with just 9 taps! ðŸ“±">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -386,7 +386,7 @@ document.querySelectorAll('.aup-filter-btn').forEach(btn => {
     });
 });
 
-// Card click ? navigate to prompt page
+// Card click â†’ navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

@@ -29,7 +29,7 @@ $tag_counts = [];
 foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $tag_counts[$t] = ($tag_counts[$t] ?? 0) + 1; } }
 $all_tags = array_unique($all_tags); sort($all_tags);
 
-// Fetch prompts with unlocked status (LIMIT/OFFSET interpolated as int � safe, no user input)
+// Fetch prompts with unlocked status (LIMIT/OFFSET interpolated as int — safe, no user input)
 $tag_where = $tag_param ? " AND LOWER(p.tag) LIKE ?" : "";
 if (isset($_SESSION["user_id"])) {
     $sql = "SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
@@ -75,18 +75,18 @@ function sessionAvatar()
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan Prompts</title>
-    <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites � only on Arigato Devan! ?">
+    <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <link rel="canonical" href="https://arigatodevan.com/gallery.php">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Gallery � All AI Couple Prompts | Arigato Devan">
-    <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites � only on Arigato Devan! ?">
+    <meta property="og:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
+    <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/gallery.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gallery � All AI Couple Prompts | Arigato Devan">
-    <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites � only on Arigato Devan! ?">
+    <meta name="twitter:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
+    <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="stylesheet" href="style.css?v=2026052201">
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -514,7 +514,7 @@ function sessionAvatar()
         <script defer src="script.js?v=2026052801"></script>
         <script>
 
-        // Card click ? navigate to clean prompt URL (with fade-out)
+        // Card click → navigate to clean prompt URL (with fade-out)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.gallery-grid .card').forEach(function(card) {
                 var trigger = card.querySelector('.card-click-trigger');
@@ -545,10 +545,10 @@ function sessionAvatar()
 <!-- Wrong Code Comic Popup -->
 <div id="wrong-code-popup">
     <div class="wrong-code-card">
-        <span class="wrong-code-emoji">?????</span>
-        <div class="wrong-code-title">NO NO BACHA�</div>
-        <div class="wrong-code-msg">its wrong code ??<br>Watch the reel to get the correct one!</div>
-        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN ??</button>
+        <span class="wrong-code-emoji">🙅‍♂️</span>
+        <div class="wrong-code-title">NO NO BACHA…</div>
+        <div class="wrong-code-msg">its wrong code 😅<br>Watch the reel to get the correct one!</div>
+        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN 🔄</button>
     </div>
 </div>
 </body>
