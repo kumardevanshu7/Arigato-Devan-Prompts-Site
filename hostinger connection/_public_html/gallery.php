@@ -30,7 +30,7 @@ foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) {
 $all_tags = array_unique($all_tags); sort($all_tags);
 
 // Fetch prompts with unlocked status (LIMIT/OFFSET interpolated as int — safe, no user input)
-$tag_where = $tag_param ? " AND LOWER(p.tag) LIKE ?" : "";
+$tag_where = $tag_param ? " AND LOWER(tag) LIKE ?" : "";
 if (isset($_SESSION["user_id"])) {
     $sql = "SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
                IF(l.id IS NOT NULL, 1, 0) as is_liked,
