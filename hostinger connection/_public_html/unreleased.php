@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -35,18 +35,18 @@ if (isset($_SESSION["user_id"])) {
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unreleased Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta name="description" content="Exclusive unreleased AI couple prompts � unlock before anyone else! Show love &amp; get early access. ??">
     <link rel="canonical" href="https://arigatodevan.com/unreleased.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Unreleased Prompts — Arigato Devan">
-<meta property="og:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta property="og:title" content="Unreleased Prompts � Arigato Devan">
+<meta property="og:description" content="Exclusive unreleased AI couple prompts � unlock before anyone else! Show love &amp; get early access. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/unreleased.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Unreleased Prompts — Arigato Devan">
-<meta name="twitter:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta name="twitter:title" content="Unreleased Prompts � Arigato Devan">
+<meta name="twitter:description" content="Exclusive unreleased AI couple prompts � unlock before anyone else! Show love &amp; get early access. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -352,7 +352,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026051205"></script>
+<script defer src="script.js?v=2026052801"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -395,7 +395,7 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
     });
 });
 
-// Card click → navigate to prompt page
+// Card click ? navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

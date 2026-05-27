@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -149,7 +149,7 @@ if (empty($_SESSION["oauth_state"])) {
     <div class="cs-icon"><i class="fa-solid fa-lock" style="font-size:2.5rem;"></i></div>
     <div class="cs-badge"><i class="fa-solid fa-clock"></i> Coming Very Soon</div>
     <h1 class="cs-title">Secret Code<br><span class="highlight">Reels</span></h1>
-    <p class="cs-sub">Exclusive locked prompts are being prepared. Watch our reels to get the secret codes and unlock them first! 🔒</p>
+    <p class="cs-sub">Exclusive locked prompts are being prepared. Watch our reels to get the secret codes and unlock them first! ??</p>
     <div class="cs-notify-row">
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f09433,#dc2743);color:white;padding:12px 24px;border-radius:12px;border:var(--border-width) solid var(--text-color);font-weight:900;text-decoration:none;box-shadow:var(--shadow-comic);"><i class="fa-brands fa-instagram"></i> Follow @arigato.devan</a>
         <a href="gallery.php" class="comic-btn" style="text-decoration:none;padding:12px 22px;"><i class="fa-solid fa-arrow-left"></i> Explore Gallery</a>
@@ -315,7 +315,7 @@ if (empty($_SESSION["oauth_state"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026051206"></script>
+<script defer src="script.js?v=2026052801"></script>
 <script>
 // Background scroll
 const bgLayers = document.querySelectorAll('.bg-layer');
@@ -406,7 +406,7 @@ function verifyCode(){
         .finally(()=>{submitBtn.disabled=false;submitBtn.innerHTML='<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt';});
 }
 
-function spawnEmojis(){const e=['🎉','✨','🔥','💡','⭐','🫶','🙸'];for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=e[Math.floor(Math.random()*e.length)];s.style.cssText=`position:fixed;top:-40px;left:${Math.random()*100}vw;font-size:${1.5+Math.random()*1.5}rem;pointer-events:none;z-index:9999;animation:fall ${1.5+Math.random()*2}s ease forwards;`;document.body.appendChild(s);setTimeout(()=>s.remove(),4000);}}
+function spawnEmojis(){const e=['??','?','??','??','?','??','??'];for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=e[Math.floor(Math.random()*e.length)];s.style.cssText=`position:fixed;top:-40px;left:${Math.random()*100}vw;font-size:${1.5+Math.random()*1.5}rem;pointer-events:none;z-index:9999;animation:fall ${1.5+Math.random()*2}s ease forwards;`;document.body.appendChild(s);setTimeout(()=>s.remove(),4000);}}
 
 // Copy
 if(copyBtn){copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(unlockedText.textContent).then(()=>{copyBtn.innerHTML='<i class="fa-solid fa-check"></i> COPIED!';setTimeout(()=>{copyBtn.innerHTML='<i class="fa-solid fa-copy"></i> COPY';},2000);});});}
