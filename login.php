@@ -534,7 +534,7 @@ unset($_SESSION["error_msg"]);
 </head>
 
 <body>
-    <div class="login-root" style="background:transparent;">
+    <div class="login-root">
         <!-- Aurora Background -->
         <div class="aurora-bg" aria-hidden="true">
             <div class="aurora-blob blob1"></div>
