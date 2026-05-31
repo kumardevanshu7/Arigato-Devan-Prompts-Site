@@ -39,6 +39,7 @@ arsort($all_tags);
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <!-- Open Graph & Twitter Card -->
@@ -54,34 +55,579 @@ arsort($all_tags);
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <style>
-/* &mdash;&ndash;&mdash;&ndash;&mdash; Blogs Page &mdash;&ndash;&mdash;&ndash;&mdash; */
+/* Global Modern Reset for Blog Section */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    background-color: #f1f5f9 !important; /* Neutral light-gray base */
+    font-family: 'Inter', sans-serif !important;
+    color: #1e293b !important;
+    margin: 0;
+    padding: 0;
+    position: relative !important;
+}
+
+/* Luxury GSAP Splash Screen Loader Styles */
+.blog-splash-screen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #090c15 !important; /* Premium dark background */
+    z-index: 9999999 !important;
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    overflow: hidden !important;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* Initial curtain down */
+}
+.splash-content {
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 32px !important;
+    perspective: 1000px !important;
+}
+.splash-logo-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    font-size: 2.8rem !important;
+    font-weight: 900 !important;
+    letter-spacing: -2px !important;
+}
+/* Word & Letter staggers */
+.splash-word {
+    display: flex !important;
+    gap: 4px !important;
+}
+.splash-word span {
+    display: inline-block !important;
+    opacity: 0;
+    transform: translateY(30px) scale(0.6);
+    filter: blur(10px);
+}
+.prompt-word span {
+    color: #e2e8f0 !important;
+    text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;
+}
+.blog-word span {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;
+}
+/* Spinning Neon Ring Loader & Arrow */
+.splash-arrow-wrap {
+    position: relative !important;
+    width: 80px !important;
+    height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.splash-arrow {
+    font-size: 1.8rem !important;
+    color: #6366f1 !important;
+    opacity: 0;
+    transform: scale(0.3) rotate(-180deg);
+    text-shadow: 0 0 25px rgba(99,102,241,0.8) !important;
+    position: absolute !important;
+    z-index: 10 !important;
+}
+/* Neon Ring Spinning Loader */
+.splash-ring-loader {
+    width: 68px !important;
+    height: 68px !important;
+    border: 3px solid rgba(99, 102, 241, 0.08) !important;
+    border-top: 3px solid #6366f1 !important;
+    border-right: 3px solid #a855f7 !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.25) !important;
+    opacity: 0;
+    transform: scale(0.5);
+}
+.splash-loading-label {
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
+    color: #475569 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+/* Responsive adjustments for Splash Screen */
+@media (max-width: 768px) {
+    .splash-logo-container {
+        font-size: 2rem !important; /* Scale down on tablets */
+        gap: 12px !important;
+    }
+    .splash-arrow-wrap {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .splash-ring-loader {
+        width: 50px !important;
+        height: 50px !important;
+        border-width: 2px !important;
+    }
+    .splash-arrow {
+        font-size: 1.4rem !important;
+    }
+}
+@media (max-width: 480px) {
+    .splash-logo-container {
+        font-size: 1.4rem !important; /* Snug fit on mobile screens under 480px */
+        gap: 8px !important;
+    }
+    .splash-arrow-wrap {
+        width: 44px !important;
+        height: 44px !important;
+    }
+    .splash-ring-loader {
+        width: 36px !important;
+        height: 36px !important;
+        border-width: 2px !important;
+    }
+    .splash-arrow {
+        font-size: 1rem !important;
+    }
+    .splash-loading-label {
+        font-size: 0.65rem !important;
+        letter-spacing: 2px !important;
+    }
+}
+@media (max-width: 360px) {
+    .splash-logo-container {
+        font-size: 1.2rem !important; /* Perfect fit on ultra-small mobile screens */
+        gap: 6px !important;
+    }
+}
+
+/* Force hide all scrollbars of HTML and Body elements during splash transitions */
+html.no-scroll, body.no-scroll {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+
+/* Animated Ambient Aurora Background */
+.aurora-bg {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: -2 !important;
+    background: 
+        radial-gradient(circle at 15% 15%, rgba(193, 232, 255, 0.75) 0%, transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(224, 218, 254, 0.75) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(245, 238, 253, 0.85) 0%, transparent 50%),
+        radial-gradient(circle at 80% 85%, rgba(193, 232, 255, 0.5) 0%, transparent 40%) !important;
+    filter: blur(80px) !important;
+    animation: auroraShift 30s ease infinite alternate !important;
+}
+
+@keyframes auroraShift {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    50% {
+        transform: translate(40px, -30px) scale(1.08);
+    }
+    100% {
+        transform: translate(-30px, 20px) scale(0.92);
+    }
+}
+
+/* Interactive Dynamic Mouse-Following Glow */
+.back-glow {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+    background: radial-gradient(700px circle at var(--x, 50vw) var(--y, 50vh), rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.04) 50%, transparent 80%) !important;
+    transition: background 0.1s ease !important;
+}
+@media (max-width: 768px) {
+    .back-glow {
+        display: none !important; /* Disabled on mobile for performance/page-speed boost! */
+    }
+}
+
+/* Hide Main Website wallpaper in Blog */
+.scroll-bg-container, body::before {
+    display: none !important;
+}
+
+/* Override Header to be stunningly premium & clean (0% comic, 100% professional) */
+header {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-radius: 24px !important;
+    margin: 15px 24px 0 !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02) !important;
+    padding: 10px 30px !important;
+    position: sticky !important;
+    top: 15px !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+    min-height: 64px !important;
+    display: flex !important;
+    flex-direction: column !important; /* Stack drawer under main header line */
+    justify-content: center !important;
+    transform: none !important;
+    transition: border-radius 0.25s ease, padding 0.25s ease !important;
+}
+header.menu-open {
+    border-radius: 24px 24px 16px 16px !important;
+    padding-bottom: 20px !important;
+}
+.header-top-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+}
+header .logo-area {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+}
+header .logo-text {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: -0.5px !important;
+    color: #0f172a !important;
+    line-height: 1.1 !important;
+}
+header .logo-flipper {
+    display: block !important;
+    width: 44px !important;
+    height: 44px !important;
+    position: relative !important;
+    transform-style: preserve-3d !important;
+    transition: transform 0.6s !important;
+    flex-shrink: 0 !important;
+}
+header .logo-front, header .logo-back {
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    backface-visibility: hidden !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+header .logo-back {
+    transform: rotateY(180deg) !important;
+}
+header .logo-front img, header .logo-back img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
+header .logo-area:hover .logo-flipper {
+    transform: rotateY(180deg) !important;
+}
+header nav.nav-links {
+    gap: 16px !important; /* Perfect spacious layout */
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important; /* Never wrap on desktop */
+}
+header nav.nav-links a {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 12px !important;
+    transition: all 0.2s;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+header nav.nav-links a:hover, header nav.nav-links a.active {
+    color: #6366f1 !important;
+    background: rgba(99, 102, 241, 0.05) !important;
+}
+header .header-right {
+    gap: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+header .header-right .logout {
+    border: none !important;
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border-radius: 12px !important;
+    padding: 8px 16px !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+header .header-right .logout:hover {
+    background: #6366f1 !important;
+    color: #ffffff !important;
+}
+header .admin-avatar {
+    border: 2px solid #e2e8f0 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Default state for mobile components */
+.dots-menu-toggle {
+    display: none !important;
+}
+.mobile-menu-drawer {
+    display: none !important;
+}
+
+/* Responsive Styles for Tablet and Mobile Viewports */
+@media (max-width: 1150px) {
+    header .desktop-only,
+    header nav.nav-links.desktop-only,
+    header .header-right.desktop-only {
+        display: none !important; /* Force hide desktop-only items with absolute authority */
+    }
+    header {
+        padding: 0 24px !important; /* Center elements vertically inside a 64px capsule */
+        margin: 15px 16px 0 !important;
+        border-radius: 20px !important;
+        height: 64px !important; /* Exact mathematical height to match desktop perfectly */
+        min-height: 64px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow: hidden !important;
+    }
+    header.menu-open {
+        border-radius: 20px 20px 16px 16px !important;
+        height: auto !important; /* Expand cleanly on mobile when open */
+        overflow: visible !important;
+        padding-bottom: 16px !important;
+    }
+    
+    /* Show 3-Dot Comic Professional macOS Window Button Toggle */
+    .dots-menu-toggle {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        background: #ffffff !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        padding: 10px 14px !important;
+        border-radius: 16px !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+        transition: all 0.2s ease !important;
+        outline: none !important;
+    }
+    .dots-menu-toggle:hover {
+        background: #f8fafc !important;
+        transform: scale(1.05);
+    }
+    .dots-menu-toggle .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .dots-menu-toggle .dot.red { background: #ff5f56; }
+    .dots-menu-toggle .dot.yellow { background: #ffbd2e; }
+    .dots-menu-toggle .dot.green { background: #27c93f; }
+
+    /* Sliding Dropdown Drawer for Mobile Menu */
+    .mobile-menu-drawer {
+        display: none !important; /* Completely hide when closed to prevent flex centering shift */
+        width: 100% !important;
+        max-height: 0;
+        overflow: hidden !important;
+        opacity: 0;
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease !important;
+        border-top: 1px solid transparent;
+        padding: 0 !important;
+    }
+    header.menu-open .mobile-menu-drawer {
+        display: block !important; /* Enable layout only when open */
+        max-height: 500px !important; /* Expand cleanly */
+        opacity: 1 !important;
+        border-top: 1px solid #f1f5f9 !important;
+        padding-top: 16px !important;
+        margin-top: 10px !important;
+    }
+    .mobile-nav-links {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    .mobile-nav-links a {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        color: #475569 !important;
+        text-decoration: none !important;
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        transition: all 0.2s !important;
+    }
+    .mobile-nav-links a:hover, .mobile-nav-links a.active {
+        color: #6366f1 !important;
+        background: rgba(99, 102, 241, 0.05) !important;
+    }
+}
+header .comic-btn {
+    border: none !important;
+    background: #6366f1 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2) !important;
+    border-radius: 12px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 700 !important;
+    padding: 10px 22px !important;
+    text-decoration: none !important;
+    transition: all 0.2s !important;
+}
+header .comic-btn:hover {
+    background: #4f46e5 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Footer modern look */
+footer {
+    background: #ffffff !important;
+    border: none !important;
+    border-top: 1px solid #f1f5f9 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 80px 0 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 40px 80px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    backdrop-filter: none !important;
+}
+footer div {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.85rem !important;
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+}
+footer .footer-links {
+    display: flex !important;
+    gap: 32px !important;
+}
+footer .footer-links a {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    text-decoration: none !important;
+    transition: color 0.2s !important;
+}
+footer .footer-links a:hover {
+    color: #6366f1 !important;
+}
+@media (max-width: 768px) {
+    footer {
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 30px 20px !important;
+        text-align: center !important;
+    }
+    footer .footer-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 16px 20px !important;
+    }
+}
+
+/* Hero Section - Matching Pic 1 */
 .blogs-hero {
-    padding: 60px 40px 40px;
-    max-width: 1300px;
+    padding: 80px 40px 40px !important;
+    max-width: 1200px;
     margin: 0 auto;
     text-align: center;
 }
+.blogs-hero .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366f1;
+    border-radius: 40px;
+    padding: 6px 16px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
 .blogs-hero h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 900;
-    margin-bottom: 14px;
-    line-height: 1.1;
-    font-family: var(--font-blog-heading);
-    letter-spacing: -1px;
+    font-size: clamp(2.2rem, 5vw, 3.8rem) !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin-bottom: 18px !important;
+    line-height: 1.15 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    letter-spacing: -1.5px !important;
+}
+.blogs-hero h1 .highlight {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .blogs-hero p {
-    font-size: 1.05rem;
-    font-weight: 400;
-    color: #666;
-    max-width: 520px;
-    margin: 0 auto 36px;
-    font-family: var(--font-blog-body);
+    font-size: 1.15rem !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
-/* &mdash;&ndash;&mdash;&ndash;&mdash; Tag Filter Pills &mdash;&ndash;&mdash;&ndash;&mdash; */
+/* Tag Filter Pills */
 .tag-filter-wrap {
-    max-width: 1300px;
-    margin: 0 auto 40px;
+    max-width: 1200px;
+    margin: 0 auto 50px;
     padding: 0 40px;
     display: flex;
     flex-wrap: wrap;
@@ -89,361 +635,494 @@ arsort($all_tags);
     justify-content: center;
 }
 .tag-pill {
-    padding: 8px 20px;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 40px;
-    font-weight: 800;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.2s ease-out;
-    font-family: var(--font-main);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-color);
+    padding: 10px 22px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 40px !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    text-transform: capitalize !important;
+    letter-spacing: 0px !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
 }
 .tag-pill:hover {
-    border-color: var(--text-color);
-    background: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 2px 2px 0 var(--text-color);
+    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    transform: translateY(-1px) !important;
 }
 .tag-pill.active {
-    background: var(--primary-color);
-    border-color: var(--text-color);
-    box-shadow: 3px 3px 0 var(--text-color);
-    transform: translateY(-1px);
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15) !important;
 }
 
-/* &mdash;&mdash;&mdash;&mdash;&mdash; Blog Grid &mdash;&mdash;&mdash;&mdash;&mdash; */
-.blogs-wrap {
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 28px 100px;
-}
-
-/* Featured Post (First post, wider) */
-.blog-featured {
+/* Main Layout Grid wrapper with Sidebar on Desktop */
+.blogs-container-layout {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 0;
-    background: var(--card-bg);
-    border: var(--border-width) solid var(--text-color);
-    border-radius: 24px;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 40px 40px 100px; /* Spacing below the floating header */
+}
+@media (max-width: 1024px) {
+    .blogs-container-layout {
+        grid-template-columns: 1fr;
+    }
+    .blog-sidebar {
+        display: none;
+    }
+}
+
+/* LEFT CONTENT WRAP */
+.blogs-wrap {
+    padding: 0 !important;
+}
+
+/* 2-column Post Grid matching Pic 1 style */
+.blogs-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 28px !important;
+    margin-top: 0 !important;
+}
+@media (max-width: 640px) {
+    .blogs-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+    }
+    .blogs-container-layout {
+        padding: 30px 16px 80px; /* Perfect spacing for mobile floating header and narrow margins */
+    }
+}
+
+/* Robust responsive floating header styling for mobile */
+@media (max-width: 768px) {
+    header {
+        padding: 8px 16px !important;
+        margin: 10px 12px 0 !important;
+        border-radius: 16px !important;
+        height: auto !important;
+        min-height: 56px !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        justify-content: space-between !important;
+    }
+    header .logo-text {
+        font-size: 0.8rem !important;
+    }
+    header .logo-flipper {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    header nav.nav-links {
+        order: 3 !important;
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        padding-top: 10px !important;
+        margin-top: 4px !important;
+    }
+    header nav.nav-links a {
+        font-size: 0.72rem !important;
+        padding: 6px 12px !important;
+        border-radius: 8px !important;
+    }
+    header .header-right {
+        gap: 10px !important;
+    }
+    header .header-right .logout {
+        padding: 6px 12px !important;
+        font-size: 0.72rem !important;
+    }
+}
+
+/* Premium Card Design matching Pic 1 exactly */
+.blog-card {
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100%;
+}
+.blog-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05) !important;
+    border-color: #e2e8f0 !important;
+}
+.blog-card-img-wrapper {
+    position: relative;
+    width: 100%;
     overflow: hidden;
-    box-shadow: var(--shadow-comic);
-    margin-bottom: 36px;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.25s ease-out;
 }
-.blog-featured:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-comic-hover);
+.blog-card-img-wrapper.ratio-16-9 {
+    aspect-ratio: 16 / 9;
 }
-.blog-featured-img {
+.blog-card-img-wrapper.ratio-9-16 {
+    aspect-ratio: 9 / 16;
+}
+.blog-card-img {
     width: 100%;
     height: 100%;
-    min-height: 320px;
-    object-fit: cover;
-    display: block;
-    border-right: var(--border-width) solid var(--text-color);
+    object-fit: cover !important;
+    transition: transform 0.5s ease;
+    border-bottom: none !important;
 }
-.blog-featured-img-placeholder {
+.blog-card:hover .blog-card-img {
+    transform: scale(1.04);
+}
+.blog-card-img-placeholder {
     width: 100%;
-    min-height: 320px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    height: 100%;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #94a3b8 !important;
+    border-bottom: none !important;
+}
+
+.blog-card-body {
+    padding: 24px !important;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.blog-card-tag {
+    background: rgba(99, 102, 241, 0.08) !important;
+    color: #6366f1 !important;
+    border: none !important;
+    border-radius: 30px !important;
+    padding: 4px 12px !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 14px !important;
+    width: fit-content;
+}
+.blog-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.35 !important;
+    margin-bottom: 10px !important;
+    transition: color 0.2s;
+}
+.blog-card:hover .blog-card-title {
+    color: #6366f1;
+}
+.blog-card-desc {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.88rem !important;
+    color: #64748b !important;
+    line-height: 1.6 !important;
+    margin-bottom: 20px !important;
+}
+.blog-card-meta {
+    margin-top: auto !important;
+    padding-top: 16px !important;
+    border-top: 1px solid #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.blog-card-meta-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.78rem !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+.blog-author-av {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 50% !important;
+}
+.blog-card-likes {
+    font-size: 0.78rem !important;
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+}
+
+/* SIDEBAR STYLES matching Pic 1 exactly */
+.blog-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.sidebar-card {
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.015);
+}
+.sidebar-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0f172a;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #f1f5f9;
+}
+
+/* About Author card */
+.author-profile-box {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 5rem;
-    border-right: var(--border-width) solid var(--text-color);
+    gap: 12px;
+    margin-bottom: 14px;
 }
-.blog-featured-body {
-    padding: 36px 32px;
+.author-profile-box img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6366f1;
+}
+.author-profile-box .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+.author-profile-box .title {
+    font-size: 0.72rem;
+    color: #8c8994;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.author-bio {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.55;
+    margin-bottom: 18px;
+}
+.author-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #475569;
+    font-weight: 600;
+}
+.author-location i {
+    color: #ef4444;
+}
+
+/* Featured Posts Sidebar layout */
+.sidebar-featured-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    text-decoration: none;
+    color: inherit;
+}
+.sidebar-featured-item:last-child {
+    margin-bottom: 0;
+}
+.sidebar-featured-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f1f5f9;
+}
+.sidebar-featured-info {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-.blog-featured-badge {
-    display: inline-block;
-    background: var(--secondary-color);
-    border: 1.5px solid var(--text-color);
-    border-radius: 20px;
-    padding: 4px 14px;
-    font-size: 0.7rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 16px;
-    width: fit-content;
-}
-.blog-featured-title {
-    font-size: 1.8rem;
-    font-weight: 900;
-    line-height: 1.25;
-    margin-bottom: 14px;
-    font-family: var(--font-blog-heading);
-}
-.blog-featured-desc {
-    font-size: 0.95rem;
-    font-weight: 400;
-    color: #666;
-    line-height: 1.65;
-    margin-bottom: 24px;
+.sidebar-featured-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #0f172a;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-family: var(--font-blog-body);
+    margin-bottom: 4px;
 }
-.blog-author-row {
+.sidebar-featured-date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Technologies Sidebar */
+.tech-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.83rem;
-    font-weight: 700;
-    color: #888;
+    gap: 12px;
+    margin-bottom: 14px;
 }
-.blog-author-av {
+.tech-item:last-child {
+    margin-bottom: 0;
+}
+.tech-icon {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--primary-color);
-    flex-shrink: 0;
-}
-.blog-author-name { color: var(--text-color); font-weight: 800; }
-
-/* &mdash;&mdash;&mdash;&mdash;&mdash; Normal Grid — Pinterest Masonry &mdash;&mdash;&mdash;&mdash;&mdash; */
-.blogs-grid {
-    column-count: 5;
-    column-gap: 18px;
-    margin-top: 20px;
-}
-@media(max-width:1400px){.blogs-grid{column-count:4;}}
-@media(max-width:1024px){.blogs-grid{column-count:3;}}
-@media(max-width:640px){.blogs-grid{column-count:3;column-gap:12px;}}
-@media(max-width:400px){.blogs-grid{column-count:2;column-gap:10;}}
-.blog-card {
-    break-inside: avoid;
-    margin-bottom: 26px;
-    background: var(--card-bg);
-    border: var(--border-width) solid var(--text-color);
-    border-radius: 22px;
-    overflow: hidden;
-    box-shadow: var(--shadow-comic);
-    transition: all 0.25s ease-out;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-}
-.blog-card:hover {
-    transform: translateY(-6px) rotate(-0.5deg);
-    box-shadow: var(--shadow-comic-hover);
-}
-.blog-card-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-bottom: var(--border-width) solid var(--text-color);
-}
-
-.blog-card-img-placeholder {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
-    border-bottom: var(--border-width) solid var(--text-color);
+    background: #f1f5f9;
+    font-size: 1rem;
+    color: #475569;
 }
+.tech-icon.figma { background: #fee2e2; color: #f43f5e; }
+.tech-icon.notion { background: #f1f5f9; color: #0f172a; }
+.tech-icon.photoshop { background: #e0f2fe; color: #0284c7; }
+.tech-icon.ai { background: #fef3c7; color: #d97706; }
 
-.blog-card-body { padding: 14px 14px 14px; }
-@media(max-width:640px){.blog-card-body{padding:10px 10px 12px;}}
-.blog-card-tag {
-    display: inline-block;
-    background: var(--secondary-color);
-    border: 1.5px solid var(--text-color);
-    border-radius: 20px;
-    padding: 3px 12px;
-    font-size: 0.72rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 11px;
+.tech-info .name {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0f172a;
 }
-.blog-card-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 9px;
-    line-height: 1.3;
-    font-family: var(--font-blog-heading);
-}
-.blog-card-desc {
-    font-size: 0.87rem;
-    font-weight: 400;
-    color: #666;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 14px;
-    font-family: var(--font-blog-body);
-}
-.blog-card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 12px;
-    border-top: 1.5px dashed var(--border-color);
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #999;
-}
-.blog-card-meta-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.blog-card-likes {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.tech-info .desc {
+    font-size: 0.7rem;
+    color: #94a3b8;
 }
 
 .empty-blogs {
     text-align: center;
     padding: 80px 20px;
-    color: #7D7887;
-    font-weight: 700;
+    color: #64748b;
+    font-weight: 600;
     font-size: 1.1rem;
-}
-
-@media (max-width: 900px) {
-    .blogs-grid { column-count: 2; }
-}
-@media (max-width: 768px) {
-    .blog-featured { grid-template-columns: 1fr; }
-    .blog-featured-img, .blog-featured-img-placeholder { min-height: 220px; border-right: none; border-bottom: var(--border-width) solid var(--text-color); }
-    .blog-featured-body { padding: 24px 20px; }
-    .blog-featured-title { font-size: 1.4rem; }
-    .tag-filter-wrap, .blogs-wrap { padding: 0 16px 80px; }
-    .blogs-hero { padding: 40px 20px 28px; }
-    .blogs-grid { column-gap: 16px; }
-}
-@media (max-width: 600px) {
-    .blogs-grid { column-count: 1; }
 }
 </style>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"}]}
-    </script>
-    <?php include_once "gtag.php"; ?>
+<link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Breadcrumb Schema -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"}]}
+</script>
+<?php include_once "gtag.php"; ?>
 </head>
 <body>
-    <!-- Scrollable Wallpaper Background -->
-    <div class="scroll-bg-container" id="scroll-bg-container">
-        <div class="bg-layer active" style="background-image: url('https://i.pinimg.com/736x/4d/e2/71/4de271ae9997273cf3fdd47098fa69a3.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/76/50/aa/7650aa986d34ca65bb52f261f954149b.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/1200x/64/c4/c5/64c4c528ee5812610d58ee2c98bbb76f.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/f9/fd/75/f9fd75e5aa551b89ac88a863921f2f75.jpg')"></div>
-        <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/a5/15/6a/a5156a264e06ebb47997cf59e66bee31.jpg')"></div>
-        <div class="bg-creamy-overlay"></div>
-    </div>
-<header>
-  <div class="logo-area" id="logo-container"  style="cursor:pointer">
-    <div class="logo-flipper">
-      <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
-    </div>
-    <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-  </div>
-  <nav class="nav-links">
-    <a href="index.php">HOME</a>
-    <a href="gallery.php">GALLERY</a>
-    <a href="blogs.php" class="active">BLOGS</a>
-        <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
-            <div class="nav-dropdown">
-                <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-                <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
-                <div class="nav-dropdown-menu">
-                    <a href="secret_code.php" <?= $curPage == "secret_code.php"
-                        ? 'style="background:var(--primary-color)"'
-                        : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
-    $nav_counts["secret_code"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "secret_code.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                    <a href="unreleased.php" <?= $curPage == "unreleased.php"
-                        ? 'style="background:var(--primary-color)"'
-                        : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
-    $nav_counts["unreleased"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "unreleased.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                    <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
-                        ? 'style="background:var(--primary-color)"'
-                        : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
-    $nav_counts["insta_viral"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "insta_viral.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                <a href="already_uploaded.php" <?= $curPage ==
-                "already_uploaded.php"
-                    ? 'style="background:var(--primary-color)"'
-                    : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty(
-    $nav_counts["already_uploaded"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "already_uploaded.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                </div>
+<!-- High-End GSAP Splash Screen Loader -->
+<div id="blog-splash-screen" class="blog-splash-screen">
+    <div class="splash-content">
+        <div class="splash-logo-container" id="splash-logo-container">
+            <div class="splash-word prompt-word" id="splash-prompt-word">
+                <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
             </div>
-    <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-      <span style="font-weight:600;">@arigato.devan</span>
-      <span class="pulse-dot"></span>
-      <span style="font-weight:800;font-size:1.1rem;">13K+</span>
-    </a>
-  </nav>
-  <div class="header-right">
-    <div class="header-divider"></div>
-    <?php if (isset($_SESSION["user_id"])): ?>
-      <?php if ($_SESSION["role"] === "admin"): ?>
-        <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar(
-            $_SESSION["profile_image"] ?? "",
-            "admin-avatar",
-            "Admin",
-            'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
-        ) ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+            <div class="splash-arrow-wrap">
+                <span class="splash-arrow" id="splash-arrow">➔</span>
+                <div class="splash-ring-loader" id="splash-ring-loader"></div>
+            </div>
+            <div class="splash-word blog-word" id="splash-blog-word">
+                <span>B</span><span>L</span><span>O</span><span>G</span>
+            </div>
+        </div>
+        <div class="splash-loading-label" id="splash-loading-label">LOADING CREATIVE REALM</div>
+    </div>
+</div>
+
+<div class="aurora-bg"></div>
+<div class="back-glow" id="back-glow"></div>
+<header>
+  <div class="header-top-row">
+    <div class="logo-area" id="logo-container" style="cursor:pointer">
+      <div class="logo-flipper">
+        <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
+        <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
+      </div>
+      <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+    </div>
+    
+    <nav class="nav-links desktop-only">
+      <a href="index.php">HOME</a>
+      <a href="gallery.php">GALLERY</a>
+      <a href="blogs.php" class="active">BLOGS</a>
+      <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
+      <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
+      <div class="nav-dropdown">
+          <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
+          <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
+          <div class="nav-dropdown-menu">
+              <a href="secret_code.php" <?= $curPage == "secret_code.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts["secret_code"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "secret_code.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
+              <a href="unreleased.php" <?= $curPage == "unreleased.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts["unreleased"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "unreleased.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
+              <a href="insta_viral.php" <?= $curPage == "insta_viral.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts["insta_viral"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "insta_viral.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
+              <a href="already_uploaded.php" <?= $curPage == "already_uploaded.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts["already_uploaded"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "already_uploaded.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
+          </div>
+      </div>
+      <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <span style="font-weight:600;">@arigato.devan</span>
+        <span class="pulse-dot"></span>
+        <span style="font-weight:800;font-size:1.1rem;">13K+</span>
+      </a>
+    </nav>
+    
+    <div class="header-right desktop-only">
+      <div class="header-divider"></div>
+      <?php if (isset($_SESSION["user_id"])): ?>
+        <?php if ($_SESSION["role"] === "admin"): ?>
+          <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Admin", 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
+        <?php else: ?>
+          <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Profile") ?></a>
+        <?php endif; ?>
+        <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
       <?php else: ?>
-        <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar(
-            $_SESSION["profile_image"] ?? "",
-            "admin-avatar",
-            "Profile",
-        ) ?></a>
+        <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
       <?php endif; ?>
-      <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
-    <?php else: ?>
-      <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
-    <?php endif; ?>
+    </div>
+
+    <!-- macOS style 3-dot mobile toggle -->
+    <button class="dots-menu-toggle" id="mobile-dots-toggle" type="button" aria-label="Toggle Menu">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Sliding Menu Drawer -->
+  <div class="mobile-menu-drawer">
+    <nav class="mobile-nav-links">
+      <a href="index.php"><i class="fa-solid fa-house"></i> HOME</a>
+      <a href="gallery.php"><i class="fa-solid fa-images"></i> GALLERY</a>
+      <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
+      <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
+      <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (13K+)</a>
+      <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
+      <?php if (isset($_SESSION["user_id"])): ?>
+        <?php if ($_SESSION["role"] === "admin"): ?>
+          <a href="dashboard.php"><i class="fa-solid fa-lock"></i> ADMIN DASHBOARD</a>
+        <?php else: ?>
+          <a href="profile.php"><i class="fa-solid fa-user"></i> MY PROFILE</a>
+        <?php endif; ?>
+        <a href="login.php?logout=1" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
+      <?php else: ?>
+        <a href="login.php" style="color:#6366f1; background:rgba(99,102,241,0.05);"><i class="fa-solid fa-right-to-bracket"></i> LOGIN</a>
+      <?php endif; ?>
+    </nav>
   </div>
 </header>
 
@@ -474,70 +1153,96 @@ arsort($all_tags);
 </div>
 <?php endif; ?>
 
-<div class="blogs-wrap">
+<!-- Container Layout holding main grid + premium sidebar -->
+<div class="blogs-container-layout">
 
-  <div class="blogs-grid" id="blogs-grid">
-    <?php foreach ($blogs as $b):
-
-        $ratio_class =
-            ($b["image_ratio"] ?? "16:9") === "9:16"
-                ? "ratio-9-16"
-                : "ratio-16-9";
-        $short_preview = mb_substr(strip_tags($b["content"]), 0, 60) . "...";
-        ?>
-    <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
-       data-tags="<?= htmlspecialchars(strtolower($b["tags"] ?? "")) ?>">
-      <?php if ($b["image_path"]): ?>
-        <img loading="lazy" src="<?= htmlspecialchars(
-            $b["image_path"],
-        ) ?>" class="blog-card-img <?= $ratio_class ?>" alt="<?= htmlspecialchars(
-    $b["title"],
-) ?>" loading="lazy">
-      <?php else: ?>
-        <div class="blog-card-img-placeholder <?= $ratio_class ?>"><i class="fa-solid fa-image"></i></div>
-      <?php endif; ?>
-      <div class="blog-card-body">
-        <?php if ($b["tags"]): ?>
-          <div class="blog-card-tag"><?= htmlspecialchars(
-              explode(",", $b["tags"])[0],
-          ) ?></div>
-        <?php endif; ?>
-        <div class="blog-card-title"><?= htmlspecialchars($b["title"]) ?></div>
-
-        <div class="blog-card-desc"><?= htmlspecialchars(
-            $short_preview,
-        ) ?></div>
-
-        <div class="blog-card-meta">
-          <div class="blog-card-meta-left">
-            <img loading="lazy" src="<?= htmlspecialchars(
-                $b["author_avatar"] ??
-                    "https://api.dicebear.com/7.x/avataaars/svg?seed=x",
-            ) ?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
-            <span style="color:var(--text-color);font-weight:800;"><?= htmlspecialchars(
-                $b["author_name"] ?? "Admin",
-            ) ?></span>
-            <span>&middot;</span>
-            <span><?= date("d M Y", strtotime($b["created_at"])) ?></span>
+  <div class="blogs-wrap">
+    <div class="blogs-grid" id="blogs-grid">
+      <?php foreach ($blogs as $b):
+          $ratio_class = ($b["image_ratio"] ?? "16:9") === "9:16" ? "ratio-9-16" : "ratio-16-9";
+          $short_preview = mb_substr(strip_tags($b["content"]), 0, 75) . "...";
+          ?>
+      <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
+         data-tags="<?= htmlspecialchars(strtolower($b["tags"] ?? "")) ?>">
+        <?php if ($b["image_path"]): ?>
+          <div class="blog-card-img-wrapper <?= $ratio_class ?>">
+            <img loading="lazy" src="<?= htmlspecialchars($b["image_path"]) ?>" class="blog-card-img" alt="<?= htmlspecialchars($b["title"]) ?>">
           </div>
-          <div>
-            <span class="blog-card-likes" style="margin-right:8px;"><i class="fa-solid fa-heart"></i> <?= (int) $b[
-                "likes_count"
-            ] ?></span>
-            <span class="blog-card-likes"><i class="fa-solid fa-eye"></i> <?= (int) ($b[
-                "views_count"
-            ] ?? 0) ?></span>
+        <?php else: ?>
+          <div class="blog-card-img-wrapper <?= $ratio_class ?>">
+            <div class="blog-card-img-placeholder"><i class="fa-solid fa-image"></i></div>
+          </div>
+        <?php endif; ?>
+        
+        <div class="blog-card-body">
+          <?php if ($b["tags"]): ?>
+            <div class="blog-card-tag"><?= htmlspecialchars(explode(",", $b["tags"])[0]) ?></div>
+          <?php endif; ?>
+          <h2 class="blog-card-title"><?= htmlspecialchars($b["title"]) ?></h2>
+          <p class="blog-card-desc"><?= htmlspecialchars($short_preview) ?></p>
+
+          <div class="blog-card-meta">
+            <div class="blog-card-meta-left">
+              <img loading="lazy" src="<?= htmlspecialchars(!empty($b["author_avatar"]) ? $b["author_avatar"] : "https://api.dicebear.com/7.x/avataaars/svg?seed=" . urlencode($b["author_name"] ?? "Admin")) ?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
+              <span style="font-weight: 700; color: #334155;"><?= htmlspecialchars($b["author_name"] ?? "Admin") ?></span>
+              <span>&middot;</span>
+              <span><?= date("M d, Y", strtotime($b["created_at"])) ?></span>
+            </div>
+            <div class="blog-card-likes">
+              <span style="margin-right:8px;"><i class="fa-solid fa-heart" style="color:#f43f5e;"></i> <?= (int)$b["likes_count"] ?></span>
+              <span><i class="fa-solid fa-eye"></i> <?= (int)($b["views_count"] ?? 0) ?></span>
+            </div>
           </div>
         </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- No results message -->
+    <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#64748b;font-weight:700;font-size:1.1rem;">
+      No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR (Matching Pic 1 exactly) -->
+  <aside class="blog-sidebar">
+    <!-- About Card -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">ABOUT ARIGATO DEVAN</div>
+      <div class="author-profile-box">
+        <img src="aboutmepics/new.webp" alt="Arigato Devan" style="object-fit: cover !important;">
+        <div>
+          <div class="name">Arigato Devan</div>
+          <div class="title">Creative Prompter</div>
+        </div>
       </div>
-    </a>
-    <?php
-    endforeach; ?>
-  </div>
-  <!-- No results message -->
-  <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#7D7887;font-weight:700;font-size:1.1rem;">
-    No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>
-  </div>
+      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> — a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+      <div class="author-location">
+        <i class="fa-solid fa-location-dot"></i> Mumbai, India
+      </div>
+    </div>
+
+    <!-- Featured Posts Card (Dynamic) -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">FEATURED POSTS</div>
+      <?php 
+      $featured_limit = array_slice($blogs, 0, 3);
+      foreach ($featured_limit as $fb): ?>
+        <a href="blog.php?slug=<?= urlencode($fb["slug"]) ?>" class="sidebar-featured-item">
+          <?php if ($fb["image_path"]): ?>
+            <img src="<?= htmlspecialchars($fb["image_path"]) ?>" class="sidebar-featured-img" alt="">
+          <?php else: ?>
+            <div class="sidebar-featured-img" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><i class="fa-solid fa-image"></i></div>
+          <?php endif; ?>
+          <div class="sidebar-featured-info">
+            <h4 class="sidebar-featured-title"><?= htmlspecialchars($fb["title"]) ?></h4>
+            <span class="sidebar-featured-date"><?= date("M d, Y", strtotime($fb["created_at"])) ?></span>
+          </div>
+        </a>
+      <?php endforeach; ?>
+    </div>
+
+  </aside>
 
 </div>
 <?php endif; ?>
@@ -586,26 +1291,167 @@ function filterByTag(tag, btn) {
 }
 </script>
 <script>
-        // Background Scroll Logic
-        const bgLayers = document.querySelectorAll('.bg-layer');
-        let _blogsScrollTicking = false;
-        if (bgLayers.length > 0) {
-            window.addEventListener('scroll', function() {
-                if (!_blogsScrollTicking) {
-                    requestAnimationFrame(function() {
-                        const scrollPos = window.scrollY;
-                        const pixelsPerLayer = 500;
-                        let activeIndex = Math.floor(scrollPos / pixelsPerLayer);
-                        if (activeIndex >= bgLayers.length) activeIndex = bgLayers.length - 1;
-                        bgLayers.forEach((layer, index) => {
-                            if (index === activeIndex) layer.classList.add('active');
-                            else layer.classList.remove('active');
-                        });
-                        _blogsScrollTicking = false;
-                    });
-                    _blogsScrollTicking = true;
+// High-End GSAP Splash Screen Loader Logic
+document.addEventListener("DOMContentLoaded", () => {
+    const splash = document.getElementById('blog-splash-screen');
+    if (!splash) return;
+
+    // Helper functions to lock and release scrollbar of both html and body elements
+    const lockScroll = () => {
+        document.documentElement.classList.add('no-scroll');
+        document.body.classList.add('no-scroll');
+    };
+    const unlockScroll = () => {
+        document.documentElement.classList.remove('no-scroll');
+        document.body.classList.remove('no-scroll');
+    };
+
+    // Safety Fallback 1: Instantly hide if GSAP CDN is blocked/offline/delayed
+    if (typeof gsap === "undefined") {
+        splash.style.setProperty('display', 'none', 'important');
+        unlockScroll();
+        return;
+    }
+
+    // Safety Fallback 2: Absolute pure JS timer to force-remove splash screen after 4.2 seconds max
+    setTimeout(() => {
+        if (splash && splash.style.display !== 'none') {
+            splash.style.setProperty('display', 'none', 'important');
+            unlockScroll();
+        }
+    }, 4200);
+
+    // Elegant UX: Only show splash loader if entering the blog system from main site
+    const referrer = document.referrer;
+    const isFromMainSite = referrer === "" || referrer.includes("index") || !referrer.includes("blog");
+
+    if (isFromMainSite) {
+        lockScroll(); // Block scroll completely during transition and hide scrollbar
+        
+        try {
+            // Spin loader infinitely on its own independent tween so it doesn't infinite-inflate the entrance timeline's duration!
+            gsap.to(".splash-ring-loader", { rotation: 360, repeat: -1, duration: 1.0, ease: "none" });
+
+            // GSAP Timeline (Snappy 0.9s build-up and 0.4s slide-up curtain reveal!) - perfectly finite!
+            const tl = gsap.timeline();
+            
+            tl.to(".splash-ring-loader", { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.2)" })
+              .to(".splash-arrow", { opacity: 1, scale: 1, rotation: 360, duration: 0.4, ease: "back.out(1.2)" }, "-=0.25")
+              .to(".prompt-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.35, ease: "power2.out" }, "-=0.25")
+              .to(".blog-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.35, ease: "power2.out" }, "-=0.3")
+              .to(".splash-loading-label", { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
+              .to({}, { duration: 0.45 }) // Short pause to absorb the gorgeous layout
+              .to(".splash-content", { scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in" })
+              .to("#blog-splash-screen", { 
+                  clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", // Fast slide up reveal!
+                  duration: 0.45, 
+                  ease: "power3.inOut",
+                  onComplete: () => {
+                      splash.style.setProperty('display', 'none', 'important');
+                      unlockScroll(); // Restore scrolling and scrollbars
+                  }
+              }, "-=0.1");
+        } catch (err) {
+            splash.style.setProperty('display', 'none', 'important');
+            unlockScroll();
+        }
+    } else {
+        // Instant load with no delay if navigating within blog pages
+        splash.style.setProperty('display', 'none', 'important');
+        unlockScroll();
+    }
+});
+
+// Intercept Outbound Clicks for BLOG ➔ PROMPT 2-second Reverse Transition
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href');
+    if (!href) return;
+    
+    // Check if link redirects back to index/home page
+    const isGoingBack = href === "index.php" || href === "index" || href.includes("index.php") || href === "gallery.php" || href.includes("gallery.php") || href === "./" || href === "/";
+    
+    if (isGoingBack && typeof gsap !== "undefined") {
+        const splash = document.getElementById('blog-splash-screen');
+        if (splash) {
+            e.preventDefault(); // Intercept redirect
+            
+            // Swap text positions to BLOG ➔ PROMPT
+            const blogWordHTML = `<span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">B</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">L</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">O</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">G</span>`;
+            const promptWordHTML = `<span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">R</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">O</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">M</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">T</span>`;
+            
+            document.getElementById('splash-prompt-word').innerHTML = blogWordHTML;
+            document.getElementById('splash-blog-word').innerHTML = promptWordHTML;
+            
+            const arrow = document.getElementById('splash-arrow');
+            arrow.style.transform = 'scale(1) rotate(180deg)'; // Point backwards!
+            arrow.style.color = '#a855f7';
+            
+            document.getElementById('splash-loading-label').textContent = 'RETURNING TO MAIN PORTAL';
+            
+            // Preset states
+            gsap.set("#splash-prompt-word span", { opacity: 0, y: 20, scale: 0.7, filter: "blur(5px)" });
+            gsap.set("#splash-blog-word span", { opacity: 0, y: 20, scale: 0.7, filter: "blur(5px)" });
+            gsap.set(".splash-ring-loader", { opacity: 0, scale: 0.6 });
+            gsap.set(".splash-arrow", { opacity: 0, scale: 0.4 });
+            gsap.set(".splash-loading-label", { opacity: 0, y: 10 });
+            gsap.set(".splash-content", { scale: 1, opacity: 1 });
+            
+            splash.style.display = 'flex';
+            
+            // Hide scrollbar during exit transition
+            document.documentElement.classList.add('no-scroll');
+            document.body.classList.add('no-scroll');
+            
+            // Spin loader infinitely on its own independent tween so it doesn't infinite-inflate the timeline's duration!
+            gsap.to(".splash-ring-loader", { rotation: -360, repeat: -1, duration: 1.0, ease: "none" });
+
+            // Exit Timeline (Snappy 0.85s build-up) - now perfectly finite and guaranteed to trigger onComplete!
+            const exitTl = gsap.timeline({
+                onComplete: () => {
+                    window.location.href = href; // Route to destination
                 }
             });
+            
+            exitTl.to("#blog-splash-screen", { 
+                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", // Curtain drops super fast!
+                      duration: 0.35, 
+                      ease: "power3.out" 
+                  })
+                  .to(".splash-ring-loader", { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.2)" }, "-=0.15")
+                  .to(".splash-arrow", { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.2)" }, "-=0.2")
+                  .to("#splash-prompt-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.3, ease: "power2.out" }, "-=0.2")
+                  .to("#splash-blog-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.3, ease: "power2.out" }, "-=0.3")
+                  .to(".splash-loading-label", { opacity: 1, y: 0, duration: 0.25 }, "-=0.2")
+                  .to({}, { duration: 0.25 }); // Short pause before instant redirect!
         }
+    }
+});
+
+// Interactive Ambient Mouse Glow Tracker
+document.addEventListener('mousemove', (e) => {
+    const glow = document.getElementById('back-glow');
+    if (glow) {
+        glow.style.setProperty('--x', e.clientX + 'px');
+        glow.style.setProperty('--y', e.clientY + 'px');
+    }
+});
+
+// Toggle mobile menu drawer
+const dotsToggle = document.getElementById('mobile-dots-toggle');
+const header = document.querySelector('header');
+if (dotsToggle && header) {
+    dotsToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        header.classList.toggle('menu-open');
+    });
+    document.addEventListener('click', (e) => {
+        if (!header.contains(e.target)) {
+            header.classList.remove('menu-open');
+        }
+    });
+}
 </script>
 </body></html>

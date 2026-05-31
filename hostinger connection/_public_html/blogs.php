@@ -39,6 +39,7 @@ arsort($all_tags);
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <!-- Open Graph & Twitter Card -->
@@ -250,6 +251,10 @@ arsort($all_tags);
     border-bottom: var(--border-width) solid var(--text-color);
 }
 
+/* Respect stored image_ratio by applying aspect-ratio on image itself */
+.blog-card-img.ratio-16-9 { aspect-ratio: 16 / 9; object-fit: cover; }
+.blog-card-img.ratio-9-16 { aspect-ratio: 9 / 16; object-fit: cover; }
+
 .blog-card-img-placeholder {
     width: 100%;
     aspect-ratio: 3 / 4;
@@ -260,6 +265,9 @@ arsort($all_tags);
     font-size: 2.5rem;
     border-bottom: var(--border-width) solid var(--text-color);
 }
+/* Override placeholder ratio based on DB value */
+.blog-card-img-placeholder.ratio-16-9 { aspect-ratio: 16 / 9; }
+.blog-card-img-placeholder.ratio-9-16 { aspect-ratio: 9 / 16; }
 
 .blog-card-body { padding: 14px 14px 14px; }
 @media(max-width:640px){.blog-card-body{padding:10px 10px 12px;}}
@@ -338,18 +346,82 @@ arsort($all_tags);
 @media (max-width: 600px) {
     .blogs-grid { column-count: 1; }
 }
+
+/* Luxury GSAP Splash Screen Loader Styles */
+.blog-splash-screen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #090c15 !important; z-index: 9999999 !important; display: none; align-items: center !important; justify-content: center !important; font-family: 'Plus Jakarta Sans', sans-serif !important; overflow: hidden !important; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+.splash-content { text-align: center !important; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 32px !important; perspective: 1000px !important; }
+.splash-logo-container { display: flex !important; align-items: center !important; gap: 20px !important; font-size: 2.2rem !important; font-weight: 900 !important; letter-spacing: -2px !important; }
+.splash-word { display: flex !important; gap: 4px !important; }
+.splash-word span { display: inline-block !important; opacity: 0; transform: translateY(30px) scale(0.6); filter: blur(10px); }
+.prompt-word span { color: #e2e8f0 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important; }
+.blog-word span { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important; }
+.splash-arrow-wrap { position: relative !important; width: 60px !important; height: 60px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+.splash-arrow { font-size: 1.4rem !important; color: #6366f1 !important; opacity: 0; transform: scale(0.3) rotate(-180deg); text-shadow: 0 0 25px rgba(99,102,241,0.8) !important; position: absolute !important; z-index: 10 !important; }
+.splash-ring-loader { width: 50px !important; height: 50px !important; border: 3px solid rgba(99, 102, 241, 0.08) !important; border-top: 3px solid #6366f1 !important; border-right: 3px solid #a855f7 !important; border-radius: 50% !important; position: absolute !important; box-shadow: 0 0 20px rgba(168, 85, 247, 0.25) !important; opacity: 0; transform: scale(0.5); }
+.splash-loading-label { font-size: 0.8rem !important; font-weight: 800 !important; color: #475569 !important; text-transform: uppercase !important; letter-spacing: 3px !important; opacity: 0; transform: translateY(15px); }
+@media (max-width: 480px) {
+  .splash-logo-container { font-size: 1.4rem !important; gap: 8px !important; }
+  .splash-arrow-wrap { width: 44px !important; height: 44px !important; }
+  .splash-ring-loader { width: 36px !important; height: 36px !important; border-width: 2px !important; }
+  .splash-arrow { font-size: 1rem !important; }
+  .splash-loading-label { font-size: 0.65rem !important; letter-spacing: 2px !important; }
+}
+/* Lock scroll when splash is visible */
+html.no-scroll, body.no-scroll { overflow: hidden !important; height: 100vh !important; }
 </style>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"}]}
     </script>
+<script>
+// High-End GSAP Splash Screen Loader Logic (compact)
+document.addEventListener('DOMContentLoaded', function(){
+  const splash = document.getElementById('blog-splash-screen');
+  if(!splash) return;
+  function lock(){ document.documentElement.classList.add('no-scroll'); document.body.classList.add('no-scroll'); }
+  function unlock(){ document.documentElement.classList.remove('no-scroll'); document.body.classList.remove('no-scroll'); }
+  if(typeof gsap === 'undefined'){ splash.style.display='none'; unlock(); return; }
+  splash.style.display = 'flex'; lock();
+  try{
+    gsap.to('.splash-ring-loader', { rotation:360, repeat:-1, duration:1, ease:'none' });
+    const tl = gsap.timeline({ onComplete: ()=>{ splash.style.display='none'; unlock(); }});
+    tl.to('.splash-ring-loader', { opacity:1, scale:1, duration:0.35, ease:'back.out(1.2)' })
+      .to('.splash-arrow', { opacity:1, scale:1, rotation:360, duration:0.35, ease:'back.out(1.2)' }, '-=0.2')
+      .to('.prompt-word span', { opacity:1, y:0, scale:1, filter:'blur(0px)', stagger:0.03, duration:0.3, ease:'power2.out' }, '-=0.2')
+      .to('.blog-word span', { opacity:1, y:0, scale:1, filter:'blur(0px)', stagger:0.03, duration:0.3, ease:'power2.out' }, '-=0.25')
+      .to('.splash-loading-label', { opacity:1, y:0, duration:0.25 }, '-=0.2')
+      .to({}, { duration:0.45 })
+      .to('.splash-content', { scale:0.9, opacity:0, duration:0.25, ease:'power2.in' })
+      .to('#blog-splash-screen', { clipPath:'polygon(0 0, 100% 0, 100% 0, 0 0)', duration:0.4, ease:'power3.inOut' });
+  }catch(err){ splash.style.display='none'; unlock(); }
+});
+</script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
+<!-- High-End GSAP Splash Screen Loader -->
+<div id="blog-splash-screen" class="blog-splash-screen">
+  <div class="splash-content">
+    <div class="splash-logo-container" id="splash-logo-container">
+      <div class="splash-word prompt-word" id="splash-prompt-word">
+        <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
+      </div>
+      <div class="splash-arrow-wrap">
+        <span class="splash-arrow" id="splash-arrow">➔</span>
+        <div class="splash-ring-loader" id="splash-ring-loader"></div>
+      </div>
+      <div class="splash-word blog-word" id="splash-blog-word">
+        <span>B</span><span>L</span><span>O</span><span>G</span>
+      </div>
+    </div>
+    <div class="splash-loading-label" id="splash-loading-label">LOADING CREATIVE REALM</div>
+  </div>
+  </div>
     <!-- Scrollable Wallpaper Background -->
     <div class="scroll-bg-container" id="scroll-bg-container">
         <div class="bg-layer active" style="background-image: url('https://i.pinimg.com/736x/4d/e2/71/4de271ae9997273cf3fdd47098fa69a3.jpg')"></div>
