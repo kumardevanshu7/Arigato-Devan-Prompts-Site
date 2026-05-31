@@ -1,9 +1,6 @@
 <?php
 session_start();
 require_once "db.php";
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0");
-header("Pragma: no-cache");
-header("Expires: 0");
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
@@ -1029,6 +1026,59 @@ footer .footer-links a:hover {
   .blog-card-desc  { font-size: 0.82rem !important; }
   .blog-card-body  { padding: 16px !important; }
 }
+
+/* Pinterest masonry fix */
+.blogs-grid {
+    align-items: start !important;
+}
+.blog-card {
+    height: max-content !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fix meta alignment and prevent wrapping */
+.blog-card-meta {
+    flex-wrap: nowrap !important;
+}
+.blog-card-meta-left {
+    white-space: nowrap !important;
+}
+.blog-card-likes {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+.blog-card-likes span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+}
+
+/* Force tight alignment for meta row */
+.blog-card-meta {
+    flex-wrap: nowrap !important;
+}
+.blog-card-meta-left {
+    white-space: nowrap !important;
+    gap: 6px !important;
+}
+.blog-card-likes {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+.blog-card-likes span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+}
 </style>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -1476,4 +1526,42 @@ if (dotsToggle && header) {
 </script>
 
 
+
+<script>
+// Force Pinterest-style image orientation based on ACTUAL image dimensions
+document.addEventListener("DOMContentLoaded", function() {
+    const cards = document.querySelectorAll('.blog-card');
+    cards.forEach(card => {
+        const wrapper = card.querySelector('.blog-card-img-wrapper');
+        const img = card.querySelector('.blog-card-img');
+        if (!wrapper || !img) return;
+        
+        function fixRatio() {
+            if (!img.naturalWidth || !img.naturalHeight) return;
+            const isPortrait = img.naturalHeight > img.naturalWidth;
+            
+            // Remove old classes
+            wrapper.classList.remove('ratio-16-9', 'ratio-9-16');
+            
+            // Apply correct class based strictly on pixels, NOT database
+            if (isPortrait) {
+                wrapper.classList.add('ratio-9-16');
+                wrapper.style.aspectRatio = '9 / 16';
+            } else {
+                wrapper.classList.add('ratio-16-9');
+                wrapper.style.aspectRatio = '16 / 9';
+            }
+            
+            // Also ensure the card itself doesn't force a weird stretch if it's in a flex grid
+            card.style.height = 'max-content';
+        }
+
+        if (img.complete) {
+            fixRatio();
+        } else {
+            img.addEventListener('load', fixRatio);
+        }
+    });
+});
+</script>
 </body></html>

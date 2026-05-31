@@ -1,12 +1,6 @@
 ﻿<?php
 session_start();
 require_once "db.php";
-$headers_set = headers_sent();
-if (!$headers_set) {
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0");
-    header("Pragma: no-cache");
-    header("Expires: 0");
-}
 $slug = $_GET["slug"] ?? "";
 if (!$slug) {
     header("Location: blogs.php");
@@ -1026,6 +1020,42 @@ footer .footer-links a:hover {
         gap: 16px 20px !important;
     }
 }
+
+/* Reaction Icons Micro-Animations */
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.25); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.25); }
+    70% { transform: scale(1); }
+}
+@keyframes fireFlicker {
+    0%, 100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+}
+@keyframes wowBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+.react-btn[data-reaction="heart"]:hover .r-emoji i, .react-btn[data-reaction="heart"].reacted .r-emoji i {
+    animation: heartBeat 1s infinite;
+    color: #ef4444;
+}
+.react-btn[data-reaction="fire"]:hover .r-emoji i, .react-btn[data-reaction="fire"].reacted .r-emoji i {
+    animation: fireFlicker 0.4s infinite alternate;
+    color: #f97316;
+}
+.react-btn[data-reaction="wow"]:hover .r-emoji i, .react-btn[data-reaction="wow"].reacted .r-emoji i {
+    animation: wowBounce 0.6s infinite;
+    color: #eab308;
+}
+.react-btn.reacted .r-emoji i {
+    color: #ffffff !important;
+}
+.r-emoji i {
+    transition: color 0.2s;
+    color: #94a3b8;
+}
 </style>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -1066,7 +1096,7 @@ footer .footer-links a:hover {
                 <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
             </div>
             <div class="splash-arrow-wrap">
-                <span class="splash-arrow" id="splash-arrow">➔</span>
+                <i class="fa-solid fa-arrow-right splash-arrow" id="splash-arrow"></i>
                 <div class="splash-ring-loader" id="splash-ring-loader"></div>
             </div>
             <div class="splash-word blog-word" id="splash-blog-word">
@@ -1214,7 +1244,7 @@ footer .footer-links a:hover {
 
   <!-- Reactions -->
   <div class="blog-reactions" id="blog-reactions">
-    <?php foreach (['heart'=>'❤️','fire'=>'🔥','wow'=>'😮'] as $rtype=>$remoji): ?>
+    <?php foreach (['heart'=>'<i class="fa-solid fa-heart"></i>','fire'=>'<i class="fa-solid fa-fire"></i>','wow'=>'<i class="fa-solid fa-face-surprise"></i>'] as $rtype=>$remoji): ?>
     <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
       <span class="r-emoji"><?= $remoji ?></span>
       <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
