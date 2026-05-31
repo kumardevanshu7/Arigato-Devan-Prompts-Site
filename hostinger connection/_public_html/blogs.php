@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0");
@@ -43,18 +43,18 @@ arsort($all_tags);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs — Arigato Devan Prompts">
-<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta property="og:title" content="Blogs ? Arigato Devan Prompts">
+<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
-<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta name="twitter:title" content="Blogs ? Arigato Devan Prompts">
+<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.css?v=2026052201">
 <style>
@@ -687,6 +687,12 @@ footer .footer-links a:hover {
     padding: 0 !important;
 }
 
+@media (min-width: 1200px) {
+  .blogs-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 24px !important; }
+  .blog-card-title { font-size: 1.12rem !important; }
+  .blog-card-desc { font-size: 0.86rem !important; }
+  .blog-card-body { padding: 18px !important; }
+}
 /* 2-column Post Grid matching Pic 1 style */
 .blogs-grid {
     display: grid !important;
@@ -1015,6 +1021,14 @@ footer .footer-links a:hover {
     font-weight: 600;
     font-size: 1.1rem;
 }
+
+/* Smaller cards override (end of style) */
+@media (min-width: 1200px) {
+  .blogs-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 22px !important; }
+  .blog-card-title { font-size: 1.08rem !important; }
+  .blog-card-desc  { font-size: 0.82rem !important; }
+  .blog-card-body  { padding: 16px !important; }
+}
 </style>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -1036,7 +1050,7 @@ footer .footer-links a:hover {
                 <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
             </div>
             <div class="splash-arrow-wrap">
-                <span class="splash-arrow" id="splash-arrow">➔</span>
+                <i class="fa-solid fa-arrow-right splash-arrow" id="splash-arrow"></i>
                 <div class="splash-ring-loader" id="splash-ring-loader"></div>
             </div>
             <div class="splash-word blog-word" id="splash-blog-word">
@@ -1162,7 +1176,10 @@ footer .footer-links a:hover {
   <div class="blogs-wrap">
     <div class="blogs-grid" id="blogs-grid">
       <?php foreach ($blogs as $b):
-          $ratio_class = ($b["image_ratio"] ?? "16:9") === "9:16" ? "ratio-9-16" : "ratio-16-9";
+          $ir = strtolower(trim($b["image_ratio"] ?? "16:9"));
+          $is_portrait = (strpos($ir, '9:16') !== false) || (strpos($ir, '9/16') !== false) || (strpos($ir, 'portrait') !== false) || (strpos($ir, 'vertical') !== false);
+          $ratio_class = $is_portrait ? "ratio-9-16" : "ratio-16-9";
+          $card_ratio = $is_portrait ? "9/16" : "16/9";
           $short_preview = mb_substr(strip_tags($b["content"]), 0, 75) . "...";
           ?>
       <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
@@ -1219,7 +1236,7 @@ footer .footer-links a:hover {
           <div class="title">Creative Prompter</div>
         </div>
       </div>
-      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> — a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ? a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
       <div class="author-location">
         <i class="fa-solid fa-location-dot"></i> Mumbai, India
       </div>
@@ -1365,7 +1382,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Intercept Outbound Clicks for BLOG ➔ PROMPT 2-second Reverse Transition
+// Intercept Outbound Clicks for BLOG ? PROMPT 2-second Reverse Transition
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
     if (!link) return;
@@ -1381,7 +1398,7 @@ document.addEventListener('click', (e) => {
         if (splash) {
             e.preventDefault(); // Intercept redirect
             
-            // Swap text positions to BLOG ➔ PROMPT
+            // Swap text positions to BLOG ? PROMPT
             const blogWordHTML = `<span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">B</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">L</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">O</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">G</span>`;
             const promptWordHTML = `<span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">R</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">O</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">M</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">T</span>`;
             
@@ -1457,4 +1474,6 @@ if (dotsToggle && header) {
     });
 }
 </script>
+
+
 </body></html>

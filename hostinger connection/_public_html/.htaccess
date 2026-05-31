@@ -13,6 +13,10 @@ ErrorDocument 404 /404.php
     RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
     # ─── Clean prompt URLs: /prompts/kiss-in-rain → prompt.php?slug=kiss-in-rain
     RewriteRule ^prompts/([a-z0-9-]+)/?$ prompt.php?slug=$1 [L,QSA]
+    # ─── Clean blog URLs: /blog/my-post → blog.php?slug=my-post
+# RewriteRule ^blog/([a-z0-9-]+)/?$ blog.php?slug=$1 [L,QSA]
+    # ─── Clean blogs list: /blogs → blogs.php
+    RewriteRule ^blogs/?$ blogs.php [L,QSA]
 </IfModule>
 
 # ─── Gzip / Deflate Compression ─────────────────────────────────────────────
