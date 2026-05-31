@@ -1056,6 +1056,45 @@ footer .footer-links a:hover {
     transition: color 0.2s;
     color: #94a3b8;
 }
+
+/* Language Toggle UI */
+.lang-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(241, 245, 249, 0.6);
+    border-radius: 30px;
+    padding: 4px;
+    border: 1px solid #e2e8f0;
+}
+.lang-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    background: transparent;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.lang-btn.active {
+    background: #ffffff;
+    color: #6366f1;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.meta-flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.blog-meta-pills {
+    margin-bottom: 0 !important;
+}
 </style>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -1240,7 +1279,10 @@ footer .footer-links a:hover {
     </div>
 
     <!-- Content of the Blog Post -->
-    <div class="blog-content"><?= $blog["content"] ?></div>
+    <div class="blog-content" id="blog-content-en"><?= $blog["content"] ?></div>
+    <?php if(!empty($blog["content_hindi"])): ?>
+    <div class="blog-content" id="blog-content-hi" style="display:none;"><?= $blog["content_hindi"] ?></div>
+    <?php endif; ?>
 
   <!-- Reactions -->
   <div class="blog-reactions" id="blog-reactions">

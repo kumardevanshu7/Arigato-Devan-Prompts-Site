@@ -69,12 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
     $pdo->prepare(
-        "UPDATE blogs SET title=?,slug=?,description=?,content=?,image_path=?,image_ratio=?,meta_title=?,meta_description=?,tags=?,is_published=?,updated_at=NOW() WHERE id=?",
+        "UPDATE blogs SET title=?,slug=?,description=?,content=?,content_hindi=?,image_path=?,image_ratio=?,meta_title=?,meta_description=?,tags=?,is_published=?,updated_at=NOW() WHERE id=?",
     )->execute([
         $title,
         $slug,
         $description,
         $content,
+        $content_hindi,
         $image_path,
         $image_ratio,
         $meta_title,
@@ -840,6 +841,41 @@ header .admin-avatar {
     border-radius: 12px;
     font-weight: 700;
     margin-bottom: 18px;
+}
+
+/* Language Tabs styling */
+.lang-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: -15px;
+    border-bottom: 2px solid var(--text-color);
+    padding-bottom: 10px;
+    z-index: 10;
+    position: relative;
+}
+.lang-tab {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    font-family: var(--font-main);
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #8c8994;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 12px 12px 0 0;
+}
+.lang-tab.active {
+    color: var(--primary-dark);
+    background: var(--primary-color);
+    border: 2px solid var(--text-color);
+    border-bottom: none;
+}
+.editor-wrapper {
+    display: none;
+}
+.editor-wrapper.active {
+    display: block;
 }
 </style>
 <noscript>
@@ -1670,6 +1706,58 @@ tinymce.init({
         const formData = new FormData();
         formData.append('file', blobInfo.blob(), blobInfo.filename());
         
+        fetch('upload_editor_image.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.url) {
+                success(data.url);
+            } else {
+                failure('Upload failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            failure('Upload error: ' + err.message);
+        });
+    }
+});
+
+tinymce.init({
+    selector: '#blog-editor-hi',
+    height: 650,
+    menubar: false,
+    statusbar: true,
+    branding: false,
+    promotion: false,
+    toolbar: false,
+    plugins: 'image link lists code codesample charmap emoticons wordcount fullscreen autosave visualblocks quickbars',
+    quickbars_selection_toolbar: 'bold italic underline | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
+    quickbars_insert_toolbar: 'image link codesample',
+    font_family_formats: 'Elegant Lora=Lora, serif; Editorial Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Fira Mono=monospace',
+    quickbars_image_toolbar: 'alignleft aligncenter alignright | rotateleft rotateright | flipv fliph | editimage imageoptions',
+    image_advtab: true,
+    image_caption: true,
+    image_dimensions: true,
+    paste_data_images: true, // Allow pasting images directly from clipboard!
+    
+    // Hide native borders so TinyMCE matches our Scribe Paper style 100% borderless!
+    setup: function (editor) {
+        editor.on('init', function () {
+            editor.getContainer().style.border = 'none';
+            editor.getContainer().style.boxShadow = 'none';
+            editor.getContainer().style.background = 'transparent';
+        });
+        editor.on('change', function() {
+            tinymce.triggerSave();
+        });
+    },
+    // Secure Drag-and-Drop / Paste Image Uploader
+    images_upload_handler: function (blobInfo, success, failure, progress) {
+        const formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.filename());
+
         fetch('upload_editor_image.php', {
             method: 'POST',
             body: formData
