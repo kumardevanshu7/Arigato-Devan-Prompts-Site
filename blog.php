@@ -1172,7 +1172,7 @@ footer .footer-links a:hover {
       <a href="gallery.php">GALLERY</a>
       <a href="blogs.php" class="active">BLOGS</a>
       <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-      <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
+      <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
       <div class="nav-dropdown">
           <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
           <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
@@ -1187,7 +1187,7 @@ footer .footer-links a:hover {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
         <span style="font-weight:600;">@arigato.devan</span>
         <span class="pulse-dot"></span>
-        <span style="font-weight:800;font-size:1.1rem;">13K+</span>
+        <span style="font-weight:800;font-size:1.1rem;">15K+</span>
       </a>
     </nav>
     
@@ -1221,7 +1221,7 @@ footer .footer-links a:hover {
       <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
       <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
       <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (13K+)</a>
+      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (15K+)</a>
       <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
       <?php if (isset($_SESSION["user_id"])): ?>
         <?php if ($_SESSION["role"] === "admin"): ?>
@@ -1280,7 +1280,7 @@ footer .footer-links a:hover {
 
     <?php if(!empty($blog["content_hindi"])): ?>
     <!-- Language Toggle -->
-    <div class="meta-flex-row" style="margin-bottom:20px;">
+    <div class="meta-flex-row" style="margin-top:24px;margin-bottom:20px;">
       <div class="lang-toggle-wrapper" id="lang-toggle">
         <button class="lang-btn active" id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
         <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')">🇮🇳 Hindi / Hinglish</button>

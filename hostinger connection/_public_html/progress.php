@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $curPage = basename($_SERVER["PHP_SELF"]);
@@ -228,7 +228,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
         <a href="gallery.php">GALLERY</a>
         <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Growth Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question nav-progress-icon"></i></a>
+            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
         <div class="nav-dropdown">
             <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
             <div class="nav-dropdown-menu">
@@ -263,7 +263,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">13K+</span>
+            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">15K+</span>
         </a>
     </nav>
     <div class="header-right">
