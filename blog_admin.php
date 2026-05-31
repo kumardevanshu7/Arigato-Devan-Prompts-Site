@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -340,10 +340,10 @@ body { background: var(--bg-color); }
 <div class="bm-wrap">
 
     <?php if ($success): ?>
-    <div class="flash-success"><?= htmlspecialchars($success) ?></div>
+    <div class="flash-success"><?= $success ?></div>
     <?php endif; ?>
     <?php if ($error): ?>
-    <div class="flash-error"><?= htmlspecialchars($error) ?></div>
+    <div class="flash-error"><?= $error ?></div>
     <?php endif; ?>
 
     <!-- Page Header -->

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $slug = $_GET["slug"] ?? "";
@@ -1278,6 +1278,16 @@ footer .footer-links a:hover {
       <?php endif; ?>
     </div>
 
+    <?php if(!empty($blog["content_hindi"])): ?>
+    <!-- Language Toggle -->
+    <div class="meta-flex-row" style="margin-bottom:20px;">
+      <div class="lang-toggle-wrapper" id="lang-toggle">
+        <button class="lang-btn active" id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
+        <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')">🇮🇳 Hindi / Hinglish</button>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Content of the Blog Post -->
     <div class="blog-content" id="blog-content-en"><?= $blog["content"] ?></div>
     <?php if(!empty($blog["content_hindi"])): ?>
@@ -1501,6 +1511,26 @@ document.querySelectorAll('.react-btn').forEach(function(btn){
       });
   });
 });
+
+// Language Toggle
+function switchLang(lang) {
+  var enEl = document.getElementById('blog-content-en');
+  var hiEl = document.getElementById('blog-content-hi');
+  var btnEn = document.getElementById('btn-en');
+  var btnHi = document.getElementById('btn-hi');
+  if (!enEl || !hiEl) return;
+  if (lang === 'hi') {
+    enEl.style.display = 'none';
+    hiEl.style.display = '';
+    btnHi.classList.add('active');
+    btnEn.classList.remove('active');
+  } else {
+    hiEl.style.display = 'none';
+    enEl.style.display = '';
+    btnEn.classList.add('active');
+    btnHi.classList.remove('active');
+  }
+}
 </script>
 <script>
 // High-End GSAP Splash Screen Loader Logic

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -2114,6 +2114,22 @@ if (typeof tinymce !== 'undefined') {
     });
 }
 // ─── End Enhanced Image Handling ─────────────────────────────────────────────
+// ─── Language Tab Switcher ─────────────────────────────────────────────────────
+document.querySelectorAll('.lang-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+        // Update active tab
+        document.querySelectorAll('.lang-tab').forEach(function(t) { t.classList.remove('active'); });
+        this.classList.add('active');
+
+        // Show matching editor wrapper
+        var target = this.getAttribute('data-target');
+        document.querySelectorAll('.editor-wrapper').forEach(function(w) { w.classList.remove('active'); });
+        var targetEl = document.getElementById(target);
+        if (targetEl) targetEl.classList.add('active');
+    });
+});
+// ─── End Language Tab Switcher ─────────────────────────────────────────────────
+
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {
     const glow = document.getElementById('back-glow');
