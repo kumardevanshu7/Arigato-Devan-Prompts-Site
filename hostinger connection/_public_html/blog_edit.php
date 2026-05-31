@@ -1323,6 +1323,7 @@ body {
 </noscript>
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
     <?php include_once "gtag.php"; ?>
 </head><body>
 <div class="aurora-bg"></div>
@@ -1382,9 +1383,8 @@ body {
       <!-- Divider Line -->
       <div class="divider-line"></div>
 
-      <!-- Rich Editor Area -->
-      <div class="editor-area" id="blog-editor" contenteditable="true" spellcheck="true" data-placeholder="Start writing your blog story here..."><?= $bl["content"] ?></div>
-      <input type="hidden" name="content" id="blog-content-input">
+      <!-- Rich Editor Area (Powered by TinyMCE) -->
+      <textarea id="blog-editor" name="content" placeholder="Start writing your blog story here..." style="width:100%; min-height:600px; border:none; outline:none; font-size:1.15rem;"><?= htmlspecialchars($bl["content"]) ?></textarea>
     </div>
   </main>
 
@@ -1422,46 +1422,120 @@ body {
         <button type="button" class="span-2" onclick="document.getElementById('editor-img-upload').click()" title="Insert Image"><i class="fa-solid fa-image"></i> Image</button>
         <input type="file" id="editor-img-upload" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
       </div>
+    </div>
+
+    <!-- SEO Content Audit Card -->
+    <div class="control-card">
+      <h3><i class="fa-solid fa-square-check"></i> SEO Content Audit</h3>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size:0.75rem; font-weight:800; color:#8c8994; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">Focus Keyword</label>
+        <input type="text" id="seo-focus-keyword" name="focus_keyword" placeholder="e.g. prompt, ai, design..." style="width:100%; padding:10px 12px; border:2px solid var(--text-color); border-radius:10px; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.85rem; font-weight:700;" value="<?= htmlspecialchars($bl["focus_keyword"] ?? "") ?>" autocomplete="off">
+      </div>
       
-      <!-- Alignment Row -->
-      <div class="editor-toolbar-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0;">
-        <button type="button" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
-        <button type="button" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
-        <button type="button" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px; font-size:0.85rem; font-weight:700; color:#475569;">
+        <div id="seo-check-title" style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword in Title
+        </div>
+        <div id="seo-check-intro" style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword in First 100 Words
+        </div>
+        <div id="seo-check-headings" style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword in H2/H3 headings
+        </div>
+        <div id="seo-check-wordcount" style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> 0 words (Aim for 800+)
+        </div>
+        <div id="seo-check-readingtime" style="display:flex; align-items:center; gap:8px; color:#6366f1;">
+          <i class="fa-solid fa-clock"></i> 0 min read
+        </div>
       </div>
     </div>
 
-    <!-- Theme & Typography Card -->
+    <!-- Beautiful Font Style Options Guide Card -->
     <div class="control-card">
-      <h3><i class="fa-solid fa-font"></i> Typography Guide</h3>
-      <p style="font-size:0.75rem; color:#8c8994; margin-top:-6px; margin-bottom:12px; font-weight:600; line-height:1.4;">Select text inside the paper first, then click a style to apply it:</p>
+      <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Premium Typography Sets</h3>
+      <p style="font-size:0.75rem; color:#8c8994; margin-top:-6px; margin-bottom:12px; font-weight:600; line-height:1.4;">Highlight text inside the paper, then click any button to apply the font style instantly:</p>
       
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <!-- Heading Styles -->
-        <div>
-          <span style="font-size:0.68rem; font-weight:800; color:#8c8994; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">For Headings (H1/H2)</span>
-          <div class="font-style-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-            <button type="button" onclick="applyFontFamily('Playfair Display, Georgia, serif')" style="font-family:'Playfair Display', serif; font-weight:800; padding:6px 10px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Editorial Serif</button>
-            <button type="button" onclick="applyFontFamily('Plus Jakarta Sans, sans-serif')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; padding:6px 10px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Modern Bold</button>
+      <div style="display:flex; flex-direction:column; gap:14px; font-size:0.8rem; line-height:1.4;">
+        <!-- SET A -->
+        <div style="padding:12px; background:#fbfcfe; border-radius:12px; border:1px solid #cbd5e1; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+          <strong style="color:#6366f1; display:flex; align-items:center; gap:6px; margin-bottom:8px; font-family:'Plus Jakarta Sans', sans-serif; font-size:0.85rem; font-weight:800;">
+            <i class="fa-solid fa-feather-pointed"></i> SET A: EDITORIAL SERIF
+          </strong>
+          
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Heading Options (H1/H2)</span>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <button type="button" onclick="applyFontFamily('Playfair Display, Georgia, serif')" style="font-family:'Playfair Display', serif; font-weight:800; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Playfair Serif</button>
+                <button type="button" onclick="applyFontFamily('Georgia, serif')" style="font-family:Georgia, serif; font-weight:bold; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Classic Georgia</button>
+              </div>
+            </div>
+            
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Body Options</span>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <button type="button" onclick="applyFontFamily('Lora, Georgia, serif')" style="font-family:'Lora', serif; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Elegant Lora</button>
+                <button type="button" onclick="applyFontFamily('Times New Roman, serif')" style="font-family:'Times New Roman', serif; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Times Book</button>
+              </div>
+            </div>
+
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Points & Bullet Options</span>
+              <button type="button" onclick="applyFontFamily('Lora, Georgia, serif')" style="font-family:'Lora', serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Lora Points ▢</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- SET B -->
+        <div style="padding:12px; background:#fbfcfe; border-radius:12px; border:1px solid #cbd5e1; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+          <strong style="color:#0ea5e9; display:flex; align-items:center; gap:6px; margin-bottom:8px; font-family:'Plus Jakarta Sans', sans-serif; font-size:0.85rem; font-weight:800;">
+            <i class="fa-solid fa-desktop"></i> SET B: MODERN SANS-SERIF
+          </strong>
+          
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Heading Options (H1/H2)</span>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <button type="button" onclick="applyFontFamily('Plus Jakarta Sans, sans-serif')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Jakarta Bold</button>
+                <button type="button" onclick="applyFontFamily('Outfit, sans-serif')" style="font-family:'Outfit', sans-serif; font-weight:800; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Outfit Bold</button>
+              </div>
+            </div>
+            
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Body Options</span>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <button type="button" onclick="applyFontFamily('Inter, sans-serif')" style="font-family:'Inter', sans-serif; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Inter Sans</button>
+                <button type="button" onclick="applyFontFamily('Arial, sans-serif')" style="font-family:Arial, sans-serif; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Clean Arial</button>
+              </div>
+            </div>
+
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Points & Bullet Options</span>
+              <button type="button" onclick="applyFontFamily('Inter, sans-serif')" style="font-family:'Inter', sans-serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Inter Points ▢</button>
+            </div>
           </div>
         </div>
 
-        <!-- Body & Subheadings -->
-        <div>
-          <span style="font-size:0.68rem; font-weight:800; color:#8c8994; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">For Body & Subheadings (H3)</span>
-          <div class="font-style-btns" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-            <button type="button" onclick="applyFontFamily('Lora, Georgia, serif')" style="font-family:'Lora', serif; padding:6px 10px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Elegant Lora</button>
-            <button type="button" onclick="applyFontFamily('Inter, sans-serif')" style="font-family:'Inter', sans-serif; padding:6px 10px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Inter Sans</button>
-          </div>
-        </div>
-
-        <!-- Inline Enhancements -->
-        <div>
-          <span style="font-size:0.68rem; font-weight:800; color:#8c8994; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">Inline Highlights & Styles</span>
-          <div class="font-style-btns" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;">
-            <button type="button" onclick="fmt('bold')" style="font-weight:900; padding:6px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Bold</button>
-            <button type="button" onclick="applyFontStyle('font-light')" style="color:#888; padding:6px; font-size:0.72rem; border-radius:8px; border:1px solid #cbd5e1; cursor:pointer;">Light</button>
-            <button type="button" onclick="applyFontStyle('font-highlight')" style="background:#FFF1B8; padding:6px; font-size:0.72rem; border-radius:8px; border:none; cursor:pointer; color:#78350f; font-weight:bold;">Highlight</button>
+        <!-- SET C -->
+        <div style="padding:12px; background:#fbfcfe; border-radius:12px; border:1px solid #cbd5e1; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+          <strong style="color:#10b981; display:flex; align-items:center; gap:6px; margin-bottom:8px; font-family:'Plus Jakarta Sans', sans-serif; font-size:0.85rem; font-weight:800;">
+            <i class="fa-solid fa-code"></i> SET C: TECH & MONOSPACE
+          </strong>
+          
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Heading Options (H1/H2)</span>
+              <button type="button" onclick="applyFontFamily('Plus Jakarta Sans, sans-serif')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Modern Tech Heading</button>
+            </div>
+            
+            <div>
+              <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Body & Bullet Options</span>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <button type="button" onclick="applyFontFamily('Courier New, monospace')" style="font-family:'Courier New', monospace; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Courier Code</button>
+                <button type="button" onclick="applyFontFamily('monospace')" style="font-family:monospace; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Fira Mono</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1522,712 +1596,178 @@ body {
   </aside>
 </form>
 <script>
-const editor = document.getElementById('blog-editor');
-const input  = document.getElementById('blog-content-input');
-
-// Sync hidden input before submit
-document.querySelector('form').addEventListener('submit', () => { input.value = editor.innerHTML; });
-
-function fmt(cmd) { document.execCommand(cmd, false, null); editor.focus(); }
-
-// ─── Image Resize, Drag & Crop System ─────────────────────────────────────────
-const imgToolbar = document.createElement('div');
-imgToolbar.id = 'img-toolbar';
-imgToolbar.style.cssText = 'display:none;position:fixed;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;box-shadow:0 10px 25px rgba(0,0,0,0.08);z-index:9999;gap:8px;flex-wrap:wrap;align-items:center;';
-
-// Standard Image Actions Toolbar
-function resetToolbar() {
-    imgToolbar.innerHTML = `
-      <span class="tb-label" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Size:</span>
-      <button type="button" onclick="resizeImg(25)">25%</button>
-      <button type="button" onclick="resizeImg(50)">50%</button>
-      <button type="button" onclick="resizeImg(75)">75%</button>
-      <button type="button" onclick="resizeImg(100)">100%</button>
-      <div class="tb-sep" style="width:1px;height:18px;background:#e2e8f0;margin:0 4px;"></div>
-      <span class="tb-label" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Align:</span>
-      <button type="button" onclick="alignImg('left')" title="Float Left & Wrap Text"><i class="fa-solid fa-align-left"></i> Wrap Left</button>
-      <button type="button" onclick="alignImg('center')" title="Center Block"><i class="fa-solid fa-align-center"></i> Center</button>
-      <button type="button" onclick="alignImg('right')" title="Float Right & Wrap Text">Wrap Right <i class="fa-solid fa-align-right"></i></button>
-      <div class="tb-sep" style="width:1px;height:18px;background:#e2e8f0;margin:0 4px;"></div>
-      <button type="button" onclick="startCropping()" title="Crop Image" style="color:#10b981; background:#e6fbf3 !important; border:none !important; font-weight:800 !important;"><i class="fa-solid fa-crop-simple"></i> Crop</button>
-      <div class="tb-sep" style="width:1px;height:18px;background:#e2e8f0;margin:0 4px;"></div>
-      <button type="button" onclick="removeImg()" style="color:#ef4444;background:#fee2e2 !important;border:none !important;"><i class="fa-solid fa-trash-can"></i></button>
-    `;
-}
-resetToolbar();
-
-// Add premium styles dynamically
-const styleTag = document.createElement('style');
-styleTag.innerHTML = `
-  #img-toolbar button {
-    background: #f1f5f9 !important;
-    border: none !important;
-    color: #475569 !important;
-    padding: 6px 12px !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    transition: all 0.2s !important;
-    box-shadow: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-  }
-  #img-toolbar button:hover {
-    background: #6366f1 !important;
-    color: #ffffff !important;
-  }
-  
-  /* Bounding Box Resizer styles */
-  #editor-image-resizer {
-    position: absolute !important;
-    border: 2px solid #6366f1 !important;
-    pointer-events: none !important;
-    z-index: 9998 !important;
-    box-sizing: border-box !important;
-    display: none;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.5), 0 10px 30px rgba(99,102,241,0.15);
-  }
-  .resize-handle {
-    position: absolute !important;
-    width: 12px !important;
-    height: 12px !important;
-    background: #ffffff !important;
-    border: 2px solid #6366f1 !important;
-    border-radius: 50% !important;
-    pointer-events: auto !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.25) !important;
-    z-index: 10000 !important;
-    box-sizing: border-box !important;
-    transition: transform 0.1s, background 0.1s !important;
-  }
-  .resize-handle:hover {
-    transform: scale(1.3) !important;
-    background: #6366f1 !important;
-  }
-  
-  .resize-handle.tl { top: -7px; left: -7px; cursor: nwse-resize; }
-  .resize-handle.tr { top: -7px; right: -7px; cursor: nesw-resize; }
-  .resize-handle.bl { bottom: -7px; left: -7px; cursor: nesw-resize; }
-  .resize-handle.br { bottom: -7px; right: -7px; cursor: nwse-resize; }
-  
-  .resize-handle.l { top: calc(50% - 6px); left: -7px; cursor: ew-resize; }
-  .resize-handle.r { top: calc(50% - 6px); right: -7px; cursor: ew-resize; }
-  .resize-handle.t { top: -7px; left: calc(50% - 6px); cursor: ns-resize; }
-  .resize-handle.b { bottom: -7px; left: calc(50% - 6px); cursor: ns-resize; }
-
-  /* Cropper overlay styles */
-  #editor-image-cropper {
-    position: absolute !important;
-    border: 2px dashed #10b981 !important;
-    background: rgba(16, 185, 129, 0.08) !important;
-    pointer-events: auto !important;
-    z-index: 10001 !important;
-    box-sizing: border-box !important;
-    display: none;
-    cursor: move;
-  }
-  .crop-handle {
-    position: absolute !important;
-    width: 14px !important;
-    height: 14px !important;
-    background: #ffffff !important;
-    border: 2.5px solid #10b981 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important;
-    z-index: 10002 !important;
-    box-sizing: border-box !important;
-  }
-  .crop-handle.tl { top: -8px; left: -8px; cursor: nwse-resize; }
-  .crop-handle.tr { top: -8px; right: -8px; cursor: nesw-resize; }
-  .crop-handle.bl { bottom: -8px; left: -8px; cursor: nesw-resize; }
-  .crop-handle.br { bottom: -8px; right: -8px; cursor: nwse-resize; }
-`;
-document.head.appendChild(styleTag);
-document.body.appendChild(imgToolbar);
-
-let selectedImg = null;
-let resizeTimeout = null;
-let activeHandle = null;
-let startX, startY, startWidth, startHeight, startRatio;
-let isCropping = false;
-
-// Dynamic Grid Guidelines creation inside Scribe Paper
-const paperElement = document.querySelector('.scribe-paper');
-let guidelines = document.getElementById('editor-grid-guidelines');
-if (paperElement && !guidelines) {
-    guidelines = document.createElement('div');
-    guidelines.id = 'editor-grid-guidelines';
-    guidelines.innerHTML = `
-        <div class="grid-guideline-line"></div>
-        <div class="grid-guideline-line"></div>
-        <div class="grid-guideline-line"></div>
-        <div class="grid-guideline-line"></div>
-        <div class="grid-guideline-line"></div>
-    `;
-    paperElement.appendChild(guidelines);
-}
-
-// Bounding Box Resizer element creation
-let resizerBox = document.getElementById('editor-image-resizer');
-if (paperElement && !resizerBox) {
-    resizerBox = document.createElement('div');
-    resizerBox.id = 'editor-image-resizer';
-    resizerBox.innerHTML = `
-        <!-- 4 Corners -->
-        <div class="resize-handle tl" data-handle="tl"></div>
-        <div class="resize-handle tr" data-handle="tr"></div>
-        <div class="resize-handle bl" data-handle="bl"></div>
-        <div class="resize-handle br" data-handle="br"></div>
-        <!-- 4 Edges -->
-        <div class="resize-handle l" data-handle="l"></div>
-        <div class="resize-handle r" data-handle="r"></div>
-        <div class="resize-handle t" data-handle="t"></div>
-        <div class="resize-handle b" data-handle="b"></div>
-    `;
-    paperElement.appendChild(resizerBox);
-}
-
-function showGuidelines() {
-    if (guidelines) {
-        guidelines.style.display = 'grid';
-        guidelines.style.opacity = '0.25';
-    }
-}
-function hideGuidelines() {
-    if (guidelines) {
-        guidelines.style.display = 'none';
-    }
-}
-
-function updateResizerPosition() {
-    if (!selectedImg || isCropping) {
-        if (resizerBox) resizerBox.style.display = 'none';
-        return;
-    }
-    const paperRect = paperElement.getBoundingClientRect();
-    const imgRect = selectedImg.getBoundingClientRect();
+// ─── TinyMCE 6 Borderless Editor Integration ───────────────────────────────────
+tinymce.init({
+    selector: '#blog-editor',
+    height: 650,
+    menubar: false,
+    statusbar: true,
+    branding: false,
+    promotion: false,
+    toolbar: false,
+    plugins: 'image link lists code codesample charmap emoticons wordcount fullscreen autosave visualblocks quickbars',
+    quickbars_selection_toolbar: 'bold italic underline | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
+    quickbars_insert_toolbar: 'image link codesample',
+    font_family_formats: 'Elegant Lora=Lora, serif; Editorial Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Fira Mono=monospace',
+    quickbars_image_toolbar: 'alignleft aligncenter alignright | rotateleft rotateright | flipv fliph | editimage imageoptions',
+    image_advtab: true,
+    image_caption: true,
+    image_dimensions: true,
+    paste_data_images: true, // Allow pasting images directly from clipboard!
     
-    const top = imgRect.top - paperRect.top;
-    const left = imgRect.left - paperRect.left;
+    // Hide native borders so TinyMCE matches our Scribe Paper style 100% borderless!
+    setup: function (editor) {
+        editor.on('init', function () {
+            editor.getContainer().style.border = 'none';
+            editor.getContainer().style.boxShadow = 'none';
+            editor.getContainer().style.background = 'transparent';
+            runRealtimeSEOAudit();
+        });
+        editor.on('NodeChange keyup change', function () {
+            runRealtimeSEOAudit();
+        });
+    },
     
-    resizerBox.style.top = top + 'px';
-    resizerBox.style.left = left + 'px';
-    resizerBox.style.width = imgRect.width + 'px';
-    resizerBox.style.height = imgRect.height + 'px';
-    resizerBox.style.display = 'block';
-}
-
-function showImgToolbar(img, e) {
-  if (isCropping) return;
-  selectedImg = img;
-  document.querySelectorAll('.editor-area img').forEach(i => i.classList.remove('img-selected'));
-  img.classList.add('img-selected');
-  
-  updateResizerPosition();
-  showGuidelines();
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(hideGuidelines, 1000);
-  
-  const rect = img.getBoundingClientRect();
-  const top = Math.max(8, rect.top - 60);
-  const left = Math.min(window.innerWidth - 450, rect.left);
-  imgToolbar.style.top = top + 'px';
-  imgToolbar.style.left = left + 'px';
-  imgToolbar.style.display = 'flex';
-}
-
-function resizeImg(pct) {
-  if (!selectedImg) return;
-  selectedImg.style.width = pct + '%';
-  selectedImg.style.height = 'auto';
-  selectedImg.style.maxWidth = '100%';
-  
-  setTimeout(() => {
-    updateResizerPosition();
-    const rect = selectedImg.getBoundingClientRect();
-    imgToolbar.style.top = Math.max(8, rect.top - 60) + 'px';
-  }, 50);
-  
-  showGuidelines();
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(hideGuidelines, 1200);
-}
-
-function alignImg(dir) {
-  if (!selectedImg) return;
-  selectedImg.style.float = 'none';
-  selectedImg.style.display = 'inline-block';
-  selectedImg.style.marginLeft = '0';
-  selectedImg.style.marginRight = '0';
-  selectedImg.style.marginTop = '12px';
-  selectedImg.style.marginBottom = '12px';
-  
-  if (dir === 'left') { 
-    selectedImg.style.float = 'left'; 
-    selectedImg.style.marginRight = '20px'; 
-    selectedImg.style.marginBottom = '15px'; 
-  }
-  else if (dir === 'right') { 
-    selectedImg.style.float = 'right'; 
-    selectedImg.style.marginLeft = '20px'; 
-    selectedImg.style.marginBottom = '15px'; 
-  }
-  else { 
-    selectedImg.style.display = 'block';
-    selectedImg.style.marginLeft = 'auto'; 
-    selectedImg.style.marginRight = 'auto'; 
-  }
-  
-  setTimeout(() => {
-    updateResizerPosition();
-    const rect = selectedImg.getBoundingClientRect();
-    imgToolbar.style.top = Math.max(8, rect.top - 60) + 'px';
-    imgToolbar.style.left = Math.min(window.innerWidth - 450, rect.left) + 'px';
-  }, 50);
-  
-  showGuidelines();
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(hideGuidelines, 1200);
-}
-
-function removeImg() {
-  if (!selectedImg) return;
-  selectedImg.parentNode.removeChild(selectedImg);
-  selectedImg = null;
-  imgToolbar.style.display = 'none';
-  if (resizerBox) resizerBox.style.display = 'none';
-  hideGuidelines();
-}
-
-// Resizer Handles Dragging Logic
-if (resizerBox) {
-    resizerBox.addEventListener('mousedown', e => {
-        const handle = e.target.closest('.resize-handle');
-        if (!handle || !selectedImg) return;
-        e.preventDefault();
-        e.stopPropagation();
+    // Custom editor styles inside the iframe matching our exact blog body styles
+    content_style: `
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap');
+        body {
+            font-family: 'Lora', Georgia, serif;
+            font-size: 1.15rem;
+            line-height: 1.85;
+            color: #2d2a35;
+            padding: 10px;
+            background: #ffffff;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: #1e1b24;
+            margin-top: 1.4em;
+            margin-bottom: 0.6em;
+            line-height: 1.35;
+        }
+        p {
+            margin-bottom: 1.25em;
+        }
+        pre {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: #cbd5e1;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+    `,
+    
+    // Secure Drag-and-Drop / Paste Image Uploader
+    images_upload_handler: function (blobInfo, success, failure, progress) {
+        const formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.filename());
         
-        activeHandle = handle.dataset.handle;
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = selectedImg.offsetWidth;
-        startHeight = selectedImg.offsetHeight;
-        startRatio = startWidth / startHeight;
-        
-        selectedImg.setAttribute('draggable', 'false');
-        showGuidelines();
-        
-        document.addEventListener('mousemove', onResizeMove);
-        document.addEventListener('mouseup', onResizeMouseUp);
-    });
-}
-
-function onResizeMove(e) {
-    if (!activeHandle || !selectedImg) return;
-    
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    
-    let newWidth = startWidth;
-    let newHeight = startHeight;
-    
-    if (activeHandle === 'br') {
-        newWidth = startWidth + dx;
-        newHeight = newWidth / startRatio;
-    } else if (activeHandle === 'bl') {
-        newWidth = startWidth - dx;
-        newHeight = newWidth / startRatio;
-    } else if (activeHandle === 'tr') {
-        newWidth = startWidth + dx;
-        newHeight = newWidth / startRatio;
-    } else if (activeHandle === 'tl') {
-        newWidth = startWidth - dx;
-        newHeight = newWidth / startRatio;
-    } else if (activeHandle === 'r') {
-        newWidth = startWidth + dx;
-    } else if (activeHandle === 'l') {
-        newWidth = startWidth - dx;
-    } else if (activeHandle === 'b') {
-        newHeight = startHeight + dy;
-    } else if (activeHandle === 't') {
-        newHeight = startHeight - dy;
+        fetch('upload_editor_image.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.url) {
+                success(data.url);
+            } else {
+                failure('Upload failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            failure('Upload error: ' + err.message);
+        });
     }
-    
-    if (newWidth > 35) {
-        selectedImg.style.width = newWidth + 'px';
-    }
-    if (newHeight > 35 && (activeHandle === 'b' || activeHandle === 't' || activeHandle === 'r' || activeHandle === 'l')) {
-        selectedImg.style.height = newHeight + 'px';
-    } else if (activeHandle === 'br' || activeHandle === 'bl' || activeHandle === 'tr' || activeHandle === 'tl') {
-        selectedImg.style.height = 'auto';
-    }
-    
-    updateResizerPosition();
-    
-    const rect = selectedImg.getBoundingClientRect();
-    imgToolbar.style.top = Math.max(8, rect.top - 60) + 'px';
-    imgToolbar.style.left = Math.min(window.innerWidth - 450, rect.left) + 'px';
-}
+});
 
-function onResizeMouseUp() {
-    activeHandle = null;
-    if (selectedImg) {
-        selectedImg.setAttribute('draggable', 'true');
-    }
-    hideGuidelines();
-    document.removeEventListener('mousemove', onResizeMove);
-    document.removeEventListener('mouseup', onResizeMouseUp);
-}
-
-// ✂️ Image Cropper Engine
-let activeCropHandle = null;
-let cropStartX, cropStartY, cropStartTop, cropStartLeft, cropStartWidth, cropStartHeight;
-
-function startCropping() {
-    if (!selectedImg) return;
-    isCropping = true;
+// ─── Real-time Yoast/RankMath-Style SEO Auditor ──────────────────────────────────
+function runRealtimeSEOAudit() {
+    const keywordInput = document.getElementById('seo-focus-keyword');
+    const titleInput = document.getElementById('bc-title');
+    if (!keywordInput || !titleInput) return;
     
-    if (resizerBox) resizerBox.style.display = 'none';
+    const keyword = keywordInput.value.toLowerCase().trim();
+    const titleVal = titleInput.value.toLowerCase().trim();
     
-    let cropOverlay = document.getElementById('editor-image-cropper');
-    if (!cropOverlay) {
-        cropOverlay = document.createElement('div');
-        cropOverlay.id = 'editor-image-cropper';
-        cropOverlay.innerHTML = `
-            <div class="crop-handle tl" data-handle="tl"></div>
-            <div class="crop-handle tr" data-handle="tr"></div>
-            <div class="crop-handle bl" data-handle="bl"></div>
-            <div class="crop-handle br" data-handle="br"></div>
-        `;
-        paperElement.appendChild(cropOverlay);
-        cropOverlay.addEventListener('mousedown', onCropMouseDown);
-    }
+    const editorInstance = tinymce.get('blog-editor');
+    if (!editorInstance) return;
     
-    const paperRect = paperElement.getBoundingClientRect();
-    const imgRect = selectedImg.getBoundingClientRect();
+    const text = editorInstance.getContent({ format: 'text' }).trim();
+    const html = editorInstance.getContent();
     
-    cropOverlay.style.top = (imgRect.top - paperRect.top) + 'px';
-    cropOverlay.style.left = (imgRect.left - paperRect.left) + 'px';
-    cropOverlay.style.width = imgRect.width + 'px';
-    cropOverlay.style.height = imgRect.height + 'px';
-    cropOverlay.style.display = 'block';
-    
-    imgToolbar.innerHTML = `
-      <span class="tb-label" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;"><i class="fa-solid fa-crop-simple"></i> Crop Mode:</span>
-      <button type="button" onclick="confirmCrop()" style="background:#10b981 !important; color:#ffffff !important; font-weight:800 !important; font-size:0.8rem !important; padding:6px 12px !important; border-radius:8px !important; cursor:pointer !important;"><i class="fa-solid fa-check"></i> Crop & Apply</button>
-      <button type="button" onclick="cancelCrop()" style="background:#ef4444 !important; color:#ffffff !important; font-weight:800 !important; font-size:0.8rem !important; padding:6px 12px !important; border-radius:8px !important; cursor:pointer !important;"><i class="fa-solid fa-xmark"></i> Cancel</button>
-    `;
-}
-
-function onCropMouseDown(e) {
-    const handle = e.target.closest('.crop-handle');
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (handle) {
-        activeCropHandle = handle.dataset.handle;
+    // 1. Word Count Check
+    const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+    const wCheck = document.getElementById('seo-check-wordcount');
+    if (words >= 800) {
+        wCheck.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> ${words} words (800+ limit reached!)`;
+        wCheck.style.color = '#10b981';
+    } else if (words >= 400) {
+        wCheck.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i> ${words} words (Aim for 800+)`;
+        wCheck.style.color = '#f59e0b';
     } else {
-        activeCropHandle = 'move';
+        wCheck.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> ${words} words (Aim for 800+)`;
+        wCheck.style.color = '#ef4444';
     }
     
-    cropStartX = e.clientX;
-    cropStartY = e.clientY;
+    // 2. Reading Time Estimation (Avg 200 words per minute)
+    const readTime = Math.ceil(words / 200);
+    document.getElementById('seo-check-readingtime').innerHTML = `<i class="fa-solid fa-clock" style="color:#6366f1;"></i> ${readTime} min read`;
     
-    const cropOverlay = document.getElementById('editor-image-cropper');
-    cropStartTop = parseFloat(cropOverlay.style.top);
-    cropStartLeft = parseFloat(cropOverlay.style.left);
-    cropStartWidth = cropOverlay.offsetWidth;
-    cropStartHeight = cropOverlay.offsetHeight;
-    
-    document.addEventListener('mousemove', onCropMouseMove);
-    document.addEventListener('mouseup', onCropMouseUp);
-}
-
-function onCropMouseMove(e) {
-    const cropOverlay = document.getElementById('editor-image-cropper');
-    if (!cropOverlay || !selectedImg) return;
-    
-    const dx = e.clientX - cropStartX;
-    const dy = e.clientY - cropStartY;
-    
-    const paperRect = paperElement.getBoundingClientRect();
-    const imgRect = selectedImg.getBoundingClientRect();
-    const imgTop = imgRect.top - paperRect.top;
-    const imgLeft = imgRect.left - paperRect.left;
-    
-    if (activeCropHandle === 'move') {
-        let newLeft = cropStartLeft + dx;
-        let newTop = cropStartTop + dy;
-        
-        newLeft = Math.max(imgLeft, Math.min(newLeft, imgLeft + imgRect.width - cropOverlay.offsetWidth));
-        newTop = Math.max(imgTop, Math.min(newTop, imgTop + imgRect.height - cropOverlay.offsetHeight));
-        
-        cropOverlay.style.left = newLeft + 'px';
-        cropOverlay.style.top = newTop + 'px';
+    // 3. Focus Keyword in H1/Title Check
+    const tCheck = document.getElementById('seo-check-title');
+    if (keyword && titleVal.includes(keyword)) {
+        tCheck.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Focus keyword in Title!`;
+        tCheck.style.color = '#10b981';
     } else {
-        let newWidth = cropStartWidth;
-        let newHeight = cropStartHeight;
-        let newLeft = cropStartLeft;
-        let newTop = cropStartTop;
-        
-        if (activeCropHandle === 'br') {
-            newWidth = Math.min(cropStartWidth + dx, imgLeft + imgRect.width - cropStartLeft);
-            newHeight = Math.min(cropStartHeight + dy, imgTop + imgRect.height - cropStartTop);
-        } else if (activeCropHandle === 'bl') {
-            const maxDx = cropStartLeft - imgLeft;
-            const safeDx = Math.max(-maxDx, dx);
-            newLeft = cropStartLeft + safeDx;
-            newWidth = cropStartWidth - safeDx;
-            newHeight = Math.min(cropStartHeight + dy, imgTop + imgRect.height - cropStartTop);
-        } else if (activeCropHandle === 'tr') {
-            const maxDy = cropStartTop - imgTop;
-            const safeDy = Math.max(-maxDy, dy);
-            newTop = cropStartTop + safeDy;
-            newHeight = cropStartHeight - safeDy;
-            newWidth = Math.min(cropStartWidth + dx, imgLeft + imgRect.width - cropStartLeft);
-        } else if (activeCropHandle === 'tl') {
-            const maxDx = cropStartLeft - imgLeft;
-            const safeDx = Math.max(-maxDx, dx);
-            const maxDy = cropStartTop - imgTop;
-            const safeDy = Math.max(-maxDy, dy);
-            
-            newLeft = cropStartLeft + safeDx;
-            newWidth = cropStartWidth - safeDx;
-            newTop = cropStartTop + safeDy;
-            newHeight = cropStartHeight - safeDy;
+        tCheck.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword not in Title`;
+        tCheck.style.color = '#64748b';
+    }
+    
+    // 4. Focus Keyword in First 100 Words Check
+    const introText = text.slice(0, 500).toLowerCase(); // Check first 500 characters of the content
+    const iCheck = document.getElementById('seo-check-intro');
+    if (keyword && introText.includes(keyword)) {
+        iCheck.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Keyword in First 100 Words!`;
+        iCheck.style.color = '#10b981';
+    } else {
+        iCheck.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword not in First 100 Words`;
+        iCheck.style.color = '#64748b';
+    }
+    
+    // 5. Focus Keyword in H2/H3 headings Check
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const headings = Array.from(doc.querySelectorAll('h2, h3')).map(h => h.textContent.toLowerCase());
+    const hCheck = document.getElementById('seo-check-headings');
+    let headingHasKeyword = false;
+    for (let hText of headings) {
+        if (keyword && hText.includes(keyword)) {
+            headingHasKeyword = true;
+            break;
         }
-        
-        if (newWidth > 30) {
-            cropOverlay.style.width = newWidth + 'px';
-            cropOverlay.style.left = newLeft + 'px';
-        }
-        if (newHeight > 30) {
-            cropOverlay.style.height = newHeight + 'px';
-            cropOverlay.style.top = newTop + 'px';
-        }
+    }
+    if (keyword && headingHasKeyword) {
+        hCheck.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Keyword in subheadings!`;
+        hCheck.style.color = '#10b981';
+    } else {
+        hCheck.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Keyword not in H2/H3 tags`;
+        hCheck.style.color = '#64748b';
     }
 }
 
-function onCropMouseUp() {
-    activeCropHandle = null;
-    document.removeEventListener('mousemove', onCropMouseMove);
-    document.removeEventListener('mouseup', onCropMouseUp);
-}
+// Bind live audits to Title and Keyword changes
+document.getElementById('bc-title').addEventListener('input', runRealtimeSEOAudit);
+document.getElementById('seo-focus-keyword').addEventListener('input', runRealtimeSEOAudit);
 
-function cancelCrop() {
-    isCropping = false;
-    const cropOverlay = document.getElementById('editor-image-cropper');
-    if (cropOverlay) cropOverlay.style.display = 'none';
-    
-    resetToolbar();
-    updateResizerPosition();
-}
-
-function confirmCrop() {
-    const cropOverlay = document.getElementById('editor-image-cropper');
-    if (!cropOverlay || !selectedImg) return;
-    
-    const paperRect = paperElement.getBoundingClientRect();
-    const imgRect = selectedImg.getBoundingClientRect();
-    const cropRect = cropOverlay.getBoundingClientRect();
-    
-    const scaleX = selectedImg.naturalWidth / imgRect.width;
-    const scaleY = selectedImg.naturalHeight / imgRect.height;
-    
-    const sourceX = (cropRect.left - imgRect.left) * scaleX;
-    const sourceY = (cropRect.top - imgRect.top) * scaleY;
-    const sourceWidth = cropRect.width * scaleX;
-    const sourceHeight = cropRect.height * scaleY;
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = sourceWidth;
-    canvas.height = sourceHeight;
-    const ctx = canvas.getContext('2d');
-    
-    const tempImg = new Image();
-    tempImg.crossOrigin = 'anonymous';
-    tempImg.onload = function() {
-        ctx.drawImage(tempImg, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
-        
-        try {
-            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-            selectedImg.src = croppedDataUrl;
-            selectedImg.style.width = cropRect.width + 'px';
-            selectedImg.style.height = 'auto';
-        } catch (err) {
-            alert('Could not crop this image due to CORS restrictions on the external domain.');
-        }
-        cancelCrop();
-    };
-    tempImg.src = selectedImg.src;
-}
-
-editor.addEventListener('click', e => {
-  if (e.target.tagName === 'IMG') {
-    e.preventDefault();
-    showImgToolbar(e.target, e);
-  } else {
-    if (isCropping) cancelCrop();
-    imgToolbar.style.display = 'none';
-    document.querySelectorAll('.editor-area img').forEach(i => i.classList.remove('img-selected'));
-    selectedImg = null;
-    if (resizerBox) resizerBox.style.display = 'none';
-    hideGuidelines();
-  }
-});
-
-document.addEventListener('scroll', () => {
-  if (selectedImg && imgToolbar.style.display !== 'none' && !isCropping) {
-    const rect = selectedImg.getBoundingClientRect();
-    imgToolbar.style.top = Math.max(8, rect.top - 60) + 'px';
-    imgToolbar.style.left = Math.min(window.innerWidth - 450, rect.left) + 'px';
-    updateResizerPosition();
-  }
-}, true);
-
-// ─── Native-like Draggable Repositioning and Formatting ───────────────────────
-let draggedImg = null;
-
-function makeImgDraggable(img) {
-  img.setAttribute('draggable', 'true');
-  img.style.cursor = 'grab';
-}
-
-// Observe editor for newly inserted images
-const observer = new MutationObserver((mutations) => {
-  mutations.forEach(mutation => {
-    mutation.addedNodes.forEach(node => {
-      if (node.tagName === 'IMG') {
-        makeImgDraggable(node);
-      } else if (node.querySelectorAll) {
-        node.querySelectorAll('img').forEach(makeImgDraggable);
-      }
-    });
-  });
-});
-observer.observe(editor, { childList: true, subtree: true });
-editor.querySelectorAll('img').forEach(makeImgDraggable);
-
-editor.addEventListener('dragstart', (e) => {
-  if (e.target.tagName === 'IMG') {
-    draggedImg = e.target;
-    if (resizerBox) resizerBox.style.display = 'none'; // Hide resizer box so it doesn't block dropping!
-    e.dataTransfer.effectAllowed = 'move';
-    e.target.style.opacity = '0.4';
-    showGuidelines(); // Show guidelines when dragging image!
-  }
-});
-
-editor.addEventListener('dragend', (e) => {
-  if (e.target.tagName === 'IMG') {
-    e.target.style.opacity = '1';
-    setTimeout(() => {
-      if (selectedImg) {
-        updateResizerPosition();
-      }
-    }, 50);
-  }
-  draggedImg = null;
-  hideGuidelines(); // Hide guidelines on drag end!
-});
-
-editor.addEventListener('dragover', (e) => {
-  e.preventDefault();
-});
-
-editor.addEventListener('drop', (e) => {
-  e.preventDefault();
-  hideGuidelines(); // Hide guidelines on drop!
-  
-  if (draggedImg) {
-    let range = null;
-    if (document.caretRangeFromPoint) {
-      range = document.caretRangeFromPoint(e.clientX, e.clientY);
-    } else if (e.rangeParent) {
-      range = document.createRange();
-      range.setStart(e.rangeParent, e.rangeOffset);
-    }
-    
-    if (range) {
-      let containerNode = range.startContainer;
-      if (containerNode.nodeType === Node.TEXT_NODE) {
-          containerNode = containerNode.parentNode;
-      }
-      
-      // Prevent nesting inside other paragraph structures! Split paragraphs smoothly.
-      if (containerNode && containerNode !== editor && editor.contains(containerNode)) {
-          let blockNode = containerNode;
-          while (blockNode.parentNode && blockNode.parentNode !== editor) {
-              blockNode = blockNode.parentNode;
-          }
-          editor.insertBefore(draggedImg, blockNode.nextSibling);
-      } else {
-          range.insertNode(draggedImg);
-      }
-      
-      // Guarantee focusable line below dropped image
-      if (!draggedImg.nextElementSibling || draggedImg.nextElementSibling.tagName !== 'P') {
-          const p = document.createElement('p');
-          p.innerHTML = '<br>';
-          editor.insertBefore(p, draggedImg.nextSibling);
-      }
-      
-      selectedImg = draggedImg;
-      setTimeout(() => {
-          updateResizerPosition();
-          showImgToolbar(selectedImg, e);
-      }, 50);
-    }
-    draggedImg = null;
-    return;
-  }
-  
-  const files = e.dataTransfer.files;
-  if (files.length > 0) {
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].type.startsWith('image/')) {
-        uploadEditorImage(files[i]);
-      }
-    }
-  }
-});
-
-function fmtBlock(tag) { document.execCommand('formatBlock', false, '<' + tag + '>'); editor.focus(); }
-
-function applyFontFamily(family) {
-  const sel = window.getSelection();
-  if (!sel.rangeCount) return;
-  const range = sel.getRangeAt(0);
-  if (range.collapsed) return;
-  const span = document.createElement('span');
-  span.style.fontFamily = family;
-  try {
-    range.surroundContents(span);
-  } catch (e) {
-    document.execCommand('fontName', false, family);
-  }
-  editor.focus();
-}
-
-function insertCodeBlock() {
-  editor.focus();
-  const codeBlockHtml = `
-    <div class="blog-code-block" contenteditable="false" style="position:relative; margin:24px 0; background:#0f172a; border-radius:12px; padding:16px 20px; font-family:monospace; color:#cbd5e1; box-sizing:border-box; text-align:left;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #1e293b; padding-bottom:8px; font-size:0.75rem; text-transform:uppercase; color:#94a3b8; font-weight:800; letter-spacing:1.5px; user-select:none;">
-        <span>Code Snippet</span>
-        <button type="button" onclick="copyCodeText(this)" style="background:#1e293b; border:none; border-radius:6px; color:#cbd5e1; padding:4px 10px; cursor:pointer; font-weight:bold; font-size:0.75rem; transition:all 0.15s; display:inline-flex; align-items:center; gap:4px; flex-shrink:0; white-space:nowrap;">
-          <i class="fa-solid fa-copy"></i> Copy
-        </button>
-      </div>
-      <pre class="code-content" contenteditable="true" style="margin:0; outline:none; border:none; background:transparent; color:#cbd5e1; font-family:'Courier New',Courier,monospace; font-size:0.9rem; line-height:1.5; white-space:pre-wrap; overflow-x:auto; text-align:left;">// Paste your code here...</pre>
-    </div>
-    <p><br></p>
-  `;
-  document.execCommand('insertHTML', false, codeBlockHtml);
-}
-
+// Live Code Copy Engine helper for code snippets
 function copyCodeText(btn) {
   const block = btn.closest('.blog-code-block');
   if (!block) return;
@@ -2235,18 +1775,35 @@ function copyCodeText(btn) {
   if (!pre) pre = block.querySelector('pre');
   if (!pre) return;
   const code = pre.innerText;
-  function showCopied(button){
+
+  function showCopied(button) {
     const originalText = button.innerHTML;
-    button.innerHTML = `<i class=\"fa-solid fa-check\" style=\"color:#10b981;\"></i> Copied!`;
+    button.innerHTML = `<i class="fa-solid fa-check" style="color:#10b981;"></i> Copied!`;
     button.style.background = '#065f46';
     button.style.color = '#ffffff';
-    setTimeout(()=>{ button.innerHTML = originalText; button.style.background = '#1e293b'; button.style.color = '#cbd5e1'; }, 2000);
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.style.background = '#1e293b';
+      button.style.color = '#cbd5e1';
+    }, 2000);
   }
-  function fallbackCopy(text, button){
-    const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); showCopied(button); } catch(e){ alert('Could not copy code.'); }
+
+  function fallbackCopy(text, button) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showCopied(button);
+    } catch(e) {
+      alert('Could not copy code.');
+    }
     document.body.removeChild(ta);
   }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(code).then(() => showCopied(btn)).catch(() => fallbackCopy(code, btn));
   } else {
@@ -2254,54 +1811,40 @@ function copyCodeText(btn) {
   }
 }
 
-function applyFontStyle(cls) {
-  const sel = window.getSelection();
-  if (!sel.rangeCount) return;
-  const range = sel.getRangeAt(0);
-  if (range.collapsed) return;
-  const span = document.createElement('span');
-  span.className = cls;
-  try { range.surroundContents(span); } catch(e) {}
-  editor.focus();
-}
-
-// Scope Ctrl+A inside Code Blocks and handle placeholders
-editor.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && (e.key === 'a' || e.key === 'A')) {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            let node = sel.anchorNode;
-            if (node) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    node = node.parentNode;
-                }
-                const codePre = node.closest('.code-content');
-                if (codePre) {
-                    e.preventDefault();
-                    const range = document.createRange();
-                    range.selectNodeContents(codePre);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            }
-        }
-    }
-});
-
-// Placeholder
-editor.addEventListener('focus', () => { if(editor.textContent.trim()==='') editor.innerHTML=''; });
-editor.addEventListener('blur',  () => {});
-
-function insertImagePrompt() {
-    const url = prompt("Enter image URL:");
-    if (url) {
-        editor.focus();
-        // Insert clean block-level image on its own line followed by a blank paragraph, with zero invalid nested paragraphs!
-        const imgHtml = `<img src="${url}" style="max-width:75%; border-radius:16px; display:block; margin:20px auto; height:auto;" alt=""><p><br></p>`;
-        document.execCommand('insertHTML', false, imgHtml);
+// Sidebar Formatting Helpers to Bridge with TinyMCE
+function applyFontFamily(family) {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.focus();
+        tinymce.activeEditor.execCommand('FontName', false, family);
     }
 }
-
+function fmt(cmd) {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.execCommand(cmd);
+    }
+}
+function fmtBlock(tag) {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.execCommand('FormatBlock', false, tag);
+    }
+}
+function insertCodeBlock() {
+    if (tinymce.activeEditor) {
+        const codeBlockHtml = `
+          <div class="blog-code-block" contenteditable="false" style="position:relative; margin:24px 0; background:#0f172a; border-radius:12px; padding:16px 20px; font-family:monospace; color:#cbd5e1; box-sizing:border-box; text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #1e293b; padding-bottom:8px; font-size:0.75rem; text-transform:uppercase; color:#94a3b8; font-weight:800; letter-spacing:1.5px; user-select:none;">
+              <span>Code Snippet</span>
+              <button type="button" onclick="copyCodeText(this)" style="background:#1e293b; border:none; border-radius:6px; color:#cbd5e1; padding:4px 10px; cursor:pointer; font-weight:bold; font-size:0.75rem; transition:all 0.15s; display:inline-flex; align-items:center; gap:4px; flex-shrink:0; white-space:nowrap;">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+            <pre class="code-content" contenteditable="true" style="margin:0; outline:none; border:none; background:transparent; color:#cbd5e1; font-family:'Courier New',Courier,monospace; font-size:0.9rem; line-height:1.5; white-space:pre-wrap; overflow-x:auto; text-align:left;">// Paste your code here...</pre>
+          </div>
+          <p><br></p>
+        `;
+        tinymce.activeEditor.execCommand('mceInsertContent', false, codeBlockHtml);
+    }
+}
 function uploadEditorImage(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -2311,11 +1854,8 @@ function uploadEditorImage(file) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.url) {
-            editor.focus();
-            // Insert clean block-level image on its own line followed by a blank paragraph, with zero invalid nested paragraphs!
-            const imgHtml = `<img src="${data.url}" style="max-width:75%; border-radius:16px; display:block; margin:20px auto; height:auto;" alt=""><p><br></p>`;
-            document.execCommand('insertHTML', false, imgHtml);
+        if (data.url && tinymce.activeEditor) {
+            tinymce.activeEditor.execCommand('mceInsertContent', false, `<img src="${data.url}" style="max-width:75%; border-radius:16px; display:block; margin:20px auto; height:auto;" alt="">`);
         } else {
             alert('Upload failed: ' + (data.error || 'Unknown error'));
         }
@@ -2323,6 +1863,191 @@ function uploadEditorImage(file) {
     .catch(err => alert('Upload error'));
 }
 
+
+
+// ─── Enhanced Image Handling for TinyMCE ────────────────────────────────────
+let scribeImgToolbar = null;
+let scribeSelectedImg = null;
+let scribeGuideLines = null;
+
+function scribeInitImgToolbar() {
+    if (scribeImgToolbar) return;
+    scribeImgToolbar = document.createElement('div');
+    scribeImgToolbar.id = 'scribe-img-toolbar';
+    scribeImgToolbar.style.cssText = 'display:none;position:fixed;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;box-shadow:0 10px 25px rgba(0,0,0,0.08);z-index:9999;gap:8px;flex-wrap:wrap;align-items:center;';
+    scribeImgToolbar.innerHTML = `
+      <span style="font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Size:</span>
+      <button type="button" onclick="scribeResizeImg(25)" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;">25%</button>
+      <button type="button" onclick="scribeResizeImg(50)" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;">50%</button>
+      <button type="button" onclick="scribeResizeImg(75)" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;">75%</button>
+      <button type="button" onclick="scribeResizeImg(100)" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;">100%</button>
+      <div style="width:1px;height:18px;background:#e2e8f0;margin:0 4px;"></div>
+      <span style="font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Align:</span>
+      <button type="button" onclick="scribeAlignImg('left')" title="Float Left" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;"><i class="fa-solid fa-align-left"></i></button>
+      <button type="button" onclick="scribeAlignImg('center')" title="Center" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;"><i class="fa-solid fa-align-center"></i></button>
+      <button type="button" onclick="scribeAlignImg('right')" title="Float Right" style="background:#f1f5f9;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:&quot;Plus Jakarta Sans&quot;,sans-serif;font-size:0.75rem;font-weight:700;"><i class="fa-solid fa-align-right"></i></button>
+      <div style="width:1px;height:18px;background:#e2e8f0;margin:0 4px;"></div>
+      <button type="button" onclick="scribeRemoveImg()" title="Remove" style="color:#ef4444;background:#fee2e2;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;"><i class="fa-solid fa-trash-can"></i></button>
+    `;
+    document.body.appendChild(scribeImgToolbar);
+}
+
+function scribeGetSelectedImg() {
+    const ed = tinymce.activeEditor;
+    if (!ed) return null;
+    const node = ed.selection.getNode();
+    if (node && node.nodeName === 'IMG') { scribeSelectedImg = node; return node; }
+    scribeSelectedImg = null;
+    return null;
+}
+
+function scribeShowImgToolbar() {
+    const img = scribeGetSelectedImg();
+    if (!img) { scribeHideImgToolbar(); return; }
+    if (!scribeImgToolbar) scribeInitImgToolbar();
+    const ed = tinymce.activeEditor;
+    const iframe = ed.getContentAreaContainer().querySelector('iframe');
+    if (!iframe) return;
+    const imgRect = img.getBoundingClientRect();
+    const iframeRect = iframe.getBoundingClientRect();
+    const top = iframeRect.top + imgRect.top - 50;
+    const left = iframeRect.left + imgRect.left;
+    scribeImgToolbar.style.display = 'flex';
+    scribeImgToolbar.style.top = Math.max(5, top) + 'px';
+    scribeImgToolbar.style.left = left + 'px';
+}
+
+function scribeHideImgToolbar() {
+    if (scribeImgToolbar) scribeImgToolbar.style.display = 'none';
+    scribeSelectedImg = null;
+}
+
+function scribeResizeImg(pct) {
+    if (!scribeSelectedImg) scribeSelectedImg = scribeGetSelectedImg();
+    if (!scribeSelectedImg) return;
+    const ed = tinymce.activeEditor;
+    const body = ed.getBody();
+    const maxWidth = body.clientWidth || body.scrollWidth;
+    const newWidth = Math.round(maxWidth * (pct / 100));
+    scribeSelectedImg.style.width = newWidth + 'px';
+    scribeSelectedImg.style.height = 'auto';
+    scribeSelectedImg.removeAttribute('width');
+    scribeSelectedImg.removeAttribute('height');
+    ed.fire('change');
+    setTimeout(scribeShowImgToolbar, 50);
+}
+
+function scribeAlignImg(align) {
+    if (!scribeSelectedImg) scribeSelectedImg = scribeGetSelectedImg();
+    if (!scribeSelectedImg) return;
+    const ed = tinymce.activeEditor;
+    const doc = ed.getDoc();
+    
+    scribeSelectedImg.style.display = 'block';
+    scribeSelectedImg.style.margin = '0';
+    scribeSelectedImg.style.position = 'static';
+    scribeSelectedImg.style.left = '';
+    scribeSelectedImg.style.top = '';
+    
+    if (align === 'left') {
+        scribeSelectedImg.style.float = 'left';
+        scribeSelectedImg.style.marginRight = '16px';
+        scribeSelectedImg.style.marginBottom = '8px';
+    } else if (align === 'right') {
+        scribeSelectedImg.style.float = 'right';
+        scribeSelectedImg.style.marginLeft = '16px';
+        scribeSelectedImg.style.marginBottom = '8px';
+    } else {
+        scribeSelectedImg.style.float = 'none';
+        scribeSelectedImg.style.margin = '16px auto';
+        scribeSelectedImg.style.display = 'block';
+    }
+    
+    // Insert clean paragraph below floated image so user can type there
+    if (align === 'left' || align === 'right') {
+        let p = scribeSelectedImg.parentNode;
+        while (p && p.tagName !== 'P' && p.tagName !== 'DIV' && p.tagName !== 'BODY') {
+            p = p.parentNode;
+        }
+        if (p && p.nextElementSibling) {
+            const next = p.nextElementSibling;
+            const html = next.innerHTML.trim().toLowerCase();
+            const isEmpty = next.tagName === 'P' && (html === '' || html === '<br>' || html === '<br/>' || html === '<br />');
+            if (!isEmpty) {
+                const clr = doc.createElement('div');
+                clr.style.clear = 'both';
+                clr.style.height = '1px';
+                p.parentNode.insertBefore(clr, next);
+                const newP = doc.createElement('p');
+                newP.innerHTML = '<br>';
+                p.parentNode.insertBefore(newP, next);
+            }
+        } else if (p) {
+            const clr = doc.createElement('div');
+            clr.style.clear = 'both';
+            clr.style.height = '1px';
+            p.parentNode.appendChild(clr);
+            const newP = doc.createElement('p');
+            newP.innerHTML = '<br>';
+            p.parentNode.appendChild(newP);
+        }
+    }
+    
+    ed.fire('change');
+    setTimeout(scribeShowImgToolbar, 50);
+}
+
+function scribeRemoveImg() {
+    if (!scribeSelectedImg) scribeSelectedImg = scribeGetSelectedImg();
+    if (!scribeSelectedImg) return;
+    scribeSelectedImg.remove();
+    scribeHideImgToolbar();
+    tinymce.activeEditor.fire('change');
+}
+
+function scribeInitGuideLines() {
+    const ed = tinymce.activeEditor;
+    if (!ed) return;
+    const body = ed.getBody();
+    if (!body) return;
+    const existing = body.querySelector('.scribe-guide-lines');
+    if (existing) existing.remove();
+    scribeGuideLines = ed.dom.create('div', {
+        class: 'scribe-guide-lines',
+        style: 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;display:none;'
+    },
+    '<div style="position:absolute;top:33%;left:0;width:100%;height:1px;background:rgba(99,102,241,0.25);"></div>' +
+    '<div style="position:absolute;top:66%;left:0;width:100%;height:1px;background:rgba(99,102,241,0.25);"></div>' +
+    '<div style="position:absolute;left:33%;top:0;height:100%;width:1px;background:rgba(99,102,241,0.25);"></div>' +
+    '<div style="position:absolute;left:66%;top:0;height:100%;width:1px;background:rgba(99,102,241,0.25);"></div>' +
+    '<div style="position:absolute;left:50%;top:0;height:100%;width:1px;background:rgba(99,102,241,0.4);"></div>' +
+    '<div style="position:absolute;top:50%;left:0;width:100%;height:1px;background:rgba(99,102,241,0.4);"></div>');
+    body.appendChild(scribeGuideLines);
+}
+
+if (typeof tinymce !== 'undefined') {
+    tinymce.on('AddEditor', function(e) {
+        if (e.editor.id === 'blog-editor') {
+            e.editor.on('init', function() {
+                scribeInitGuideLines();
+            });
+            e.editor.on('NodeChange SelectionChange', function() {
+                const img = scribeGetSelectedImg();
+                if (img) { scribeShowImgToolbar(); } else { scribeHideImgToolbar(); }
+            });
+            e.editor.on('click', function(edEvt) {
+                if (edEvt.target.nodeName === 'IMG') {
+                    scribeShowImgToolbar();
+                } else {
+                    setTimeout(function() {
+                        if (!scribeGetSelectedImg()) scribeHideImgToolbar();
+                    }, 100);
+                }
+            });
+        }
+    });
+}
+// ─── End Enhanced Image Handling ─────────────────────────────────────────────
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {
     const glow = document.getElementById('back-glow');
