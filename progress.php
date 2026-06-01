@@ -115,7 +115,7 @@ $milestones = [
 <title>Growth Journey &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
     <link rel="canonical" href="https://arigatodevan.com/progress.php">
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
 <style>

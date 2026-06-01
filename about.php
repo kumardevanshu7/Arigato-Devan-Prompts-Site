@@ -1,23 +1,23 @@
-ï»¿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse â€” a platform crafting beautiful AI prompts for couples and creative souls.">
+    <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse — a platform crafting beautiful AI prompts for couples and creative souls.">
     <link rel="canonical" href="https://arigatodevan.com/about.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="About Us â€” Arigato Devan PromptVerse">
-    <meta property="og:description" content="Meet the creator of Arigato Devan â€” crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
+    <meta property="og:title" content="About Us — Arigato Devan PromptVerse">
+    <meta property="og:description" content="Meet the creator of Arigato Devan — crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/about.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="About Us â€” Arigato Devan PromptVerse">
-    <meta name="twitter:description" content="Meet the creator of Arigato Devan â€” crafting premium AI couple prompts for Instagram Reels.">
+    <meta name="twitter:title" content="About Us — Arigato Devan PromptVerse">
+    <meta name="twitter:description" content="Meet the creator of Arigato Devan — crafting premium AI couple prompts for Instagram Reels.">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         .about-wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 100px; }
 
@@ -118,10 +118,10 @@
             <div class="profile-flipper" id="profileFlipper" onclick="toggleFlip()" title="Click to flip">
                 <div class="profile-inner" id="profileInner">
                     <div class="pf-front">
-                        <img loading="lazy" src="aboutmepics/new.webp" alt="Arigato Devan â€” Now">
+                        <img loading="lazy" src="aboutmepics/new.webp" alt="Arigato Devan — Now">
                     </div>
                     <div class="pf-back">
-                        <img loading="lazy" src="aboutmepics/old.webp" alt="Arigato Devan â€” Then">
+                        <img loading="lazy" src="aboutmepics/old.webp" alt="Arigato Devan — Then">
                     </div>
                 </div>
             </div>
@@ -131,8 +131,8 @@
         <div class="about-bio">
             <h1>Arigato Devan</h1>
             <div class="handle"><i class="fa-brands fa-instagram"></i> @arigato.devan</div>
-            <p>Hello! I'm the creator behind <strong>Arigato Devan PromptVerse</strong> â€” a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
-            <p>Every prompt here is carefully designed to produce stunning visuals â€” from cinematic couple portraits to viral-worthy aesthetic shots. Just copy, paste into your favourite AI tool, and create magic.</p>
+            <p>Hello! I'm the creator behind <strong>Arigato Devan PromptVerse</strong> — a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+            <p>Every prompt here is carefully designed to produce stunning visuals — from cinematic couple portraits to viral-worthy aesthetic shots. Just copy, paste into your favourite AI tool, and create magic.</p>
             <div class="about-badge-row">
                 <span class="about-badge"><i class="fa-solid fa-heart"></i> Couple Prompts</span>
                 <span class="about-badge"><i class="fa-solid fa-sparkles"></i> Lovely Prompts</span>
@@ -147,12 +147,12 @@
         <div class="about-info-card">
             <div class="aic-icon"><i class="fa-solid fa-robot"></i></div>
             <h3>AI Tools Used</h3>
-            <p>All prompts are primarily crafted and tested with <strong>ChatGPT (DALLÂ·E)</strong> and <strong>Google Gemini</strong>. However, they work beautifully on any AI image platform â€” Midjourney, Adobe Firefly, Stable Diffusion, and more.</p>
+            <p>All prompts are primarily crafted and tested with <strong>ChatGPT (DALL·E)</strong> and <strong>Google Gemini</strong>. However, they work beautifully on any AI image platform — Midjourney, Adobe Firefly, Stable Diffusion, and more.</p>
         </div>
         <div class="about-info-card">
             <div class="aic-icon" style="background:var(--secondary-color);"><i class="fa-solid fa-lock"></i></div>
             <h3>Your Privacy</h3>
-            <p>We use <strong>Google OAuth</strong> for secure login â€” we only access your name and email. No passwords are stored. Your data is protected and never sold to third parties.</p>
+            <p>We use <strong>Google OAuth</strong> for secure login — we only access your name and email. No passwords are stored. Your data is protected and never sold to third parties.</p>
         </div>
         <div class="about-info-card">
             <div class="aic-icon" style="background:#d1fae5;"><i class="fa-solid fa-globe"></i></div>

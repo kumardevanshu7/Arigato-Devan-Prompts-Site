@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -100,7 +100,7 @@ $edit_error = $_SESSION["edit_error"] ?? "";
 unset($_SESSION["edit_error"]);
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.css?v=2026052201">
+<title>Edit Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Scribe Editor */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap');
@@ -1518,7 +1518,7 @@ body {
 
             <div>
               <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Points & Bullet Options</span>
-              <button type="button" onclick="applyFontFamily('Lora, Georgia, serif')" style="font-family:'Lora', serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Lora Points ▢</button>
+              <button type="button" onclick="applyFontFamily('Lora, Georgia, serif')" style="font-family:'Lora', serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Lora Points ?</button>
             </div>
           </div>
         </div>
@@ -1548,7 +1548,7 @@ body {
 
             <div>
               <span style="font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:3px;">Points & Bullet Options</span>
-              <button type="button" onclick="applyFontFamily('Inter, sans-serif')" style="font-family:'Inter', sans-serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Inter Points ▢</button>
+              <button type="button" onclick="applyFontFamily('Inter, sans-serif')" style="font-family:'Inter', sans-serif; width:100%; padding:5px; font-size:0.7rem; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer;">Inter Points ?</button>
             </div>
           </div>
         </div>
@@ -1632,7 +1632,7 @@ body {
   </aside>
 </form>
 <script>
-// ─── TinyMCE 6 Borderless Editor Integration ───────────────────────────────────
+// --- TinyMCE 6 Borderless Editor Integration -----------------------------------
 tinymce.init({
     selector: '#blog-editor',
     height: 650,
@@ -1776,7 +1776,7 @@ tinymce.init({
     }
 });
 
-// ─── Real-time Yoast/RankMath-Style SEO Auditor ──────────────────────────────────
+// --- Real-time Yoast/RankMath-Style SEO Auditor ----------------------------------
 function runRealtimeSEOAudit() {
     const keywordInput = document.getElementById('seo-focus-keyword');
     const titleInput = document.getElementById('bc-title');
@@ -1953,7 +1953,7 @@ function uploadEditorImage(file) {
 
 
 
-// ─── Enhanced Image Handling for TinyMCE ────────────────────────────────────
+// --- Enhanced Image Handling for TinyMCE ------------------------------------
 let scribeImgToolbar = null;
 let scribeSelectedImg = null;
 let scribeGuideLines = null;
@@ -2135,7 +2135,7 @@ if (typeof tinymce !== 'undefined') {
         }
     });
 }
-// ─── End Enhanced Image Handling ─────────────────────────────────────────────
+// --- End Enhanced Image Handling ---------------------------------------------
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {
     const glow = document.getElementById('back-glow');

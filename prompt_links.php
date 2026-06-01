@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -20,8 +20,8 @@ $total = count($prompts);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Share Links — Admin</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <title>Prompt Share Links � Admin</title>
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { background: var(--bg-color); }
@@ -299,7 +299,7 @@ $total = count($prompts);
                     <th style="width:68px;">Cover</th>
                     <th>Title</th>
                     <th style="width:110px;">Type</th>
-                    <th style="width:60px;text-align:center;">❤️</th>
+                    <th style="width:60px;text-align:center;">??</th>
                     <th style="text-align:right;">Direct Link</th>
                 </tr>
             </thead>
@@ -307,25 +307,25 @@ $total = count($prompts);
             <?php
             $type_map = [
                 "secret" => [
-                    "emoji" => "🔒",
+                    "emoji" => "??",
                     "label" => "Secret Code",
                     "bg" => "#ffe3e3",
                     "color" => "#d03030",
                 ],
                 "unreleased" => [
-                    "emoji" => "🌙",
+                    "emoji" => "??",
                     "label" => "Unreleased",
                     "bg" => "#fff4cc",
                     "color" => "#7a5800",
                 ],
                 "insta_viral" => [
-                    "emoji" => "🔥",
+                    "emoji" => "??",
                     "label" => "Insta Viral",
                     "bg" => "#e3f7ff",
                     "color" => "#004f7a",
                 ],
                 "already_uploaded" => [
-                    "emoji" => "📤",
+                    "emoji" => "??",
                     "label" => "Already Uploaded",
                     "bg" => "#e6f2ff",
                     "color" => "#00509e",

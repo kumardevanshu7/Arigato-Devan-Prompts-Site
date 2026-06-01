@@ -65,7 +65,7 @@ $read_time = max(1, (int)ceil($word_count / 200));
 <?php if ($blog["tags"]): ?><meta name="keywords" content="<?= htmlspecialchars(
     $blog["tags"],
 ) ?>"><?php endif; ?>
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Blog Post Viewer */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -1365,7 +1365,7 @@ footer .footer-links a:hover {
   <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script defer src="script.js?v=1778000000"></script>
+<script defer src="script.min.js?v=20260601"></script>
 <script>
 // Live Code Copy Engine
 function copyCodeText(btn) {

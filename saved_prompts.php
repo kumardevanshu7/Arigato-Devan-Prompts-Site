@@ -77,7 +77,7 @@ $type_map = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saved Prompts &mdash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
@@ -462,7 +462,7 @@ $type_map = [
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026052801"></script>
+<script defer src="script.min.js?v=20260601"></script>
 <script>
 (function () {
     const popup = document.getElementById('sp-confirm-remove');

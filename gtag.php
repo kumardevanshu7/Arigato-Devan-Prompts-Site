@@ -4,6 +4,9 @@ $_gtag_canonical = 'https://arigatodevan.com' . strtok($_gtag_script, '?');
 ?>
 <!-- Canonical URL -->
 <link rel="canonical" href="<?= htmlspecialchars($_gtag_canonical) ?>">
+<!-- Preload background wallpaper images (LCP/FCP boost) -->
+<link rel="preload" as="image" href="/backgroundwally/phone-wally.webp" media="(max-width: 768px)">
+<link rel="preload" as="image" href="/backgroundwally/laptop-wally.webp" media="(min-width: 769px)">
 <!-- Organization Schema — appears on all pages -->
 <script type="application/ld+json">
 [

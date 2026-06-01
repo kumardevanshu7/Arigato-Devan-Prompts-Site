@@ -88,7 +88,7 @@ function sessionAvatar()
     <meta name="twitter:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
     <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
@@ -227,7 +227,7 @@ function sessionAvatar()
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
+                    <img loading="lazy" src="/toplogo/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
                     Login
                 </a>
             <?php endif; ?>
@@ -511,7 +511,7 @@ function sessionAvatar()
       });
     })();
     </script>
-        <script defer src="script.js?v=2026052801"></script>
+        <script defer src="script.min.js?v=20260601"></script>
         <script>
 
         // Card click → navigate to clean prompt URL (with fade-out)

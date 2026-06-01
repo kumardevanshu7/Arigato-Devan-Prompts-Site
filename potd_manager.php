@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -41,10 +41,10 @@ foreach ($prompts as $p) { if ($p["is_featured"]) $active_existing_id = (int)$p[
 foreach ($customs as $c) { if ($c["is_active"]) $active_custom_id = (int)$c["id"]; }
 
 $type_map = [
-    "secret" => ["emoji"=>"🔒","label"=>"Secret Code","bg"=>"#ffe3e3","color"=>"#d03030"],
-    "unreleased" => ["emoji"=>"🌙","label"=>"Unreleased","bg"=>"#fff4cc","color"=>"#7a5800"],
-    "insta_viral" => ["emoji"=>"🔥","label"=>"Insta Viral","bg"=>"#e3f7ff","color"=>"#004f7a"],
-    "already_uploaded" => ["emoji"=>"📤","label"=>"Already Uploaded","bg"=>"#e6f2ff","color"=>"#00509e"],
+    "secret" => ["emoji"=>"??","label"=>"Secret Code","bg"=>"#ffe3e3","color"=>"#d03030"],
+    "unreleased" => ["emoji"=>"??","label"=>"Unreleased","bg"=>"#fff4cc","color"=>"#7a5800"],
+    "insta_viral" => ["emoji"=>"??","label"=>"Insta Viral","bg"=>"#e3f7ff","color"=>"#004f7a"],
+    "already_uploaded" => ["emoji"=>"??","label"=>"Already Uploaded","bg"=>"#e6f2ff","color"=>"#00509e"],
 ];
 ?>
 <!DOCTYPE html>
@@ -52,8 +52,8 @@ $type_map = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt of the Day Manager — Admin</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <title>Prompt of the Day Manager � Admin</title>
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { background: var(--bg-color); }
@@ -194,7 +194,7 @@ $type_map = [
                     <th style="width:68px;">Cover</th>
                     <th>Title</th>
                     <th style="width:110px;">Type</th>
-                    <th style="width:60px;text-align:center;">❤️</th>
+                    <th style="width:60px;text-align:center;">??</th>
                     <th style="width:100px;text-align:center;">POTD</th>
                 </tr>
             </thead>
@@ -266,7 +266,7 @@ $type_map = [
                     <?php if ($c_img): ?>
                         <img loading="lazy" src="<?= $c_img ?>" class="pm-cover" alt="Custom" onerror="this.style.display='none'">
                     <?php else: ?>
-                        <div class="pm-cover" style="display:flex;align-items:center;justify-content:center;background:#f3e8ff;font-size:1.2rem;">✨</div>
+                        <div class="pm-cover" style="display:flex;align-items:center;justify-content:center;background:#f3e8ff;font-size:1.2rem;">?</div>
                     <?php endif; ?>
                 </td>
                 <td>

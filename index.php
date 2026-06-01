@@ -136,7 +136,6 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan — AI Couple Prompts for Instagram Reels</title>
     <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts — use instantly on ChatGPT. Only on Arigato Devan.">
-    <link rel="canonical" href="https://arigatodevan.com/">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -182,7 +181,7 @@ try {
       ]
     }
     </script>
-        <link rel="stylesheet" href="style.css?v=2026052201">
+        <link rel="stylesheet" href="style.min.css?v=20260601">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->
@@ -195,23 +194,7 @@ try {
                 "\n";
         }
     } ?>
-    <!-- WebSite Schema — homepage only -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Arigato Devan Prompts",
-      "url": "https://arigatodevan.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://arigatodevan.com/gallery.php?search={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
+
     <?php include_once "gtag.php"; ?>
     <style>
     .pers-welcome{display:inline-flex;align-items:center;gap:10px;padding:8px 20px;border-radius:999px;margin-bottom:14px;backdrop-filter:blur(10px);}
@@ -455,7 +438,7 @@ try {
             <!-- CTA Buttons -->
             <div class="landing-comic-cta">
                 <a href="login.php" class="cta-btn cta-primary" id="hero-login-btn">
-                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G">
+                    <img loading="lazy" src="/toplogo/g-logo.png" alt="G">
                     Login with Google
                 </a>
                 <a href="gallery.php" class="cta-btn cta-secondary" id="hero-gallery-btn">
@@ -1018,7 +1001,7 @@ try {
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
         ? "true"
         : "false" ?>;</script>
-        <script defer src="script.js?v=2026052801"></script>
+        <script defer src="script.min.js?v=20260601"></script>
                 <script>
 
         // Background Scroll Logic

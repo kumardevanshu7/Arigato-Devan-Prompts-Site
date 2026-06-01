@@ -53,7 +53,7 @@ arsort($all_tags);
 <meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
 <meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Blog Section */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -1253,7 +1253,7 @@ footer .footer-links a:hover {
   <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script defer src="script.js?v=1778000000"></script>
+<script defer src="script.min.js?v=20260601"></script>
 <script>
 function filterByTag(tag, btn) {
   // Update active pill

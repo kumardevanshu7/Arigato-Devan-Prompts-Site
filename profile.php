@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile &ndash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         body { min-height: 100vh; padding: 40px 16px 80px; background: var(--bg-color); }
 
@@ -308,7 +308,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <h2><?= htmlspecialchars(
                         $user["username"] ?? "Your Profile",
                     ) ?></h2>
-                    <p>Update your profile anytime &mdash; no restrictions!</p>
+                    <p>Update your profile anytime &mdash;� no restrictions!</p>
                 </div>
             </div>
 
@@ -421,9 +421,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         const hint    = document.getElementById('char-counter');
         input.addEventListener('input', () => {
             const len = input.value.length;
-            if (len < 3)       { hint.textContent = `${len}/15 "Ã¢â‚¬Â Need at least 3`; hint.style.color = '#FF6B6B'; }
-            else if (len > 15) { hint.textContent = `${len}/15 "Ã¢â‚¬Â Too long!`;        hint.style.color = '#FF6B6B'; }
-            else               { hint.textContent = `${len}/15 ✓`;                  hint.style.color = '#2ecc71'; }
+            if (len < 3)       { hint.textContent = `${len}/15 "â€ Need at least 3`; hint.style.color = '#FF6B6B'; }
+            else if (len > 15) { hint.textContent = `${len}/15 "â€ Too long!`;        hint.style.color = '#FF6B6B'; }
+            else               { hint.textContent = `${len}/15 ?`;                  hint.style.color = '#2ecc71'; }
         });
 
         // Live avatar preview in header

@@ -29,7 +29,7 @@ if (empty($_SESSION["oauth_state"])) {
 <title>Secret Code Reels &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="Unlock exclusive secret prompts on PromptVerse with a 6-character code.">
     <link rel="canonical" href="https://arigatodevan.com/secret_code.php">
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -315,7 +315,7 @@ if (empty($_SESSION["oauth_state"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026052801"></script>
+<script defer src="script.min.js?v=20260601"></script>
 <script>
 // Background scroll
 const bgLayers = document.querySelectorAll('.bg-layer');

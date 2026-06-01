@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     exit();
 }
 
-// ── Bulk toggle (checkbox + publish/unpublish) ──
+// -- Bulk toggle (checkbox + publish/unpublish) --
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'], $_POST['selected_ids'])) {
     $ids = array_map('intval', (array)$_POST['selected_ids']);
     if (!empty($ids)) {
@@ -63,7 +63,7 @@ sort($all_mgr_tags);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Prompts - Admin</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
     <style>
         body { background: var(--bg-color); }
@@ -188,7 +188,7 @@ sort($all_mgr_tags);
                         title="<?= $p["is_featured"]
                             ? "Currently Featured"
                             : "Set as Prompt of the Day" ?>">
-                        <?= $p["is_featured"] ? "⭐ Featured" : "☆ Feature" ?>
+                        <?= $p["is_featured"] ? "? Featured" : "? Feature" ?>
                     </button>
                     <a href="edit_prompt.php?id=<?= $item_id ?>" class="edit-btn" title="Edit"><i class="fa-solid fa-pencil"></i></a>
                     <button class="delete-btn" title="Delete" onclick="confirmDelete(<?= $item_id ?>, '<?= $item_js ?>')">
@@ -217,9 +217,9 @@ sort($all_mgr_tags);
                 <tr style="border-bottom:2px solid var(--text-color);text-align:left;">
                     <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">#</th>
                     <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">Prompt</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">❤️ Likes</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">🔖 Saves</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">🔥 Score</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Likes</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Saves</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Score</th>
                 </tr>
             </thead>
             <tbody>
@@ -264,7 +264,7 @@ sort($all_mgr_tags);
                 <div style="font-size:.72rem;color:#aaa;font-weight:600;"><?= date('d M Y', strtotime($dp['created_at'])) ?></div>
             </div>
             <span style="background:<?= $type_colors[$dp['prompt_type']] ?? '#eee' ?>;border:1.5px solid var(--text-color);border-radius:8px;padding:3px 9px;font-size:.7rem;font-weight:900;white-space:nowrap;"><?= strtoupper($dp['prompt_type']) ?></span>
-            <a href="edit_prompt.php?id=<?= $dp['id'] ?>" style="background:#d4eaff;border:2px solid var(--text-color);border-radius:8px;padding:5px 11px;font-size:.75rem;font-weight:800;text-decoration:none;color:var(--text-color);white-space:nowrap;">✏️ Edit</a>
+            <a href="edit_prompt.php?id=<?= $dp['id'] ?>" style="background:#d4eaff;border:2px solid var(--text-color);border-radius:8px;padding:5px 11px;font-size:.75rem;font-weight:800;text-decoration:none;color:var(--text-color);white-space:nowrap;">?? Edit</a>
         </div>
         <?php endforeach; ?>
     </div>
@@ -274,7 +274,7 @@ sort($all_mgr_tags);
     <div class="dash-card" style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
             <h2 style="margin:0;padding:0;border:none;font-size:1.2rem;"><i class="fa-solid fa-check-double" style="color:#22c55e;"></i> Bulk Type Change</h2>
-            <span style="font-size:.75rem;font-weight:800;color:#999;">Select prompts → change type</span>
+            <span style="font-size:.75rem;font-weight:800;color:#999;">Select prompts ? change type</span>
         </div>
         <form method="POST" id="bulk-form">
             <input type="hidden" name="bulk_action" id="bulk-action-val" value="">
@@ -283,10 +283,10 @@ sort($all_mgr_tags);
                 <button type="button" onclick="setBulkAction('<?= $bt ?>')"
                     style="background:<?= $type_colors[$bt]??'#eee' ?>;border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);transition:all .15s;"
                     id="bulk-btn-<?= $bt ?>">
-                    Set → <?= strtoupper($bt) ?>
+                    Set ? <?= strtoupper($bt) ?>
                 </button>
                 <?php endforeach; ?>
-                <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);">☑️ Select All</button>
+                <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);">?? Select All</button>
             </div>
             <div id="bulk-list" style="max-height:320px;overflow-y:auto;border:2px solid var(--border-color);border-radius:14px;padding:8px;">
                 <?php foreach ($prompts as $bp): ?>
@@ -322,14 +322,14 @@ function featurePrompt(id) {
         if (d.success) {
             // Reset all feature buttons
             document.querySelectorAll('[id^="feat-btn-"]').forEach(btn => {
-                btn.textContent = '☆ Feature';
+                btn.textContent = '? Feature';
                 btn.style.background = 'var(--bg-color)';
                 btn.title = 'Set as Prompt of the Day';
             });
             // Highlight selected
             const btn = document.getElementById('feat-btn-' + id);
             if (btn) {
-                btn.textContent = '⭐ Featured';
+                btn.textContent = '? Featured';
                 btn.style.background = 'var(--secondary-color)';
                 btn.title = 'Currently Featured';
             }

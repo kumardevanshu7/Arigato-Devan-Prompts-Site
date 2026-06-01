@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -16,7 +16,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Prompt - Admin</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
     <style>
@@ -185,15 +185,15 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 </div>
 
                 <div class="form-group">
-                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — which AI gives best results with this prompt)</span></label>
+                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � which AI gives best results with this prompt)</span></label>
                     <div class="bwi-selector">
                         <label class="bwi-btn bwi-banana-opt" onclick="setBwi('nano_banana',this)">
                             <input type="radio" name="best_works_in" value="nano_banana">
-                            🍌 Nano Banana
+                            ?? Nano Banana
                         </label>
                         <label class="bwi-btn bwi-chatgpt-opt" onclick="setBwi('chatgpt',this)">
                             <input type="radio" name="best_works_in" value="chatgpt">
-                            ✦ ChatGPT
+                            ? ChatGPT
                         </label>
                     </div>
                 </div>
@@ -205,13 +205,13 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
                 <!-- Extra Prompts (Optional) -->
                 <div class="form-group">
-                    <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — add up to 2 more prompt variants for this card)</span></label>
+                    <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � add up to 2 more prompt variants for this card)</span></label>
 
                     <div id="ep2-section" style="display:none;">
                         <div class="extra-prompt-box">
                             <div class="extra-prompt-header">
-                                <span class="extra-prompt-num">✦ Prompt 2</span>
-                                <button type="button" class="extra-remove-btn" onclick="removeEP(2)">✕ Remove</button>
+                                <span class="extra-prompt-num">? Prompt 2</span>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(2)">? Remove</button>
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 2 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
@@ -235,8 +235,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     <div id="ep3-section" style="display:none;">
                         <div class="extra-prompt-box">
                             <div class="extra-prompt-header">
-                                <span class="extra-prompt-num">✦ Prompt 3</span>
-                                <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
+                                <span class="extra-prompt-num">? Prompt 3</span>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(3)">? Remove</button>
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 3 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
@@ -258,11 +258,11 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
 
                     <div id="ep-add-btns">
-                        <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)">➕ Add Prompt 2</button>
+                        <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)">? Add Prompt 2</button>
                     </div>
                 </div>
 
-                <!-- Access Code — full width, only shows for Secret Code type -->
+                <!-- Access Code � full width, only shows for Secret Code type -->
                 <div class="form-group" id="unlock-code-group" style="display:block;">
                     <label for="unlock_code"><i class="bx bx-key"></i> Access Code (6 chars)</label>
                     <input type="text" id="unlock_code" name="unlock_code" maxlength="6" pattern="[A-Za-z0-9]{6}" title="Exactly 6 alphanumeric characters" placeholder="e.g. MAGIC1" style="text-transform:uppercase; letter-spacing: 4px; font-weight: 900; font-size: 1.1rem;" required>
@@ -270,10 +270,10 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
                 <!-- Assets Toggle -->
                 <div class="form-group">
-                    <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — attach reference images shown after unlock)</span></label>
+                    <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � attach reference images shown after unlock)</span></label>
                     <label class="assets-toggle-label" id="assets-toggle-label">
                         <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)">
-                        <span>📎 Include Assets</span>
+                        <span>?? Include Assets</span>
                     </label>
                     <div id="assets-fields" style="display:none;">
                         <div class="assets-fields-box">
@@ -297,7 +297,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
                 </div>
 
-                <!-- Cover Image + Reel Link — side by side -->
+                <!-- Cover Image + Reel Link � side by side -->
                 <div class="form-row" style="gap:20px; margin-bottom:0;">
                     <div class="form-group" style="flex:1; min-width:0;">
                         <label>Cover Image</label>
@@ -426,7 +426,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             // Check tags
             if (tags.length === 0) {
                 e.preventDefault();
-                alert('⚠️ Please add at least one tag before uploading!');
+                alert('?? Please add at least one tag before uploading!');
                 tagInputField.focus();
                 return;
             }
@@ -448,7 +448,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 const reel = reelLinkInput.value.trim();
                 if (!reel) {
                     e.preventDefault();
-                    alert('⚠️ Reel Link is required for Secret Code type!');
+                    alert('?? Reel Link is required for Secret Code type!');
                     reelLinkInput.focus();
                     return;
                 }
@@ -465,7 +465,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 const addBtns = document.getElementById('ep-add-btns');
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.id = 'ep-add3-btn'; btn.className = 'extra-add-btn';
-                btn.innerHTML = '➕ Add Prompt 3';
+                btn.innerHTML = '? Add Prompt 3';
                 btn.onclick = function(){ addEP(3); };
                 addBtns.appendChild(btn);
             }

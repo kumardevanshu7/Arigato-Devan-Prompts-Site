@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -28,7 +28,7 @@ function fill30($pdo, $sql) {
     return ['l' => json_encode($days), 'd' => json_encode($vals)];
 }
 
-// ── Core stats ──
+// -- Core stats --
 $total_prompts = sqOne($pdo, "SELECT COUNT(*) FROM prompts");
 $total_likes   = sqOne($pdo, "SELECT COALESCE(SUM(likes_count),0) FROM prompts");
 $total_users   = sqOne($pdo, "SELECT COUNT(*) FROM users");
@@ -45,26 +45,26 @@ $most_liked_r  = sqAll($pdo, "SELECT title,likes_count FROM prompts ORDER BY lik
 $most_liked    = $most_liked_r[0] ?? null;
 $avg_journey   = round((float)sqOne($pdo, "SELECT AVG(DATEDIFF(f.fu,u.created_at)) FROM users u JOIN (SELECT user_id,MIN(created_at) as fu FROM unlocked_prompts GROUP BY user_id) f ON u.id=f.user_id", 0), 1);
 
-// ── Chart data ──
+// -- Chart data --
 $top_prompts    = sqAll($pdo, "SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 10");
 $top_unlocked   = sqAll($pdo, "SELECT p.title, COUNT(u.id) as c FROM unlocked_prompts u JOIN prompts p ON p.id=u.prompt_id GROUP BY p.id,p.title ORDER BY c DESC LIMIT 10");
 $type_breakdown = sqAll($pdo, "SELECT prompt_type, COUNT(*) as cnt FROM prompts GROUP BY prompt_type ORDER BY cnt DESC");
 
-// ── 30-day trends ──
+// -- 30-day trends --
 $ug  = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
 $pg  = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
 $spd = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM saved_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
 $upd = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
 
-// ── Blog reads ──
+// -- Blog reads --
 $top_blogs = sqAll($pdo, "SELECT title, COALESCE(view_count,0) as views FROM blogs WHERE is_published=1 ORDER BY views DESC LIMIT 10");
 
-// ── New users by hour (IST, UTC+5:30) ──
+// -- New users by hour (IST, UTC+5:30) --
 $ubh_raw = sqAll($pdo, "SELECT HOUR(CONVERT_TZ(created_at,'+00:00','+05:30')) as h, COUNT(*) as c FROM users GROUP BY h ORDER BY h ASC");
 $hmap = array_fill(0, 24, 0);
 foreach ($ubh_raw as $r) $hmap[(int)$r['h']] = (int)$r['c'];
 
-// ── Retention (requires last_active column) ──
+// -- Retention (requires last_active column) --
 $coh1   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 1 DAY)");
 $r1cnt  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 1 DAY) AND last_active > DATE_ADD(created_at,INTERVAL 1 DAY)");
 $coh7   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 7 DAY)");
@@ -75,38 +75,38 @@ $ret_d1  = $coh1  > 0 ? round($r1cnt*100/$coh1,1)   : 0;
 $ret_d7  = $coh7  > 0 ? round($r7cnt*100/$coh7,1)   : 0;
 $ret_d30 = $coh30 > 0 ? round($r30cnt*100/$coh30,1) : 0;
 
-// ── New vs Returning (last 7 days) ──
+// -- New vs Returning (last 7 days) --
 $new_7    = (int)$weekly_u;
 $return_7 = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 7 DAY) AND last_active >= DATE_SUB(NOW(),INTERVAL 7 DAY)");
 
-// ── Top saved prompts ──
+// -- Top saved prompts --
 $top_saved = sqAll($pdo, "SELECT p.title, COUNT(sp.id) as c FROM saved_prompts sp JOIN prompts p ON p.id=sp.prompt_id GROUP BY p.id,p.title ORDER BY c DESC LIMIT 10");
 
-// ── Unlock-to-view ratio ──
+// -- Unlock-to-view ratio --
 $unlock_view = sqAll($pdo, "SELECT p.title, COUNT(up.id) as unlocks, COALESCE(p.view_count,0) as views FROM unlocked_prompts up JOIN prompts p ON p.id=up.prompt_id GROUP BY p.id,p.title ORDER BY unlocks DESC LIMIT 10");
 
-// ── Prompt age vs performance ──
+// -- Prompt age vs performance --
 $age_perf = sqAll($pdo, "SELECT p.title, DATEDIFF(NOW(),p.created_at) as age, COUNT(up.id) as unlocks, p.likes_count FROM prompts p LEFT JOIN unlocked_prompts up ON p.id=up.prompt_id GROUP BY p.id,p.title,p.created_at,p.likes_count ORDER BY unlocks DESC LIMIT 12");
 
-// ── Power users (5+ unlocks) ──
+// -- Power users (5+ unlocks) --
 $power_users = sqAll($pdo, "SELECT u.username, u.email, COUNT(up.id) as cnt FROM users u JOIN unlocked_prompts up ON u.id=up.user_id GROUP BY u.id,u.username,u.email HAVING cnt >= 5 ORDER BY cnt DESC LIMIT 15");
 
-// ── Churn risk (active 8–30 days ago, not in last 7 days) ──
+// -- Churn risk (active 8�30 days ago, not in last 7 days) --
 $churn_users = sqAll($pdo, "SELECT username, email, last_active FROM users WHERE last_active >= DATE_SUB(NOW(),INTERVAL 30 DAY) AND last_active < DATE_SUB(NOW(),INTERVAL 7 DAY) ORDER BY last_active ASC LIMIT 10");
 
-// ── Dead prompts (0 unlocks in last 30 days) ──
+// -- Dead prompts (0 unlocks in last 30 days) --
 $dead_prompts = sqAll($pdo, "SELECT p.title, p.created_at, p.likes_count FROM prompts p WHERE p.id NOT IN (SELECT DISTINCT prompt_id FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)) ORDER BY p.likes_count DESC LIMIT 10");
 
-// ── Spike days (50+ signups) ──
+// -- Spike days (50+ signups) --
 $spike_days = sqAll($pdo, "SELECT DATE(CONVERT_TZ(created_at,'+00:00','+05:30')) as d, COUNT(*) as cnt FROM users GROUP BY d HAVING cnt >= 50 ORDER BY d DESC LIMIT 5");
 
-// ── Milestones ──
+// -- Milestones --
 $ms_all     = [50, 100, 150, 200, 300, 500, 750, 1000];
 $next_ms    = null;
 foreach ($ms_all as $m) { if ((int)$total_users < $m) { $next_ms = $m; break; } }
 $reached_ms = array_values(array_filter($ms_all, fn($m) => (int)$total_users >= $m));
 
-// ── JSON for charts ──
+// -- JSON for charts --
 $bar_labels  = json_encode(array_column($top_prompts, "title"));
 $bar_data    = json_encode(array_column($top_prompts, "likes_count"));
 $ul_labels   = json_encode(array_column($top_unlocked, "title"));
@@ -120,7 +120,7 @@ $blog_data   = json_encode(array_column($top_blogs, "views"));
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analytics &mdash; Arigato Devan Prompts Admin</title>
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 <style>
 body{background:var(--bg-color)}
@@ -195,7 +195,7 @@ canvas{max-height:260px}
   <div class="an-title"><i class="fa-solid fa-chart-simple"></i> Analytics Dashboard</div>
   <div class="an-sub">Real-time data &mdash; updated on every page load.</div>
 
-  <!-- ── STAT GRID ── -->
+  <!-- -- STAT GRID -- -->
   <div class="stat-grid">
     <div class="s-card" style="background:var(--primary-color)"><div class="s-val"><?= $total_prompts ?></div><div class="s-label">Prompts</div></div>
     <div class="s-card" style="background:var(--secondary-color)"><div class="s-val"><?= number_format($total_likes) ?></div><div class="s-label">Likes</div></div>
@@ -207,7 +207,7 @@ canvas{max-height:260px}
     <div class="s-card" style="background:#f3e5f5"><div class="s-val"><?= number_format((int)$total_shares) ?></div><div class="s-label">Shares</div></div>
     <div class="s-card" style="background:#ede9ff"><div class="s-val">+<?= $weekly_p ?></div><div class="s-label">Prompts</div><div class="s-sub">This Week</div></div>
     <div class="s-card" style="background:#e8f9ef"><div class="s-val">+<?= $weekly_u ?></div><div class="s-label">Users</div><div class="s-sub">This Week</div></div>
-    <div class="s-card" style="background:#fff3cd"><div class="s-val"><?= $avg_journey ?>d</div><div class="s-label">Avg Journey</div><div class="s-sub">Signup → Unlock</div></div>
+    <div class="s-card" style="background:#fff3cd"><div class="s-val"><?= $avg_journey ?>d</div><div class="s-label">Avg Journey</div><div class="s-sub">Signup ? Unlock</div></div>
     <?php if ($most_liked): ?>
     <div class="s-card" style="background:#fff1b8;grid-column:span 2">
       <div class="s-val" style="font-size:.9rem;font-weight:900"><i class="fa-solid fa-star"></i> <?= htmlspecialchars($most_liked["title"]) ?></div>
@@ -216,7 +216,7 @@ canvas{max-height:260px}
     <?php endif; ?>
   </div>
 
-  <!-- ── ALERTS & MILESTONES ── -->
+  <!-- -- ALERTS & MILESTONES -- -->
   <div class="sec-hdr"><i class="fa-solid fa-bell"></i> Alerts &amp; Milestones</div>
   <div class="alert-row">
 
@@ -233,7 +233,7 @@ canvas{max-height:260px}
           <span style="font-size:.82rem;font-weight:600;color:#555">No milestones yet.</span>
         <?php endif; ?>
       </div>
-      <div style="margin-top:10px;font-size:.81rem;font-weight:700;color:#555"><?= $total_users ?> / <?= $next_ms ?? '—' ?> users</div>
+      <div style="margin-top:10px;font-size:.81rem;font-weight:700;color:#555"><?= $total_users ?> / <?= $next_ms ?? '�' ?> users</div>
     </div>
 
     <div class="alert-box alert-spike">
@@ -246,22 +246,22 @@ canvas{max-height:260px}
     <div class="alert-box alert-dead">
       <h4><i class="fa-solid fa-skull"></i> Dead Prompts (0 unlocks / 30d)</h4>
       <?php if ($dead_prompts): ?>
-        <ul><?php foreach (array_slice($dead_prompts, 0, 5) as $d): ?><li><?= htmlspecialchars($d['title']) ?> <span style="color:#bbb">(<?= $d['likes_count'] ?> ♥)</span></li><?php endforeach; ?></ul>
+        <ul><?php foreach (array_slice($dead_prompts, 0, 5) as $d): ?><li><?= htmlspecialchars($d['title']) ?> <span style="color:#bbb">(<?= $d['likes_count'] ?> ?)</span></li><?php endforeach; ?></ul>
         <?php if (count($dead_prompts) > 5): ?><div style="font-size:.73rem;color:#aaa;font-weight:700;margin-top:5px">+<?= count($dead_prompts)-5 ?> more</div><?php endif; ?>
-      <?php else: ?><p style="color:#888">All prompts active! 🎉</p><?php endif; ?>
+      <?php else: ?><p style="color:#888">All prompts active! ??</p><?php endif; ?>
     </div>
 
     <div class="alert-box alert-churn">
-      <h4><i class="fa-solid fa-user-slash"></i> Churn Risk (active 8–30d ago)</h4>
+      <h4><i class="fa-solid fa-user-slash"></i> Churn Risk (active 8�30d ago)</h4>
       <?php if ($churn_users): ?>
         <ul><?php foreach (array_slice($churn_users, 0, 5) as $cu): ?><li><?= htmlspecialchars($cu['username']) ?> <span style="color:#bbb">(<?= date('d M', strtotime($cu['last_active'])) ?>)</span></li><?php endforeach; ?></ul>
         <?php if (count($churn_users) > 5): ?><div style="font-size:.73rem;color:#aaa;font-weight:700;margin-top:5px">+<?= count($churn_users)-5 ?> more</div><?php endif; ?>
-      <?php else: ?><p style="color:#888">No churn risk. ✅</p><?php endif; ?>
+      <?php else: ?><p style="color:#888">No churn risk. ?</p><?php endif; ?>
     </div>
 
   </div>
 
-  <!-- ── ENGAGEMENT TRENDS ── -->
+  <!-- -- ENGAGEMENT TRENDS -- -->
   <div class="sec-hdr"><i class="fa-solid fa-chart-line"></i> Engagement Trends (Last 30 Days)</div>
   <div class="charts-grid">
     <div class="chart-card"><h3><i class="fa-solid fa-bookmark"></i> Saves per Day</h3><canvas id="savesChart"></canvas></div>
@@ -270,7 +270,7 @@ canvas{max-height:260px}
     <div class="chart-card"><h3><i class="fa-solid fa-box"></i> Prompt Uploads</h3><canvas id="promptLineChart"></canvas></div>
   </div>
 
-  <!-- ── CONTENT & AUDIENCE ── -->
+  <!-- -- CONTENT & AUDIENCE -- -->
   <div class="sec-hdr"><i class="fa-solid fa-users"></i> Content &amp; Audience</div>
   <div class="charts-grid">
     <div class="chart-card"><h3><i class="fa-solid fa-book-open"></i> Blog Reads (Top 10)</h3><canvas id="blogChart"></canvas></div>
@@ -299,7 +299,7 @@ canvas{max-height:260px}
     <div class="chart-card chart-full"><h3><i class="fa-solid fa-chart-pie"></i> Prompt Type Breakdown</h3><canvas id="typeChart"></canvas></div>
   </div>
 
-  <!-- ── DETAILED TABLES ── -->
+  <!-- -- DETAILED TABLES -- -->
   <div class="sec-hdr"><i class="fa-solid fa-table"></i> Detailed Data</div>
   <div class="tables-grid">
 

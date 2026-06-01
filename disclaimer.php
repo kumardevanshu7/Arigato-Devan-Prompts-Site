@@ -1,4 +1,4 @@
-﻿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +7,7 @@
     <title>Disclaimer &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="AI-generated content disclaimer for Arigato Devan PromptVerse. Understand the nature of AI prompts and content.">
     <link rel="canonical" href="https://arigatodevan.com/disclaimer.php">
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         .legal-wrap { max-width: 780px; margin: 40px auto; padding: 0 24px 100px; }
         .legal-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 48px 48px; box-shadow: var(--shadow-comic); }

@@ -76,18 +76,6 @@ try {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )");
 
-    // Migrate existing blogs table
-    $blog_alters = [
-        "ALTER TABLE blogs ADD COLUMN image_ratio VARCHAR(10) DEFAULT '16:9'",
-        "ALTER TABLE blogs ADD COLUMN views_count INT DEFAULT 0",
-    ];
-    foreach ($blog_alters as $sql) {
-        try {
-            $pdo->exec($sql);
-        } catch (PDOException $e) {
-        }
-    }
-
     // Blog likes table
     $pdo->exec("CREATE TABLE IF NOT EXISTS blog_likes (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -106,47 +94,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    // Safely alter existing tables to add new columns if they already existed
-    $user_alters = [
-        "ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE",
-        "ALTER TABLE users ADD COLUMN google_id VARCHAR(100) UNIQUE",
-        "ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'",
-        "ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) NULL",
-        "ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL",
-        "ALTER TABLE users ADD COLUMN gender VARCHAR(20) DEFAULT NULL",
-        "ALTER TABLE users ADD COLUMN onboarding_complete TINYINT(1) DEFAULT 0",
-        "ALTER TABLE users MODIFY password_hash VARCHAR(255) NULL",
-        "ALTER TABLE users MODIFY username VARCHAR(50) NULL",
-        // Unique constraint restore — safe, will fail silently if already exists
-        "ALTER TABLE users ADD UNIQUE KEY username (username)",
-        "ALTER TABLE users ADD COLUMN last_visit_date DATE DEFAULT NULL",
-        "ALTER TABLE users ADD COLUMN streak_count INT DEFAULT 0",
-    ];
-    foreach ($user_alters as $sql) {
-        try {
-            $pdo->exec($sql);
-        } catch (PDOException $e) {
-        }
-    }
-
-    $prompt_alters = [
-        "ALTER TABLE prompts ADD COLUMN reel_link VARCHAR(255) DEFAULT ''",
-        "ALTER TABLE prompts ADD COLUMN likes_count INT DEFAULT 0",
-        "ALTER TABLE prompts CHANGE description tag TEXT NOT NULL",
-        "ALTER TABLE prompts ADD COLUMN prompt_type VARCHAR(20) DEFAULT 'secret'",
-        "ALTER TABLE prompts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0",
-        "ALTER TABLE prompts ADD COLUMN best_works_in VARCHAR(50) DEFAULT NULL",
-        "ALTER TABLE prompts ADD COLUMN asset_title VARCHAR(255) DEFAULT NULL",
-        "ALTER TABLE prompts ADD COLUMN asset_images TEXT DEFAULT NULL",
-    ];
-    foreach ($prompt_alters as $sql) {
-        try {
-            $pdo->exec($sql);
-        } catch (PDOException $e) {
-        }
-    }
-
-    // Custom Prompt of the Day table (for manually added POTD entries)
+    // Custom Prompt of the Day table
     $pdo->exec("CREATE TABLE IF NOT EXISTS potd_custom (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(200) NOT NULL,
@@ -155,6 +103,52 @@ try {
         is_active TINYINT(1) NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
+
+    // ─── Run ALTER TABLE migrations only once per session (not every page load) ─
+    if (empty($_SESSION['_db_migrations_done'])) {
+        $blog_alters = [
+            "ALTER TABLE blogs ADD COLUMN image_ratio VARCHAR(10) DEFAULT '16:9'",
+            "ALTER TABLE blogs ADD COLUMN views_count INT DEFAULT 0",
+        ];
+        foreach ($blog_alters as $sql) {
+            try { $pdo->exec($sql); } catch (PDOException $e) {}
+        }
+
+        $user_alters = [
+            "ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE",
+            "ALTER TABLE users ADD COLUMN google_id VARCHAR(100) UNIQUE",
+            "ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'",
+            "ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) NULL",
+            "ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL",
+            "ALTER TABLE users ADD COLUMN gender VARCHAR(20) DEFAULT NULL",
+            "ALTER TABLE users ADD COLUMN onboarding_complete TINYINT(1) DEFAULT 0",
+            "ALTER TABLE users MODIFY password_hash VARCHAR(255) NULL",
+            "ALTER TABLE users MODIFY username VARCHAR(50) NULL",
+            "ALTER TABLE users ADD UNIQUE KEY username (username)",
+            "ALTER TABLE users ADD COLUMN last_visit_date DATE DEFAULT NULL",
+            "ALTER TABLE users ADD COLUMN streak_count INT DEFAULT 0",
+        ];
+        foreach ($user_alters as $sql) {
+            try { $pdo->exec($sql); } catch (PDOException $e) {}
+        }
+
+        $prompt_alters = [
+            "ALTER TABLE prompts ADD COLUMN reel_link VARCHAR(255) DEFAULT ''",
+            "ALTER TABLE prompts ADD COLUMN likes_count INT DEFAULT 0",
+            "ALTER TABLE prompts CHANGE description tag TEXT NOT NULL",
+            "ALTER TABLE prompts ADD COLUMN prompt_type VARCHAR(20) DEFAULT 'secret'",
+            "ALTER TABLE prompts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0",
+            "ALTER TABLE prompts ADD COLUMN best_works_in VARCHAR(50) DEFAULT NULL",
+            "ALTER TABLE prompts ADD COLUMN asset_title VARCHAR(255) DEFAULT NULL",
+            "ALTER TABLE prompts ADD COLUMN asset_images TEXT DEFAULT NULL",
+            "ALTER TABLE prompts ADD COLUMN slug VARCHAR(255) DEFAULT NULL",
+        ];
+        foreach ($prompt_alters as $sql) {
+            try { $pdo->exec($sql); } catch (PDOException $e) {}
+        }
+
+        $_SESSION['_db_migrations_done'] = true;
+    }
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }

@@ -1,7 +1,0 @@
-google_config.php
-db.php
-firebase_auth.php
-/private/
-*.log
-.DS_Store
-Thumbs.db

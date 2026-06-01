@@ -1,23 +1,23 @@
-ï»¿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Get in touch with Arigato Devan â€” we'd love to hear from you. Send us your queries, feedback, or suggestions.">
+    <meta name="description" content="Get in touch with Arigato Devan — we'd love to hear from you. Send us your queries, feedback, or suggestions.">
     <link rel="canonical" href="https://arigatodevan.com/contact.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Contact Us â€” Arigato Devan PromptVerse">
-    <meta property="og:description" content="Have a question or feedback? Contact Arigato Devan â€” we reply within 24 hours.">
+    <meta property="og:title" content="Contact Us — Arigato Devan PromptVerse">
+    <meta property="og:description" content="Have a question or feedback? Contact Arigato Devan — we reply within 24 hours.">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/contact.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Contact Us â€” Arigato Devan PromptVerse">
-    <meta name="twitter:description" content="Have a question or feedback? Contact Arigato Devan â€” we reply within 24 hours.">
+    <meta name="twitter:title" content="Contact Us — Arigato Devan PromptVerse">
+    <meta name="twitter:description" content="Have a question or feedback? Contact Arigato Devan — we reply within 24 hours.">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         .contact-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 100px; }
 
@@ -130,7 +130,7 @@
         <div style="font-size:2.2rem;font-weight:900;display:inline-flex;align-items:center;gap:12px;">
             <i class="fa-solid fa-envelope" style="color:var(--primary-color);"></i> Contact Us
         </div>
-        <div style="font-size:.95rem;color:#888;font-weight:600;margin-top:6px;">We'd love to hear from you â€” usually reply within 24 hours.</div>
+        <div style="font-size:.95rem;color:#888;font-weight:600;margin-top:6px;">We'd love to hear from you — usually reply within 24 hours.</div>
     </div>
 
     <div class="contact-layout">

@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.css?v=2026052201">
+<title>Create Blog &ndash; Admin | Arigato Devan Prompts</title><link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Scribe Editor */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap');

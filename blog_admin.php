@@ -48,7 +48,7 @@ function getAuthorAvatar(array $row): string
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blog Management &ndash; Admin | Arigato Devan Prompts</title>
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 body { background: var(--bg-color); }
 

@@ -48,7 +48,7 @@ if (isset($_SESSION["user_id"])) {
 <meta name="twitter:title" content="Unreleased Prompts — Arigato Devan">
 <meta name="twitter:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<link rel="stylesheet" href="style.css?v=2026052201">
+<link rel="stylesheet" href="style.min.css?v=20260601">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
 
@@ -352,7 +352,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.js?v=2026052801"></script>
+<script defer src="script.min.js?v=20260601"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');

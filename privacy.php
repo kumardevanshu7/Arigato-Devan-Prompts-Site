@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 require_once "db.php";
 ?>
@@ -8,9 +8,9 @@ require_once "db.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse â€” how we collect, use and protect your data.">
+    <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
     <link rel="canonical" href="https://arigatodevan.com/privacy.php">
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         .legal-wrap { max-width: 800px; margin: 0 auto; padding: 60px 24px 100px; position: relative; z-index: 2; }
         .legal-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 48px; box-shadow: var(--shadow-comic); }
@@ -89,7 +89,7 @@ require_once "db.php";
         <p>We do <strong>not</strong> sell, rent, or share your personal data with any third party for commercial purposes.</p>
 
         <h2>3. Google Sign-In & Firebase Authentication</h2>
-        <p>We use <strong>Firebase Authentication</strong> (by Google LLC) for secure login via Google OAuth 2.0. We request only your basic profile â€” name and email. We do <strong>not</strong> access your Google Drive, Gmail, contacts, or any other Google services.</p>
+        <p>We use <strong>Firebase Authentication</strong> (by Google LLC) for secure login via Google OAuth 2.0. We request only your basic profile — name and email. We do <strong>not</strong> access your Google Drive, Gmail, contacts, or any other Google services.</p>
         <p>Google's privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></p>
 
         <h2>4. Google Analytics</h2>

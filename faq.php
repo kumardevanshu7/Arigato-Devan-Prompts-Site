@@ -39,7 +39,7 @@
       ]
     }
     </script>
-    <link rel="stylesheet" href="style.css?v=2026052401">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
         .faq-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 100px; }
 

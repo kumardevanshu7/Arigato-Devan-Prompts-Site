@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -58,7 +58,7 @@ $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? ''
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
-$page_title   = htmlspecialchars($p["title"]) . " — AI Prompt | Arigato Devan";
+$page_title   = htmlspecialchars($p["title"]) . " � AI Prompt | Arigato Devan";
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
@@ -88,7 +88,7 @@ function sessionAvatar() {
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $meta_desc ?>">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
+    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> � Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
@@ -122,7 +122,7 @@ function sessionAvatar() {
         'inLanguage'      => 'en',
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
     </script>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <link rel="stylesheet" href="style.min.css?v=20260601">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <style>
         .pp-wrap { max-width: 1100px; margin: 0 auto; padding: 20px 20px 80px; }
@@ -149,7 +149,7 @@ function sessionAvatar() {
         @media(max-width:700px){.pp-extra-layout{flex-direction:column;} .pp-extra-img-col{width:100%;max-width:300px;}}
         .pp-info-col { flex: 1; min-width: 0; }
         .pp-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
-        /* ── Task Card ── */
+        /* -- Task Card -- */
         .pp-task-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 32px 28px; box-shadow: var(--shadow-comic); text-align: center; }
         .pp-task-icon { font-size: 3rem; margin-bottom: 12px; }
         .pp-task-card h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; }
@@ -163,18 +163,18 @@ function sessionAvatar() {
         .pp-unlock-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-2px); }
         .pp-unlock-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
         .pp-unlock-big { background: var(--secondary-color); font-size: 1.1rem; padding: 18px 32px; margin-top: 8px; }
-        /* ── Love Tap ── */
+        /* -- Love Tap -- */
         .pp-love-area { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 8px 0 20px; }
         .pp-love-btn { font-size: 3.5rem; background: none; border: none; cursor: pointer; transition: transform .1s; line-height: 1; padding: 0; }
         .pp-love-btn:active { transform: scale(0.85); }
         .pp-love-progress { font-size: 1.4rem; font-weight: 900; }
         .pp-progress-bar { width: 200px; height: 10px; background: #eee; border-radius: 20px; border: 2px solid var(--text-color); overflow: hidden; }
         .pp-progress-fill { height: 100%; background: var(--primary-dark); border-radius: 20px; transition: width .2s; }
-        /* ── Math ── */
+        /* -- Math -- */
         .pp-math-q { font-size: 1.8rem; font-weight: 900; background: var(--secondary-color); border: var(--border-width) solid var(--text-color); border-radius: 14px; padding: 16px 24px; margin: 0 auto 20px; display: inline-block; box-shadow: var(--shadow-comic); }
-        /* ── Error ── */
+        /* -- Error -- */
         .pp-error { background: #fff0f0; border: 2px solid #ff6b6b; color: #c00; border-radius: 12px; padding: 10px 16px; font-weight: 700; margin-top: 14px; font-size: 0.9rem; }
-        /* ── Content Section ── */
+        /* -- Content Section -- */
         .pp-content-section { display: flex; flex-direction: column; gap: 16px; }
         .pp-prompt-label { font-weight: 900; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
         .pp-bwi-badge { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--text-color); border-radius: 20px; padding: 4px 14px; font-size: .78rem; font-weight: 900; box-shadow: 2px 2px 0 var(--text-color); }
@@ -195,12 +195,12 @@ function sessionAvatar() {
         .pp-like-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-1px); }
         .pp-like-btn .liked-heart { color: #ff6b6b; }
         .pp-like-btn.is-liked { background: rgba(255,107,107,.15); border-color: #ff6b6b; }
-        /* ── Assets ── */
+        /* -- Assets -- */
         .pp-assets { border-top: var(--border-width) solid var(--text-color); padding-top: 16px; margin-top: 4px; }
         .pp-assets-title { font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
         .pp-assets-grid { display: flex; gap: 10px; flex-wrap: wrap; }
         .pp-assets-grid img { width: 100px; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; border: var(--border-width) solid var(--text-color); }
-        /* ── Related ── */
+        /* -- Related -- */
         .pp-related { margin-top: 48px; }
         .pp-related h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; }
         .pp-rel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -208,7 +208,7 @@ function sessionAvatar() {
         .pp-rel-card:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-3px); }
         .pp-rel-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
         .pp-rel-card-title { padding: 10px 12px; font-weight: 800; font-size: 0.8rem; line-height: 1.3; }
-        /* ── Mobile ── */
+        /* -- Mobile -- */
         @media (max-width: 768px) {
             .pp-layout { flex-direction: column; }
             .pp-img-col { width: 100%; position: static; max-width: 320px; margin: 0 auto; }
@@ -246,7 +246,7 @@ function sessionAvatar() {
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img loading="lazy" src="https://developers.google.com/identity/images/g-logo.png" alt="G" style="width:18px;margin-right:8px;"> Login
+                    <img loading="lazy" src="/toplogo/g-logo.png" alt="G" style="width:18px;margin-right:8px;"> Login
                 </a>
             <?php endif; ?>
         </div>
@@ -281,15 +281,15 @@ function sessionAvatar() {
             <!-- Info Column -->
             <div class="pp-info-col">
                 <?php if ($total_prompts > 1): ?>
-                <div class="pp-multi-badge">🎯 <?= $total_prompts ?> Prompts Inside!</div>
+                <div class="pp-multi-badge">?? <?= $total_prompts ?> Prompts Inside!</div>
                 <?php endif; ?>
                 <h1 class="pp-title"><?= htmlspecialchars($p['title']) ?></h1>
 
-                <!-- ── TASK SECTION (shown when locked) ── -->
+                <!-- -- TASK SECTION (shown when locked) -- -->
                 <?php if (!$is_unlocked): ?>
                 <div id="pp-task" class="pp-task-card">
                     <?php if ($ptype === 'secret_code'): ?>
-                        <div class="pp-task-icon">🔐</div>
+                        <div class="pp-task-icon">??</div>
                         <h3>Enter Secret Code</h3>
                         <p>Watch our Instagram Reel to get the 6-letter secret code, then enter it below to reveal this prompt.</p>
                         <?php if (!empty($p['reel_link'])): ?>
@@ -303,21 +303,21 @@ function sessionAvatar() {
                         </div>
 
                     <?php elseif ($ptype === 'unreleased'): ?>
-                        <div class="pp-task-icon">❤️</div>
+                        <div class="pp-task-icon">??</div>
                         <h3>Show Some Love!</h3>
                         <?php if (isset($_SESSION['user_id'])): ?>
                         <p>Tap the heart <strong>20 times</strong> to unlock this prompt.</p>
                         <?php else: ?>
-                        <p>Tap the heart <strong>90 times</strong> to unlock — or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
+                        <p>Tap the heart <strong>90 times</strong> to unlock � or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
                         <?php endif; ?>
                         <div class="pp-love-area">
-                            <button id="pp-love-btn" class="pp-love-btn">❤️</button>
+                            <button id="pp-love-btn" class="pp-love-btn">??</button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count">0</span> / <span id="pp-tap-total"><?= isset($_SESSION['user_id']) ? 20 : 90 ?></span></div>
                         </div>
 
                     <?php elseif ($ptype === 'insta_viral'): ?>
-                        <div class="pp-task-icon">🧮</div>
+                        <div class="pp-task-icon">??</div>
                         <h3>Quick Math Challenge</h3>
                         <p>Solve this to prove you're human and unlock the prompt!</p>
                         <div class="pp-math-q" id="pp-math-q">Loading...</div>
@@ -327,11 +327,11 @@ function sessionAvatar() {
                         </div>
 
                     <?php elseif ($ptype === 'already_uploaded'): ?>
-                        <div class="pp-task-icon">📤</div>
+                        <div class="pp-task-icon">??</div>
                         <h3>Already on Instagram!</h3>
                         <p>This prompt has been shared on our Instagram. Tap the heart <strong>9 times</strong> to unlock it!</p>
                         <div class="pp-love-area">
-                            <button id="pp-love-btn-au" class="pp-love-btn">❤️</button>
+                            <button id="pp-love-btn-au" class="pp-love-btn">??</button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-au" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
                         </div>
@@ -341,13 +341,13 @@ function sessionAvatar() {
                 </div>
                 <?php endif; ?>
 
-                <!-- ── CONTENT SECTION (shown when unlocked) ── -->
+                <!-- -- CONTENT SECTION (shown when unlocked) -- -->
                 <div id="pp-content" class="pp-content-section" <?= !$is_unlocked ? 'style="display:none;"' : '' ?>>
                     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                         <span class="pp-prompt-label"><i class="fa-solid fa-scroll"></i> THE PROMPT:</span>
                         <?php if (!empty($p['best_works_in'])): ?>
                         <span class="pp-bwi-badge" style="background:<?= $p['best_works_in'] === 'nano_banana' ? '#ffe066' : '#10a37f' ?>;color:<?= $p['best_works_in'] === 'nano_banana' ? '#2d2a35' : '#fff' ?>;">
-                            <?= $p['best_works_in'] === 'nano_banana' ? '🍌 Best in Nano Banana' : '✦ Best in ChatGPT' ?>
+                            <?= $p['best_works_in'] === 'nano_banana' ? '?? Best in Nano Banana' : '? Best in ChatGPT' ?>
                         </span>
                         <?php endif; ?>
                     </div>
@@ -389,7 +389,7 @@ function sessionAvatar() {
 
                     <?php foreach ($extra_prompts_arr as $ep_i => $ep): ?>
                     <div class="pp-extra-section" id="pp-extra-<?= $ep_i ?>">
-                        <div class="pp-extra-num">✦ Prompt <?= $ep_i + 2 ?></div>
+                        <div class="pp-extra-num">? Prompt <?= $ep_i + 2 ?></div>
                         <div class="pp-extra-layout">
                             <?php if (!empty($ep['image_path'])): ?>
                             <div class="pp-extra-img-col">
@@ -443,7 +443,7 @@ function sessionAvatar() {
     const promptId = <?= $id ?>;
     const ptype    = '<?= $ptype ?>';
 
-    // ── Error helper ──
+    // -- Error helper --
     function showError(msg) {
         const el = document.getElementById('pp-task-error');
         if (!el) return;
@@ -452,7 +452,7 @@ function sessionAvatar() {
         setTimeout(() => el.style.display = 'none', 4000);
     }
 
-    // ── Reveal content after unlock ──
+    // -- Reveal content after unlock --
     function revealPrompt(text, extraPrompts) {
         const task = document.getElementById('pp-task');
         const content = document.getElementById('pp-content');
@@ -480,7 +480,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── SECRET CODE ──
+    // -- SECRET CODE --
     const submitCode = document.getElementById('pp-submit-code');
     if (submitCode) {
         submitCode.addEventListener('click', async function() {
@@ -496,7 +496,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── UNRELEASED (20 taps logged in / 90 taps guest) ──
+    // -- UNRELEASED (20 taps logged in / 90 taps guest) --
     const loveBtn = document.getElementById('pp-love-btn');
     if (loveBtn) {
         let tapCount = 0;
@@ -522,7 +522,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── ALREADY UPLOADED (9 heart taps) ──
+    // -- ALREADY UPLOADED (9 heart taps) --
     const loveBtnAu = document.getElementById('pp-love-btn-au');
     if (loveBtnAu) {
         let tapCountAu = 0;
@@ -543,7 +543,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── INSTA VIRAL (math) ──
+    // -- INSTA VIRAL (math) --
     const mathQ = document.getElementById('pp-math-q');
     if (mathQ) {
         (async function initMath() {
@@ -563,7 +563,7 @@ function sessionAvatar() {
     }
 
 
-    // ── COPY ──
+    // -- COPY --
     const copyBtn = document.getElementById('pp-copy-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
@@ -577,7 +577,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── SAVE ──
+    // -- SAVE --
     const saveBtn = document.getElementById('pp-save-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', async function() {
@@ -597,14 +597,14 @@ function sessionAvatar() {
         });
     }
 
-    // ── SHARE ──
+    // -- SHARE --
     const shareBtn = document.getElementById('pp-share-btn');
     if (shareBtn) {
         shareBtn.addEventListener('click', async function() {
             const url = window.location.href;
             const title = <?= json_encode($p['title']) ?>;
             if (navigator.share) {
-                try { await navigator.share({ title: title + ' — Arigato Devan', url: url }); return; } catch(e) {}
+                try { await navigator.share({ title: title + ' � Arigato Devan', url: url }); return; } catch(e) {}
             }
             navigator.clipboard.writeText(url).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
@@ -613,7 +613,7 @@ function sessionAvatar() {
         });
     }
 
-    // ── LIKE ──
+    // -- LIKE --
     const likeBtn = document.getElementById('pp-like-btn');
     if (likeBtn) {
         likeBtn.addEventListener('click', async function() {

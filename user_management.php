@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -7,7 +7,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     header("Location: index.php"); exit();
 }
 
-// ── AJAX: user activity ──
+// -- AJAX: user activity --
 if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
     header('Content-Type: application/json');
     try {
@@ -38,7 +38,7 @@ if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
 
 $users = $pdo->query("SELECT id, username, email, avatar, gender, role, created_at, last_active FROM users ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 
-// ── Growth chart: last 30 days (IST) ──
+// -- Growth chart: last 30 days (IST) --
 $growth_raw = $pdo->query("
     SELECT DATE(CONVERT_TZ(created_at,'+00:00','+05:30')) as d, COUNT(*) as cnt
     FROM users
@@ -55,7 +55,7 @@ for ($i = 29; $i >= 0; $i--) {
     $growth_data[]   = $growth_map[$date] ?? 0;
 }
 
-// ── Top 10 users by unlocks ──
+// -- Top 10 users by unlocks --
 try {
     $top_users = $pdo->query("
         SELECT u.id, u.username, u.email, u.avatar,
@@ -80,8 +80,8 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management — Admin</title>
-    <link rel="stylesheet" href="style.css?v=2026052201">
+    <title>User Management � Admin</title>
+    <link rel="stylesheet" href="style.min.css?v=20260601">
 
     <style>
         body { background: var(--bg-color); }
@@ -160,7 +160,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
         @media (max-width: 700px) {
             .um-stats { grid-template-columns: 1fr 1fr; }
             .um-wrap  { padding: 20px 14px 80px; }
-            /* Hide: Gender(4), Role(5), Joined(6), Last Active(7) — keep #, Avatar, Name, Activity */
+            /* Hide: Gender(4), Role(5), Joined(6), Last Active(7) � keep #, Avatar, Name, Activity */
             .um-table th:nth-child(4), .um-table td:nth-child(4),
             .um-table th:nth-child(5), .um-table td:nth-child(5),
             .um-table th:nth-child(6), .um-table td:nth-child(6),
@@ -229,7 +229,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
     <!-- Growth Chart + Top Users -->
     <div class="um-analytics">
         <div class="um-chart-card">
-            <div class="um-chart-title"><i class="fa-solid fa-chart-line"></i> User Growth — Last 30 Days</div>
+            <div class="um-chart-title"><i class="fa-solid fa-chart-line"></i> User Growth � Last 30 Days</div>
             <canvas id="growthChart" height="140"></canvas>
         </div>
         <div class="um-chart-card">
@@ -303,10 +303,10 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
                 <td class="um-num"><?= $total - $i ?></td>
                 <td><img loading="lazy" src="<?= htmlspecialchars($u_avatar) ?>" class="um-avatar" alt=""></td>
                 <td>
-                    <div class="um-name"><?= htmlspecialchars($u['username'] ?? '—') ?></div>
+                    <div class="um-name"><?= htmlspecialchars($u['username'] ?? '�') ?></div>
                     <div class="um-email"><?= htmlspecialchars($u['email'] ?? '') ?></div>
                 </td>
-                <td style="font-weight:700;font-size:.88rem;"><?= htmlspecialchars(ucfirst($u['gender'] ?? '—')) ?></td>
+                <td style="font-weight:700;font-size:.88rem;"><?= htmlspecialchars(ucfirst($u['gender'] ?? '�')) ?></td>
                 <td><span class="role-pill <?= ($u['role'] ?? '') === 'admin' ? 'role-admin' : 'role-user' ?>"><?= strtoupper($u['role'] ?? 'user') ?></span></td>
                 <td style="font-size:.82rem;font-weight:700;color:#7D7887;">
                     <?= $joined_dt->format('d M Y') ?><br>
@@ -316,7 +316,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
                     <?php if ($la_display): ?>
                         <span class="last-active-badge"><i class="fa-solid fa-circle" style="font-size:.5rem;margin-right:4px;"></i><?= $la_display ?></span>
                     <?php else: ?>
-                        <span class="last-active-never">—</span>
+                        <span class="last-active-never">�</span>
                     <?php endif; ?>
                 </td>
                 <td style="text-align:right;">
@@ -434,8 +434,8 @@ function openActivity(uid) {
             var u = data.user;
             var av = u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(u.email || 'x');
             document.getElementById('act-avatar').src = av;
-            document.getElementById('act-name').textContent  = u.username || '—';
-            document.getElementById('act-email').textContent = u.email    || '—';
+            document.getElementById('act-name').textContent  = u.username || '�';
+            document.getElementById('act-email').textContent = u.email    || '�';
             var la = u.last_active ? new Date(u.last_active.replace(' ','T')+'Z') : null;
             document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
             document.getElementById('act-unlocks').textContent = data.unlock_list.length;
@@ -449,7 +449,7 @@ function openActivity(uid) {
                 data.unlock_list.forEach(function(p) {
                     var d = document.createElement('div');
                     d.style.cssText = 'background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;';
-                    d.textContent = '🔓 ' + (p.title || '—');
+                    d.textContent = '?? ' + (p.title || '�');
                     list.appendChild(d);
                 });
             }

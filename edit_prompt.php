@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 require_once "slug_helper.php";
@@ -146,7 +146,7 @@ $ep2_data = $current_extra_arr[0] ?? null;
 $ep3_data = $current_extra_arr[1] ?? null;
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.css?v=2026052201">
+<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
 .edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
@@ -264,7 +264,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "secret"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('secret')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🔒</span><span>Secret Code</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Secret Code</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type === "unreleased"
               ? "sel-unreleased"
@@ -273,7 +273,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "unreleased"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('unreleased')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🌙</span><span>Unreleased</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Unreleased</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type === "insta_viral"
               ? "sel-viral"
@@ -282,7 +282,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "insta_viral"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('insta_viral')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">🔥</span><span>Insta Viral</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Insta Viral</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type ===
           "already_uploaded"
@@ -292,7 +292,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "already_uploaded"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('already_uploaded')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">📤</span><span>Already Uploaded</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Already Uploaded</span>
           </label>
         </div>
       </div>
@@ -347,11 +347,11 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         <div class="bwi-selector">
           <label class="bwi-btn bwi-banana-opt <?= $current_bwi === 'nano_banana' ? 'bwi-selected' : '' ?>" onclick="setBwi('nano_banana',this)">
             <input type="radio" name="best_works_in" value="nano_banana" <?= $current_bwi === 'nano_banana' ? 'checked' : '' ?>>
-            🍌 Nano Banana
+            ?? Nano Banana
           </label>
           <label class="bwi-btn bwi-chatgpt-opt <?= $current_bwi === 'chatgpt' ? 'bwi-selected' : '' ?>" onclick="setBwi('chatgpt',this)">
             <input type="radio" name="best_works_in" value="chatgpt" <?= $current_bwi === 'chatgpt' ? 'checked' : '' ?>>
-            ✦ ChatGPT
+            ? ChatGPT
           </label>
         </div>
       </div>
@@ -361,20 +361,20 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
       ) ?></textarea></div>
 
       <div class="form-group">
-        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
+        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
       </div>
 
       <!-- Extra Prompts -->
       <div class="form-group">
-        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 2 more variants for this card)</span></label>
+        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � up to 2 more variants for this card)</span></label>
 
         <div id="ep2-section" style="<?= $ep2_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
             <div class="extra-prompt-header">
-              <span class="extra-prompt-num">✦ Prompt 2</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(2)">✕ Remove</button>
+              <span class="extra-prompt-num">? Prompt 2</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(2)">? Remove</button>
             </div>
             <input type="hidden" name="extra_prompt_2_current_image" value="<?= htmlspecialchars($ep2_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
@@ -402,8 +402,8 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         <div id="ep3-section" style="<?= $ep3_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
             <div class="extra-prompt-header">
-              <span class="extra-prompt-num">✦ Prompt 3</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(3)">✕ Remove</button>
+              <span class="extra-prompt-num">? Prompt 3</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(3)">? Remove</button>
             </div>
             <input type="hidden" name="extra_prompt_3_current_image" value="<?= htmlspecialchars($ep3_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
@@ -429,9 +429,9 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         </div>
 
         <div id="ep-add-btns">
-          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)">➕ Add Prompt 2</button>
+          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)">? Add Prompt 2</button>
           <?php if ($ep2_data): ?>
-          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)">➕ Add Prompt 3</button>
+          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)">? Add Prompt 3</button>
           <?php endif; ?>
         </div>
       </div>
@@ -464,10 +464,10 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <!-- Assets Toggle -->
       <div class="form-group">
-        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — reference images shown after unlock)</span></label>
+        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � reference images shown after unlock)</span></label>
         <label class="assets-toggle-label" id="assets-toggle-label">
             <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)" <?= $has_current_assets ? 'checked' : '' ?>>
-            <span>📎 Include Assets</span>
+            <span>?? Include Assets</span>
         </label>
         <div id="assets-fields" style="<?= $has_current_assets ? 'display:block;' : 'display:none;' ?>">
             <div class="assets-fields-box">
@@ -638,7 +638,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                 if (!b3) {
                     b3 = document.createElement('button');
                     b3.type='button'; b3.id='ep-add3-btn'; b3.className='extra-add-btn';
-                    b3.innerHTML='➕ Add Prompt 3'; b3.onclick=function(){ addEP(3); };
+                    b3.innerHTML='? Add Prompt 3'; b3.onclick=function(){ addEP(3); };
                     addBtns.appendChild(b3);
                 } else { b3.style.display=''; }
             }
