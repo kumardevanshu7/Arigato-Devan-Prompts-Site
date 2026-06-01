@@ -1,0 +1,228 @@
+<?php
+session_start();
+require_once "db.php";
+
+// ── Auto resize + convert to WebP on upload ──────────────────────────────────
+function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $quality = 82): string {
+    if (!file_exists($src)) return $src;
+    $info = @getimagesize($src);
+    if (!$info) return $src;
+    [$origW, $origH, $type] = [$info[0], $info[1], $info[2]];
+    $img = match($type) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
+        IMAGETYPE_PNG  => @imagecreatefrompng($src),
+        IMAGETYPE_WEBP => @imagecreatefromwebp($src),
+        IMAGETYPE_GIF  => @imagecreatefromgif($src),
+        default        => false,
+    };
+    if (!$img) return $src;
+    // Calculate new dimensions (maintain aspect ratio)
+    $ratio = min($maxW / $origW, $maxH / $origH, 1.0); // never upscale
+    $newW = (int)round($origW * $ratio);
+    $newH = (int)round($origH * $ratio);
+    $resized = imagecreatetruecolor($newW, $newH);
+    // Preserve transparency for PNG/WebP
+    imagealphablending($resized, false);
+    imagesavealpha($resized, true);
+    imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+    imagedestroy($img);
+    // Save as WebP, replace original
+    $dest = preg_replace('/\.[^.]+$/', '.webp', $src);
+    imagewebp($resized, $dest, $quality);
+    imagedestroy($resized);
+    // Remove original if different extension
+    if ($dest !== $src && file_exists($src)) @unlink($src);
+    return $dest;
+}
+
+// Protect endpoint — must be logged in AND be an admin
+if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
+    header("Location: login.php");
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $title = trim($_POST["title"] ?? "");
+    $tag = trim($_POST["tag"] ?? "");
+    $prompt_text = trim($_POST["prompt_text"] ?? "");
+    $reel_link = trim($_POST["reel_link"] ?? "");
+    $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'insta_viral'
+    $bwi_raw = trim($_POST["best_works_in"] ?? "");
+    $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
+    $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
+    $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
+    $asset_images_json = null;
+
+    // Validate prompt_type
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
+    if (!in_array($prompt_type, $valid_types)) {
+        $prompt_type = "secret";
+    }
+
+    // For secret type, unlock code is required
+    if ($prompt_type === "secret") {
+        $unlock_code = strtoupper(trim($_POST["unlock_code"] ?? ""));
+        if (
+            empty($title) ||
+            empty($tag) ||
+            empty($prompt_text) ||
+            empty($unlock_code)
+        ) {
+            $_SESSION["error_msg"] = "All fields are required!";
+            header("Location: upload_prompt.php");
+            exit();
+        }
+        if (strlen($unlock_code) !== 6) {
+            $_SESSION["error_msg"] =
+                "Unlock code must be exactly 6 characters!";
+            header("Location: upload_prompt.php");
+            exit();
+        }
+        if (empty($reel_link)) {
+            $_SESSION["error_msg"] =
+                "Reel Link is required for Secret Code type.";
+            header("Location: upload_prompt.php");
+            exit();
+        }
+    } else {
+        // No code needed for unreleased / insta_viral
+        $unlock_code = "XXXXXX";
+        if (empty($title) || empty($tag) || empty($prompt_text)) {
+            $_SESSION["error_msg"] = "All fields are required!";
+            header("Location: upload_prompt.php");
+            exit();
+        }
+    }
+
+    // Handle Image Upload
+    if (
+        !isset($_FILES["image"]) ||
+        $_FILES["image"]["error"] !== UPLOAD_ERR_OK
+    ) {
+        $err_code = $_FILES["image"]["error"] ?? "N/A";
+        $_SESSION[
+            "error_msg"
+        ] = "Image upload failed! Error code: $err_code. Make sure file size is under PHP limit.";
+        header("Location: upload_prompt.php");
+        exit();
+    }
+
+    $upload_dir = "uploads/";
+    // Create dir if somehow deleted
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
+    $file_info = pathinfo($_FILES["image"]["name"]);
+    $ext = strtolower($file_info["extension"]);
+
+    $allowed_ext = ["jpg", "jpeg", "png", "gif", "webp"];
+    if (!in_array($ext, $allowed_ext)) {
+        $_SESSION[
+            "error_msg"
+        ] = "Invalid image format! Use JPG, PNG, GIF, or WebP. (Got: .$ext)";
+        header("Location: upload_prompt.php");
+        exit();
+    }
+
+    // Generate unique filename
+    $new_filename = uniqid("img_") . "." . $ext;
+    $target_file = $upload_dir . $new_filename;
+
+    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+        $target_file = resizeToWebP($target_file);
+        $new_filename = basename($target_file);
+        // Handle asset images upload (max 2)
+        if ($has_assets && isset($_FILES["asset_images"]) && !empty($_FILES["asset_images"]["name"][0])) {
+            $asset_dir = "uploads/assets/";
+            if (!is_dir($asset_dir)) {
+                if (!mkdir($asset_dir, 0755, true)) {
+                    $_SESSION["error_msg"] = "Asset folder could not be created. Please create 'uploads/assets/' directory on the server.";
+                    header("Location: upload_prompt.php");
+                    exit();
+                }
+            }
+            $asset_paths = [];
+            $allowed_asset_ext = ["jpg", "jpeg", "png", "gif", "webp"];
+            foreach ($_FILES["asset_images"]["tmp_name"] as $i => $tmp) {
+                if ($i >= 2) break;
+                if ($_FILES["asset_images"]["error"][$i] !== UPLOAD_ERR_OK) continue;
+                $aext = strtolower(pathinfo($_FILES["asset_images"]["name"][$i], PATHINFO_EXTENSION));
+                if (!in_array($aext, $allowed_asset_ext)) continue;
+                $afname = "uploads/assets/" . uniqid("asset_") . "." . $aext;
+                if (move_uploaded_file($tmp, $afname)) { $afname = resizeToWebP($afname); $asset_paths[] = $afname; }
+            }
+            if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
+        }
+
+        // Handle extra prompts (2 and 3)
+        $extra_prompts_data = [];
+        for ($ep = 2; $ep <= 3; $ep++) {
+            $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
+            if (empty($ep_text)) continue;
+            $ep_image_path = null;
+            if (isset($_FILES["extra_prompt_{$ep}_image"]) && $_FILES["extra_prompt_{$ep}_image"]["error"] === UPLOAD_ERR_OK) {
+                $ep_ext = strtolower(pathinfo($_FILES["extra_prompt_{$ep}_image"]["name"], PATHINFO_EXTENSION));
+                if (in_array($ep_ext, $allowed_ext)) {
+                    $ep_fname = "uploads/" . uniqid("ep_") . "." . $ep_ext;
+                    if (move_uploaded_file($_FILES["extra_prompt_{$ep}_image"]["tmp_name"], $ep_fname)) {
+                        $ep_image_path = resizeToWebP($ep_fname);
+                    }
+                }
+            }
+            $ep_title = trim($_POST["extra_prompt_{$ep}_title"] ?? '');
+            $extra_prompts_data[] = ['title' => $ep_title ?: null, 'prompt_text' => $ep_text, 'image_path' => $ep_image_path];
+        }
+        $extra_prompts_json = !empty($extra_prompts_data) ? json_encode($extra_prompts_data) : null;
+
+        // Insert into DB
+        require_once "slug_helper.php";
+        $new_slug = uniqueSlug($pdo, $title);
+        try {
+            $stmt = $pdo->prepare(
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            );
+            $stmt->execute([
+                $title,
+                $new_slug,
+                $tag,
+                $prompt_text,
+                $unlock_code,
+                $target_file,
+                $reel_link,
+                $prompt_type,
+                $best_works_in,
+                $asset_title,
+                $asset_images_json,
+                $extra_prompts_json,
+            ]);
+
+            $_SESSION["success_msg"] =
+                "Prompt successfully added to the Verse!";
+
+            // Send FCM push notification to all subscribers
+            if (file_exists(__DIR__ . '/fcm_notify.php')) {
+                require_once __DIR__ . '/fcm_notify.php';
+                @sendFCMNotification(
+                    '✨ New Prompt: ' . $title,
+                    'A new AI couple prompt just dropped! Tap to check it out. 💫',
+                    'https://arigatodevan.com'
+                );
+            }
+        } catch (PDOException $e) {
+            $_SESSION["error_msg"] = "Database error: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION["error_msg"] =
+            "Failed to move uploaded file. Check server write permissions on 'uploads/' folder.";
+        header("Location: upload_prompt.php");
+        exit();
+    }
+
+    header("Location: dashboard.php");
+    exit();
+} else {
+    header("Location: dashboard.php");
+    exit();
+}
+?>

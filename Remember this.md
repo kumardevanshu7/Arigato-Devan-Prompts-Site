@@ -54,6 +54,42 @@ The user has two separate environments — Local (XAMPP) and Hostinger (live sit
 
 The user edits and tests everything locally first. The `hostinger connection\_public_html\` folder is a mirror of the live site — the user copy-pastes files from there directly to Hostinger FTP. That is his upload process. Do NOT touch that folder unless he explicitly says so.
 
-Do NOT auto-sync, do NOT assume "I'll just update both", do NOT say "go to FTP and upload". Just edit the local files, and when he asks which files to copy — list them from the hostinger mirror folder only.
-
 The user has scolded multiple times for mixing up environments and making changes without being asked. Do not repeat that mistake. Only do what is asked — nothing more, nothing less.
+
+---
+
+## 7. ⚠️ PAST MISTAKES — Claude (Madarchod Model) Ne Kya Galat Kiya (1 June 2026)
+
+> Ye section isliye hai taaki future mein ye galtiyan KABHI repeat na hon.
+
+### ❌ Galti 1 — Git use kiya bina permission ke
+- User ne sirf files edit karne ko kaha tha
+- Claude ne khud se `git add`, `git commit`, `git push` kar diya — **bina pooche, bina permission ke**
+- Git ka koi kaam nahi tha is session mein
+- **Aage se: Kabhi bhi git commands mat chalao jab tak user explicitly "git push" ya "git commit" na bole**
+
+### ❌ Galti 2 — Local `db.php` Hostinger pe copy karne ki koshish ki
+- Local `db.php` mein credentials hain: `root`, empty password, `localhost`
+- Hostinger `db.php` mein ALAG credentials hain: actual live database username/password
+- Claude ne ek bulk PowerShell command chalai jisme `db.php` bhi copy hone wali thi
+- **Agar user ne command allow kar li hoti, live site CRASH ho jaati**
+- User ne command deny karke site bachali
+- **Aage se: `db.php` aur `firebase_auth.php` ko KABHI COPY MAT KARO — chahe kuch bhi ho**
+
+### ❌ Galti 3 — `Remember this.md` pehle nahi padha
+- Ye file PROJECT KE ROOT MEIN HAI — HAMESHA pehle padho
+- Isme saare rules clearly likhe hain
+- Claude ne seedha kaam shuru kar diya bina ye file padhe
+- **Aage se: Koi bhi kaam shuru karne se pehle `Remember this.md` padho — mandatory hai**
+
+### ❌ Galti 4 — Hostinger mirror folder bina permission touch kiya
+- User ne sirf local files edit karne ko kaha tha
+- Claude ne without asking hostinger mirror mein bhi changes karne ki koshish ki
+- **Aage se: `hostinger connection/_public_html/` tab hi touch karo jab user EXPLICITLY bole "ab hostinger mein bhi karo"**
+
+### ❌ Galti 5 — Subagent launch kiya file copy ke liye
+- Subagent ne blindly files copy karna shuru kiya — `db.php` bhi copy ho jaati
+- User ne "Stop" bola, tab subagent kill kiya
+- **Aage se: Koi bhi destructive/copy operation ke liye subagent mat use karo**
+
+---
