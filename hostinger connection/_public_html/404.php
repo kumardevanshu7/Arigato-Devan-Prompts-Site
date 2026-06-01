@@ -1,4 +1,4 @@
-﻿<?php http_response_code(404); ?>
+<?php http_response_code(404); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 — Page Nahi Mila | Arigato Devan</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg:      #fdfbf7;
@@ -240,24 +241,24 @@
 <div class="err-page">
 
     <!-- Speech bubble ABOVE character -->
-    <div class="bubble">Yaar… yeh page toh ghoom gaya! 😅</div>
+    <div class="bubble">Yaar... yeh page toh ghoom gaya! <i class="fa-solid fa-face-dizzy"></i></div>
 
     <!-- Floating character -->
-    <span class="err-char">😵‍💫</span>
+    <span class="err-char"><i class="fa-solid fa-robot"></i></span>
 
     <!-- Glitch 404 -->
     <div class="err-num">404</div>
 
     <!-- Badge -->
-    <div><span class="err-badge"><i class="fa-solid fa-triangle-exclamation"></i> &nbsp;Error 404 — Not Found</span></div>
+    <div><span class="err-badge"><i class="fa-solid fa-triangle-exclamation"></i> &nbsp;Error 404 &mdash; Not Found</span></div>
 
     <!-- Title -->
     <h1 class="err-title">Oops! Page Nahi Mila!</h1>
 
     <!-- Desc -->
     <p class="err-desc">
-        Lagta hai yeh page apna rasta bhool gaya…<br>
-        Koi baat nahi — wapas chalte hain! 🚀
+        Lagta hai yeh page apna rasta bhool gaya...<br>
+        Koi baat nahi &mdash; wapas chalte hain! <i class="fa-solid fa-rocket"></i>
     </p>
 
     <!-- Buttons -->
@@ -274,7 +275,7 @@
 
 <script>
 (function () {
-    var emojis  = ["✨","💫","⭐","🌟","💜","🔥","🎉","🎯","💡","🎲","🌸","🦋"];
+    var icons  = ['fa-star','fa-heart','fa-fire','fa-bolt','fa-rocket','fa-dice','fa-wand-magic-sparkles','fa-bullseye','fa-gem','fa-crown','fa-trophy','fa-sparkles'];
     var body    = document.body;
     var COUNT   = 16;
 
@@ -282,7 +283,8 @@
         (function (idx) {
             var el          = document.createElement("span");
             el.className    = "particle";
-            el.textContent  = emojis[Math.floor(Math.random() * emojis.length)];
+            var ic = icons[Math.floor(Math.random() * icons.length)];
+            el.innerHTML = '<i class="fa-solid ' + ic + '"></i>';
             var dur         = 7 + Math.random() * 9;
             var delay       = -(Math.random() * dur);
             var left        = 2 + Math.random() * 96;
@@ -291,7 +293,8 @@
                 "left:" + left + "vw;" +
                 "font-size:" + size + "rem;" +
                 "animation-duration:" + dur + "s;" +
-                "animation-delay:" + delay + "s;";
+                "animation-delay:" + delay + "s;" +
+                "color:hsl(" + Math.floor(Math.random()*360) + ",70%,60%);";
             body.appendChild(el);
         })(i);
     }

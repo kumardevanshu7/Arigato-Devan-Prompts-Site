@@ -31,7 +31,7 @@ $_all_steps = [
         ['fa-solid fa-wand-magic-sparkles','Paste on Gemini', 'Generate!'],
     ],
     'homepage' => [
-        ['fa-solid fa-grid-2',             'Pick Category',   'Secret / Viral / More'],
+        ['fa-solid fa-layer-group',        'Pick Category',   'Secret / Viral / More'],
         ['fa-solid fa-lock-open',          'Unlock Prompt',   'Easy challenges'],
         ['fa-solid fa-copy',               'Copy Prompt',     ''],
         ['fa-solid fa-wand-magic-sparkles','Paste on Gemini', 'Generate!'],

@@ -46,25 +46,25 @@ foreach ($saved as $p) {
 
 $type_map = [
     "secret" => [
-        "emoji" => "🔒",
+        "icon" => '<i class="fa-solid fa-lock"></i>',
         "label" => "Secret Code",
         "bg" => "#ffe3e3",
         "color" => "#d03030",
     ],
     "unreleased" => [
-        "emoji" => "🌙",
+        "icon" => '<i class="fa-solid fa-moon"></i>',
         "label" => "Unreleased",
         "bg" => "#fff4cc",
         "color" => "#7a5800",
     ],
     "insta_viral" => [
-        "emoji" => "🔥",
+        "icon" => '<i class="fa-solid fa-fire"></i>',
         "label" => "Insta Viral",
         "bg" => "#e3f7ff",
         "color" => "#004f7a",
     ],
     "already_uploaded" => [
-        "emoji" => "📤",
+        "icon" => '<i class="fa-solid fa-upload"></i>',
         "label" => "Already Uploaded",
         "bg" => "#e6f2ff",
         "color" => "#00509e",
@@ -335,17 +335,17 @@ $type_map = [
             </div>
             <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
             <div class="sp-filters">
-                <?php if($stats['secret'] > 0): ?><span class="sp-pill">🔒 Secret <?= $stats['secret'] ?></span><?php endif; ?>
-                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill">🔥 Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
-                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill">🌙 Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
-                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill">📤 Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
+                <?php if($stats['secret'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-lock"></i> Secret <?= $stats['secret'] ?></span><?php endif; ?>
+                <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-fire"></i> Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
+                <?php if($stats['unreleased'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-moon"></i> Unreleased <?= $stats['unreleased'] ?></span><?php endif; ?>
+                <?php if($stats['already_uploaded'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-upload"></i> Uploaded <?= $stats['already_uploaded'] ?></span><?php endif; ?>
             </div>
         </div>
     </div>
 
     <?php if ($total === 0): ?>
     <div class="sp-empty">
-        <div class="sp-empty-icon">🔖</div>
+        <div class="sp-empty-icon"><i class="fa-solid fa-bookmark"></i></div>
         <h2>No Saved Prompts Yet</h2>
         <p>Unlock prompts on the site and they'll appear here!</p>
         <a href="index.php" class="comic-btn-small"><i class="fa-solid fa-arrow-left"></i> Browse Prompts</a>
@@ -382,7 +382,7 @@ $type_map = [
                 "insta_viral" => "ivp",
                 "already_uploaded" => "aup",
             ][$pt] ?? "scp" ?>" style="font-size:.55rem;padding:2px 6px;">
-                <?= $tinfo["emoji"] ?> <?= $tinfo["label"] ?>
+                <?= $tinfo["icon"] ?> <?= $tinfo["label"] ?>
             </span>
 
             <div class="card-lock-icon" style="background:var(--primary-color);">

@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 // Handle logout
 if (isset($_GET["logout"])) {
@@ -26,7 +26,7 @@ unset($_SESSION["error_msg"]);
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
-        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Login Page Root &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
+        /* &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; Login Page Root &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; */
         html,
         body {
             height: 100%;
@@ -125,7 +125,7 @@ unset($_SESSION["error_msg"]);
             background: var(--primary-color);
         }
 
-        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Center Content &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
+        /* &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; Center Content &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; */
         .login-body {
             position: relative;
             z-index: 5;
@@ -136,7 +136,7 @@ unset($_SESSION["error_msg"]);
             padding: 40px 20px;
         }
 
-        /* &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; Login Card &mdash;&ndash;&mdash;&ndash;&mdash;&ndash;&mdash; */
+        /* &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; Login Card &mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash;&ndash;ï¿½&mdash; */
         .login-card {
             background: var(--card-bg);
             border: var(--border-width) solid var(--text-color);
@@ -594,7 +594,7 @@ unset($_SESSION["error_msg"]);
 
                 <!-- Google Sign-In -->
                 <button class="google-btn" id="google-login-btn">
-                    <img loading="lazy" src="/toplogo/g-logo.png" alt="Google">
+                    <i class="fa-brands fa-google" style="font-size:20px;margin-right:8px;"></i>
                     Continue with Google
                 </button>
 
@@ -770,13 +770,13 @@ unset($_SESSION["error_msg"]);
                         window.location.href = 'index.php'; // PHP session created, go to home
                     } else {
                         alert("Login error: " + data.error);
-                        loginBtn.innerHTML = '<img loading="lazy" src="/toplogo/g-logo.png" alt="Google"> Continue with Google';
+                        loginBtn.innerHTML = '<i class="fa-brands fa-google" style="font-size:20px;margin-right:8px;"></i> Continue with Google';
                         loginBtn.disabled = false;
                     }
                 })
                 .catch((error) => {
                     console.error("Firebase Auth Error:", error);
-                    loginBtn.innerHTML = '<img loading="lazy" src="/toplogo/g-logo.png" alt="Google"> Continue with Google';
+                    loginBtn.innerHTML = '<i class="fa-brands fa-google" style="font-size:20px;margin-right:8px;"></i> Continue with Google';
                     loginBtn.disabled = false;
                     if(error.code !== 'auth/popup-closed-by-user') {
                         alert("Authentication failed. Please try again.");

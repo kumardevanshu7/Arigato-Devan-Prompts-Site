@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -16,7 +16,7 @@ if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
     header('Content-Type: application/json');
     try {
         $uid = (int)$_GET['uid'];
-        // Fetch user — last_active may not exist yet, fallback gracefully
+        // Fetch user ï¿½ last_active may not exist yet, fallback gracefully
         try {
             $user = $pdo->prepare("SELECT id, username, email, avatar, gender, role, created_at, last_active FROM users WHERE id = ?");
             $user->execute([$uid]);
@@ -27,7 +27,7 @@ if (isset($_GET['xhr']) && $_GET['xhr'] === 'activity' && isset($_GET['uid'])) {
         $udata = $user->fetch(PDO::FETCH_ASSOC);
         if (!$udata) { echo json_encode(['ok'=>false,'error'=>'User not found']); exit; }
         if (!isset($udata['last_active'])) $udata['last_active'] = null;
-        // Unlocks — order by id DESC (safe, always exists)
+        // Unlocks ï¿½ order by id DESC (safe, always exists)
         $unlocks = $pdo->prepare("SELECT p.title, p.slug FROM unlocked_prompts up LEFT JOIN prompts p ON up.prompt_id = p.id WHERE up.user_id = ? ORDER BY up.id DESC");
         $unlocks->execute([$uid]);
         $unlock_list = $unlocks->fetchAll(PDO::FETCH_ASSOC);
@@ -134,7 +134,7 @@ try {
     ")->fetchAll(PDO::FETCH_ASSOC);
 } catch(Exception $e) { $ghost_users = []; }
 
-// Platform breakdown (user_agent column — may not exist yet)
+// Platform breakdown (user_agent column ï¿½ may not exist yet)
 try {
     $mobile_count  = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE user_agent REGEXP 'Mobile|Android|iPhone'")->fetchColumn();
     $desktop_count = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE user_agent IS NOT NULL AND user_agent NOT REGEXP 'Mobile|Android|iPhone'")->fetchColumn();
@@ -146,17 +146,17 @@ $admin_hour  = (int)date('H');
 $admin_gender = strtolower($admin_info['gender'] ?? 'male');
 $admin_name  = $admin_info['username'] ?? 'Admin';
 if ($admin_gender === 'female') {
-    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Sundari ?? Aaj bhi site shining hai teri tarah! ??";
-    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Hey Beautiful ?? Lunch break mein bhi admin grind? Queen hai tu! ??";
-    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Babe ?? Afternoon check-in — sab smooth chal raha hai? ??";
-    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Hey Gorgeous ?? Evening mein bhi site dekh rahi hai? Crown tujhe hi milega ??";
-    else                                            $admin_greet = "Late night session, Babe ??? Thak gayi? Thoda rest bhi karo!";
+    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Sundari! <i class=\"fa-solid fa-sun\"></i> Aaj bhi site shining hai teri tarah!";
+    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Hey Beautiful! <i class=\"fa-solid fa-crown\"></i> Lunch break mein bhi admin grind? Queen hai tu!";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Babe ?? Afternoon check-in ï¿½ sab smooth chal raha hai? ??";
+    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Hey Gorgeous! <i class=\"fa-solid fa-crown\"></i> Evening mein bhi site dekh rahi hai? Crown tujhe hi milega!";
+    else                                            $admin_greet = "Late night session, Babe! <i class=\"fa-solid fa-moon\"></i> Thak gayi? Thoda rest bhi karo!";
 } else {
-    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Bhai ?? Fresh start — aaj kya plan hai? ??";
-    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Kya chal raha hai, King ?? Lunch break admin session? Respect! ??";
-    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Afternoon hustle mode, Bhai ?? Site grow ho rahi hai — check karo stats! ??";
-    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Evening check-in, Boss ?? Aaj ka kaam kaisa raha? Dekho numbers! ??";
-    else                                            $admin_greet = "Late night grind, Bhai ?? Site ka khyal rakh raha hai — respect! ??";
+    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Bhai ?? Fresh start ï¿½ aaj kya plan hai? ??";
+    elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Kya chal raha hai, King! <i class=\"fa-solid fa-crown\"></i> Lunch break admin session? Respect!";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Afternoon hustle mode, Bhai ?? Site grow ho rahi hai ï¿½ check karo stats! ??";
+    elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Evening check-in, Boss! <i class=\"fa-solid fa-chart-bar\"></i> Aaj ka kaam kaisa raha? Dekho numbers!";
+    else                                            $admin_greet = "Late night grind, Bhai ?? Site ka khyal rakh raha hai ï¿½ respect! ??";
 }
 
 // User growth milestones
@@ -651,17 +651,17 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 
         <!-- Greeting Bar -->
         <div class="greeting-bar">
-            <div class="greeting-text"><?= htmlspecialchars($admin_greet) ?></div>
-            <div class="greeting-time"><?= date('D, d M Y — h:i A') ?> IST</div>
+            <div class="greeting-text"><?= $admin_greet ?></div>
+            <div class="greeting-time"><?= date('D, d M Y ï¿½ h:i A') ?> IST</div>
         </div>
 
         <!-- Live Stats Bar -->
         <div class="live-stats-bar">
-            <div class="ls-pill"><span>??</span> <span class="ls-num"><?= $total_users_count ?></span> Users</div>
-            <div class="ls-pill"><span>??</span> <span class="ls-num"><?= $total_prompts ?></span> Prompts</div>
-            <div class="ls-pill"><span>??</span> <span class="ls-num"><?= number_format($total_likes) ?></span> Likes</div>
-            <div class="ls-pill"><span>??</span> <span class="ls-num"><?= $total_saves ?></span> Saves</div>
-            <div class="ls-pill"><span>??</span> <span class="ls-num"><?= $total_blogs ?></span> Blogs</div>
+            <div class="ls-pill"><span><i class="fa-solid fa-users"></i></span> <span class="ls-num"><?= $total_users_count ?></span> Users</div>
+            <div class="ls-pill"><span><i class="fa-solid fa-scroll"></i></span> <span class="ls-num"><?= $total_prompts ?></span> Prompts</div>
+            <div class="ls-pill"><span><i class="fa-solid fa-heart"></i></span> <span class="ls-num"><?= number_format($total_likes) ?></span> Likes</div>
+            <div class="ls-pill"><span><i class="fa-solid fa-bookmark"></i></span> <span class="ls-num"><?= $total_saves ?></span> Saves</div>
+            <div class="ls-pill"><span><i class="fa-solid fa-feather"></i></span> <span class="ls-num"><?= $total_blogs ?></span> Blogs</div>
         </div>
 
         <!-- Analytics Grid -->
@@ -701,24 +701,24 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <!-- Weekly Summary + Best Day + Milestones -->
         <div class="weekly-row">
             <?php
-            $u_arrow = $users_trend > 0 ? '?' : ($users_trend < 0 ? '?' : '?');
+            $u_arrow = $users_trend > 0 ? '<i class="fa-solid fa-arrow-trend-up"></i>' : ($users_trend < 0 ? '<i class="fa-solid fa-arrow-trend-down"></i>' : '<i class="fa-solid fa-minus"></i>');
             $u_cls   = $users_trend > 0 ? 'trend-up' : ($users_trend < 0 ? 'trend-dn' : 'trend-flat');
-            $p_arrow = $prompts_trend > 0 ? '?' : ($prompts_trend < 0 ? '?' : '?');
+            $p_arrow = $prompts_trend > 0 ? '<i class="fa-solid fa-arrow-trend-up"></i>' : ($prompts_trend < 0 ? '<i class="fa-solid fa-arrow-trend-down"></i>' : '<i class="fa-solid fa-minus"></i>');
             $p_cls   = $prompts_trend > 0 ? 'trend-up' : ($prompts_trend < 0 ? 'trend-dn' : 'trend-flat');
             ?>
             <div class="wk-card" style="background:var(--primary-color);">
-                <div class="wk-title">?? New Users This Week</div>
+                <div class="wk-title"><i class="fa-solid fa-user-plus"></i> New Users This Week</div>
                 <div class="wk-val">+<?= $weekly_users_int ?></div>
                 <div class="wk-trend <?= $u_cls ?>"><?= $u_arrow ?> <?= abs($users_trend) ?>% vs last week</div>
             </div>
             <div class="wk-card" style="background:var(--secondary-color);">
-                <div class="wk-title">?? Prompts This Week</div>
+                <div class="wk-title"><i class="fa-solid fa-scroll"></i> Prompts This Week</div>
                 <div class="wk-val">+<?= $weekly_prompts_int ?></div>
                 <div class="wk-trend <?= $p_cls ?>"><?= $p_arrow ?> <?= abs($prompts_trend) ?>% vs last week</div>
             </div>
             <?php if ($best_day && $best_day['cnt'] > 0): ?>
             <div class="wk-card" style="background:#fff3cd;">
-                <div class="wk-title">?? Best Signup Day Ever</div>
+                <div class="wk-title"><i class="fa-solid fa-trophy"></i> Best Signup Day Ever</div>
                 <div class="wk-val"><?= $best_day['cnt'] ?> users</div>
                 <div class="wk-trend trend-flat"><?= date('d M Y', strtotime($best_day['day'])) ?></div>
             </div>
@@ -728,11 +728,11 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <!-- User Growth Milestones -->
         <div class="milestone-bar-wrap">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;">?? User Milestone Progress</div>
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;"><i class="fa-solid fa-chart-line"></i> User Milestone Progress</div>
                 <?php if ($next_milestone): ?>
                 <div style="font-size:.85rem;font-weight:800;"><?= $total_users_count ?> / <?= $next_milestone ?> users</div>
                 <?php else: ?>
-                <div style="font-size:.85rem;font-weight:800;color:#22c55e;">?? All milestones cleared!</div>
+                <div style="font-size:.85rem;font-weight:800;color:#22c55e;"><i class="fa-solid fa-circle-check"></i> All milestones cleared!</div>
                 <?php endif; ?>
             </div>
             <div class="ms-track"><div class="ms-fill" style="width:<?= $milestone_pct ?>%;"></div></div>
@@ -756,7 +756,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <div class="dual-grid">
             <!-- Hourly Heatmap -->
             <div class="dash-card" style="margin-bottom:0;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:4px;">? Hourly Signup Heatmap</div>
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:4px;"><i class="fa-solid fa-clock"></i> HOURLY SIGNUP HEATMAP</div>
                 <div style="font-size:.75rem;color:#aaa;font-weight:600;margin-bottom:8px;">When do users join? (hover for count)</div>
                 <div class="heatmap-grid">
                     <?php foreach ($hourly_data as $hr => $cnt):
@@ -766,7 +766,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         $b = (int)(220 - $intensity * 150);
                         $bg = "rgb($r,$g,$b)";
                     ?>
-                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 — <?= $cnt ?> users"></div>
+                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 ï¿½ <?= $cnt ?> users"></div>
                     <?php endforeach; ?>
                 </div>
                 <div class="hm-labels">
@@ -778,7 +778,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 
             <!-- Platform Breakdown -->
             <div class="dash-card" style="margin-bottom:0;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:8px;">?? Platform Breakdown</div>
+                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:8px;"><i class="fa-solid fa-chart-pie"></i> Platform Breakdown</div>
                 <?php $plat_total = $mobile_count + $desktop_count; ?>
                 <?php if ($plat_total > 0): ?>
                 <?php $mob_pct = round($mobile_count/$plat_total*100); $desk_pct = 100-$mob_pct; ?>
@@ -787,26 +787,28 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                     <div class="plat-desktop" style="width:<?= $desk_pct ?>%;"></div>
                 </div>
                 <div style="display:flex;gap:14px;font-size:.82rem;font-weight:800;margin-top:8px;">
-                    <span><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:3px;margin-right:5px;"></span>?? Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
-                    <span><span style="display:inline-block;width:12px;height:12px;background:#34d399;border-radius:3px;margin-right:5px;"></span>?? Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:3px;margin-right:5px;"></span><i class="fa-solid fa-mobile-screen"></i> Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#34d399;border-radius:3px;margin-right:5px;"></span><i class="fa-solid fa-desktop"></i> Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
                 </div>
                 <?php else: ?>
                 <div style="color:#aaa;font-size:.85rem;font-weight:600;padding:20px 0;text-align:center;">
-                    <i class="fa-solid fa-circle-info"></i> Data collection starting — will show after users log in
+                    <i class="fa-solid fa-circle-info"></i> Data collection starting ï¿½ will show after users log in
                 </div>
                 <?php endif; ?>
 
                 <!-- Top 3 Leaderboard inside platform card -->
                 <div style="margin-top:20px;border-top:2px dashed var(--border-color);padding-top:16px;">
-                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:10px;">?? Top 3 Most Active Users</div>
+                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:10px;"><i class="fa-solid fa-crown"></i> Top 3 Most Active Users</div>
                     <?php if (empty($top3_users)): ?>
                     <div style="color:#aaa;font-size:.85rem;font-weight:600;text-align:center;padding:12px 0;">No activity data yet.</div>
                     <?php else: ?>
                     <div class="top3-grid" style="grid-template-columns:repeat(<?= count($top3_users) ?>,1fr);">
-                        <?php $crowns = ['??','??','??']; ?>
+                        <?php $crowns = ['<i class="fa-solid fa-crown" style="color:#f59e0b;"></i>', '<i class="fa-solid fa-crown" style="color:#94a3b8;"></i>', '<i class="fa-solid fa-crown" style="color:#b45309;"></i>']; ?>
                         <?php foreach ($top3_users as $i => $tu): ?>
                         <div class="top3-card" style="background:<?= $i===0?'#fff3cd':($i===1?'#f1f5f9':'#fef6ee') ?>;">
                             <div class="top3-rank"><?= $crowns[$i] ?? ($i+1) ?></div>
+                            <?php $g = strtolower($tu['gender'] ?? ''); ?>
+                            <div class="top3-gender"><?= $g === 'male' ? '<i class="fa-solid fa-mars"></i>' : ($g === 'female' ? '<i class="fa-solid fa-venus"></i>' : ($g === 'nonbinary' ? '<i class="fa-solid fa-venus-mars"></i>' : '<i class="fa-solid fa-user-astronaut" title="Alien"></i>')) ?></div>
                             <?php if (!empty($tu['avatar'])): ?>
                             <img class="top3-av" src="<?= htmlspecialchars($tu['avatar']) ?>" alt="">
                             <?php else: ?>
@@ -826,7 +828,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <?php if (!empty($ghost_users)): ?>
         <div class="dash-card" style="margin-bottom:28px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
-                <div style="font-size:1.1rem;font-weight:900;display:flex;align-items:center;gap:8px;">?? Ghost Users <span style="font-size:.72rem;background:#ffe3e3;border:1.5px solid #d03030;color:#d03030;border-radius:20px;padding:2px 10px;font-weight:900;"><?= count($ghost_users) ?>+ joined, never interacted</span></div>
+                <div style="font-size:1.1rem;font-weight:900;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-ghost"></i> Ghost Users <span style="font-size:.72rem;background:#ffe3e3;border:1.5px solid #d03030;color:#d03030;border-radius:20px;padding:2px 10px;font-weight:900;"><?= count($ghost_users) ?>+ joined, never interacted</span></div>
                 <a href="user_management.php" style="font-size:.78rem;font-weight:800;color:var(--primary-color);text-decoration:none;">View All ?</a>
             </div>
             <?php foreach ($ghost_users as $gu): ?>
@@ -1025,9 +1027,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                     ) ?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?= htmlspecialchars(
     $u["email"] ?? "",
 ) ?></div></td>
-                    <td><?= htmlspecialchars(
-                        ucfirst($u["gender"] ?? "&mdash;"),
-                    ) ?></td>
+                    <td><?= empty($u["gender"]) ? '<i class="fa-solid fa-user-astronaut"></i> Alien' : htmlspecialchars(ucfirst($u["gender"])) ?></td>
                     <td><span class="role-badge <?= $u["role"] === "admin"
                         ? "role-admin"
                         : "role-user" ?>"><?= htmlspecialchars(
@@ -1163,8 +1163,8 @@ function openActivity(uid) {
             const u = data.user;
             const av = u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(u.email || 'x');
             document.getElementById('act-avatar').src = av;
-            document.getElementById('act-name').textContent = u.username || '—';
-            document.getElementById('act-email').textContent = u.email || '—';
+            document.getElementById('act-name').textContent = u.username || 'ï¿½';
+            document.getElementById('act-email').textContent = u.email || 'ï¿½';
             const la = u.last_active ? new Date(u.last_active.replace(' ', 'T') + 'Z') : null;
             document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN', {timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
             document.getElementById('act-unlocks').textContent = data.unlock_list.length;
@@ -1178,7 +1178,7 @@ function openActivity(uid) {
                 data.unlock_list.forEach(p => {
                     const d = document.createElement('div');
                     d.style.cssText = 'background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;';
-                    d.textContent = '?? ' + (p.title || '—');
+                    d.textContent = '?? ' + (p.title || 'ï¿½');
                     list.appendChild(d);
                 });
             }

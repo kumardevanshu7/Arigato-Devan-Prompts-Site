@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once "db.php";
 
@@ -52,7 +52,7 @@ $type_map = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt of the Day Manager — Admin</title>
+    <title>Prompt of the Day Manager ï¿½ Admin</title>
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
@@ -194,7 +194,7 @@ $type_map = [
                     <th style="width:68px;">Cover</th>
                     <th>Title</th>
                     <th style="width:110px;">Type</th>
-                    <th style="width:60px;text-align:center;">??</th>
+                    <th style="width:60px;text-align:center;"><i class="fa-solid fa-star"></i></th>
                     <th style="width:100px;text-align:center;">POTD</th>
                 </tr>
             </thead>

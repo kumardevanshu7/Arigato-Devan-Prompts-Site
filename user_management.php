@@ -306,7 +306,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
                     <div class="um-name"><?= htmlspecialchars($u['username'] ?? '—') ?></div>
                     <div class="um-email"><?= htmlspecialchars($u['email'] ?? '') ?></div>
                 </td>
-                <td style="font-weight:700;font-size:.88rem;"><?= htmlspecialchars(ucfirst($u['gender'] ?? '—')) ?></td>
+                <td style="font-weight:700;font-size:.88rem;"><?= empty($u['gender']) ? '<i class="fa-solid fa-user-astronaut"></i> Alien' : htmlspecialchars(ucfirst($u['gender'])) ?></td>
                 <td><span class="role-pill <?= ($u['role'] ?? '') === 'admin' ? 'role-admin' : 'role-user' ?>"><?= strtoupper($u['role'] ?? 'user') ?></span></td>
                 <td style="font-size:.82rem;font-weight:700;color:#7D7887;">
                     <?= $joined_dt->format('d M Y') ?><br>

@@ -1282,8 +1282,8 @@ footer .footer-links a:hover {
     <!-- Language Toggle -->
     <div class="meta-flex-row" style="margin-top:24px;margin-bottom:20px;">
       <div class="lang-toggle-wrapper" id="lang-toggle">
-        <button class="lang-btn active" id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
-        <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')">🇮🇳 Hindi / Hinglish</button>
+        <button class="lang-btn active" id="btn-en" onclick="switchLang('en')"><i class="fa-solid fa-language"></i> English</button>
+        <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')"><i class="fa-solid fa-language"></i> Hindi / Hinglish</button>
       </div>
     </div>
     <?php endif; ?>
@@ -1431,7 +1431,7 @@ const likeBtn = document.getElementById('blog-like-btn');
 if (likeBtn) {
   likeBtn.addEventListener('click', () => {
     <?php if (!isset($_SESSION["user_id"])): ?>
-    showToast('Login first to like! 💛'); return;
+    showToast('Login first to like!'); return;
     <?php endif; ?>
     const blogId = likeBtn.dataset.blogId;
     const fd = new FormData(); fd.append('blog_id', blogId);

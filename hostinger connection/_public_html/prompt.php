@@ -58,7 +58,7 @@ $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? ''
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
-$page_title   = htmlspecialchars($p["title"]) . " — AI Prompt | Arigato Devan";
+$page_title   = htmlspecialchars($p["title"]) . " ï¿½ AI Prompt | Arigato Devan";
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
@@ -88,7 +88,7 @@ function sessionAvatar() {
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $meta_desc ?>">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
+    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> ï¿½ Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
@@ -165,8 +165,9 @@ function sessionAvatar() {
         .pp-unlock-big { background: var(--secondary-color); font-size: 1.1rem; padding: 18px 32px; margin-top: 8px; }
         /* -- Love Tap -- */
         .pp-love-area { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 8px 0 20px; }
-        .pp-love-btn { font-size: 3.5rem; background: none; border: none; cursor: pointer; transition: transform .1s; line-height: 1; padding: 0; }
+        .pp-love-btn { font-size: 3.5rem; background: none; border: none; cursor: pointer; transition: transform .1s; line-height: 1; padding: 0; color: #e11d48; }
         .pp-love-btn:active { transform: scale(0.85); }
+        .pp-love-btn:hover { color: #be123c; }
         .pp-love-progress { font-size: 1.4rem; font-weight: 900; }
         .pp-progress-bar { width: 200px; height: 10px; background: #eee; border-radius: 20px; border: 2px solid var(--text-color); overflow: hidden; }
         .pp-progress-fill { height: 100%; background: var(--primary-dark); border-radius: 20px; transition: width .2s; }
@@ -246,7 +247,7 @@ function sessionAvatar() {
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img loading="lazy" src="/toplogo/g-logo.png" alt="G" style="width:18px;margin-right:8px;"> Login
+                    <i class="fa-brands fa-google" style="font-size:18px;"></i> Login
                 </a>
             <?php endif; ?>
         </div>
@@ -281,7 +282,7 @@ function sessionAvatar() {
             <!-- Info Column -->
             <div class="pp-info-col">
                 <?php if ($total_prompts > 1): ?>
-                <div class="pp-multi-badge">?? <?= $total_prompts ?> Prompts Inside!</div>
+                <div class="pp-multi-badge"><i class="fa-solid fa-layer-group"></i> <?= $total_prompts ?> Prompts Inside!</div>
                 <?php endif; ?>
                 <h1 class="pp-title"><?= htmlspecialchars($p['title']) ?></h1>
 
@@ -289,7 +290,7 @@ function sessionAvatar() {
                 <?php if (!$is_unlocked): ?>
                 <div id="pp-task" class="pp-task-card">
                     <?php if ($ptype === 'secret_code'): ?>
-                        <div class="pp-task-icon">??</div>
+                        <div class="pp-task-icon"><i class="fa-solid fa-lock"></i></div>
                         <h3>Enter Secret Code</h3>
                         <p>Watch our Instagram Reel to get the 6-letter secret code, then enter it below to reveal this prompt.</p>
                         <?php if (!empty($p['reel_link'])): ?>
@@ -303,21 +304,21 @@ function sessionAvatar() {
                         </div>
 
                     <?php elseif ($ptype === 'unreleased'): ?>
-                        <div class="pp-task-icon">??</div>
+                        <div class="pp-task-icon"><i class="fa-solid fa-heart"></i></div>
                         <h3>Show Some Love!</h3>
                         <?php if (isset($_SESSION['user_id'])): ?>
                         <p>Tap the heart <strong>20 times</strong> to unlock this prompt.</p>
                         <?php else: ?>
-                        <p>Tap the heart <strong>90 times</strong> to unlock — or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
+                        <p>Tap the heart <strong>90 times</strong> to unlock ï¿½ or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
                         <?php endif; ?>
                         <div class="pp-love-area">
-                            <button id="pp-love-btn" class="pp-love-btn">??</button>
+                            <button id="pp-love-btn" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count">0</span> / <span id="pp-tap-total"><?= isset($_SESSION['user_id']) ? 20 : 90 ?></span></div>
                         </div>
 
                     <?php elseif ($ptype === 'insta_viral'): ?>
-                        <div class="pp-task-icon">??</div>
+                        <div class="pp-task-icon"><i class="fa-solid fa-calculator"></i></div>
                         <h3>Quick Math Challenge</h3>
                         <p>Solve this to prove you're human and unlock the prompt!</p>
                         <div class="pp-math-q" id="pp-math-q">Loading...</div>
@@ -327,11 +328,11 @@ function sessionAvatar() {
                         </div>
 
                     <?php elseif ($ptype === 'already_uploaded'): ?>
-                        <div class="pp-task-icon">??</div>
+                        <div class="pp-task-icon"><i class="fa-brands fa-instagram" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i></div>
                         <h3>Already on Instagram!</h3>
                         <p>This prompt has been shared on our Instagram. Tap the heart <strong>9 times</strong> to unlock it!</p>
                         <div class="pp-love-area">
-                            <button id="pp-love-btn-au" class="pp-love-btn">??</button>
+                            <button id="pp-love-btn-au" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-au" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
                         </div>
@@ -347,7 +348,7 @@ function sessionAvatar() {
                         <span class="pp-prompt-label"><i class="fa-solid fa-scroll"></i> THE PROMPT:</span>
                         <?php if (!empty($p['best_works_in'])): ?>
                         <span class="pp-bwi-badge" style="background:<?= $p['best_works_in'] === 'nano_banana' ? '#ffe066' : '#10a37f' ?>;color:<?= $p['best_works_in'] === 'nano_banana' ? '#2d2a35' : '#fff' ?>;">
-                            <?= $p['best_works_in'] === 'nano_banana' ? '?? Best in Nano Banana' : '? Best in ChatGPT' ?>
+                            <?= $p['best_works_in'] === 'nano_banana' ? '<i class="fa-solid fa-star"></i> Best in Nano Banana' : '<i class="fa-solid fa-robot"></i> Best in ChatGPT' ?>
                         </span>
                         <?php endif; ?>
                     </div>
@@ -604,7 +605,7 @@ function sessionAvatar() {
             const url = window.location.href;
             const title = <?= json_encode($p['title']) ?>;
             if (navigator.share) {
-                try { await navigator.share({ title: title + ' — Arigato Devan', url: url }); return; } catch(e) {}
+                try { await navigator.share({ title: title + ' ï¿½ Arigato Devan', url: url }); return; } catch(e) {}
             }
             navigator.clipboard.writeText(url).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';

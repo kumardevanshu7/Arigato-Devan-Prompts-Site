@@ -54,7 +54,7 @@ $milestones = [
     [
         "file" => "progress07.jpg",
         "count" => "1M Views",
-        "label" => "1 Million Views 🚀",
+        "label" => "1 Million Views",
         "sub" => "The viral moment that changed everything",
         "side" => "center",
         "size" => "hero",
@@ -102,7 +102,7 @@ $milestones = [
     [
         "file" => "progress13.jpg",
         "count" => "10,000+",
-        "label" => "10K Achieved 🌟",
+        "label" => "10K Achieved",
         "sub" => "From 693 to 10K &mdash; The Journey Complete",
         "side" => "center",
         "size" => "finale",

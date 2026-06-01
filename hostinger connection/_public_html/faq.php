@@ -152,11 +152,11 @@
 
         <!-- Hero -->
         <div class="faq-hero">
-            <h1>❓ Frequently Asked Questions</h1>
+            <h1><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h1>
             <p>Everything you need to know about Arigato Devan Prompts — answered.</p>
             <div class="lang-toggle">
-                <button class="lang-btn active" id="btn-en" onclick="setLang('en')">🇬🇧 English</button>
-                <button class="lang-btn" id="btn-hi" onclick="setLang('hi')">🇮🇳 Hinglish</button>
+                <button class="lang-btn active" id="btn-en" onclick="setLang('en')"><i class="fa-solid fa-language"></i> English</button>
+                <button class="lang-btn" id="btn-hi" onclick="setLang('hi')"><i class="fa-solid fa-language"></i> Hinglish</button>
             </div>
         </div>
 
@@ -174,9 +174,9 @@
                 <i class="fa-solid fa-chevron-down faq-arrow"></i>
             </button>
             <div class="faq-a"><div class="faq-a-inner"
-                data-en="A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel → the code arrives in your DMs automatically via Auto-DM → enter it on the site → exclusive prompt unlocked! 🎉"
-                data-hi="Secret Code ek <strong>6-letter ka code</strong> hota hai jo Instagram Reel ke andar chhupa hota hai. Reel pe comment karo → code apne aap Auto-DM se DM mein aa jaata hai → site pe enter karo → exclusive prompt unlock! 🎉">
-                A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel → the code arrives in your DMs automatically via Auto-DM → enter it on the site → exclusive prompt unlocked! 🎉
+                data-en="A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked! <i class='fa-solid fa-party-horn'></i>"
+                data-hi="Secret Code ek <strong>6-letter ka code</strong> hota hai jo Instagram Reel ke andar chhupa hota hai. Reel pe comment karo &rarr; code apne aap Auto-DM se DM mein aa jaata hai &rarr; site pe enter karo &rarr; exclusive prompt unlock! <i class='fa-solid fa-party-horn'></i>">
+                A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked! <i class="fa-solid fa-party-horn"></i>
             </div></div>
         </div>
 
@@ -188,9 +188,9 @@
                 <i class="fa-solid fa-chevron-down faq-arrow"></i>
             </button>
             <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Step 1:</strong> Go to the Instagram Reel &nbsp;→&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;→&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;→&nbsp; <strong>Step 4:</strong> Copy it &nbsp;→&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;→&nbsp; Prompt unlocked! 🔓"
-                data-hi="<strong>Step 1:</strong> Instagram Reel pe jaao &nbsp;→&nbsp; <strong>Step 2:</strong> Koi bhi comment karo &nbsp;→&nbsp; <strong>Step 3:</strong> Auto-DM se code DM mein aayega &nbsp;→&nbsp; <strong>Step 4:</strong> Copy karo &nbsp;→&nbsp; <strong>Step 5:</strong> Site ke Secret Code box mein paste karo &nbsp;→&nbsp; Prompt unlock! 🔓">
-                <strong>Step 1:</strong> Go to the Instagram Reel &nbsp;→&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;→&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;→&nbsp; <strong>Step 4:</strong> Copy it &nbsp;→&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;→&nbsp; Prompt unlocked! 🔓
+                data-en="<strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked! <i class='fa-solid fa-lock-open'></i>"
+                data-hi="<strong>Step 1:</strong> Instagram Reel pe jaao &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Koi bhi comment karo &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Auto-DM se code DM mein aayega &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy karo &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Site ke Secret Code box mein paste karo &nbsp;&rarr;&nbsp; Prompt unlock! <i class='fa-solid fa-lock-open'></i>">
+                <strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked! <i class="fa-solid fa-lock-open"></i>
             </div></div>
         </div>
 
@@ -408,9 +408,9 @@
                 <i class="fa-solid fa-chevron-down faq-arrow"></i>
             </button>
             <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! 🚀"
-                data-hi="<strong>Haan!</strong> Instagram Reels, YouTube Shorts ya kisi bhi personal/commercial creative content ke liye freely use kar sakte ho. Banao dhamaka! 🚀">
-                <strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! 🚀
+                data-en="<strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! <i class='fa-solid fa-rocket'></i>"
+                data-hi="<strong>Haan!</strong> Instagram Reels, YouTube Shorts ya kisi bhi personal/commercial creative content ke liye freely use kar sakte ho. Banao dhamaka! <i class='fa-solid fa-rocket'></i>">
+                <strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! <i class="fa-solid fa-rocket"></i>
             </div></div>
         </div>
 
@@ -422,9 +422,9 @@
                 <i class="fa-solid fa-chevron-down faq-arrow"></i>
             </button>
             <div class="faq-a"><div class="faq-a-inner"
-                data-en="Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent — the longer the streak, the more satisfying it feels! 🔥"
-                data-hi="Har din login karne pe <strong>streak 1 badhti hai</strong>. Ek din miss kiya — reset! Consistent rehna — jitni lambi streak, utna zyada maza! 🔥">
-                Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent! 🔥
+                data-en="Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent &mdash; the longer the streak, the more satisfying it feels! <i class='fa-solid fa-fire'></i>"
+                data-hi="Har din login karne pe <strong>streak 1 badhti hai</strong>. Ek din miss kiya &mdash; reset! Consistent rehna &mdash; jitni lambi streak, utna zyada maza! <i class='fa-solid fa-fire'></i>">
+                Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent! <i class="fa-solid fa-fire"></i>
             </div></div>
         </div>
 

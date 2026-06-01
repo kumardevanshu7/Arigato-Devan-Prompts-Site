@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -91,7 +91,7 @@ $age_perf = sqAll($pdo, "SELECT p.title, DATEDIFF(NOW(),p.created_at) as age, CO
 // -- Power users (5+ unlocks) --
 $power_users = sqAll($pdo, "SELECT u.username, u.email, COUNT(up.id) as cnt FROM users u JOIN unlocked_prompts up ON u.id=up.user_id GROUP BY u.id,u.username,u.email HAVING cnt >= 5 ORDER BY cnt DESC LIMIT 15");
 
-// -- Churn risk (active 8–30 days ago, not in last 7 days) --
+// -- Churn risk (active 8ï¿½30 days ago, not in last 7 days) --
 $churn_users = sqAll($pdo, "SELECT username, email, last_active FROM users WHERE last_active >= DATE_SUB(NOW(),INTERVAL 30 DAY) AND last_active < DATE_SUB(NOW(),INTERVAL 7 DAY) ORDER BY last_active ASC LIMIT 10");
 
 // -- Dead prompts (0 unlocks in last 30 days) --
@@ -233,7 +233,7 @@ canvas{max-height:260px}
           <span style="font-size:.82rem;font-weight:600;color:#555">No milestones yet.</span>
         <?php endif; ?>
       </div>
-      <div style="margin-top:10px;font-size:.81rem;font-weight:700;color:#555"><?= $total_users ?> / <?= $next_ms ?? '—' ?> users</div>
+      <div style="margin-top:10px;font-size:.81rem;font-weight:700;color:#555"><?= $total_users ?> / <?= $next_ms ?? 'ï¿½' ?> users</div>
     </div>
 
     <div class="alert-box alert-spike">
@@ -248,11 +248,11 @@ canvas{max-height:260px}
       <?php if ($dead_prompts): ?>
         <ul><?php foreach (array_slice($dead_prompts, 0, 5) as $d): ?><li><?= htmlspecialchars($d['title']) ?> <span style="color:#bbb">(<?= $d['likes_count'] ?> ?)</span></li><?php endforeach; ?></ul>
         <?php if (count($dead_prompts) > 5): ?><div style="font-size:.73rem;color:#aaa;font-weight:700;margin-top:5px">+<?= count($dead_prompts)-5 ?> more</div><?php endif; ?>
-      <?php else: ?><p style="color:#888">All prompts active! ??</p><?php endif; ?>
+      <?php else: ?><p style="color:#888">All prompts active! <i class="fa-solid fa-circle-check"></i></p><?php endif; ?>
     </div>
 
     <div class="alert-box alert-churn">
-      <h4><i class="fa-solid fa-user-slash"></i> Churn Risk (active 8–30d ago)</h4>
+      <h4><i class="fa-solid fa-user-slash"></i> Churn Risk (active 8ï¿½30d ago)</h4>
       <?php if ($churn_users): ?>
         <ul><?php foreach (array_slice($churn_users, 0, 5) as $cu): ?><li><?= htmlspecialchars($cu['username']) ?> <span style="color:#bbb">(<?= date('d M', strtotime($cu['last_active'])) ?>)</span></li><?php endforeach; ?></ul>
         <?php if (count($churn_users) > 5): ?><div style="font-size:.73rem;color:#aaa;font-weight:700;margin-top:5px">+<?= count($churn_users)-5 ?> more</div><?php endif; ?>

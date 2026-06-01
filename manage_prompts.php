@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -217,9 +217,9 @@ sort($all_mgr_tags);
                 <tr style="border-bottom:2px solid var(--text-color);text-align:left;">
                     <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">#</th>
                     <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;">Prompt</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Likes</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Saves</th>
-                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;">?? Score</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;"><i class="fa-solid fa-heart"></i> Likes</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;"><i class="fa-solid fa-bookmark"></i> Saves</th>
+                    <th style="padding:10px 12px;font-size:.7rem;font-weight:900;text-transform:uppercase;text-align:center;"><i class="fa-solid fa-bolt"></i> Score</th>
                 </tr>
             </thead>
             <tbody>
@@ -286,7 +286,7 @@ sort($all_mgr_tags);
                     Set ? <?= strtoupper($bt) ?>
                 </button>
                 <?php endforeach; ?>
-                <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);">?? Select All</button>
+                <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);"><i class="fa-solid fa-check-double"></i> Select All</button>
             </div>
             <div id="bulk-list" style="max-height:320px;overflow-y:auto;border:2px solid var(--border-color);border-radius:14px;padding:8px;">
                 <?php foreach ($prompts as $bp): ?>

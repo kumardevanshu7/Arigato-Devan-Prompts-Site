@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once "db.php";
 require_once "slug_helper.php";
@@ -264,7 +264,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "secret"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('secret')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Secret Code</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-lock"></i></span><span>Secret Code</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type === "unreleased"
               ? "sel-unreleased"
@@ -273,7 +273,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "unreleased"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('unreleased')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Unreleased</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-star"></i></span><span>Unreleased</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type === "insta_viral"
               ? "sel-viral"
@@ -282,7 +282,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "insta_viral"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('insta_viral')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Insta Viral</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-brands fa-instagram"></i></span><span>Insta Viral</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type ===
           "already_uploaded"
@@ -292,7 +292,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             "already_uploaded"
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('already_uploaded')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;">??</span><span>Already Uploaded</span>
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-clock-rotate-left"></i></span><span>Already Uploaded</span>
           </label>
         </div>
       </div>
@@ -361,14 +361,14 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
       ) ?></textarea></div>
 
       <div class="form-group">
-        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
+        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
       </div>
 
       <!-- Extra Prompts -->
       <div class="form-group">
-        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 2 more variants for this card)</span></label>
+        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ up to 2 more variants for this card)</span></label>
 
         <div id="ep2-section" style="<?= $ep2_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
@@ -464,10 +464,10 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <!-- Assets Toggle -->
       <div class="form-group">
-        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — reference images shown after unlock)</span></label>
+        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ reference images shown after unlock)</span></label>
         <label class="assets-toggle-label" id="assets-toggle-label">
             <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)" <?= $has_current_assets ? 'checked' : '' ?>>
-            <span>?? Include Assets</span>
+            <span><i class="fa-solid fa-paperclip"></i> Include Assets</span>
         </label>
         <div id="assets-fields" style="<?= $has_current_assets ? 'display:block;' : 'display:none;' ?>">
             <div class="assets-fields-box">

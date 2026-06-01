@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once "db.php";
 
@@ -20,7 +20,7 @@ $total = count($prompts);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Share Links — Admin</title>
+    <title>Prompt Share Links ï¿½ Admin</title>
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
@@ -299,7 +299,7 @@ $total = count($prompts);
                     <th style="width:68px;">Cover</th>
                     <th>Title</th>
                     <th style="width:110px;">Type</th>
-                    <th style="width:60px;text-align:center;">??</th>
+                    <th style="width:60px;text-align:center;"><i class="fa-solid fa-link"></i></th>
                     <th style="text-align:right;">Direct Link</th>
                 </tr>
             </thead>

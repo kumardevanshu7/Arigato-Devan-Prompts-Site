@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once "db.php";
 
@@ -185,7 +185,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 </div>
 
                 <div class="form-group">
-                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — which AI gives best results with this prompt)</span></label>
+                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ which AI gives best results with this prompt)</span></label>
                     <div class="bwi-selector">
                         <label class="bwi-btn bwi-banana-opt" onclick="setBwi('nano_banana',this)">
                             <input type="radio" name="best_works_in" value="nano_banana">
@@ -205,7 +205,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
                 <!-- Extra Prompts (Optional) -->
                 <div class="form-group">
-                    <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — add up to 2 more prompt variants for this card)</span></label>
+                    <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ add up to 2 more prompt variants for this card)</span></label>
 
                     <div id="ep2-section" style="display:none;">
                         <div class="extra-prompt-box">
@@ -262,7 +262,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
                 </div>
 
-                <!-- Access Code — full width, only shows for Secret Code type -->
+                <!-- Access Code ï¿½ full width, only shows for Secret Code type -->
                 <div class="form-group" id="unlock-code-group" style="display:block;">
                     <label for="unlock_code"><i class="bx bx-key"></i> Access Code (6 chars)</label>
                     <input type="text" id="unlock_code" name="unlock_code" maxlength="6" pattern="[A-Za-z0-9]{6}" title="Exactly 6 alphanumeric characters" placeholder="e.g. MAGIC1" style="text-transform:uppercase; letter-spacing: 4px; font-weight: 900; font-size: 1.1rem;" required>
@@ -270,10 +270,10 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
                 <!-- Assets Toggle -->
                 <div class="form-group">
-                    <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — attach reference images shown after unlock)</span></label>
+                    <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional ï¿½ attach reference images shown after unlock)</span></label>
                     <label class="assets-toggle-label" id="assets-toggle-label">
                         <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)">
-                        <span>?? Include Assets</span>
+                        <span><i class="fa-solid fa-paperclip"></i> Include Assets</span>
                     </label>
                     <div id="assets-fields" style="display:none;">
                         <div class="assets-fields-box">
@@ -297,7 +297,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
                 </div>
 
-                <!-- Cover Image + Reel Link — side by side -->
+                <!-- Cover Image + Reel Link ï¿½ side by side -->
                 <div class="form-row" style="gap:20px; margin-bottom:0;">
                     <div class="form-group" style="flex:1; min-width:0;">
                         <label>Cover Image</label>
@@ -426,7 +426,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             // Check tags
             if (tags.length === 0) {
                 e.preventDefault();
-                alert('?? Please add at least one tag before uploading!');
+                alert('Please add at least one tag before uploading!');
                 tagInputField.focus();
                 return;
             }
@@ -448,7 +448,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 const reel = reelLinkInput.value.trim();
                 if (!reel) {
                     e.preventDefault();
-                    alert('?? Reel Link is required for Secret Code type!');
+                    alert('Reel Link is required for Secret Code type!');
                     reelLinkInput.focus();
                     return;
                 }

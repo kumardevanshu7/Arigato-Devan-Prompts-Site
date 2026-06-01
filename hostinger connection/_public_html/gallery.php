@@ -227,7 +227,7 @@ function sessionAvatar()
                 <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
             <?php else: ?>
                 <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <img loading="lazy" src="/toplogo/g-logo.png" alt="G" style="width:18px;margin-right:8px;">
+                    <i class="fa-brands fa-google" style="font-size:18px;"></i>
                     Login
                 </a>
             <?php endif; ?>
@@ -545,10 +545,10 @@ function sessionAvatar()
 <!-- Wrong Code Comic Popup -->
 <div id="wrong-code-popup">
     <div class="wrong-code-card">
-        <span class="wrong-code-emoji">🙅‍♂️</span>
-        <div class="wrong-code-title">NO NO BACHA…</div>
-        <div class="wrong-code-msg">its wrong code 😅<br>Watch the reel to get the correct one!</div>
-        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN 🔄</button>
+        <span class="wrong-code-emoji"><i class="fa-solid fa-xmark"></i></span>
+        <div class="wrong-code-title">NO NO BACHA...</div>
+        <div class="wrong-code-msg">Its wrong code <i class="fa-solid fa-face-sad-cry"></i><br>Watch the reel to get the correct one!</div>
+        <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN <i class="fa-solid fa-rotate"></i></button>
     </div>
 </div>
 </body>

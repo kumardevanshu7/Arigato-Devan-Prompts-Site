@@ -191,10 +191,10 @@ html:has(#cc-dot) a,html:has(#cc-dot) button,html:has(#cc-dot) input,html:has(#c
     var btn=document.createElement('button');
     btn.id='sound-toggle-btn'; btn.title='Toggle sound effects';
     var on=localStorage.getItem('arigatoSound')!=='off';
-    btn.textContent=on?'🔊':'🔇';
+    btn.innerHTML=on?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
     btn.addEventListener('click',function(){
       on=!on; localStorage.setItem('arigatoSound',on?'on':'off');
-      btn.textContent=on?'🔊':'🔇';
+      btn.innerHTML=on?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
     });
     document.body.appendChild(btn);
   });
