@@ -9,12 +9,12 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
 // Fetch secret prompts by prompt_type
 if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare(
-        "SELECT p.*, IF(u.id IS NOT NULL,1,0) as is_unlocked, IF(l.id IS NOT NULL,1,0) as is_liked, IF(sv.id IS NOT NULL, 1, 0) as is_saved FROM prompts p LEFT JOIN unlocked_prompts u ON p.id=u.prompt_id AND u.user_id=? LEFT JOIN likes l ON p.id=l.prompt_id AND l.user_id=? LEFT JOIN saved_prompts sv ON p.id=sv.prompt_id AND sv.user_id=? WHERE p.prompt_type='secret' ORDER BY p.created_at DESC",
+        "SELECT p.*, IF(u.id IS NOT NULL,1,0) as is_unlocked, IF(l.id IS NOT NULL,1,0) as is_liked, IF(sv.id IS NOT NULL, 1, 0) as is_saved FROM prompts p LEFT JOIN unlocked_prompts u ON p.id=u.prompt_id AND u.user_id=? LEFT JOIN likes l ON p.id=l.prompt_id AND l.user_id=? LEFT JOIN saved_prompts sv ON p.id=sv.prompt_id AND sv.user_id=? WHERE p.prompt_type='secret' AND (p.is_trial = 0 OR p.is_trial IS NULL) ORDER BY p.created_at DESC",
     );
     $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
 } else {
     $stmt = $pdo->query(
-        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='secret' ORDER BY created_at DESC",
+        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='secret' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
     );
 }
 $secret_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 require_once "slug_helper.php";
@@ -46,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $prompt_type = "secret";
     }
     $is_secret = $prompt_type === "secret";
+    $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
     // Only validate code for secret type
     if ($is_secret) {
@@ -101,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, extra_prompts=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, extra_prompts=?, is_trial=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -116,6 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $asset_images_json,
         $description ?: null,
         $extra_prompts_json,
+        $is_trial,
         $id,
     ]);
 
@@ -294,6 +296,22 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                 : "" ?> onchange="onEditTypeChange('already_uploaded')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-clock-rotate-left"></i></span><span>Already Uploaded</span>
           </label>
+        </div>
+      </div>
+
+      <!-- Trial Reel Mode Toggle -->
+      <div class="form-group" style="margin-top:4px;">
+        <label style="display:block;font-weight:800;margin-bottom:7px;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;">Trial Reel Mode</label>
+        <label class="assets-toggle-label" id="trial-toggle-label" style="background:<?= ($p['is_trial'] ?? 0) ? '#fff3e0' : '#f5f5f5' ?>;border-color:<?= ($p['is_trial'] ?? 0) ? '#f97316' : '#ccc' ?>;color:<?= ($p['is_trial'] ?? 0) ? '#c2410c' : '#666' ?>;">
+          <input type="checkbox" name="is_trial" id="is_trial" value="1" onchange="toggleTrialUI(this)" <?= ($p['is_trial'] ?? 0) ? 'checked' : '' ?>>
+          <span><i class="fa-solid fa-flask"></i> Trial Mode &mdash; Hidden from site, direct link only</span>
+        </label>
+        <div style="margin-top:8px;font-size:.78rem;color:#888;font-weight:600;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;" id="trial-info-box">
+          <?php if ($p['is_trial'] ?? 0): ?>
+          <i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.
+          <?php else: ?>
+          <i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Appears normally on the site.
+          <?php endif; ?>
         </div>
       </div>
 
@@ -667,6 +685,22 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
                 };
                 r.readAsDataURL(f);
             });
+        }
+
+        function toggleTrialUI(cb) {
+            const label = document.getElementById('trial-toggle-label');
+            const info = document.getElementById('trial-info-box');
+            if (cb.checked) {
+                label.style.background = '#fff3e0';
+                label.style.borderColor = '#f97316';
+                label.style.color = '#c2410c';
+                info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+            } else {
+                label.style.background = '#f5f5f5';
+                label.style.borderColor = '#ccc';
+                label.style.color = '#666';
+                info.innerHTML = '<i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Appears normally on the site.';
+            }
         }
 </script>
 </body></html>

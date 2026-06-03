@@ -8,7 +8,7 @@ session_start();
 require_once "db.php";
 
 try {
-    $stmt = $pdo->query("SELECT id, prompt_type FROM prompts ORDER BY RAND() LIMIT 1");
+    $stmt = $pdo->query("SELECT id, prompt_type FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) ORDER BY RAND() LIMIT 1");
     $p = $stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     header("Location: gallery.php");

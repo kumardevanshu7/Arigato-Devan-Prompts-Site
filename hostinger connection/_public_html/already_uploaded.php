@@ -15,7 +15,7 @@ if (isset($_SESSION["user_id"])) {
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        WHERE p.prompt_type = 'already_uploaded'
+        WHERE p.prompt_type = 'already_uploaded' AND (p.is_trial = 0 OR p.is_trial IS NULL) AND (p.is_trial = 0 OR p.is_trial IS NULL)
         ORDER BY p.created_at DESC
     ");
     $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
@@ -23,7 +23,7 @@ if (isset($_SESSION["user_id"])) {
 } else {
     $uploaded_prompts = $pdo
         ->query(
-            "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='already_uploaded' ORDER BY created_at DESC",
+            "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='already_uploaded' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
         )
         ->fetchAll(PDO::FETCH_ASSOC);
 }

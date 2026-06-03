@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -159,6 +159,9 @@ sort($all_mgr_tags);
                     <div class="prompt-item-title">
                         <?= $item_name ?>
                         <span class="card-type-badge <?= $badge_cls ?>" style="font-size:0.6rem;padding:2px 7px;position:relative;top:auto;right:auto;border-top:2px solid var(--text-color);border-radius:6px;display:inline-block;margin-left:8px;box-shadow:none;"><?= $badge_label ?></span>
+                        <?php if ($p['is_trial'] ?? 0): ?>
+                        <span style="background:#fff3e0;color:#c2410c;border:2px solid #f97316;border-radius:6px;padding:2px 7px;font-size:0.6rem;font-weight:900;margin-left:4px;"><i class="fa-solid fa-flask"></i> TRIAL</span>
+                        <?php endif; ?>
                     </div>
                     <div class="prompt-item-meta">
                         <?php if ($ptype === "secret"): ?>
@@ -264,7 +267,7 @@ sort($all_mgr_tags);
                 <div style="font-size:.72rem;color:#aaa;font-weight:600;"><?= date('d M Y', strtotime($dp['created_at'])) ?></div>
             </div>
             <span style="background:<?= $type_colors[$dp['prompt_type']] ?? '#eee' ?>;border:1.5px solid var(--text-color);border-radius:8px;padding:3px 9px;font-size:.7rem;font-weight:900;white-space:nowrap;"><?= strtoupper($dp['prompt_type']) ?></span>
-            <a href="edit_prompt.php?id=<?= $dp['id'] ?>" style="background:#d4eaff;border:2px solid var(--text-color);border-radius:8px;padding:5px 11px;font-size:.75rem;font-weight:800;text-decoration:none;color:var(--text-color);white-space:nowrap;">?? Edit</a>
+            <a href="edit_prompt.php?id=<?= $dp['id'] ?>" style="background:#d4eaff;border:2px solid var(--text-color);border-radius:8px;padding:5px 11px;font-size:.75rem;font-weight:800;text-decoration:none;color:var(--text-color);white-space:nowrap;"><i class="fa-solid fa-pen"></i> Edit</a>
         </div>
         <?php endforeach; ?>
     </div>
@@ -274,7 +277,7 @@ sort($all_mgr_tags);
     <div class="dash-card" style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
             <h2 style="margin:0;padding:0;border:none;font-size:1.2rem;"><i class="fa-solid fa-check-double" style="color:#22c55e;"></i> Bulk Type Change</h2>
-            <span style="font-size:.75rem;font-weight:800;color:#999;">Select prompts ? change type</span>
+            <span style="font-size:.75rem;font-weight:800;color:#999;">Select prompts &rarr; change type</span>
         </div>
         <form method="POST" id="bulk-form">
             <input type="hidden" name="bulk_action" id="bulk-action-val" value="">
@@ -283,7 +286,7 @@ sort($all_mgr_tags);
                 <button type="button" onclick="setBulkAction('<?= $bt ?>')"
                     style="background:<?= $type_colors[$bt]??'#eee' ?>;border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);transition:all .15s;"
                     id="bulk-btn-<?= $bt ?>">
-                    Set ? <?= strtoupper($bt) ?>
+                    Set &rarr; <?= strtoupper($bt) ?>
                 </button>
                 <?php endforeach; ?>
                 <button type="button" onclick="selectAllBulk()" style="background:var(--bg-color);border:2px solid var(--text-color);border-radius:12px;padding:8px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);"><i class="fa-solid fa-check-double"></i> Select All</button>

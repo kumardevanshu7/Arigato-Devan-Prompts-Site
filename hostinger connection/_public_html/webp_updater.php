@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 function updateFile($filepath) {
     if (!file_exists($filepath)) return;
     $content = file_get_contents($filepath);
@@ -9,21 +9,21 @@ function updateFile($filepath) {
     $content = preg_replace('/"landingpics\/lan\$i\.png"/', '"landingpics/lan$i.webp"', $content);
 
     // 2. Replace filmstrip-frame img tags with picture wrappers
-    $imgRegex = '/<div class="filmstrip-frame">\s*<img src="(<\?= \$img \?>)" alt="" loading="lazy">\s*<\/div>/is';
+    $imgRegex = '/<div class="filmstrip-frame">\s*<img loading="lazy" src="(<\?= \$img \?>)" alt="" loading="lazy">\s*<\/div>/is';
     $pictureReplacement = '<div class="filmstrip-frame">
                             <picture>
                                 <source srcset="$1" type="image/webp">
-                                <img src="<?= str_replace(\'.webp\', \'.png\', $img) ?>" alt="" loading="lazy">
+                                <img loading="lazy" src="<?= str_replace(\'.webp\', \'.png\', $img) ?>" alt="" loading="lazy">
                             </picture>
                         </div>';
     $content = preg_replace($imgRegex, $pictureReplacement, $content);
     
     // For index.php where the HTML might differ
-    $imgRegexIndex = '/<div class="filmstrip-frame">\s*<img src="(<\?= htmlspecialchars\(\$img\) \?>)" alt="Filmstrip Image" loading="lazy">\s*<\/div>/is';
+    $imgRegexIndex = '/<div class="filmstrip-frame">\s*<img loading="lazy" src="(<\?= htmlspecialchars\(\$img\) \?>)" alt="Filmstrip Image" loading="lazy">\s*<\/div>/is';
     $pictureReplacementIndex = '<div class="filmstrip-frame">
                         <picture>
                             <source srcset="$1" type="image/webp">
-                            <img src="<?= htmlspecialchars(str_replace(\'.webp\', \'.png\', $img)) ?>" alt="Filmstrip Image" loading="lazy">
+                            <img loading="lazy" src="<?= htmlspecialchars(str_replace(\'.webp\', \'.png\', $img)) ?>" alt="Filmstrip Image" loading="lazy">
                         </picture>
                     </div>';
     $content = preg_replace($imgRegexIndex, $pictureReplacementIndex, $content);

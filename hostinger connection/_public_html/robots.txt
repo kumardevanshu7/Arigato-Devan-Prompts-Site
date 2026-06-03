@@ -14,7 +14,10 @@ Disallow: /blog_create.php
 Disallow: /blog_edit.php
 Disallow: /blog_delete.php
 Disallow: /blog_toggle.php
+Disallow: /blog_comment.php
 Disallow: /prompt_links.php
+Disallow: /potd_manager.php
+Disallow: /user_management.php
 Disallow: /onboarding.php
 Disallow: /saved_prompts.php
 Disallow: /profile.php
@@ -25,12 +28,27 @@ Disallow: /save_prompt.php
 Disallow: /get_prompt.php
 Disallow: /user_data.php
 Disallow: /db.php
-Disallow: /uploads/
-Disallow: /profiledp/
+Disallow: /gtag.php
+Disallow: /react.php
+Disallow: /track.php
+Disallow: /track_action.php
+Disallow: /activity_ping.php
+Disallow: /send_contact.php
+Disallow: /feature_prompt.php
+Disallow: /fcm_init.php
+Disallow: /fcm_notify.php
+Disallow: /fcm_subscribe.php
+Disallow: /slug_helper.php
 Disallow: /surprise_me.php
 Disallow: /webp_updater.php
+Disallow: /card.php
+Disallow: /signup.php
+Disallow: /uploads/
+Disallow: /profiledp/
+Disallow: /toplogo/
+Disallow: /private/
 Disallow: /gallery.php?tag=
 Disallow: /gallery.php?page=
 
 # Sitemap location
-Sitemap: https://arigatodevan.com/sitemap.xml
+Sitemap: https://arigatodevan.com/sitemap.php

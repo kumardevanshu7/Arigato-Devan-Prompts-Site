@@ -58,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
+    $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
     // For secret type, unlock code is required
     if ($prompt_type === "secret") {
@@ -180,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -195,6 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $asset_title,
                 $asset_images_json,
                 $extra_prompts_json,
+                $is_trial,
             ]);
 
             $_SESSION["success_msg"] =

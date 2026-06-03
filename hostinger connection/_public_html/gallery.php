@@ -15,14 +15,14 @@ $tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . $tag_filter . '%' :
 $offset     = ($page - 1) * $per_page;
 
 // Count total for pagination
-$count_sql  = $tag_param ? "SELECT COUNT(*) FROM prompts WHERE LOWER(tag) LIKE ?" : "SELECT COUNT(*) FROM prompts";
+$count_sql  = $tag_param ? "SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) AND LOWER(tag) LIKE ?" : "SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)";
 $count_stmt = $pdo->prepare($count_sql);
 $count_stmt->execute($tag_param ? [$tag_param] : []);
 $total       = (int)$count_stmt->fetchColumn();
 $total_pages = max(1, (int)ceil($total / $per_page));
 
 // All unique tags for filter buttons (separate query, not paginated)
-$all_tags_raw = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != ''") ->fetchAll(PDO::FETCH_COLUMN);
+$all_tags_raw = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != '' AND (is_trial = 0 OR is_trial IS NULL)") ->fetchAll(PDO::FETCH_COLUMN);
 $all_tags = [];
 foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $all_tags[] = $t; } }
 $tag_counts = [];
@@ -39,14 +39,14 @@ if (isset($_SESSION["user_id"])) {
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        WHERE 1=1{$tag_where}
+        WHERE (p.is_trial = 0 OR p.is_trial IS NULL){$tag_where}
         ORDER BY p.created_at DESC LIMIT {$per_page} OFFSET {$offset}";
     $params = [$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]];
     if ($tag_param) $params[] = $tag_param;
     $stmt = $pdo->prepare($sql); $stmt->execute($params);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $sql = "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE 1=1{$tag_where} ORDER BY created_at DESC LIMIT {$per_page} OFFSET {$offset}";
+    $sql = "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL){$tag_where} ORDER BY created_at DESC LIMIT {$per_page} OFFSET {$offset}";
     $params = []; if ($tag_param) $params[] = $tag_param;
     $stmt = $pdo->prepare($sql); $stmt->execute($params);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);

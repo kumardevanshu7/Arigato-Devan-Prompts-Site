@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -134,6 +134,18 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                             <span class="type-icon"><i class="bx bx-history type-icon"></i></span>
                             <span class="type-label">Already Uploaded</span>
                         </label>
+                    </div>
+                </div>
+
+                <!-- Trial Reel Mode Toggle -->
+                <div class="form-group" style="margin-top:4px;">
+                    <label>Trial Reel Mode</label>
+                    <label class="assets-toggle-label" id="trial-toggle-label" style="background:#f5f5f5;border-color:#ccc;color:#666;">
+                        <input type="checkbox" name="is_trial" id="is_trial" value="1" onchange="toggleTrialUI(this)">
+                        <span><i class="fa-solid fa-flask"></i> Trial Mode &mdash; Hidden from site, direct link only</span>
+                    </label>
+                    <div style="margin-top:8px;font-size:.78rem;color:#888;font-weight:600;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;" id="trial-info-box">
+                        <i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Prompt will appear normally on the site.
                     </div>
                 </div>
 
@@ -514,6 +526,21 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 reader.readAsDataURL(f);
             });
         }
-    </script>
+            function toggleTrialUI(cb) {
+            const label = document.getElementById('trial-toggle-label');
+            const info = document.getElementById('trial-info-box');
+            if (cb.checked) {
+                label.style.background = '#fff3e0';
+                label.style.borderColor = '#f97316';
+                label.style.color = '#c2410c';
+                info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+            } else {
+                label.style.background = '#f5f5f5';
+                label.style.borderColor = '#ccc';
+                label.style.color = '#666';
+                info.innerHTML = '<i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Prompt will appear normally on the site.';
+            }
+        }
+</script>
 </body>
 </html>

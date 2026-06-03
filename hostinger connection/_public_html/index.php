@@ -17,14 +17,14 @@ if (isset($_SESSION["user_id"])) {
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        WHERE p.prompt_type = 'secret'
+        WHERE p.prompt_type = 'secret' AND (p.is_trial = 0 OR p.is_trial IS NULL)
         ORDER BY p.created_at DESC
     ");
     $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     $stmt = $pdo->query(
-        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type = 'secret' ORDER BY created_at DESC",
+        "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type = 'secret' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
     );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -63,13 +63,13 @@ try {
                 LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
                 LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
                 LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-                WHERE p.is_featured = 1
+                WHERE p.is_featured = 1 AND (p.is_trial = 0 OR p.is_trial IS NULL)
                 LIMIT 1
             ");
             $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
         } else {
             $fStmt = $pdo->query(
-                "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE is_featured = 1 LIMIT 1",
+                "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE is_featured = 1 AND (is_trial = 0 OR is_trial IS NULL) LIMIT 1",
             );
         }
         $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
@@ -86,12 +86,13 @@ try {
                 LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
                 LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
                 LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
+                WHERE (p.is_trial = 0 OR p.is_trial IS NULL)
                 ORDER BY p.likes_count DESC LIMIT 1
             ");
             $fStmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
         } else {
             $fStmt = $pdo->query(
-                "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts ORDER BY likes_count DESC LIMIT 1",
+                "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) ORDER BY likes_count DESC LIMIT 1",
             );
         }
         $featuredPrompt = $fStmt->fetch(PDO::FETCH_ASSOC);
@@ -103,7 +104,7 @@ try {
 // Count of new prompts dropped in last 48 hours (for "NEW DROP" banner)
 $new_drop_count = 0;
 try {
-    $newStmt = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= NOW() - INTERVAL 48 HOUR");
+    $newStmt = $pdo->query("SELECT COUNT(*) FROM prompts WHERE created_at >= NOW() - INTERVAL 48 HOUR AND (is_trial = 0 OR is_trial IS NULL)");
     $new_drop_count = (int) $newStmt->fetchColumn();
 } catch (PDOException $e) {
     $new_drop_count = 0;

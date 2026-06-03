@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 
 $prompts = $pdo
     ->query(
-        "SELECT id, slug, title, image_path, prompt_type, likes_count FROM prompts ORDER BY created_at DESC",
+        "SELECT id, slug, title, image_path, prompt_type, likes_count, is_trial FROM prompts ORDER BY created_at DESC",
     )
     ->fetchAll(PDO::FETCH_ASSOC);
 $total = count($prompts);
@@ -306,31 +306,11 @@ $total = count($prompts);
             <tbody>
             <?php
             $type_map = [
-                "secret" => [
-                    "emoji" => "??",
-                    "label" => "Secret Code",
-                    "bg" => "#ffe3e3",
-                    "color" => "#d03030",
-                ],
-                "unreleased" => [
-                    "emoji" => "??",
-                    "label" => "Unreleased",
-                    "bg" => "#fff4cc",
-                    "color" => "#7a5800",
-                ],
-                "insta_viral" => [
-                    "emoji" => "??",
-                    "label" => "Insta Viral",
-                    "bg" => "#e3f7ff",
-                    "color" => "#004f7a",
-                ],
-                "already_uploaded" => [
-                    "emoji" => "??",
-                    "label" => "Already Uploaded",
-                    "bg" => "#e6f2ff",
-                    "color" => "#00509e",
-                ],
-            ];
+    "secret"           => ["icon"=>"fa-solid fa-lock",           "label"=>"Secret Code",      "bg"=>"#ffe3e3", "color"=>"#d03030"],
+    "unreleased"       => ["icon"=>"fa-solid fa-star",           "label"=>"Unreleased",        "bg"=>"#fff4cc", "color"=>"#7a5800"],
+    "insta_viral"      => ["icon"=>"fa-brands fa-instagram",     "label"=>"Insta Viral",       "bg"=>"#e3f7ff", "color"=>"#004f7a"],
+    "already_uploaded" => ["icon"=>"fa-solid fa-clock-rotate-left","label"=>"Already Uploaded","bg"=>"#e6f2ff", "color"=>"#00509e"],
+];
             foreach ($prompts as $i => $p):
 
                 $pt = $p["prompt_type"] ?? "secret";
@@ -352,8 +332,11 @@ $total = count($prompts);
                     <span class="type-pill" style="background:<?= $tinfo[
                         "bg"
                     ] ?>;color:<?= $tinfo["color"] ?>;">
-                        <?= $tinfo["emoji"] ?> <?= $tinfo["label"] ?>
+                        <?= '<i class="' . $tinfo["icon"] . '"></i> ' . $tinfo["label"] ?>
                     </span>
+                    <?php if ($p['is_trial'] ?? 0): ?>
+                    <span style="background:#fff3e0;color:#c2410c;border:1.5px solid #f97316;border-radius:6px;padding:2px 8px;font-size:.68rem;font-weight:900;margin-left:4px;white-space:nowrap;display:inline-block;margin-top:4px;"><i class="fa-solid fa-flask"></i> TRIAL</span>
+                    <?php endif; ?>
                 </td>
                 <td style="text-align:center;font-weight:800;color:#ff6b6b;"><?= $likes ?></td>
                 <td style="text-align:right;">

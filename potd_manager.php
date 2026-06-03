@@ -41,10 +41,10 @@ foreach ($prompts as $p) { if ($p["is_featured"]) $active_existing_id = (int)$p[
 foreach ($customs as $c) { if ($c["is_active"]) $active_custom_id = (int)$c["id"]; }
 
 $type_map = [
-    "secret" => ["emoji"=>"??","label"=>"Secret Code","bg"=>"#ffe3e3","color"=>"#d03030"],
-    "unreleased" => ["emoji"=>"??","label"=>"Unreleased","bg"=>"#fff4cc","color"=>"#7a5800"],
-    "insta_viral" => ["emoji"=>"??","label"=>"Insta Viral","bg"=>"#e3f7ff","color"=>"#004f7a"],
-    "already_uploaded" => ["emoji"=>"??","label"=>"Already Uploaded","bg"=>"#e6f2ff","color"=>"#00509e"],
+    "secret"           => ["icon"=>"fa-solid fa-lock",           "label"=>"Secret Code",      "bg"=>"#ffe3e3", "color"=>"#d03030"],
+    "unreleased"       => ["icon"=>"fa-solid fa-star",           "label"=>"Unreleased",        "bg"=>"#fff4cc", "color"=>"#7a5800"],
+    "insta_viral"      => ["icon"=>"fa-brands fa-instagram",     "label"=>"Insta Viral",       "bg"=>"#e3f7ff", "color"=>"#004f7a"],
+    "already_uploaded" => ["icon"=>"fa-solid fa-clock-rotate-left","label"=>"Already Uploaded","bg"=>"#e6f2ff", "color"=>"#00509e"],
 ];
 ?>
 <!DOCTYPE html>
@@ -216,7 +216,7 @@ $type_map = [
                 </td>
                 <td>
                     <span class="type-pill" style="background:<?= $tinfo["bg"] ?>;color:<?= $tinfo["color"] ?>;">
-                        <?= $tinfo["emoji"] ?> <?= $tinfo["label"] ?>
+                        <?= '<i class="' . $tinfo["icon"] . '"></i> ' . $tinfo["label"] ?>
                     </span>
                 </td>
                 <td style="text-align:center;font-weight:800;color:#ff6b6b;"><?= $likes ?></td>

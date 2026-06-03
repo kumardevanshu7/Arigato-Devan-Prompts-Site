@@ -7,111 +7,117 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 $base = "https://arigatodevan.com";
 
-// Static pages — public only (no login required pages)
+// Static pages — public only (no login required)
 $static_pages = [
     [
-        "url" => "/",
-        "priority" => "1.0",
+        "url"        => "/",
+        "priority"   => "1.0",
         "changefreq" => "daily",
-        "lastmod" => "2026-05-22",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/gallery.php",
-        "priority" => "0.9",
+        "url"        => "/gallery.php",
+        "priority"   => "0.9",
         "changefreq" => "daily",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/secret_code.php",
-        "priority" => "0.8",
+        "url"        => "/secret_code.php",
+        "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/insta_viral.php",
-        "priority" => "0.8",
+        "url"        => "/insta_viral.php",
+        "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/unreleased.php",
-        "priority" => "0.8",
+        "url"        => "/unreleased.php",
+        "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/already_uploaded.php",
-        "priority" => "0.8",
+        "url"        => "/already_uploaded.php",
+        "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/blogs.php",
-        "priority" => "0.7",
+        "url"        => "/blogs.php",
+        "priority"   => "0.7",
         "changefreq" => "weekly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/how_to_use.php",
-        "priority" => "0.7",
+        "url"        => "/how_to_use.php",
+        "priority"   => "0.7",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-20",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/progress.php",
-        "priority" => "0.5",
+        "url"        => "/steps_guide.php",
+        "priority"   => "0.7",
         "changefreq" => "monthly",
-        "lastmod" => "2025-02-14",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/login.php",
-        "priority" => "0.4",
+        "url"        => "/faq.php",
+        "priority"   => "0.7",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-22",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/terms.php",
-        "priority" => "0.2",
+        "url"        => "/about.php",
+        "priority"   => "0.6",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-22",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/disclaimer.php",
-        "priority" => "0.2",
+        "url"        => "/contact.php",
+        "priority"   => "0.5",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-22",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/privacy.php",
-        "priority" => "0.3",
+        "url"        => "/progress.php",
+        "priority"   => "0.5",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-24",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/about.php",
-        "priority" => "0.6",
+        "url"        => "/login.php",
+        "priority"   => "0.4",
         "changefreq" => "monthly",
-        "lastmod" => "2026-05-24",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/contact.php",
-        "priority" => "0.5",
-        "changefreq" => "monthly",
-        "lastmod" => "2026-05-24",
+        "url"        => "/privacy.php",
+        "priority"   => "0.3",
+        "changefreq" => "yearly",
+        "lastmod"    => "2026-06-01",
     ],
     [
-        "url" => "/faq.php",
-        "priority" => "0.7",
-        "changefreq" => "monthly",
-        "lastmod" => "2026-05-24",
+        "url"        => "/terms.php",
+        "priority"   => "0.2",
+        "changefreq" => "yearly",
+        "lastmod"    => "2026-06-01",
+    ],
+    [
+        "url"        => "/disclaimer.php",
+        "priority"   => "0.2",
+        "changefreq" => "yearly",
+        "lastmod"    => "2026-06-01",
     ],
 ];
 
-// Fetch all prompts with slugs dynamically
+// Fetch all public prompts with slugs dynamically
 $prompts = [];
 try {
     $stmt = $pdo->query(
-        "SELECT slug, id, created_at FROM prompts WHERE slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+        "SELECT slug, id, created_at FROM prompts WHERE slug IS NOT NULL AND slug != '' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
     );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -131,7 +137,10 @@ try {
 
 $today = date("Y-m-d");
 ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
 <?php foreach ($static_pages as $page): ?>
   <url>

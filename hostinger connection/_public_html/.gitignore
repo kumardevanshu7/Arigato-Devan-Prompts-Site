@@ -1,7 +1,14 @@
-google_config.php
+# ===== CREDENTIALS — NEVER UPLOAD =====
 db.php
 firebase_auth.php
+
+# ===== SERVER CONFIG — NEVER SYNC =====
+.htaccess
+
+# ===== PRIVATE FOLDER =====
 /private/
+
+# ===== LOGS & OS FILES =====
 *.log
 .DS_Store
 Thumbs.db
