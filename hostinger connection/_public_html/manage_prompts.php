@@ -191,7 +191,7 @@ sort($all_mgr_tags);
                         title="<?= $p["is_featured"]
                             ? "Currently Featured"
                             : "Set as Prompt of the Day" ?>">
-                        <?= $p["is_featured"] ? "? Featured" : "? Feature" ?>
+                        <?= $p["is_featured"] ? '<i class="fa-solid fa-star"></i> Featured' : '<i class="fa-solid fa-star"></i> Feature' ?>
                     </button>
                     <a href="edit_prompt.php?id=<?= $item_id ?>" class="edit-btn" title="Edit"><i class="fa-solid fa-pencil"></i></a>
                     <button class="delete-btn" title="Delete" onclick="confirmDelete(<?= $item_id ?>, '<?= $item_js ?>')">
@@ -325,7 +325,7 @@ function featurePrompt(id) {
         if (d.success) {
             // Reset all feature buttons
             document.querySelectorAll('[id^="feat-btn-"]').forEach(btn => {
-                btn.textContent = '? Feature';
+                btn.innerHTML = '<i class="fa-solid fa-star"></i> Feature';
                 btn.style.background = 'var(--bg-color)';
                 btn.title = 'Set as Prompt of the Day';
             });
@@ -341,10 +341,16 @@ function featurePrompt(id) {
 }
 
 function confirmDelete(id, title) {
-    if (confirm("Are you sure you want to delete '" + title + "'?")) {
+    const modal = document.getElementById('delete-modal');
+    document.getElementById('delete-modal-title').textContent = '"' + title + '"'
+    modal.style.display = 'flex';
+    document.getElementById('delete-confirm-btn').onclick = function() {
         document.getElementById('delete-prompt-id').value = id;
         document.getElementById('delete-form').submit();
-    }
+    };
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.style.display = 'none';
+    }, { once: true });
 }
 
 // Bulk action JS

@@ -71,6 +71,7 @@ try {
 $total = count($users);
 $total_male   = count(array_filter($users, fn($u) => strtolower($u['gender'] ?? '') === 'male'));
 $total_female = count(array_filter($users, fn($u) => strtolower($u['gender'] ?? '') === 'female'));
+$total_alien  = count(array_filter($users, fn($u) => empty($u['gender']) || !in_array(strtolower($u['gender']), ['male','female','nonbinary'])));
 $total_admin  = count(array_filter($users, fn($u) => ($u['role'] ?? '') === 'admin'));
 // New today
 $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(created_at,'+00:00','+05:30')) = CURDATE()")->fetchColumn();
@@ -224,6 +225,10 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
             <div class="um-stat-num" style="color:#f43f5e;"><?= $total_female ?></div>
             <div class="um-stat-label">Female</div>
         </div>
+        <div class="um-stat-card">
+            <div class="um-stat-num" style="color:#8b5cf6;"><?= $total_alien ?></div>
+            <div class="um-stat-label"><i class="fa-solid fa-user-astronaut"></i> Alien</div>
+        </div>
     </div>
 
     <!-- Growth Chart + Top Users -->
@@ -267,6 +272,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
             <option value="">All Genders</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
+<option value="">Alien / Unknown</option>
         </select>
     </div>
 

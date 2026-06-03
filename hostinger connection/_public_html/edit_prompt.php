@@ -379,20 +379,20 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
       ) ?></textarea></div>
 
       <div class="form-group">
-        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � shown in Google search results)</span></label>
+        <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
       </div>
 
       <!-- Extra Prompts -->
       <div class="form-group">
-        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � up to 2 more variants for this card)</span></label>
+        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 2 more variants for this card)</span></label>
 
         <div id="ep2-section" style="<?= $ep2_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
             <div class="extra-prompt-header">
-              <span class="extra-prompt-num">? Prompt 2</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(2)">? Remove</button>
+              <span class="extra-prompt-num"><i class="fa-solid fa-2"></i> Prompt 2</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(2)"><i class="fa-solid fa-xmark"></i> Remove</button>
             </div>
             <input type="hidden" name="extra_prompt_2_current_image" value="<?= htmlspecialchars($ep2_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
@@ -420,8 +420,8 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         <div id="ep3-section" style="<?= $ep3_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
             <div class="extra-prompt-header">
-              <span class="extra-prompt-num">? Prompt 3</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(3)">? Remove</button>
+              <span class="extra-prompt-num"><i class="fa-solid fa-3"></i> Prompt 3</span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(3)"><i class="fa-solid fa-xmark"></i> Remove</button>
             </div>
             <input type="hidden" name="extra_prompt_3_current_image" value="<?= htmlspecialchars($ep3_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
@@ -447,9 +447,9 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
         </div>
 
         <div id="ep-add-btns">
-          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)">? Add Prompt 2</button>
+          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)"><i class="fa-solid fa-plus"></i> Add Prompt 2</button>
           <?php if ($ep2_data): ?>
-          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)">? Add Prompt 3</button>
+          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)"><i class="fa-solid fa-plus"></i> Add Prompt 3</button>
           <?php endif; ?>
         </div>
       </div>
@@ -482,7 +482,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <!-- Assets Toggle -->
       <div class="form-group">
-        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � reference images shown after unlock)</span></label>
+        <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — reference images shown after unlock)</span></label>
         <label class="assets-toggle-label" id="assets-toggle-label">
             <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)" <?= $has_current_assets ? 'checked' : '' ?>>
             <span><i class="fa-solid fa-paperclip"></i> Include Assets</span>

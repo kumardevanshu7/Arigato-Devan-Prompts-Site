@@ -197,7 +197,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 </div>
 
                 <div class="form-group">
-                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional � which AI gives best results with this prompt)</span></label>
+                    <label>Best Works In <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — which AI gives best results with this prompt)</span></label>
                     <div class="bwi-selector">
                         <label class="bwi-btn bwi-banana-opt" onclick="setBwi('nano_banana',this)">
                             <input type="radio" name="best_works_in" value="nano_banana">
@@ -223,7 +223,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                         <div class="extra-prompt-box">
                             <div class="extra-prompt-header">
                                 <span class="extra-prompt-num">? Prompt 2</span>
-                                <button type="button" class="extra-remove-btn" onclick="removeEP(2)">? Remove</button>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(2)"><i class="fa-solid fa-xmark"></i> Remove</button>
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 2 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
@@ -248,7 +248,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                         <div class="extra-prompt-box">
                             <div class="extra-prompt-header">
                                 <span class="extra-prompt-num">? Prompt 3</span>
-                                <button type="button" class="extra-remove-btn" onclick="removeEP(3)">? Remove</button>
+                                <button type="button" class="extra-remove-btn" onclick="removeEP(3)"><i class="fa-solid fa-xmark"></i> Remove</button>
                             </div>
                             <div class="form-group" style="margin-bottom:12px;">
                                 <label>Prompt 3 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
@@ -270,11 +270,11 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
 
                     <div id="ep-add-btns">
-                        <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)">? Add Prompt 2</button>
+                        <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)"><i class="fa-solid fa-plus"></i> Add Prompt 2</button>
                     </div>
                 </div>
 
-                <!-- Access Code � full width, only shows for Secret Code type -->
+                <!-- Access Code — full width, only shows for Secret Code type -->
                 <div class="form-group" id="unlock-code-group" style="display:block;">
                     <label for="unlock_code"><i class="bx bx-key"></i> Access Code (6 chars)</label>
                     <input type="text" id="unlock_code" name="unlock_code" maxlength="6" pattern="[A-Za-z0-9]{6}" title="Exactly 6 alphanumeric characters" placeholder="e.g. MAGIC1" style="text-transform:uppercase; letter-spacing: 4px; font-weight: 900; font-size: 1.1rem;" required>
@@ -309,7 +309,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                     </div>
                 </div>
 
-                <!-- Cover Image + Reel Link � side by side -->
+                <!-- Cover Image + Reel Link — side by side -->
                 <div class="form-row" style="gap:20px; margin-bottom:0;">
                     <div class="form-group" style="flex:1; min-width:0;">
                         <label>Cover Image</label>

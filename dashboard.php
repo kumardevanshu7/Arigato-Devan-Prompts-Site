@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -148,15 +148,15 @@ $admin_name  = $admin_info['username'] ?? 'Admin';
 if ($admin_gender === 'female') {
     if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Sundari! <i class=\"fa-solid fa-sun\"></i> Aaj bhi site shining hai teri tarah!";
     elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Hey Beautiful! <i class=\"fa-solid fa-crown\"></i> Lunch break mein bhi admin grind? Queen hai tu!";
-    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Babe ?? Afternoon check-in � sab smooth chal raha hai? ??";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Babe ?? Afternoon check-in sab smooth chal raha hai? ??";
     elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Hey Gorgeous! <i class=\"fa-solid fa-crown\"></i> Evening mein bhi site dekh rahi hai? Crown tujhe hi milega!";
     else                                            $admin_greet = "Late night session, Babe! <i class=\"fa-solid fa-moon\"></i> Thak gayi? Thoda rest bhi karo!";
 } else {
-    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Bhai ?? Fresh start � aaj kya plan hai? ??";
+    if ($admin_hour >= 5  && $admin_hour < 12) $admin_greet = "Good Morning, Bhai ?? Fresh start aaj kya plan hai? ??";
     elseif ($admin_hour >= 12 && $admin_hour < 15) $admin_greet = "Kya chal raha hai, King! <i class=\"fa-solid fa-crown\"></i> Lunch break admin session? Respect!";
-    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Afternoon hustle mode, Bhai ?? Site grow ho rahi hai � check karo stats! ??";
+    elseif ($admin_hour >= 15 && $admin_hour < 18) $admin_greet = "Afternoon hustle mode, Bhai ?? Site grow ho rahi hai check karo stats! ??";
     elseif ($admin_hour >= 18 && $admin_hour < 21) $admin_greet = "Evening check-in, Boss! <i class=\"fa-solid fa-chart-bar\"></i> Aaj ka kaam kaisa raha? Dekho numbers!";
-    else                                            $admin_greet = "Late night grind, Bhai ?? Site ka khyal rakh raha hai � respect! ??";
+    else                                            $admin_greet = "Late night grind, Bhai ?? Site ka khyal rakh raha hai respect! ??";
 }
 
 // User growth milestones
@@ -652,7 +652,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
         <!-- Greeting Bar -->
         <div class="greeting-bar">
             <div class="greeting-text"><?= $admin_greet ?></div>
-            <div class="greeting-time"><?= date('D, d M Y � h:i A') ?> IST</div>
+            <div class="greeting-time"><?= date('D, d M Y | h:i A') ?> IST</div>
         </div>
 
         <!-- Live Stats Bar -->
@@ -766,7 +766,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
                         $b = (int)(220 - $intensity * 150);
                         $bg = "rgb($r,$g,$b)";
                     ?>
-                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 � <?= $cnt ?> users"></div>
+                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 &mdash; <?= $cnt ?> users"></div>
                     <?php endforeach; ?>
                 </div>
                 <div class="hm-labels">
@@ -984,7 +984,7 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;">
                 <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-users"></i> User Management</h2>
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 16px;width:fit-content;flex-shrink:0;"><?= $total_users_count ?> Users</div>
+                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 12px;width:fit-content;flex-shrink:0;font-size:.82rem;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= $total_users_count ?> Users</div>
                     <a href="user_management.php" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:12px;padding:7px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Page</a>
                 </div>
             </div>
@@ -1178,7 +1178,7 @@ function openActivity(uid) {
                 data.unlock_list.forEach(p => {
                     const d = document.createElement('div');
                     d.style.cssText = 'background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;';
-                    d.textContent = '?? ' + (p.title || '�');
+                    d.textContent = '↗ ' + (p.title || '�');
                     list.appendChild(d);
                 });
             }
