@@ -46,7 +46,7 @@ $tinfo = [
     "already_uploaded" => ["label" => "ALREADY UPLOADED",   "bg" => "#e6f2ff", "color" => "#00509e"],
 ][$ptype];
 
-$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path FROM prompts WHERE prompt_type = ? AND id != ? ORDER BY RAND() LIMIT 4");
+$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
 $rel_stmt->execute([$db_type, $id]);
 $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
