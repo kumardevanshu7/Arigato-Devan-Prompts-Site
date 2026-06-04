@@ -122,17 +122,23 @@ $top3_users = $pdo->query("
     ORDER BY score DESC LIMIT 3
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// Ghost users (no unlocks, saves, or likes at all)
+// Ghost users preview (only 3 for dashboard)
 try {
+    $ghost_total = (int)$pdo->query("
+        SELECT COUNT(*) FROM users u WHERE u.role='user'
+          AND NOT EXISTS (SELECT 1 FROM unlocked_prompts up WHERE up.user_id=u.id)
+          AND NOT EXISTS (SELECT 1 FROM saved_prompts   sp WHERE sp.user_id=u.id)
+          AND NOT EXISTS (SELECT 1 FROM likes            l  WHERE  l.user_id=u.id)
+    ")->fetchColumn();
     $ghost_users = $pdo->query("
-        SELECT u.id, u.username, u.email, u.gender, u.created_at
+        SELECT u.id, u.username, u.email, u.created_at
         FROM users u WHERE u.role='user'
           AND NOT EXISTS (SELECT 1 FROM unlocked_prompts up WHERE up.user_id=u.id)
           AND NOT EXISTS (SELECT 1 FROM saved_prompts   sp WHERE sp.user_id=u.id)
           AND NOT EXISTS (SELECT 1 FROM likes            l  WHERE  l.user_id=u.id)
-        ORDER BY u.created_at DESC LIMIT 8
+        ORDER BY u.created_at DESC LIMIT 3
     ")->fetchAll(PDO::FETCH_ASSOC);
-} catch(Exception $e) { $ghost_users = []; }
+} catch(Exception $e) { $ghost_users = []; $ghost_total = 0; }
 
 // Platform breakdown (user_agent column � may not exist yet)
 try {
@@ -178,1053 +184,637 @@ unset($_SESSION["success_msg"], $_SESSION["error_msg"]);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard &ndash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <style>
-        body { background: var(--bg-color); }
-
-        .dashboard-wrap {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 40px 100px;
-        }
-
-        .dash-page-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            margin-bottom: 30px;
-        }
-
-        /* Analytics Grid */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 20px;
-            padding: 24px 20px;
-            text-align: center;
-            box-shadow: var(--shadow-comic);
-            transition: all 0.2s ease-out;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px) rotate(-1deg);
-            box-shadow: var(--shadow-comic-hover);
-        }
-
-        .stat-card.accent-1 { background: var(--primary-color); }
-        .stat-card.accent-2 { background: var(--secondary-color); }
-        .stat-card.accent-3 { background: #d4eaff; }
-        .stat-card.accent-4 { background: #ffe3f0; }
-        .stat-card.accent-5 { background: #d9f5e5; }
-
-        .stat-value {
-            font-size: 2.4rem;
-            font-weight: 900;
-            color: var(--text-color);
-            margin-bottom: 6px;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            font-weight: 800;
-            color: var(--text-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-sub {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-
-        /* Dashboard columns */
-        .dashboard-cols {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 40px;
-        }
-
-        /* Form */
-        .dash-card {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: var(--shadow-comic);
-        }
-
-        .dash-card h2 {
-            font-size: 1.6rem;
-            font-weight: 900;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px dashed var(--border-color);
-        }
-
-        .form-group { margin-bottom: 20px; }
-
-        .form-group label {
-            display: block;
-            font-weight: 800;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 12px;
-            font-family: var(--font-main);
-            font-size: 0.95rem;
-            font-weight: 600;
-            background: var(--bg-color);
-            color: var(--text-color);
-            box-shadow: var(--shadow-comic);
-            outline: none;
-            transition: all 0.2s;
-            box-sizing: border-box;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--primary-dark);
-            box-shadow: var(--shadow-comic-hover);
-            transform: translateY(-1px);
-        }
-
-        .form-group textarea { resize: vertical; min-height: 100px; }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-        .unreleased-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: var(--bg-color);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .unreleased-toggle input[type="checkbox"] {
-            width: 22px; height: 22px;
-            box-shadow: none;
-            cursor: pointer;
-            border-radius: 6px;
-            accent-color: var(--primary-dark);
-        }
-
-        /* Prompt List */
-        .prompt-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px;
-            border: 2px solid var(--border-color);
-            border-radius: 14px;
-            margin-bottom: 12px;
-            transition: all 0.2s;
-        }
-
-        .prompt-item:hover {
-            border-color: var(--text-color);
-            transform: translateX(3px);
-            box-shadow: 3px 3px 0px var(--text-color);
-        }
-
-        .prompt-item.is-unreleased { border-style: dashed; background: rgba(255, 220, 100, 0.08); }
-
-        .prompt-item-img {
-            width: 56px; height: 56px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid var(--text-color);
-            flex-shrink: 0;
-        }
-
-        .prompt-item-details { flex-grow: 1; min-width: 0; }
-
-        .prompt-item-title {
-            font-weight: 800;
-            font-size: 1rem;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .prompt-item-meta {
-            font-size: 0.82rem;
-            color: #7D7887;
-            font-weight: 600;
-        }
-
-        .code-badge {
-            font-weight: 900;
-            background: var(--secondary-color);
-            padding: 2px 8px;
-            border-radius: 6px;
-            border: 1px solid var(--text-color);
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-
-        .unreleased-badge {
-            display: inline-block;
-            background: var(--primary-color);
-            color: var(--text-color);
-            font-size: 0.7rem;
-            font-weight: 900;
-            padding: 2px 8px;
-            border-radius: 20px;
-            border: 1.5px solid var(--text-color);
-            text-transform: uppercase;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-
-        .delete-btn {
-            background: #FF6B6B;
-            color: #fff;
-            border: 2px solid var(--text-color);
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 2px 2px 0px var(--text-color);
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .delete-btn:hover {
-            background: #FF4757;
-            transform: translateY(-2px) rotate(2deg);
-            box-shadow: 4px 4px 0px var(--text-color);
-        }
-
-        .file-upload-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--bg-color);
-            padding: 10px 16px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow-comic);
-        }
-
-        .file-upload-btn {
-            background: var(--primary-color);
-            color: var(--text-color);
-            padding: 8px 16px;
-            border: 2px solid var(--text-color);
-            border-radius: 8px;
-            font-weight: 800;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 2px 2px 0px var(--text-color);
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .file-upload-name {
-            font-weight: 600;
-            color: #7D7887;
-            font-size: 0.9rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .flash-success {
-            background: #d9f5e5;
-            color: #1e5c36;
-            padding: 16px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 12px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            box-shadow: 3px 3px 0px var(--text-color);
-        }
-
-        .flash-error {
-            background: #ffe6e6;
-            color: #a70000;
-            padding: 16px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 12px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            box-shadow: 3px 3px 0px var(--text-color);
-        }
-
-        .edit-btn {
-            background: var(--primary-color);
-            color: var(--text-color);
-            border: 2px solid var(--text-color);
-            padding: 8px 10px;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 2px 2px 0 var(--text-color);
-            transition: all .2s;
-            text-decoration: none;
-            font-size: .95rem;
-            display: inline-flex;
-            align-items: center;
-        }
-        .edit-btn:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--text-color); }
-        .users-table { width:100%; border-collapse:collapse; }
-        .users-table th { font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px; padding:10px 14px; background:var(--bg-color); border-bottom:2px solid var(--border-color); text-align:left; }
-        .users-table td { padding:12px 14px; border-bottom:1px solid var(--border-color); vertical-align:middle; }
-        .users-table tr:last-child td { border-bottom:none; }
-        .users-table tr:hover td { background:var(--bg-color); }
-        .user-avatar-sm { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--primary-color); }
-        .role-badge { padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:900; border:1.5px solid var(--text-color); }
-        .role-admin { background:var(--primary-color); }
-        .role-user  { background:var(--secondary-color); }
-        @media (max-width: 992px) {
-            .dashboard-cols { grid-template-columns: 1fr; }
-            .form-row { grid-template-columns: 1fr; }
-        }
-        /* Fix card text cut-off on mobile */
-        .dash-card > a > div,
-        .dash-card > div[style*="display:flex"] {
-            flex-wrap: nowrap;
-        }
-        .dash-card [style*="display:flex"][style*="align-items:center"] > div:not([style*="width:64px"]):not([style*="width: 64px"]) {
-            flex: 1;
-            min-width: 0;
-        }
-        .dash-card p { word-break: break-word; }
-        @media (max-width: 480px) {
-            .dash-card { padding: 18px 16px; }
-            .dash-card h2 { font-size: 1.15rem; }
-            .dash-card p { font-size: .82rem; }
-            .dash-card [style*="width:64px"], .dash-card [style*="width: 64px"] { width: 48px !important; height: 48px !important; border-radius: 14px !important; flex-shrink: 0 !important; }
-            .dash-card [style*="width:64px"] i, .dash-card [style*="width: 64px"] i { font-size: 1.2rem !important; }
-        }
-
-        /* -- Greeting Bar -- */
-        .greeting-bar { background:linear-gradient(135deg,var(--primary-color),var(--secondary-color)); border:var(--border-width) solid var(--text-color); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow-comic); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
-        .greeting-text { font-size:1.05rem; font-weight:800; color:var(--text-color); }
-        .greeting-time { font-size:.78rem; font-weight:700; color:var(--text-color); opacity:.7; }
-
-        /* -- Live Stats Bar -- */
-        .live-stats-bar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
-        .ls-pill { display:flex; align-items:center; gap:7px; background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:40px; padding:8px 18px; font-weight:800; font-size:.88rem; box-shadow:3px 3px 0 var(--text-color); white-space:nowrap; }
-        .ls-pill .ls-num { font-size:1.05rem; font-weight:900; }
-
-        /* -- Weekly Summary -- */
-        .weekly-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:28px; }
-        .wk-card { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:18px; padding:18px 20px; box-shadow:var(--shadow-comic); }
-        .wk-title { font-size:.7rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:#999; margin-bottom:6px; }
-        .wk-val { font-size:1.6rem; font-weight:900; line-height:1; }
-        .wk-trend { font-size:.78rem; font-weight:800; margin-top:4px; }
-        .trend-up { color:#22c55e; } .trend-dn { color:#ef4444; } .trend-flat { color:#aaa; }
-        @media(max-width:700px){ .weekly-row { grid-template-columns:1fr 1fr; } }
-
-        /* -- Milestones -- */
-        .milestone-bar-wrap { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:18px; padding:18px 22px; box-shadow:var(--shadow-comic); margin-bottom:28px; }
-        .ms-track { background:#eee; border-radius:40px; height:14px; overflow:hidden; margin:10px 0 6px; border:1.5px solid var(--text-color); }
-        .ms-fill  { height:100%; border-radius:40px; background:linear-gradient(90deg,var(--primary-color),var(--secondary-color)); transition:width .5s ease; }
-        .ms-labels { display:flex; justify-content:space-between; font-size:.75rem; font-weight:800; color:#aaa; }
-
-        /* -- Hourly Heatmap -- */
-        .heatmap-grid { display:grid; grid-template-columns:repeat(24,1fr); gap:4px; margin-top:14px; }
-        .hm-cell { aspect-ratio:1; border-radius:5px; cursor:default; transition:transform .15s; position:relative; }
-        .hm-cell:hover { transform:scale(1.3); z-index:2; }
-        .hm-cell::after { content:attr(data-tip); position:absolute; bottom:130%; left:50%; transform:translateX(-50%); background:#222; color:#fff; font-size:.65rem; font-weight:700; padding:3px 7px; border-radius:6px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s; }
-        .hm-cell:hover::after { opacity:1; }
-        .hm-labels { display:grid; grid-template-columns:repeat(24,1fr); gap:4px; margin-top:4px; }
-        .hm-label  { font-size:.55rem; font-weight:700; color:#aaa; text-align:center; }
-        @media(max-width:600px){ .heatmap-grid,.hm-labels { grid-template-columns:repeat(12,1fr); } }
-
-        /* -- Platform Breakdown -- */
-        .platform-bar { display:flex; height:18px; border-radius:40px; overflow:hidden; border:2px solid var(--text-color); margin:10px 0; }
-        .plat-mobile  { background:#a78bfa; }
-        .plat-desktop { background:#34d399; }
-
-        /* -- Top 3 Leaderboard -- */
-        .top3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
-        .top3-card { border:var(--border-width) solid var(--text-color); border-radius:16px; padding:16px 14px; text-align:center; box-shadow:var(--shadow-comic); transition:transform .15s; }
-        .top3-card:hover { transform:translateY(-3px); }
-        .top3-rank { font-size:1.5rem; margin-bottom:6px; }
-        .top3-av { width:52px; height:52px; border-radius:50%; border:3px solid var(--text-color); object-fit:cover; margin:0 auto 8px; display:block; }
-        .top3-av-ph { width:52px; height:52px; border-radius:50%; border:3px solid var(--text-color); background:var(--primary-color); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-weight:900; font-size:1.1rem; color:#fff; }
-        .top3-name { font-weight:800; font-size:.88rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .top3-score { font-size:.75rem; font-weight:700; color:var(--primary-color); margin-top:3px; }
-        @media(max-width:500px){ .top3-grid { grid-template-columns:1fr 1fr; } }
-
-        /* -- Ghost Users -- */
-        .ghost-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border-color); }
-        .ghost-row:last-child { border-bottom:none; }
-        .ghost-av-ph { width:36px; height:36px; border-radius:50%; border:2px solid var(--text-color); background:#eee; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem; flex-shrink:0; }
-
-        /* -- Dual section grid -- */
-        .dual-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
-        @media(max-width:800px){ .dual-grid { grid-template-columns:1fr; } }
-    </style>
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <?php include_once "gtag.php"; ?>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Arigato Devan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<?php include_once "gtag.php"; ?>
+<style>
+:root{
+  --bg:#07060f;--surface:#0f0d1e;--surface2:#15122a;
+  --border:rgba(139,92,246,0.18);--border2:rgba(139,92,246,0.08);
+  --accent:#8b5cf6;--accent2:#c084fc;
+  --pink:#f472b6;--cyan:#22d3ee;--green:#4ade80;
+  --yellow:#fbbf24;--orange:#fb923c;--red:#f87171;
+  --text:#e2e0ff;--muted:#9490bb;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh}
+#sp{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--pink),var(--cyan));z-index:9999;transition:width .1s;box-shadow:0 0 10px var(--accent)}
+#pc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,6,15,0.98);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--border2)}
+.sb-brand{font-size:.72rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
+.sb-brand i{-webkit-text-fill-color:#a78bfa;font-size:1rem}
+.sb-admin{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border2)}
+.sb-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0}
+.sb-av-ph{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;flex-shrink:0}
+.sb-uname{font-size:.78rem;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-role{font-size:.6rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.sb-nav::-webkit-scrollbar{width:2px}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.sb-sec{font-size:.58rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 10px 5px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:1px}
+.sb-link:hover{background:rgba(139,92,246,0.08);color:var(--text)}
+.sb-link.active{background:rgba(139,92,246,0.15);color:var(--accent2);border-color:var(--border)}
+.sb-link i{width:16px;text-align:center;flex-shrink:0}
+.sb-bottom{padding:12px 8px;border-top:1px solid var(--border2)}
+.sb-logout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:700;color:var(--red);text-decoration:none;transition:all .2s}
+.sb-logout:hover{background:rgba(248,113,113,0.1)}
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;padding:28px 32px 80px;position:relative;z-index:1;max-width:1300px}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.tb-title{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;display:flex;align-items:center;gap:10px}
+.tb-title i{-webkit-text-fill-color:var(--accent2);font-size:1.3rem}
+.tb-time{font-size:.72rem;font-weight:700;color:var(--muted);background:rgba(15,13,30,0.8);border:1px solid var(--border2);padding:6px 14px;border-radius:100px}
+.tb-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;border:1px solid;transition:all .2s;cursor:pointer;font-family:var(--font)}
+.tb-red{background:rgba(248,113,113,0.08);color:var(--red);border-color:rgba(248,113,113,0.2)}
+.tb-red:hover{background:rgba(248,113,113,0.15)}
+/* GREETING */
+.greeting{background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(244,114,182,0.08));border:1px solid var(--border);border-radius:18px;padding:18px 24px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:relative;overflow:hidden}
+.greeting::after{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(139,92,246,0.2),transparent 70%)}
+.g-text{font-size:.98rem;font-weight:800;color:var(--text);position:relative;z-index:1}
+.g-dt{font-size:.72rem;color:var(--muted);font-weight:600;position:relative;z-index:1}
+/* FLASH */
+.flash{padding:13px 18px;border-radius:12px;font-weight:700;font-size:.83rem;margin-bottom:18px;display:flex;align-items:center;gap:10px;border:1px solid}
+.flash-ok{background:rgba(74,222,128,0.07);color:var(--green);border-color:rgba(74,222,128,0.2)}
+.flash-err{background:rgba(248,113,113,0.07);color:var(--red);border-color:rgba(248,113,113,0.2)}
+/* PILLS */
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.pill{display:flex;align-items:center;gap:8px;background:rgba(15,13,30,0.8);border:1px solid var(--border2);border-radius:100px;padding:8px 18px;font-size:.82rem;font-weight:700;transition:all .22s;cursor:default;backdrop-filter:blur(8px)}
+.pill:hover{border-color:rgba(139,92,246,0.35);background:rgba(139,92,246,0.07)}
+.pill-num{font-size:1rem;font-weight:900}
+/* STAT GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.scard{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:16px;padding:20px 18px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s;border-radius:16px 16px 0 0}
+.scard:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
+.scard:hover::before{opacity:1}
+.sc-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;margin-bottom:12px}
+.sc-val{font-size:1.9rem;font-weight:900;line-height:1;margin-bottom:3px}
+.sc-lbl{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+/* color combos */
+.s-purple .sc-icon{background:rgba(139,92,246,0.15);color:var(--accent2)}.s-purple .sc-val{color:var(--accent2)}.s-purple::before{background:var(--accent2)}
+.s-red .sc-icon{background:rgba(248,113,113,0.12);color:var(--red)}.s-red .sc-val{color:var(--red)}.s-red::before{background:var(--red)}
+.s-cyan .sc-icon{background:rgba(34,211,238,0.1);color:var(--cyan)}.s-cyan .sc-val{color:var(--cyan)}.s-cyan::before{background:var(--cyan)}
+.s-green .sc-icon{background:rgba(74,222,128,0.1);color:var(--green)}.s-green .sc-val{color:var(--green)}.s-green::before{background:var(--green)}
+.s-yellow .sc-icon{background:rgba(251,191,36,0.1);color:var(--yellow)}.s-yellow .sc-val{color:var(--yellow)}.s-yellow::before{background:var(--yellow)}
+.s-orange .sc-icon{background:rgba(251,146,60,0.1);color:var(--orange)}.s-orange .sc-val{color:var(--orange)}.s-orange::before{background:var(--orange)}
+/* MLB */
+.ml-banner{background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,146,60,0.06));border:1px solid rgba(251,191,36,0.22);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.ml-icon{width:40px;height:40px;border-radius:12px;background:rgba(251,191,36,0.14);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--yellow);flex-shrink:0}
+.ml-lbl{font-size:.6rem;font-weight:900;color:var(--yellow);text-transform:uppercase;letter-spacing:.1em}
+.ml-t{font-size:.9rem;font-weight:800;color:var(--text)}
+.ml-cnt{margin-left:auto;font-size:.78rem;font-weight:800;color:var(--yellow);white-space:nowrap}
+/* CARD */
+.card{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px;backdrop-filter:blur(8px);transition:border-color .3s}
+.card:hover{border-color:rgba(139,92,246,0.3)}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border2);gap:10px;flex-wrap:wrap}
+.card-title{font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title i{color:var(--accent2)}
+.card-lnk{font-size:.72rem;font-weight:800;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .2s}
+.card-lnk:hover{color:var(--accent2)}
+/* WEEKLY */
+.weekly-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.wcard{border-radius:14px;padding:16px 18px;border:1px solid;transition:all .25s}
+.wcard:hover{transform:translateY(-3px)}
+.wc-p{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.22)}
+.wc-pk{background:rgba(244,114,182,0.08);border-color:rgba(244,114,182,0.18)}
+.wc-y{background:rgba(251,191,36,0.07);border-color:rgba(251,191,36,0.18)}
+.wc-lbl{font-size:.6rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.wc-val{font-size:1.8rem;font-weight:900;line-height:1;margin-bottom:4px}
+.wc-trend{font-size:.7rem;font-weight:800;display:flex;align-items:center;gap:4px}
+.t-up{color:var(--green)}.t-dn{color:var(--red)}.t-flat{color:var(--muted)}
+/* MILESTONE */
+.milestone{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:18px}
+.ms-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ms-lbl{font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.ms-cnt{font-size:.85rem;font-weight:800;color:var(--accent2)}
+.ms-track{background:rgba(255,255,255,0.05);border-radius:40px;height:11px;overflow:hidden;margin-bottom:7px;border:1px solid var(--border2)}
+.ms-fill{height:100%;border-radius:40px;background:linear-gradient(90deg,var(--accent),var(--pink));transition:width .8s ease;box-shadow:0 0 10px rgba(139,92,246,0.4)}
+.ms-row{display:flex;justify-content:space-between;font-size:.68rem;font-weight:800;color:var(--muted)}
+.ms-achieved{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.ms-badge{background:rgba(139,92,246,0.1);border:1px solid var(--border2);border-radius:100px;padding:2px 10px;font-size:.62rem;font-weight:900;color:var(--accent2)}
+/* DUAL */
+.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+/* HEATMAP */
+.hm-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:10px}
+.hm-cell{aspect-ratio:1;border-radius:4px;cursor:default;transition:transform .15s;position:relative}
+.hm-cell:hover{transform:scale(1.4);z-index:5}
+.hm-cell::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:#0a0a16;color:#fff;font-size:.58rem;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid var(--border);z-index:10}
+.hm-cell:hover::after{opacity:1}
+.hm-labels{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:3px}
+.hm-lbl{font-size:.48rem;font-weight:700;color:var(--muted);text-align:center}
+/* PLATFORM */
+.plat-bar{display:flex;height:14px;border-radius:40px;overflow:hidden;border:1px solid var(--border);margin:10px 0}
+.plat-m{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.plat-d{background:linear-gradient(90deg,var(--cyan),#38bdf8)}
+/* TOP3 */
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.t3card{background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:12px;padding:14px 10px;text-align:center;transition:all .2s}
+.t3card:hover{transform:translateY(-3px);border-color:var(--border)}
+.t3-av{width:44px;height:44px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;margin:0 auto 7px;display:block}
+.t3-ph{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-weight:900;color:#fff}
+.t3-name{font-weight:800;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.t3-score{font-size:.65rem;font-weight:700;color:var(--accent2);margin-top:2px}
+/* GHOST */
+.ghost-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border2)}
+.ghost-row:last-child{border-bottom:none}
+.g-ph{width:32px;height:32px;border-radius:50%;background:rgba(139,92,246,0.1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:var(--accent2);flex-shrink:0}
+/* ACTION GRID */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.acard{display:flex;align-items:center;gap:14px;padding:18px;border-radius:14px;text-decoration:none;border:1px solid;transition:all .28s;position:relative;overflow:hidden}
+.acard:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3)}
+.ac-p{background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.22)}.ac-p:hover{background:rgba(139,92,246,0.13)}
+.ac-pk{background:rgba(244,114,182,0.06);border-color:rgba(244,114,182,0.18)}.ac-pk:hover{background:rgba(244,114,182,0.1)}
+.ac-c{background:rgba(34,211,238,0.05);border-color:rgba(34,211,238,0.15)}.ac-c:hover{background:rgba(34,211,238,0.09)}
+.ac-y{background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.18)}.ac-y:hover{background:rgba(251,191,36,0.1)}
+.ac-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0}
+.ai-p{background:rgba(139,92,246,0.18);color:var(--accent2)}
+.ai-pk{background:rgba(244,114,182,0.14);color:var(--pink)}
+.ai-c{background:rgba(34,211,238,0.1);color:var(--cyan)}
+.ai-y{background:rgba(251,191,36,0.12);color:var(--yellow)}
+.ac-t{font-size:.9rem;font-weight:900;color:var(--text);margin-bottom:2px}
+.ac-d{font-size:.7rem;color:var(--muted);font-weight:500}
+.ac-arr{margin-left:auto;font-size:.85rem;color:var(--muted);transition:all .22s;flex-shrink:0}
+.acard:hover .ac-arr{color:var(--accent2);transform:translateX(4px)}
+/* TABLE */
+.dtable{width:100%;border-collapse:collapse;font-size:.78rem}
+.dtable th{background:rgba(139,92,246,0.07);color:var(--accent2);font-weight:800;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+.dtable td{padding:10px 13px;border-bottom:1px solid var(--border2);color:var(--muted);vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:rgba(139,92,246,0.03)}
+.u-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(139,92,246,0.3)}
+.u-n{font-weight:800;color:var(--text);font-size:.83rem}
+.u-e{font-size:.68rem;color:var(--muted);margin-top:1px}
+.rbadge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:100px;font-size:.6rem;font-weight:900;text-transform:uppercase;border:1px solid}
+.rb-a{background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.22)}
+.rb-u{background:rgba(139,92,246,0.08);color:var(--accent2);border-color:var(--border2)}
+.d-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:9px;font-size:.73rem;font-weight:800;border:1px solid;transition:all .2s;cursor:pointer;background:transparent;font-family:var(--font);text-decoration:none}
+.db-p{color:var(--accent2);border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.07)}
+.db-p:hover{background:rgba(139,92,246,0.15)}
+.db-full{width:100%;justify-content:center;padding:11px}
+/* MODALS */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(14px);z-index:2000;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.6);max-height:88vh;overflow-y:auto;position:relative}
+.modal-box::-webkit-scrollbar{width:3px}
+.modal-box::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.m-close{position:absolute;top:13px;right:13px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:var(--font)}
+.m-close:hover{background:rgba(248,113,113,0.1);color:var(--red)}
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.astat{border-radius:12px;padding:13px;text-align:center;border:1px solid}
+.as-p{background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.18)}
+.as-y{background:rgba(251,191,36,0.05);border-color:rgba(251,191,36,0.18)}
+.as-g{background:rgba(74,222,128,0.05);border-color:rgba(74,222,128,0.16)}
+.as-r{background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.16)}
+.astat-val{font-size:1.4rem;font-weight:900;line-height:1}
+.astat-lbl{font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.del-icon{width:56px;height:56px;border-radius:16px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.22);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--red);margin:0 auto 14px}
+.del-btns{display:flex;gap:10px;margin-top:18px}
+.del-cancel{flex:1;padding:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;color:var(--muted);font-weight:800;cursor:pointer;font-family:var(--font);font-size:.85rem;transition:all .2s}
+.del-cancel:hover{border-color:var(--accent);color:var(--text)}
+.del-confirm{flex:1;padding:11px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);border-radius:11px;color:var(--red);font-weight:800;cursor:pointer;font-family:var(--font);font-size:.85rem;transition:all .2s;width:100%}
+.del-confirm:hover{background:rgba(248,113,113,0.18)}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
+/* GENDER */
+.gi-m{color:var(--cyan)}.gi-f{color:var(--pink)}.gi-a{color:var(--muted)}
+@media(max-width:1100px){.dual-grid,.weekly-grid,.action-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px}}
+@media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 90px}.stats-grid{grid-template-columns:1fr 1fr}.top3-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 90px}.mob-topbar{display:flex!important}.mob-bottom-nav{display:block!important}.topbar{display:none}}
+/* MOBILE TOPBAR */
+.mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
+.mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
+.mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.mob-home-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;background:rgba(34,211,238,0.08);color:var(--cyan);border:1px solid rgba(34,211,238,0.2);flex-shrink:0}
+/* MOBILE DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:265px;background:rgba(7,6,15,0.99);border-right:1px solid var(--border);z-index:600;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drawer-overlay.open{display:block}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px;border-bottom:1px solid var(--border2)}
+.drawer-brand{font-size:.8rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.drawer-close{width:32px;height:32px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem}
+.drawer-user{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border2)}
+.d-av{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;flex-shrink:0}
+.d-av-ph{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
+.d-uname{font-size:.85rem;font-weight:800}
+.d-role{font-size:.65rem;color:var(--accent2);font-weight:700;text-transform:uppercase}
+.drawer-nav{flex:1;overflow-y:auto;padding:8px 10px}
+.d-sec{font-size:.6rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 8px 5px}
+.d-link{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;margin-bottom:2px}
+.d-link:hover,.d-link.active{background:rgba(139,92,246,0.1);color:var(--accent2)}
+.d-link i{width:18px;text-align:center}
+.drawer-bottom{padding:12px 10px;border-top:1px solid var(--border2)}
+.d-logout{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--red);text-decoration:none}
+.d-logout:hover{background:rgba(248,113,113,0.08)}
+/* MOBILE BOTTOM NAV */
+.mob-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:rgba(7,6,15,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px)}
+.mob-nav-items{display:flex;justify-content:space-around;align-items:center}
+.mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:12px;text-decoration:none;color:var(--muted);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;transition:all .2s;border:1px solid transparent}
+.mob-nav-item i{font-size:1.1rem}
+.mob-nav-item.active{color:var(--accent2);background:rgba(139,92,246,0.1);border-color:var(--border)}
+/* CUSTOM CURSOR */
+*{cursor:none!important}
+#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
+#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
+.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
+.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
+.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
+.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}</style>
 </head>
 <body>
-    <header>
-        <div class="logo-area" id="logo-container"  style="cursor:pointer;">
-            <div class="logo-flipper">
-                <div class="logo-front">
-                    <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo">
-                </div>
-                <div class="logo-back">
-                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
-                </div>
-            </div>
-            <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-        </div>
-        <nav class="nav-links">
-            <a href="index.php">HOME</a>
-            <a href="gallery.php">GALLERY</a>
-            <a href="analytics.php" style="background:var(--secondary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-chart-simple"></i> ANALYTICS</a>
-            <a href="blog_admin.php" style="background:var(--primary-color);border:2px solid var(--text-color);box-shadow:3px 3px 0 var(--text-color);border-radius:20px;"><i class="fa-solid fa-pen-nib"></i> BLOGS</a>
-        </nav>
-        <div class="header-right">
-            <div class="header-divider"></div>
-            <div style="display:flex;align-items:center;gap:8px;">
-                <a href="profile.php" title="Edit Profile">
-                    <?= renderAvatar(
-                        $_SESSION["profile_image"] ?? "",
-                        "admin-avatar",
-                        "Admin",
-                        'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
-                    ) ?>
-                </a>
-                <a href="dashboard.php" style="color:var(--text-color);font-weight:800;" class="active">ADMIN</a>
-            </div>
-            <a href="login.php?logout=1" class="logout">
-                <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
-            </a>
-        </div>
-    </header>
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+<div id="sp"></div>
+<canvas id="pc"></canvas>
 
-    <div class="dashboard-wrap">
-        <?php if ($success): ?>
-            <div class="flash-success"><?= htmlspecialchars($success) ?></div>
-        <?php endif; ?>
-        <?php if ($error): ?>
-            <div class="flash-error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
+<!-- MOBILE DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="sideDrawer">
+  <div class="drawer-head">
+    <div class="drawer-brand">Arigato Admin</div>
+    <div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div>
+  </div>
+  <div class="drawer-user">
+    <?php $sav2=!empty($_SESSION['profile_image'])?htmlspecialchars($_SESSION['profile_image']):''; ?>
+    <?php if($sav2): ?><img src="<?= $sav2 ?>" class="d-av" alt="">
+    <?php else: ?><div class="d-av-ph"><?= strtoupper(substr($admin_name,0,1)) ?></div><?php endif; ?>
+    <div><div class="d-uname"><?= htmlspecialchars($admin_name) ?></div><div class="d-role">Admin</div></div>
+  </div>
+  <nav class="drawer-nav">
+    <div class="d-sec">Overview</div>
+    <a href="dashboard.php" class="d-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="analytics.php" class="d-link"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <div class="d-sec">Content</div>
+    <a href="upload_prompt.php" class="d-link"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
+    <a href="manage_prompts.php" class="d-link"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
+    <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <div class="d-sec">Blog</div>
+    <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
+    <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
+    <div class="d-sec">Users</div>
+    <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
+    <div class="d-sec">Tools</div>
+    <a href="index.php" class="d-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
+  </nav>
+  <div class="drawer-bottom">
+    <a href="login.php?logout=1" class="d-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </div>
+</div>
 
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:30px;">
-            <div class="dash-page-title" style="margin-bottom:0;"><i class="fa-solid fa-chart-simple"></i> Admin Dashboard</div>
-            <a href="404.php" target="_blank"
-               style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#ff6b6b;color:#fff;border:3px solid var(--text-color);border-radius:999px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;box-shadow:3px 3px 0 var(--text-color);transition:transform .12s ease,box-shadow .12s ease;white-space:nowrap;"
-               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='5px 5px 0 var(--text-color)'"
-               onmouseout="this.style.transform='';this.style.boxShadow='3px 3px 0 var(--text-color)'"
-               onmousedown="this.style.transform='translate(2px,2px)';this.style.boxShadow='1px 1px 0 var(--text-color)'"
-               onmouseup="this.style.transform='translateY(-2px)';this.style.boxShadow='5px 5px 0 var(--text-color)'">
-                <i class="fa-solid fa-triangle-exclamation"></i> Preview 404 Page
-            </a>
-        </div>
+<!-- MOBILE TOP BAR -->
+<div class="mob-topbar">
+  <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
+  <div class="mob-page-title"><i class="fa-solid fa-gauge-high" style="-webkit-text-fill-color:var(--accent2);margin-right:6px"></i>Dashboard</div>
+  <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
+</div>
 
-        <!-- Greeting Bar -->
-        <div class="greeting-bar">
-            <div class="greeting-text"><?= $admin_greet ?></div>
-            <div class="greeting-time"><?= date('D, d M Y | h:i A') ?> IST</div>
-        </div>
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div>
+  </div>
+  <div class="sb-admin">
+    <?php $sav=!empty($_SESSION['profile_image'])?htmlspecialchars($_SESSION['profile_image']):''; ?>
+    <?php if($sav): ?><img src="<?= $sav ?>" class="sb-av" alt="">
+    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($admin_name,0,1)) ?></div><?php endif; ?>
+    <div><div class="sb-uname"><?= htmlspecialchars($admin_name) ?></div><div class="sb-role">Admin</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="dashboard.php" class="sb-link active"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
+    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
+    <div class="sb-sec">Content</div>
+    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
+    <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
+    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
+    <div class="sb-sec">Blog</div>
+    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
+    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
+    <div class="sb-sec">Users</div>
+    <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+    <div class="sb-sec">Tools</div>
+    
+    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
+  </nav>
+  <div class="sb-bottom">
+    <a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
+  </div>
+</aside>
 
-        <!-- Live Stats Bar -->
-        <div class="live-stats-bar">
-            <div class="ls-pill"><span><i class="fa-solid fa-users"></i></span> <span class="ls-num"><?= $total_users_count ?></span> Users</div>
-            <div class="ls-pill"><span><i class="fa-solid fa-scroll"></i></span> <span class="ls-num"><?= $total_prompts ?></span> Prompts</div>
-            <div class="ls-pill"><span><i class="fa-solid fa-heart"></i></span> <span class="ls-num"><?= number_format($total_likes) ?></span> Likes</div>
-            <div class="ls-pill"><span><i class="fa-solid fa-bookmark"></i></span> <span class="ls-num"><?= $total_saves ?></span> Saves</div>
-            <div class="ls-pill"><span><i class="fa-solid fa-feather"></i></span> <span class="ls-num"><?= $total_blogs ?></span> Blogs</div>
-        </div>
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</div>
+    <div class="tb-time"><i class="fa-regular fa-clock"></i> <?= date('D, d M Y | h:i A') ?> IST</div>
+    <a href="404.php" target="_blank" class="tb-btn tb-red"><i class="fa-solid fa-triangle-exclamation"></i> Preview 404</a>
+  </div>
 
-        <!-- Analytics Grid -->
-        <div class="analytics-grid">
-            <div class="stat-card accent-1">
-                <div class="stat-value"><?= $total_prompts ?></div>
-                <div class="stat-label">Total Prompts</div>
-            </div>
-            <div class="stat-card accent-2">
-                <div class="stat-value"><?= number_format($total_likes) ?></div>
-                <div class="stat-label">Total Likes</div>
-            </div>
-            <div class="stat-card accent-3">
-                <div class="stat-value"><?= $total_users ?></div>
-                <div class="stat-label">Total Users</div>
-            </div>
-            <div class="stat-card accent-4">
-                <div class="stat-value">+<?= $weekly_prompts ?></div>
-                <div class="stat-label">Prompts This Week</div>
-            </div>
-            <div class="stat-card accent-5">
-                <div class="stat-value">+<?= $weekly_users ?></div>
-                <div class="stat-label">New Users (7d)</div>
-            </div>
-            <?php if ($most_liked): ?>
-            <div class="stat-card" style="background: #fff3cd; grid-column: span 2;">
-                <div class="stat-value" style="font-size:1.1rem; font-weight:800; color:var(--text-color);"><i class="fa-solid fa-star"></i> <?= htmlspecialchars(
-                    $most_liked["title"],
-                ) ?></div>
-                <div class="stat-label">Most Liked &mdash; <?= $most_liked[
-                    "likes_count"
-                ] ?> <i class="fa-solid fa-heart"></i></div>
-            </div>
-            <?php endif; ?>
-        </div>
+  <?php if ($success): ?><div class="flash flash-ok"><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($success) ?></div><?php endif; ?>
+  <?php if ($error): ?><div class="flash flash-err"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars($error) ?></div><?php endif; ?>
 
-        <!-- Weekly Summary + Best Day + Milestones -->
-        <div class="weekly-row">
-            <?php
-            $u_arrow = $users_trend > 0 ? '<i class="fa-solid fa-arrow-trend-up"></i>' : ($users_trend < 0 ? '<i class="fa-solid fa-arrow-trend-down"></i>' : '<i class="fa-solid fa-minus"></i>');
-            $u_cls   = $users_trend > 0 ? 'trend-up' : ($users_trend < 0 ? 'trend-dn' : 'trend-flat');
-            $p_arrow = $prompts_trend > 0 ? '<i class="fa-solid fa-arrow-trend-up"></i>' : ($prompts_trend < 0 ? '<i class="fa-solid fa-arrow-trend-down"></i>' : '<i class="fa-solid fa-minus"></i>');
-            $p_cls   = $prompts_trend > 0 ? 'trend-up' : ($prompts_trend < 0 ? 'trend-dn' : 'trend-flat');
-            ?>
-            <div class="wk-card" style="background:var(--primary-color);">
-                <div class="wk-title"><i class="fa-solid fa-user-plus"></i> New Users This Week</div>
-                <div class="wk-val">+<?= $weekly_users_int ?></div>
-                <div class="wk-trend <?= $u_cls ?>"><?= $u_arrow ?> <?= abs($users_trend) ?>% vs last week</div>
-            </div>
-            <div class="wk-card" style="background:var(--secondary-color);">
-                <div class="wk-title"><i class="fa-solid fa-scroll"></i> Prompts This Week</div>
-                <div class="wk-val">+<?= $weekly_prompts_int ?></div>
-                <div class="wk-trend <?= $p_cls ?>"><?= $p_arrow ?> <?= abs($prompts_trend) ?>% vs last week</div>
-            </div>
-            <?php if ($best_day && $best_day['cnt'] > 0): ?>
-            <div class="wk-card" style="background:#fff3cd;">
-                <div class="wk-title"><i class="fa-solid fa-trophy"></i> Best Signup Day Ever</div>
-                <div class="wk-val"><?= $best_day['cnt'] ?> users</div>
-                <div class="wk-trend trend-flat"><?= date('d M Y', strtotime($best_day['day'])) ?></div>
-            </div>
-            <?php endif; ?>
-        </div>
+  <div class="greeting">
+    <div class="g-text"><?= $admin_greet ?></div>
+    <div class="g-dt"><?= date('l, d F Y') ?></div>
+  </div>
 
-        <!-- User Growth Milestones -->
-        <div class="milestone-bar-wrap">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;"><i class="fa-solid fa-chart-line"></i> User Milestone Progress</div>
-                <?php if ($next_milestone): ?>
-                <div style="font-size:.85rem;font-weight:800;"><?= $total_users_count ?> / <?= $next_milestone ?> users</div>
-                <?php else: ?>
-                <div style="font-size:.85rem;font-weight:800;color:#22c55e;"><i class="fa-solid fa-circle-check"></i> All milestones cleared!</div>
-                <?php endif; ?>
-            </div>
-            <div class="ms-track"><div class="ms-fill" style="width:<?= $milestone_pct ?>%;"></div></div>
-            <div class="ms-labels">
-                <span><?= $prev_milestone ?></span>
-                <span style="font-size:.8rem;font-weight:900;color:var(--primary-color);"><?= $milestone_pct ?>%</span>
-                <span><?= $next_milestone ?? '?' ?></span>
-            </div>
-            <?php
-            $achieved = array_filter($milestone_goals, fn($g) => $total_users_count >= $g);
-            if (!empty($achieved)): ?>
-            <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
-                <?php foreach ($achieved as $ag): ?>
-                <span style="background:var(--secondary-color);border:1.5px solid var(--text-color);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:900;">? <?= $ag ?></span>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
-        </div>
+  <div class="pills">
+    <div class="pill"><i class="fa-solid fa-users" style="color:var(--cyan)"></i><span class="pill-num" style="color:var(--cyan)"><?= $total_users_count ?></span><span style="color:var(--muted)">Users</span></div>
+    <div class="pill"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent2)"></i><span class="pill-num" style="color:var(--accent2)"><?= $total_prompts ?></span><span style="color:var(--muted)">Prompts</span></div>
+    <div class="pill"><i class="fa-solid fa-heart" style="color:var(--red)"></i><span class="pill-num" style="color:var(--red)"><?= number_format($total_likes) ?></span><span style="color:var(--muted)">Likes</span></div>
+    <div class="pill"><i class="fa-solid fa-bookmark" style="color:var(--yellow)"></i><span class="pill-num" style="color:var(--yellow)"><?= $total_saves ?></span><span style="color:var(--muted)">Saves</span></div>
+    <div class="pill"><i class="fa-solid fa-pen-nib" style="color:var(--green)"></i><span class="pill-num" style="color:var(--green)"><?= $total_blogs ?></span><span style="color:var(--muted)">Blogs</span></div>
+  </div>
 
-        <!-- Hourly Heatmap + Platform Breakdown (dual) -->
-        <div class="dual-grid">
-            <!-- Hourly Heatmap -->
-            <div class="dash-card" style="margin-bottom:0;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:4px;"><i class="fa-solid fa-clock"></i> HOURLY SIGNUP HEATMAP</div>
-                <div style="font-size:.75rem;color:#aaa;font-weight:600;margin-bottom:8px;">When do users join? (hover for count)</div>
-                <div class="heatmap-grid">
-                    <?php foreach ($hourly_data as $hr => $cnt):
-                        $intensity = $hourly_max > 0 ? $cnt / $hourly_max : 0;
-                        $r = (int)(200 - $intensity * 100);
-                        $g = (int)(100 + $intensity * 120);
-                        $b = (int)(220 - $intensity * 150);
-                        $bg = "rgb($r,$g,$b)";
-                    ?>
-                    <div class="hm-cell" style="background:<?= $bg ?>;border:1.5px solid rgba(0,0,0,.08);" data-tip="<?= $hr ?>:00 &mdash; <?= $cnt ?> users"></div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="hm-labels">
-                    <?php for ($h=0;$h<24;$h++): ?>
-                    <div class="hm-label"><?= $h%6===0 ? $h : '' ?></div>
-                    <?php endfor; ?>
-                </div>
-            </div>
+  <div class="stats-grid">
+    <div class="scard s-purple"><div class="sc-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="sc-val"><?= $total_prompts ?></div><div class="sc-lbl">Total Prompts</div></div>
+    <div class="scard s-red"><div class="sc-icon"><i class="fa-solid fa-heart"></i></div><div class="sc-val"><?= number_format($total_likes) ?></div><div class="sc-lbl">Total Likes</div></div>
+    <div class="scard s-cyan"><div class="sc-icon"><i class="fa-solid fa-users"></i></div><div class="sc-val"><?= $total_users ?></div><div class="sc-lbl">Total Users</div></div>
+    <div class="scard s-green"><div class="sc-icon"><i class="fa-solid fa-bookmark"></i></div><div class="sc-val"><?= $total_saves ?></div><div class="sc-lbl">Total Saves</div></div>
+    <div class="scard s-yellow"><div class="sc-icon"><i class="fa-solid fa-user-plus"></i></div><div class="sc-val">+<?= $weekly_users ?></div><div class="sc-lbl">New Users (7d)</div></div>
+    <div class="scard s-orange"><div class="sc-icon"><i class="fa-solid fa-fire"></i></div><div class="sc-val">+<?= $weekly_prompts ?></div><div class="sc-lbl">Prompts (7d)</div></div>
+  </div>
 
-            <!-- Platform Breakdown -->
-            <div class="dash-card" style="margin-bottom:0;">
-                <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:8px;"><i class="fa-solid fa-chart-pie"></i> Platform Breakdown</div>
-                <?php $plat_total = $mobile_count + $desktop_count; ?>
-                <?php if ($plat_total > 0): ?>
-                <?php $mob_pct = round($mobile_count/$plat_total*100); $desk_pct = 100-$mob_pct; ?>
-                <div class="platform-bar">
-                    <div class="plat-mobile"  style="width:<?= $mob_pct ?>%;"></div>
-                    <div class="plat-desktop" style="width:<?= $desk_pct ?>%;"></div>
-                </div>
-                <div style="display:flex;gap:14px;font-size:.82rem;font-weight:800;margin-top:8px;">
-                    <span><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:3px;margin-right:5px;"></span><i class="fa-solid fa-mobile-screen"></i> Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
-                    <span><span style="display:inline-block;width:12px;height:12px;background:#34d399;border-radius:3px;margin-right:5px;"></span><i class="fa-solid fa-desktop"></i> Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
-                </div>
-                <?php else: ?>
-                <div style="color:#aaa;font-size:.85rem;font-weight:600;padding:20px 0;text-align:center;">
-                    <i class="fa-solid fa-circle-info"></i> Data collection starting � will show after users log in
-                </div>
-                <?php endif; ?>
+  <?php if ($most_liked): ?>
+  <div class="ml-banner">
+    <div class="ml-icon"><i class="fa-solid fa-trophy"></i></div>
+    <div><div class="ml-lbl">Most Liked Prompt</div><div class="ml-t"><?= htmlspecialchars($most_liked['title']) ?></div></div>
+    <div class="ml-cnt"><i class="fa-solid fa-heart"></i> <?= $most_liked['likes_count'] ?></div>
+  </div>
+  <?php endif; ?>
 
-                <!-- Top 3 Leaderboard inside platform card -->
-                <div style="margin-top:20px;border-top:2px dashed var(--border-color);padding-top:16px;">
-                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#999;margin-bottom:10px;"><i class="fa-solid fa-crown"></i> Top 3 Most Active Users</div>
-                    <?php if (empty($top3_users)): ?>
-                    <div style="color:#aaa;font-size:.85rem;font-weight:600;text-align:center;padding:12px 0;">No activity data yet.</div>
-                    <?php else: ?>
-                    <div class="top3-grid" style="grid-template-columns:repeat(<?= count($top3_users) ?>,1fr);">
-                        <?php $crowns = ['<i class="fa-solid fa-crown" style="color:#f59e0b;"></i>', '<i class="fa-solid fa-crown" style="color:#94a3b8;"></i>', '<i class="fa-solid fa-crown" style="color:#b45309;"></i>']; ?>
-                        <?php foreach ($top3_users as $i => $tu): ?>
-                        <div class="top3-card" style="background:<?= $i===0?'#fff3cd':($i===1?'#f1f5f9':'#fef6ee') ?>;">
-                            <div class="top3-rank"><?= $crowns[$i] ?? ($i+1) ?></div>
-                            <?php $g = strtolower($tu['gender'] ?? ''); ?>
-                            <div class="top3-gender"><?= $g === 'male' ? '<i class="fa-solid fa-mars"></i>' : ($g === 'female' ? '<i class="fa-solid fa-venus"></i>' : ($g === 'nonbinary' ? '<i class="fa-solid fa-venus-mars"></i>' : '<i class="fa-solid fa-user-astronaut" title="Alien"></i>')) ?></div>
-                            <?php if (!empty($tu['avatar'])): ?>
-                            <img class="top3-av" src="<?= htmlspecialchars($tu['avatar']) ?>" alt="">
-                            <?php else: ?>
-                            <div class="top3-av-ph"><?= strtoupper(substr($tu['username']??'U',0,1)) ?></div>
-                            <?php endif; ?>
-                            <div class="top3-name"><?= htmlspecialchars($tu['username']??'User') ?></div>
-                            <div class="top3-score"><?= $tu['score'] ?> pts</div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+  <?php
+  $u_arrow=$users_trend>0?'<i class="fa-solid fa-arrow-trend-up"></i>':($users_trend<0?'<i class="fa-solid fa-arrow-trend-down"></i>':'<i class="fa-solid fa-minus"></i>');
+  $u_cls=$users_trend>0?'t-up':($users_trend<0?'t-dn':'t-flat');
+  $p_arrow=$prompts_trend>0?'<i class="fa-solid fa-arrow-trend-up"></i>':($prompts_trend<0?'<i class="fa-solid fa-arrow-trend-down"></i>':'<i class="fa-solid fa-minus"></i>');
+  $p_cls=$prompts_trend>0?'t-up':($prompts_trend<0?'t-dn':'t-flat');
+  ?>
+  <div class="weekly-grid">
+    <div class="wcard wc-p"><div class="wc-lbl"><i class="fa-solid fa-user-plus"></i> New Users This Week</div><div class="wc-val" style="color:var(--accent2)">+<?= $weekly_users_int ?></div><div class="wc-trend <?= $u_cls ?>"><?= $u_arrow ?> <?= abs($users_trend) ?>% vs last week</div></div>
+    <div class="wcard wc-pk"><div class="wc-lbl"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompts This Week</div><div class="wc-val" style="color:var(--pink)">+<?= $weekly_prompts_int ?></div><div class="wc-trend <?= $p_cls ?>"><?= $p_arrow ?> <?= abs($prompts_trend) ?>% vs last week</div></div>
+    <?php if ($best_day&&$best_day['cnt']>0): ?>
+    <div class="wcard wc-y"><div class="wc-lbl"><i class="fa-solid fa-trophy"></i> Best Signup Day Ever</div><div class="wc-val" style="color:var(--yellow)"><?= $best_day['cnt'] ?> users</div><div class="wc-trend t-flat"><?= date('d M Y',strtotime($best_day['day'])) ?></div></div>
+    <?php endif; ?>
+  </div>
 
-        <!-- Ghost Users -->
-        <?php if (!empty($ghost_users)): ?>
-        <div class="dash-card" style="margin-bottom:28px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:2px dashed var(--border-color);padding-bottom:14px;">
-                <div style="font-size:1.1rem;font-weight:900;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-ghost"></i> Ghost Users <span style="font-size:.72rem;background:#ffe3e3;border:1.5px solid #d03030;color:#d03030;border-radius:20px;padding:2px 10px;font-weight:900;"><?= count($ghost_users) ?>+ joined, never interacted</span></div>
-                <a href="user_management.php" style="font-size:.78rem;font-weight:800;color:var(--primary-color);text-decoration:none;">View All ?</a>
-            </div>
-            <?php foreach ($ghost_users as $gu): ?>
-            <div class="ghost-row">
-                <div class="ghost-av-ph"><?= strtoupper(substr($gu['username']??'U',0,1)) ?></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-weight:800;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($gu['username']??'User') ?></div>
-                    <div style="font-size:.72rem;color:#aaa;font-weight:600;"><?= htmlspecialchars($gu['email']??'') ?></div>
-                </div>
-                <div style="font-size:.72rem;font-weight:700;color:#bbb;white-space:nowrap;"><?= date('d M Y', strtotime($gu['created_at'])) ?></div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
+  <div class="milestone">
+    <div class="ms-top">
+      <div class="ms-lbl"><i class="fa-solid fa-chart-line"></i> User Milestone Progress</div>
+      <?php if ($next_milestone): ?><div class="ms-cnt"><?= $total_users_count ?> / <?= $next_milestone ?> users</div>
+      <?php else: ?><div class="ms-cnt" style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> All cleared!</div><?php endif; ?>
+    </div>
+    <div class="ms-track"><div class="ms-fill" id="msFill" style="width:0%"></div></div>
+    <div class="ms-row"><span><?= $prev_milestone ?></span><span style="color:var(--accent2);font-weight:900"><?= $milestone_pct ?>%</span><span><?= $next_milestone??'?' ?></span></div>
+    <?php $achieved=array_filter($milestone_goals,fn($g)=>$total_users_count>=$g); ?>
+    <?php if(!empty($achieved)): ?><div class="ms-achieved"><?php foreach($achieved as $ag): ?><span class="ms-badge"><i class="fa-solid fa-check" style="font-size:.5rem"></i> <?= $ag ?></span><?php endforeach; ?></div><?php endif; ?>
+  </div>
 
-        <!-- Quick Action Cards: Upload & Manage (now separate pages) -->
-        <div class="dashboard-cols" style="gap:24px;">
-            <!-- Upload Prompt Card -->
-            <a href="upload_prompt.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:var(--primary-color);transition:all .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px) rotate(-1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-                <div style="display:flex;align-items:center;gap:18px;">
-                    <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa-solid fa-upload" style="font-size:1.6rem;color:var(--bg-color);"></i>
-                    </div>
-                    <div>
-                        <h2 style="font-size:1.4rem;margin-bottom:4px;">Upload Prompt</h2>
-                        <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Add a new AI prompt reel to the platform</p>
-                    </div>
-                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
-                </div>
-            </a>
-
-            <!-- Manage Prompts Card -->
-            <a href="manage_prompts.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:var(--secondary-color);transition:all .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px) rotate(1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-                <div style="display:flex;align-items:center;gap:18px;">
-                    <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa-solid fa-list-check" style="font-size:1.6rem;color:var(--bg-color);"></i>
-                    </div>
-                    <div>
-                        <h2 style="font-size:1.4rem;margin-bottom:4px;">Manage Prompts</h2>
-                        <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Edit, delete, or review all <?= $total_prompts ?> prompts</p>
-                    </div>
-                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
-                </div>
-            </a>
-
-        <!-- Prompt Share Links Card (links to dedicated page) -->
-        <a href="prompt_links.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:#d4eaff;transition:all .2s;cursor:pointer;margin-top:0;align-self:start;" onmouseover="this.style.transform='translateY(-4px) rotate(-1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-            <div style="display:flex;align-items:center;gap:18px;">
-                <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fa-solid fa-link" style="font-size:1.6rem;color:#d4eaff;"></i>
-                </div>
-                <div>
-                    <h2 style="font-size:1.4rem;margin-bottom:4px;">Prompt Share Links</h2>
-                    <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Copy direct links for any prompt to share with users</p>
-                </div>
-                <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
-            </div>
-        </a>
-
-        <!-- Prompt of the Day Manager Card -->
-        <a href="potd_manager.php" class="dash-card" style="text-decoration:none;color:var(--text-color);display:block;background:#fff3cd;transition:all .2s;cursor:pointer;margin-top:0;align-self:start;" onmouseover="this.style.transform='translateY(-4px) rotate(1deg)';this.style.boxShadow='var(--shadow-comic-hover)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-            <div style="display:flex;align-items:center;gap:18px;">
-                <div style="width:64px;height:64px;background:var(--text-color);border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fa-solid fa-star" style="font-size:1.6rem;color:#f0c040;"></i>
-                </div>
-                <div>
-                    <h2 style="font-size:1.4rem;margin-bottom:4px;">Prompt of the Day</h2>
-                    <p style="color:var(--text-color);opacity:.7;font-weight:600;font-size:.9rem;">Manage featured daily prompts with toggle controls</p>
-                </div>
-                <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:1.3rem;opacity:.6;"></i>
-            </div>
-        </a>
-
-        <!-- PLACEHOLDER for old section start - will be removed below -->
-        <div class="dash-card" style="display:none;margin-top:28px;grid-column:1/-1;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;flex-wrap:wrap;gap:12px;">
-                <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-link" style="color:#007ab8;"></i> Prompt Share Links</h2>
-                <div class="badge" style="margin:0;transform:rotate(0);background:#d4eaff;padding:6px 16px;"><?= $total_prompts ?> Prompts</div>
-            </div>
-            <p style="color:#7D7887;font-weight:600;margin-bottom:14px;font-size:.88rem;"><i class="fa-solid fa-circle-info"></i> Copy a prompt's direct link &mdash; when the user opens it, that card auto-opens on the site. Works for guests too!</p>
-            <input type="text" id="link-table-search" placeholder="&#128269; Search by title..." oninput="filterLinkTable(this.value)" style="width:100%;padding:11px 15px;border:2px solid var(--border-color);border-radius:12px;font-family:var(--font-main);font-weight:600;font-size:.9rem;background:var(--bg-color);color:var(--text-color);outline:none;transition:all .2s;margin-bottom:16px;box-sizing:border-box;" onfocus="this.style.borderColor='var(--text-color)'" onblur="this.style.borderColor='var(--border-color)'">
-            <div style="overflow-x:auto;">
-                <table id="link-table" style="width:100%;border-collapse:collapse;min-width:480px;">
-                    <thead>
-                        <tr style="border-bottom:2px solid var(--text-color);text-align:left;">
-                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;width:52px;">Cover</th>
-                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;">Title</th>
-                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;">Type</th>
-                            <th style="padding:10px 12px;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;text-align:right;white-space:nowrap;">Share</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    $ltype_map = [
-                        "secret" => [
-                            "label" => "&#128274; SCP",
-                            "bg" => "#ffe3e3",
-                            "color" => "#d03030",
-                        ],
-                        "unreleased" => [
-                            "label" => "&#127769; URP",
-                            "bg" => "#fff4cc",
-                            "color" => "#7a5800",
-                        ],
-                        "insta_viral" => [
-                            "label" => "&#128293; IVP",
-                            "bg" => "#e3f7ff",
-                            "color" => "#004f7a",
-                        ],
-                        "already_uploaded" => [
-                            "label" => "&#128228; AUP",
-                            "bg" => "#e6f2ff",
-                            "color" => "#00509e",
-                        ],
-                    ];
-                    foreach ($prompts as $lp):
-
-                        $lt = $lp["prompt_type"] ?? "secret";
-                        $linfo = $ltype_map[$lt] ?? $ltype_map["secret"];
-                        $ltitle = htmlspecialchars($lp["title"]);
-                        $limg = htmlspecialchars($lp["image_path"]);
-                        $lid = (int) $lp["id"];
-                        ?>
-                        <tr data-search="<?= strtolower(
-                            $ltitle,
-                        ) ?>" style="border-bottom:1px solid var(--border-color);transition:background .15s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background=''">
-                            <td style="padding:9px 12px;"><img loading="lazy" src="<?= $limg ?>" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);display:block;"></td>
-                            <td style="padding:9px 12px;font-weight:700;font-size:.92rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= $ltitle ?></td>
-                            <td style="padding:9px 12px;"><span style="background:<?= $linfo[
-                                "bg"
-                            ] ?>;color:<?= $linfo[
-    "color"
-] ?>;border:1.5px solid currentColor;border-radius:8px;padding:3px 9px;font-size:.72rem;font-weight:900;white-space:nowrap;"><?= $linfo[
-    "label"
-] ?></span></td>
-                            <td style="padding:9px 12px;text-align:right;">
-                                <button onclick="copyPromptLink(<?= $lid ?>, this)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.8rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);transition:all .15s;white-space:nowrap;">
-                                    <i class="fa-solid fa-copy"></i> Copy Link
-                                </button>
-                            </td>
-                        </tr>
-                    <?php
-                    endforeach;
-                    ?>
-                    </tbody>
-                </table>
-            </div>
-            <p id="link-table-empty" style="display:none;text-align:center;color:#7D7887;font-weight:600;padding:20px 0;">No prompts found.</p>
-        </div>
-
-        <!-- User Management -->
-        <div class="dash-card" style="margin-top:40px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px dashed var(--border-color);padding-bottom:16px;">
-                <h2 style="margin:0;padding:0;border:none;"><i class="fa-solid fa-users"></i> User Management</h2>
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div class="badge" style="margin:0;transform:rotate(0);background:var(--secondary-color);padding:6px 12px;width:fit-content;flex-shrink:0;font-size:.82rem;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= $total_users_count ?> Users</div>
-                    <a href="user_management.php" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:12px;padding:7px 16px;font-family:var(--font-main);font-weight:800;font-size:.82rem;text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Page</a>
-                </div>
-            </div>
-            <?php if (count($users) === 0): ?>
-                <p style="text-align:center;color:#7D7887;font-weight:600;padding:30px 0;">No users registered yet.</p>
-            <?php
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                // Show avatar (from onboarding) first, then dicebear &mdash; NEVER Google pic
-                else: ?>
-            <div style="overflow-x:auto;">
-            <table class="users-table">
-                <thead><tr><th>Avatar</th><th>Name / Email</th><th>Gender</th><th>Role</th><th>Joined</th><th>Activity</th></tr></thead>
-                <tbody>
-                <?php foreach ($users as $u): ?>
-                <tr>
-                <td><?php $u_avatar = !empty($u["avatar"])
-                    ? $u["avatar"]
-                    : "https://api.dicebear.com/7.x/avataaars/svg?seed=" .
-                        urlencode(
-                            $u["email"] ?? "x",
-                        ); ?><img loading="lazy" src="<?= htmlspecialchars(
-    $u_avatar,
-) ?>" class="user-avatar-sm" alt=""></td>
-                    <td><div style="font-weight:800;font-size:.95rem;"><?= htmlspecialchars(
-                        $u["username"] ?? "&mdash;",
-                    ) ?></div><div style="font-size:.8rem;color:#7D7887;font-weight:600;"><?= htmlspecialchars(
-    $u["email"] ?? "",
-) ?></div></td>
-                    <td><?= empty($u["gender"]) ? '<i class="fa-solid fa-user-astronaut"></i> Alien' : htmlspecialchars(ucfirst($u["gender"])) ?></td>
-                    <td><span class="role-badge <?= $u["role"] === "admin"
-                        ? "role-admin"
-                        : "role-user" ?>"><?= htmlspecialchars(
-    strtoupper($u["role"] ?? "user"),
-) ?></span></td>
-                    <?php
-                    $joined_dt = new DateTime($u['created_at'], new DateTimeZone('UTC'));
-                    $joined_dt->setTimezone(new DateTimeZone('Asia/Kolkata'));
-                    ?>
-                    <td style="font-size:.82rem;color:#7D7887;font-weight:600;"><?= $joined_dt->format('d M Y') ?><br><span style="font-size:.75rem;color:#aaa;"><?= $joined_dt->format('h:i A') ?></span></td>
-                    <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:10px;padding:7px 14px;font-family:var(--font-main);font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;transition:all .15s;"><i class="fa-solid fa-chart-simple"></i> See Activity</button></td>
-                </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-            </div>
-            <?php endif; ?>
-            <div style="text-align:center;padding:18px 16px;border-top:2px dashed var(--border-color);">
-                <a href="user_management.php" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary-color);border:2px solid var(--text-color);border-radius:14px;padding:11px 28px;font-family:var(--font-main);font-weight:800;font-size:.92rem;text-decoration:none;color:var(--text-color);box-shadow:3px 3px 0 var(--text-color);transition:all .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='4px 4px 0 var(--text-color)'" onmouseout="this.style.transform='';this.style.boxShadow='3px 3px 0 var(--text-color)'"><i class="fa-solid fa-users"></i> View All <?= $total_users_count ?> Users &rarr;</a>
-            </div>
-        </div>
+  <div class="dual-grid">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head"><div class="card-title"><i class="fa-solid fa-clock"></i> Hourly Signup Heatmap</div><span style="font-size:.65rem;color:var(--muted)">Hover for count</span></div>
+      <div class="hm-grid">
+        <?php foreach($hourly_data as $hr=>$cnt):
+          $intensity=$hourly_max>0?$cnt/$hourly_max:0;
+          $a=0.07+$intensity*0.78;
+        ?>
+        <div class="hm-cell" style="background:rgba(139,92,246,<?= $a ?>);border:1px solid rgba(139,92,246,0.08)" data-tip="<?= $hr ?>:00 — <?= $cnt ?> users"></div>
+        <?php endforeach; ?>
+      </div>
+      <div class="hm-labels"><?php for($h=0;$h<24;$h++): ?><div class="hm-lbl"><?= $h%6===0?$h:'' ?></div><?php endfor; ?></div>
     </div>
 
-    <!-- User Activity Modal -->
-    <div id="activity-modal" style="display:none;position:fixed;inset:0;background:rgba(45,42,53,.5);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeActivity()">
-        <div style="background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:32px;max-width:520px;width:100%;box-shadow:8px 8px 0 var(--text-color);max-height:88vh;overflow-y:auto;position:relative;">
-            <button onclick="closeActivity()" style="position:absolute;top:16px;right:16px;background:var(--bg-color);border:2px solid var(--text-color);border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;font-family:var(--font-main);font-weight:800;">&#10005;</button>
-            <div id="activity-loading" style="text-align:center;padding:40px 0;font-weight:700;color:#888;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
-            <div id="activity-content" style="display:none;">
-                <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:2px dashed var(--border-color);">
-                    <img loading="lazy" id="act-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--text-color);object-fit:cover;" alt="">
-                    <div>
-                        <div id="act-name" style="font-size:1.15rem;font-weight:900;"></div>
-                        <div id="act-email" style="font-size:.82rem;color:#7D7887;font-weight:600;"></div>
-                    </div>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
-                    <div style="background:#f8f4ff;border:2px solid #c084fc;border-radius:14px;padding:14px;text-align:center;">
-                        <div id="act-last-active" style="font-size:1rem;font-weight:900;color:#7c3aed;"></div>
-                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Last Active</div>
-                    </div>
-                    <div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:14px;padding:14px;text-align:center;">
-                        <div id="act-unlocks" style="font-size:1.6rem;font-weight:900;color:#b45309;"></div>
-                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Unlocked</div>
-                    </div>
-                    <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:14px;padding:14px;text-align:center;">
-                        <div id="act-saves" style="font-size:1.6rem;font-weight:900;color:#15803d;"></div>
-                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Saved</div>
-                    </div>
-                    <div style="background:#fff1f2;border:2px solid #f43f5e;border-radius:14px;padding:14px;text-align:center;">
-                        <div id="act-likes" style="font-size:1.6rem;font-weight:900;color:#be123c;"></div>
-                        <div style="font-size:.72rem;font-weight:800;color:#888;margin-top:4px;text-transform:uppercase;">Prompts Liked</div>
-                    </div>
-                </div>
-                <div id="act-unlock-list-wrap">
-                    <div style="font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:10px;">&#128274; Unlocked Prompts</div>
-                    <div id="act-unlock-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
-                </div>
-            </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head"><div class="card-title"><i class="fa-solid fa-chart-pie"></i> Platform + Leaderboard</div></div>
+      <?php $plat_total=$mobile_count+$desktop_count; ?>
+      <?php if($plat_total>0): $mob_pct=round($mobile_count/$plat_total*100);$desk_pct=100-$mob_pct; ?>
+      <div class="plat-bar"><div class="plat-m" style="width:<?= $mob_pct ?>%"></div><div class="plat-d" style="width:<?= $desk_pct ?>%"></div></div>
+      <div style="display:flex;gap:16px;font-size:.74rem;font-weight:700;margin-bottom:14px">
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:middle"></span><i class="fa-solid fa-mobile-screen" style="color:var(--accent2)"></i> Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--cyan);margin-right:5px;vertical-align:middle"></span><i class="fa-solid fa-desktop" style="color:var(--cyan)"></i> Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
+      </div>
+      <?php else: ?><div style="color:var(--muted);font-size:.8rem;text-align:center;padding:10px 0 14px"><i class="fa-solid fa-circle-info"></i> Data will show after users log in</div><?php endif; ?>
+      <div style="padding-top:12px;border-top:1px solid var(--border2)">
+        <div style="font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px"><i class="fa-solid fa-crown" style="color:var(--yellow)"></i> Top 3 Most Active Users</div>
+        <?php if(empty($top3_users)): ?><div style="color:var(--muted);font-size:.8rem;text-align:center;padding:10px 0">No activity data yet.</div>
+        <?php else: ?>
+        <div class="top3-grid" style="grid-template-columns:repeat(<?= count($top3_users) ?>,1fr)">
+          <?php $cr=['<i class="fa-solid fa-crown" style="color:var(--yellow)"></i>','<i class="fa-solid fa-crown" style="color:var(--muted)"></i>','<i class="fa-solid fa-crown" style="color:var(--orange)"></i>']; ?>
+          <?php foreach($top3_users as $i=>$tu): $g=strtolower($tu['gender']??''); ?>
+          <div class="t3card">
+            <div style="font-size:1.2rem;margin-bottom:5px"><?= $cr[$i]??($i+1) ?></div>
+            <div style="font-size:.65rem;margin-bottom:5px" class="<?= $g==='male'?'gi-m':($g==='female'?'gi-f':'gi-a') ?>"><i class="fa-solid fa-<?= $g==='male'?'mars':($g==='female'?'venus':'user-astronaut') ?>"></i></div>
+            <?php if(!empty($tu['avatar'])): ?><img class="t3-av" src="<?= htmlspecialchars($tu['avatar']) ?>" alt="">
+            <?php else: ?><div class="t3-ph"><?= strtoupper(substr($tu['username']??'U',0,1)) ?></div><?php endif; ?>
+            <div class="t3-name"><?= htmlspecialchars($tu['username']??'User') ?></div>
+            <div class="t3-score"><?= $tu['score'] ?> pts</div>
+          </div>
+          <?php endforeach; ?>
         </div>
+        <?php endif; ?>
+      </div>
     </div>
+  </div>
 
-    <!-- Delete Confirm Modal -->
-    <div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(45,42,53,.45);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;">
-        <div style="background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:36px 32px;max-width:400px;width:90%;box-shadow:8px 8px 0 var(--text-color);text-align:center;">
-            <div style="font-size:2.5rem;margin-bottom:12px;"><i class="fa-solid fa-trash"></i></div>
-            <h3 style="font-size:1.4rem;font-weight:900;margin-bottom:10px;">Delete Prompt?</h3>
-            <p id="delete-modal-name" style="font-weight:700;color:#555;margin-bottom:24px;font-size:.95rem;"></p>
-            <div style="display:flex;gap:12px;">
-                <button onclick="closeDeleteModal()" style="flex:1;padding:14px;background:var(--bg-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);transition:all .2s;">Cancel</button>
-                <form id="delete-form" action="delete_prompt.php" method="POST" style="flex:1;margin:0;">
-                    <input type="hidden" id="delete-prompt-id" name="prompt_id" value="">
-                    <button type="submit" style="width:100%;padding:14px;background:#FF6B6B;color:#fff;border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:var(--shadow-comic);transition:all .2s;">Delete</button>
-                </form>
-            </div>
-        </div>
+  <?php if(!empty($ghost_users)): ?>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><i class="fa-solid fa-ghost" style="color:var(--muted)"></i> Ghost Users <span style="font-size:.62rem;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);border-radius:100px;padding:2px 9px;font-weight:900;margin-left:6px"><?= $ghost_total ?> never interacted</span></div>
+      <a href="user_management.php#ghost-section" class="card-lnk"><i class="fa-solid fa-arrow-right"></i> View All</a>
     </div>
+    <?php foreach($ghost_users as $gu): ?>
+    <div class="ghost-row">
+      <div class="g-ph"><?= strtoupper(substr($gu['username']??'U',0,1)) ?></div>
+      <div style="flex:1;min-width:0"><div style="font-weight:800;font-size:.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)"><?= htmlspecialchars($gu['username']??'User') ?></div><div style="font-size:.68rem;color:var(--muted)"><?= htmlspecialchars($gu['email']??'') ?></div></div>
+      <div style="font-size:.68rem;color:var(--muted);white-space:nowrap"><?= date('d M Y',strtotime($gu['created_at'])) ?></div>
+    </div>
+    <?php endforeach; ?>
+    <a href="user_management.php#ghost-section" style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;padding:10px;border-radius:10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);color:var(--red);font-size:.78rem;font-weight:800;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(248,113,113,0.1)'" onmouseout="this.style.background='rgba(248,113,113,0.05)'">
+      <i class="fa-solid fa-ghost"></i> View all <?= $ghost_total ?> ghost users →
+    </a>
+  </div>
+  <?php endif; ?>
 
-    </div><!-- end .dashboard-wrap -->
-</body>
+  <div style="font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px"><i class="fa-solid fa-bolt" style="color:var(--yellow)"></i> Quick Actions</div>
+  <div class="action-grid">
+    <a href="upload_prompt.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-upload"></i></div><div><div class="ac-t">Upload Prompt</div><div class="ac-d">Add a new AI prompt to the platform</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="manage_prompts.php" class="acard ac-pk"><div class="ac-icon ai-pk"><i class="fa-solid fa-list-check"></i></div><div><div class="ac-t">Manage Prompts</div><div class="ac-d">Edit, delete, review all <?= $total_prompts ?> prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="prompt_links.php" class="acard ac-c"><div class="ac-icon ai-c"><i class="fa-solid fa-link"></i></div><div><div class="ac-t">Prompt Share Links</div><div class="ac-d">Copy direct links to share prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="potd_manager.php" class="acard ac-y"><div class="ac-icon ai-y"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><i class="fa-solid fa-users"></i> Recent Users <span style="font-size:.68rem;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.18);color:var(--cyan);border-radius:100px;padding:2px 9px;margin-left:6px;font-weight:900"><?= $total_users_count ?> Total</span></div>
+      <a href="user_management.php" class="card-lnk"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Page</a>
+    </div>
+    <?php if(count($users)===0): ?>
+    <div style="text-align:center;color:var(--muted);padding:28px 0;font-size:.85rem"><i class="fa-solid fa-users-slash"></i> No users registered yet.</div>
+    <?php else: ?>
+    <div style="overflow-x:auto">
+    <table class="dtable">
+      <thead><tr><th>Avatar</th><th>Name / Email</th><th>Gender</th><th>Role</th><th>Joined</th><th>Activity</th></tr></thead>
+      <tbody>
+      <?php foreach($users as $u):
+        $u_avatar=!empty($u['avatar'])?$u['avatar']:'https://api.dicebear.com/7.x/avataaars/svg?seed='.urlencode($u['email']??'x');
+        $jdt=new DateTime($u['created_at'],new DateTimeZone('UTC'));
+        $jdt->setTimezone(new DateTimeZone('Asia/Kolkata'));
+        $ug=strtolower($u['gender']??'');
+      ?>
+      <tr>
+        <td><img loading="lazy" src="<?= htmlspecialchars($u_avatar) ?>" class="u-av" alt=""></td>
+        <td><div class="u-n"><?= htmlspecialchars($u['username']??'—') ?></div><div class="u-e"><?= htmlspecialchars($u['email']??'') ?></div></td>
+        <td class="<?= $ug==='male'?'gi-m':($ug==='female'?'gi-f':'gi-a') ?>"><i class="fa-solid fa-<?= $ug==='male'?'mars':($ug==='female'?'venus':'user-astronaut') ?>"></i> <?= $ug===''?'Alien':ucfirst($ug) ?></td>
+        <td><span class="rbadge <?= $u['role']==='admin'?'rb-a':'rb-u' ?>"><?= strtoupper($u['role']??'user') ?></span></td>
+        <td style="font-size:.72rem;color:var(--muted)"><?= $jdt->format('d M Y') ?><br><span style="opacity:.6;font-size:.65rem"><?= $jdt->format('h:i A') ?></span></td>
+        <td><button onclick="openActivity(<?= (int)$u['id'] ?>)" class="d-btn db-p"><i class="fa-solid fa-chart-simple"></i> Activity</button></td>
+      </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    </div>
+    <?php endif; ?>
+    <div style="text-align:center;padding:14px 0 4px;border-top:1px solid var(--border2);margin-top:14px">
+      <a href="user_management.php" class="d-btn db-p db-full"><i class="fa-solid fa-users"></i> View All <?= $total_users_count ?> Users</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- ACTIVITY MODAL -->
+<div id="activity-modal" class="modal-ov" onclick="if(event.target===this)closeActivity()">
+  <div class="modal-box">
+    <button class="m-close" onclick="closeActivity()"><i class="fa-solid fa-xmark"></i></button>
+    <div id="act-loading" style="text-align:center;padding:40px 0;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);font-size:1.5rem"></i></div>
+    <div id="act-content" style="display:none">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border2)">
+        <img id="act-avatar" src="" style="width:50px;height:50px;border-radius:50%;border:2px solid var(--accent);object-fit:cover" alt="">
+        <div><div id="act-name" style="font-size:1rem;font-weight:900;color:var(--text)"></div><div id="act-email" style="font-size:.75rem;color:var(--muted);margin-top:2px"></div></div>
+      </div>
+      <div class="act-grid">
+        <div class="astat as-p" style="grid-column:1/-1"><div id="act-last-active" class="astat-val" style="color:var(--accent2);font-size:.95rem"></div><div class="astat-lbl">Last Active</div></div>
+        <div class="astat as-y"><div id="act-unlocks" class="astat-val" style="color:var(--yellow)"></div><div class="astat-lbl">Unlocked</div></div>
+        <div class="astat as-g"><div id="act-saves" class="astat-val" style="color:var(--green)"></div><div class="astat-lbl">Saved</div></div>
+        <div class="astat as-r"><div id="act-likes" class="astat-val" style="color:var(--red)"></div><div class="astat-lbl">Liked</div></div>
+      </div>
+      <div style="font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px"><i class="fa-solid fa-lock-open" style="color:var(--accent2)"></i> Unlocked Prompts</div>
+      <div id="act-unlock-list" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="delete-modal" class="modal-ov" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-box" style="max-width:360px;text-align:center">
+    <button class="m-close" onclick="closeDeleteModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="del-icon"><i class="fa-solid fa-trash"></i></div>
+    <div style="font-size:1.1rem;font-weight:900;color:var(--text);margin-bottom:7px">Delete Prompt?</div>
+    <div id="delete-modal-name" style="font-size:.85rem;color:var(--muted);font-weight:600"></div>
+    <div class="del-btns">
+      <button onclick="closeDeleteModal()" class="del-cancel">Cancel</button>
+      <form id="delete-form" action="delete_prompt.php" method="POST" style="flex:1;margin:0">
+        <input type="hidden" id="delete-prompt-id" name="prompt_id" value="">
+        <button type="submit" class="del-confirm">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-// Search & Filter
-const searchInput = document.getElementById('prompt-search');
-const catFilter   = document.getElementById('prompt-cat-filter');
-function filterPrompts() {
-    const q   = (searchInput?.value || '').toLowerCase();
-    const cat = (catFilter?.value || '').toLowerCase();
-    document.querySelectorAll('#prompts-list .prompt-item').forEach(item => {
-        const title = item.dataset.title || '';
-        const c     = (item.dataset.cat || '').toLowerCase();
-        const show  = title.includes(q) && (!cat || c === cat);
-        item.style.display = show ? '' : 'none';
-    });
-}
-searchInput?.addEventListener('input', filterPrompts);
-catFilter?.addEventListener('change', filterPrompts);
+// Scroll progress
+const sp=document.getElementById('sp');
+window.addEventListener('scroll',()=>{const h=document.documentElement;sp.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
 
-// Delete Confirm Modal
-function confirmDelete(id, name) {
-    document.getElementById('delete-prompt-id').value = id;
-    document.getElementById('delete-modal-name').textContent = '"' + name + '"';
-    const m = document.getElementById('delete-modal');
-    m.style.display = 'flex';
-}
-function closeDeleteModal() {
-    document.getElementById('delete-modal').style.display = 'none';
-}
-document.getElementById('delete-modal')?.addEventListener('click', function(e){
-    if (e.target === this) closeDeleteModal();
+// Particles
+(function(){
+  const c=document.getElementById('pc'),ctx=c.getContext('2d');let W,H,pts=[];
+  function rs(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}rs();window.addEventListener('resize',rs);
+  class P{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.4+.3;this.a=Math.random()*.45+.1;const cols=['139,92,246','244,114,182','34,211,238'];this.col=cols[Math.floor(Math.random()*cols.length)]}
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}
+  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(${this.col},${this.a})`;ctx.fill()}}
+  for(let i=0;i<70;i++)pts.push(new P());
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw()});
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(139,92,246,${(1-d/100)*.09})`;ctx.lineWidth=.5;ctx.stroke()}}
+    requestAnimationFrame(loop)}loop();
+})();
+
+// Milestone fill animate
+setTimeout(()=>{const f=document.getElementById('msFill');if(f)f.style.width='<?= $milestone_pct ?>%';},500);
+
+// CountUp for stat cards
+document.querySelectorAll('.sc-val').forEach(el=>{
+  const raw=el.textContent.trim();
+  const prefix=raw.startsWith('+')?'+':'';
+  const num=parseInt(raw.replace(/[^0-9]/g,''));
+  if(!isNaN(num)&&num>0){el.textContent=prefix+'0';let s=0,step=num/60;const t=setInterval(()=>{s+=step;if(s>=num){s=num;clearInterval(t)}el.textContent=prefix+Math.floor(s).toLocaleString()},16)}
+});
+document.querySelectorAll('.pill-num').forEach(el=>{
+  const n=parseInt(el.textContent.replace(/,/g,''));
+  if(!isNaN(n)&&n>0){el.textContent='0';let s=0,step=n/50;const t=setInterval(()=>{s+=step;if(s>=n){s=n;clearInterval(t)}el.textContent=Math.floor(s).toLocaleString()},16)}
 });
 
-// Blog Delete Confirm Modal
-function confirmBlogDelete(id, name) {
-    document.getElementById('blog-delete-id').value = id;
-    document.getElementById('blog-delete-name').textContent = '"' + name + '"';
-    const m = document.getElementById('blog-delete-modal');
-    m.style.display = 'flex';
-}
-document.getElementById('blog-delete-modal')?.addEventListener('click', function(e){
-    if (e.target === this) this.style.display = 'none';
-});
+// Delete Modal
+function confirmDelete(id,name){document.getElementById('delete-prompt-id').value=id;document.getElementById('delete-modal-name').textContent='"'+name+'"';document.getElementById('delete-modal').style.display='flex'}
+function closeDeleteModal(){document.getElementById('delete-modal').style.display='none'}
 
-// User Activity Modal
-function openActivity(uid) {
-    const modal = document.getElementById('activity-modal');
-    modal.style.display = 'flex';
-    document.getElementById('activity-loading').style.display = 'block';
-    document.getElementById('activity-content').style.display = 'none';
-    fetch('dashboard.php?xhr=activity&uid=' + uid)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok) return;
-            const u = data.user;
-            const av = u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(u.email || 'x');
-            document.getElementById('act-avatar').src = av;
-            document.getElementById('act-name').textContent = u.username || '�';
-            document.getElementById('act-email').textContent = u.email || '�';
-            const la = u.last_active ? new Date(u.last_active.replace(' ', 'T') + 'Z') : null;
-            document.getElementById('act-last-active').textContent = la ? la.toLocaleString('en-IN', {timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Never';
-            document.getElementById('act-unlocks').textContent = data.unlock_list.length;
-            document.getElementById('act-saves').textContent = data.saves_count;
-            document.getElementById('act-likes').textContent = data.likes_count;
-            const list = document.getElementById('act-unlock-list');
-            list.innerHTML = '';
-            if (data.unlock_list.length === 0) {
-                list.innerHTML = '<div style="color:#aaa;font-size:.82rem;font-weight:600;">No prompts unlocked yet.</div>';
-            } else {
-                data.unlock_list.forEach(p => {
-                    const d = document.createElement('div');
-                    d.style.cssText = 'background:var(--bg-color);border:1.5px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;';
-                    d.textContent = '↗ ' + (p.title || '�');
-                    list.appendChild(d);
-                });
-            }
-            document.getElementById('activity-loading').style.display = 'none';
-            document.getElementById('activity-content').style.display = 'block';
-        });
+// Activity Modal
+function openActivity(uid){
+  document.getElementById('activity-modal').style.display='flex';
+  document.getElementById('act-loading').style.display='block';
+  document.getElementById('act-content').style.display='none';
+  fetch('dashboard.php?xhr=activity&uid='+uid).then(r=>r.json()).then(data=>{
+    if(!data.ok)return;const u=data.user;
+    const av=u.avatar||'https://api.dicebear.com/7.x/avataaars/svg?seed='+encodeURIComponent(u.email||'x');
+    document.getElementById('act-avatar').src=av;
+    document.getElementById('act-name').textContent=u.username||'—';
+    document.getElementById('act-email').textContent=u.email||'—';
+    const la=u.last_active?new Date(u.last_active.replace(' ','T')+'Z'):null;
+    document.getElementById('act-last-active').textContent=la?la.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Never';
+    document.getElementById('act-unlocks').textContent=data.unlock_list.length;
+    document.getElementById('act-saves').textContent=data.saves_count;
+    document.getElementById('act-likes').textContent=data.likes_count;
+    const list=document.getElementById('act-unlock-list');list.innerHTML='';
+    if(data.unlock_list.length===0){list.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:8px 0">No prompts unlocked yet.</div>'}
+    else{data.unlock_list.forEach(p=>{const d=document.createElement('div');d.style.cssText='background:rgba(139,92,246,0.07);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text)';d.innerHTML='<i class="fa-solid fa-lock-open" style="color:var(--accent2);margin-right:6px;font-size:.65rem"></i>'+(p.title||'—');list.appendChild(d)})}
+    document.getElementById('act-loading').style.display='none';document.getElementById('act-content').style.display='block';
+  });
 }
-function closeActivity() {
-    document.getElementById('activity-modal').style.display = 'none';
-}
+function closeActivity(){document.getElementById('activity-modal').style.display='none'}
 
-// Copy prompt shareable link
-function copyPromptLink(id, btn) {
-    var link = window.location.origin + '/card.php?id=' + id;
-    navigator.clipboard.writeText(link).then(function() {
-        var orig = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-        btn.style.background = '#d9f5e5';
-        btn.style.color = '#2a7a4b';
-        btn.style.borderColor = '#2a7a4b';
-        btn.style.boxShadow = '2px 2px 0 #2a7a4b';
-        setTimeout(function() {
-            btn.innerHTML = orig;
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.style.borderColor = '';
-            btn.style.boxShadow = '';
-        }, 2000);
-    }).catch(function() {
-        // Fallback for older browsers
-        window.prompt('Copy this link:', window.location.origin + '/card.php?id=' + id);
-    });
+// Copy prompt link
+function copyPromptLink(id,btn){
+  var link=window.location.origin+'/card.php?id='+id;
+  navigator.clipboard.writeText(link).then(()=>{var o=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';btn.style.color='var(--green)';btn.style.borderColor='rgba(74,222,128,0.3)';setTimeout(()=>{btn.innerHTML=o;btn.style.color='';btn.style.borderColor=''},2000)}).catch(()=>window.prompt('Copy link:',link));
 }
+function filterLinkTable(q){q=q.toLowerCase();var rows=document.querySelectorAll('#link-table tbody tr'),any=false;rows.forEach(r=>{var m=(r.dataset.search||'').includes(q);r.style.display=m?'':'none';if(m)any=true});var em=document.getElementById('link-table-empty');if(em)em.style.display=any?'none':'block'}
 
-// Filter prompt link table
-function filterLinkTable(query) {
-    query = query.toLowerCase();
-    var rows = document.querySelectorAll('#link-table tbody tr');
-    var anyVisible = false;
-    rows.forEach(function(row) {
-        var match = (row.dataset.search || '').includes(query);
-        row.style.display = match ? '' : 'none';
-        if (match) anyVisible = true;
-    });
-    var emptyMsg = document.getElementById('link-table-empty');
-    if (emptyMsg) emptyMsg.style.display = anyVisible ? 'none' : 'block';
-}
+// Mobile drawer
+function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
 </script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-bottom-nav">
+  <div class="mob-nav-items">
+    <a href="dashboard.php" class="mob-nav-item active"><i class="fa-solid fa-gauge-high"></i><span>Dash</span></a>
+    <a href="manage_prompts.php" class="mob-nav-item"><i class="fa-solid fa-list-check"></i><span>Prompts</span></a>
+    <a href="blog_admin.php" class="mob-nav-item"><i class="fa-solid fa-pen-nib"></i><span>Blogs</span></a>
+    <a href="user_management.php" class="mob-nav-item"><i class="fa-solid fa-users"></i><span>Users</span></a>
+    <a href="analytics.php" class="mob-nav-item"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
+  </div>
+</nav>
 </html>
+
+

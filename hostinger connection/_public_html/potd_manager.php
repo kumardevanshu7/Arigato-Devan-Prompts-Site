@@ -50,364 +50,274 @@ $type_map = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt of the Day Manager � Admin</title>
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { background: var(--bg-color); }
-
-        .pm-wrap { max-width: 1060px; margin: 0 auto; padding: 32px 36px 100px; }
-
-        .pm-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:12px; }
-        .pm-title { font-size:2.2rem; font-weight:900; display:flex; align-items:center; gap:12px; }
-        .pm-sub { color:#7D7887; font-weight:600; font-size:.92rem; margin-bottom:24px; }
-
-        .pm-search { width:100%; padding:13px 18px; border:var(--border-width) solid var(--text-color); border-radius:14px; font-family:var(--font-main); font-weight:600; font-size:1rem; background:var(--card-bg); color:var(--text-color); outline:none; box-shadow:var(--shadow-comic); transition:all .2s; margin-bottom:20px; box-sizing:border-box; }
-        .pm-search:focus { box-shadow:var(--shadow-comic-hover); transform:translateY(-1px); }
-
-        .pm-card { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:24px; box-shadow:var(--shadow-comic); overflow:hidden; margin-bottom:32px; }
-
-        .pm-table { width:100%; border-collapse:collapse; }
-        .pm-table thead tr { border-bottom:2px solid var(--text-color); background:var(--bg-color); }
-        .pm-table th { padding:14px 16px; font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.6px; color:var(--text-color); text-align:left; }
-        .pm-table tbody tr { border-bottom:1px solid var(--border-color); transition:all .2s; }
-        .pm-table tbody tr:last-child { border-bottom:none; }
-        .pm-table tbody tr:hover { background:var(--bg-color); }
-        .pm-table td { padding:12px 16px; vertical-align:middle; }
-
-        .pm-table tbody tr.row-active { background:rgba(255,215,0,0.08); border-left:4px solid #f0c040; }
-
-        .pm-cover { width:52px; height:52px; object-fit:cover; border-radius:10px; border:2px solid var(--text-color); display:block; }
-        .pm-title-cell { font-weight:800; font-size:.96rem; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .pm-likes { font-size:.82rem; color:#999; font-weight:600; margin-top:3px; }
-
-        .type-pill { border-radius:8px; padding:4px 10px; font-size:.72rem; font-weight:900; white-space:nowrap; border:1.5px solid currentColor; display:inline-block; }
-        .custom-pill { background:#f3e8ff; color:#7c3aed; border:1.5px solid #7c3aed; border-radius:8px; padding:4px 10px; font-size:.72rem; font-weight:900; }
-
-        /* Toggle Switch */
-        .toggle-wrap { display:flex; align-items:center; gap:8px; }
-        .toggle-label { font-size:.72rem; font-weight:800; text-transform:uppercase; color:#999; }
-        .toggle-label.on { color:#22c55e; }
-
-        .toggle-switch { position:relative; width:50px; height:28px; cursor:pointer; }
-        .toggle-switch input { opacity:0; width:0; height:0; }
-        .toggle-slider { position:absolute; inset:0; background:#ccc; border-radius:28px; border:2px solid var(--text-color); transition:all .3s cubic-bezier(.4,0,.2,1); }
-        .toggle-slider::before { content:""; position:absolute; width:20px; height:20px; left:3px; bottom:2px; background:#fff; border-radius:50%; border:1.5px solid var(--text-color); transition:all .3s cubic-bezier(.4,0,.2,1); box-shadow:1px 1px 0 var(--text-color); }
-        .toggle-switch input:checked + .toggle-slider { background:#22c55e; }
-        .toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); }
-
-        /* Flash Messages */
-        .pm-flash-ok { background:#d9f5e5; color:#1e5c36; padding:14px 18px; border:var(--border-width) solid var(--text-color); border-radius:14px; font-weight:800; margin-bottom:20px; box-shadow:3px 3px 0 var(--text-color); }
-        .pm-flash-err { background:#ffe6e6; color:#a70000; padding:14px 18px; border:var(--border-width) solid var(--text-color); border-radius:14px; font-weight:800; margin-bottom:20px; box-shadow:3px 3px 0 var(--text-color); }
-
-        /* Custom POTD Form */
-        .pm-form-card { background:var(--card-bg); border:var(--border-width) solid var(--text-color); border-radius:24px; padding:30px; box-shadow:var(--shadow-comic); }
-        .pm-form-card h2 { font-size:1.5rem; font-weight:900; margin-bottom:20px; padding-bottom:14px; border-bottom:2px dashed var(--border-color); display:flex; align-items:center; gap:10px; }
-        .pm-fg { margin-bottom:18px; }
-        .pm-fg label { display:block; font-weight:800; margin-bottom:7px; font-size:.85rem; text-transform:uppercase; letter-spacing:.5px; }
-        .pm-fg input, .pm-fg textarea { width:100%; padding:12px 16px; border:var(--border-width) solid var(--text-color); border-radius:12px; font-family:var(--font-main); font-size:.95rem; font-weight:600; background:var(--bg-color); color:var(--text-color); box-shadow:var(--shadow-comic); outline:none; transition:all .2s; box-sizing:border-box; }
-        .pm-fg input:focus, .pm-fg textarea:focus { border-color:var(--primary-dark); box-shadow:var(--shadow-comic-hover); transform:translateY(-1px); }
-        .pm-fg textarea { resize:vertical; min-height:90px; }
-
-        .pm-submit { background:var(--primary-color); color:var(--text-color); border:var(--border-width) solid var(--text-color); border-radius:14px; padding:14px 28px; font-family:var(--font-main); font-weight:900; font-size:1rem; cursor:pointer; box-shadow:var(--shadow-comic); transition:all .2s; display:inline-flex; align-items:center; gap:8px; }
-        .pm-submit:hover { transform:translateY(-2px); box-shadow:var(--shadow-comic-hover); }
-
-        /* Delete button for custom entries */
-        .pm-del-btn { background:#ffe3e3; color:#d03030; border:2px solid var(--text-color); border-radius:8px; padding:6px 10px; cursor:pointer; font-weight:800; font-size:.75rem; transition:all .15s; }
-        .pm-del-btn:hover { background:#ffc9c9; transform:translateY(-1px); }
-
-        /* Section divider */
-        .pm-section-divider { display:flex; align-items:center; gap:14px; margin:36px 0 24px; }
-        .pm-section-divider .line { flex:1; height:2px; background:var(--border-color); }
-        .pm-section-divider .label { font-weight:900; font-size:.85rem; color:#7D7887; text-transform:uppercase; letter-spacing:1px; white-space:nowrap; }
-
-        .pm-empty { text-align:center; color:#7D7887; font-weight:600; padding:40px 0; display:none; }
-
-        @media (max-width: 600px) {
-            .pm-wrap { padding:22px 16px 80px; }
-            .pm-title { font-size:1.6rem; }
-            .pm-title-cell { max-width:120px; }
-        }
-    </style>
-    <?php include_once "gtag.php"; ?>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POTD Manager — Arigato Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<?php include_once "gtag.php"; ?>
+<style>
+:root{--bg:#07060f;--surface:#0f0d1e;--border:rgba(139,92,246,0.18);--border2:rgba(139,92,246,0.08);--accent:#8b5cf6;--accent2:#c084fc;--pink:#f472b6;--cyan:#22d3ee;--green:#4ade80;--yellow:#fbbf24;--orange:#fb923c;--red:#f87171;--text:#e2e0ff;--muted:#9490bb;--font:'Inter',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh}
+#sp{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--pink),var(--cyan));z-index:9999;box-shadow:0 0 10px var(--accent)}
+#pc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,6,15,0.98);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--border2)}
+.sb-brand{font-size:.72rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
+.sb-brand i{-webkit-text-fill-color:#a78bfa}
+.sb-admin{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border2)}
+.sb-av-ph{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
+.sb-uname{font-size:.78rem;font-weight:800;color:var(--text)}.sb-role{font-size:.6rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}.sb-nav::-webkit-scrollbar{width:2px}.sb-nav::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.sb-sec{font-size:.58rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 10px 5px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:1px}
+.sb-link:hover{background:rgba(139,92,246,0.08);color:var(--text)}.sb-link.active{background:rgba(139,92,246,0.15);color:var(--accent2);border-color:var(--border)}
+.sb-link i{width:16px;text-align:center;flex-shrink:0}
+.sb-bottom{padding:12px 8px;border-top:1px solid var(--border2)}
+.sb-logout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:700;color:var(--red);text-decoration:none;transition:all .2s}
+.sb-logout:hover{background:rgba(248,113,113,0.1)}
+.main{margin-left:220px;min-height:100vh;padding:28px 32px 80px;position:relative;z-index:1}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.tb-title{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.card{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px;backdrop-filter:blur(8px);transition:border-color .3s}
+.card:hover{border-color:rgba(139,92,246,0.3)}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border2);gap:10px;flex-wrap:wrap}
+.card-title{font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title i{color:var(--accent2)}
+.srch-inp{width:100%;padding:10px 16px;background:rgba(15,13,30,0.8);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font);font-size:.85rem;outline:none;transition:all .2s;box-sizing:border-box;margin-bottom:14px}
+.srch-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,0.1)}
+.srch-inp::placeholder{color:var(--muted)}
+.dtable{width:100%;border-collapse:collapse;font-size:.78rem}
+.dtable th{background:rgba(139,92,246,0.07);color:var(--accent2);font-weight:800;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+.dtable td{padding:10px 13px;border-bottom:1px solid var(--border2);color:var(--muted);vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}.dtable tr:hover td{background:rgba(139,92,246,0.03)}
+.dtable tr.row-active td{background:rgba(74,222,128,0.07);box-shadow:inset 0 0 30px rgba(74,222,128,0.05)}
+.dtable tr.row-active{outline:1px solid rgba(74,222,128,0.18);outline-offset:-1px;border-radius:8px;filter:drop-shadow(0 0 6px rgba(74,222,128,0.12))}
+.p-thumb{width:42px;height:42px;border-radius:9px;object-fit:cover;border:1px solid var(--border2)}
+.type-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:100px;font-size:.6rem;font-weight:900;border:1px solid;text-transform:uppercase}
+.tb-scp{background:rgba(248,113,113,0.08);color:var(--red);border-color:rgba(248,113,113,0.22)}
+.tb-urp{background:rgba(251,191,36,0.08);color:var(--yellow);border-color:rgba(251,191,36,0.22)}
+.tb-ivp{background:rgba(34,211,238,0.06);color:var(--cyan);border-color:rgba(34,211,238,0.18)}
+.tb-aup{background:rgba(96,165,250,0.06);color:#60a5fa;border-color:rgba(96,165,250,0.18)}
+.potd-toggle{width:40px;height:22px;border-radius:100px;border:1px solid;background:rgba(255,255,255,0.04);cursor:pointer;position:relative;transition:all .3s;outline:none;appearance:none;-webkit-appearance:none}
+.potd-toggle:checked{background:var(--yellow);border-color:rgba(251,191,36,0.5);box-shadow:0 0 10px rgba(251,191,36,0.3)}
+.potd-toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+.potd-toggle:checked::after{left:21px}
+.active-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:.62rem;font-weight:900;background:rgba(251,191,36,0.1);color:var(--yellow);border:1px solid rgba(251,191,36,0.25)}
+.del-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;font-size:.7rem;font-weight:800;border:1px solid rgba(248,113,113,0.22);background:rgba(248,113,113,0.07);color:var(--red);cursor:pointer;transition:all .2s;font-family:var(--font)}
+.del-btn:hover{background:rgba(248,113,113,0.14)}
+/* FLASH */
+.flash-ok{background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.22);color:var(--green);padding:11px 16px;border-radius:12px;font-size:.83rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.flash-err{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.22);color:var(--red);padding:11px 16px;border-radius:12px;font-size:.83rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.form-input{width:100%;padding:10px 15px;background:rgba(15,13,30,0.8);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:var(--font);font-size:.85rem;outline:none;transition:all .2s;box-sizing:border-box}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,0.1)}
+.form-input::placeholder{color:var(--muted)}
+textarea.form-input{resize:vertical;min-height:80px}
+.btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,rgba(139,92,246,0.8),rgba(192,132,252,0.6));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;font-weight:900;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-submit:hover{background:linear-gradient(135deg,rgba(139,92,246,0.95),rgba(192,132,252,0.75));box-shadow:0 4px 20px rgba(139,92,246,0.3)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(7,6,15,0.97);border-top:1px solid var(--border);z-index:500;padding:8px 0 max(8px,env(safe-area-inset-bottom));flex-direction:row;justify-content:space-around;align-items:center}
+.mn-link{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.6rem;font-weight:700;color:var(--muted);text-decoration:none;padding:4px 8px;min-width:48px;transition:all .2s}
+.mn-link:hover{color:var(--accent2)}.mn-link i{font-size:1.1rem}
+@media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}}
+@media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}}
+/* CUSTOM CURSOR */
+*{cursor:none!important}
+#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
+#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
+.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
+.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
+.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
+.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}</style>
 </head>
 <body>
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+<div id="sp"></div>
+<canvas id="pc"></canvas>
+<aside class="sidebar">
+  <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
+  <div class="sb-admin">
+    <?php
+      $__sn = $_SESSION['username'] ?? ($_SESSION['user_name'] ?? 'Admin');
+      $__sa = $_SESSION['profile_image'] ?? ($_SESSION['avatar'] ?? '');
+      if(empty($__sa)){
+        try{
+          $__q=$pdo->prepare("SELECT username,avatar,profile_image FROM users WHERE id=? LIMIT 1");
+          $__q->execute([$_SESSION['user_id']??0]);
+          $__u=$__q->fetch(PDO::FETCH_ASSOC);
+          if($__u){$__sn=$__u['username']??$__sn;$__sa=$__u['profile_image']??$__u['avatar']??'';}
+        }catch(Exception $__e){}
+      }
+    ?>
+    <?php if(!empty($__sa)): ?><img src="<?= htmlspecialchars($__sa) ?>" class="sb-av" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0" alt="">
+    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($__sn,0,1)) ?></div><?php endif; ?>
+    <div><div class="sb-uname"><?= htmlspecialchars($__sn) ?></div><div class="sb-role">Administrator</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
+    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
+    <div class="sb-sec">Content</div>
+    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
+    <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
+    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="potd_manager.php" class="sb-link active"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
+    <div class="sb-sec">Blog</div>
+    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
+    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
+    <div class="sb-sec">Users</div>
+    <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+    <div class="sb-sec">Tools</div>
+    
+    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
+  </nav>
+  <div class="sb-bottom"><a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></div>
+</aside>
 
-<header>
-    <div class="logo-area" style="cursor:pointer">
-        <div class="logo-flipper">
-            <div class="logo-front">
-                <img src="toplogo/logo01.webp" alt="Logo">
-            </div>
-            <div class="logo-back">
-                <img loading="lazy" src="toplogo/logo02.webp" alt="">
-            </div>
-        </div>
-        <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title"><i class="fa-solid fa-sun" style="color:var(--yellow);-webkit-text-fill-color:var(--yellow)"></i> POTD Manager</div>
+    <span style="font-size:.75rem;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:var(--yellow);border-radius:100px;padding:5px 14px;font-weight:800"><i class="fa-solid fa-star"></i> Prompt of the Day</span>
+    <a href="dashboard.php" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:.75rem;font-weight:800;border:1px solid rgba(139,92,246,0.22);background:rgba(139,92,246,0.07);color:var(--accent2);text-decoration:none"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  </div>
+
+  <?php if($msg): ?><div class="flash-ok"><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($msg) ?></div><?php endif; ?>
+  <?php if($err): ?><div class="flash-err"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars($err) ?></div><?php endif; ?>
+
+  <!-- EXISTING PROMPTS -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Set Prompt as POTD</div>
+      <?php if($active_existing_id): ?><div class="active-badge"><i class="fa-solid fa-star"></i> Active: Prompt #<?= $active_existing_id ?></div><?php endif; ?>
     </div>
-    <nav class="nav-links">
-        <a href="dashboard.php"><i class="fa-solid fa-arrow-left"></i> BACK TO DASHBOARD</a>
-    </nav>
-    <div class="header-right">
-        <div class="header-divider"></div>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Admin") ?>
-            <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
-        </div>
-        <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
+    <input type="text" id="pm-search" class="srch-inp" placeholder="Search by prompt title..." oninput="filterPotdTable(this.value)">
+    <div style="overflow-x:auto">
+    <table class="dtable" id="pm-table-existing">
+      <thead><tr><th>Cover</th><th>Title</th><th>Type</th><th><i class="fa-solid fa-star"></i> Likes</th><th>POTD Toggle</th></tr></thead>
+      <tbody>
+      <?php foreach($prompts as $p):
+        $isActive=(int)$p['id']===$active_existing_id;
+        $ptype=$p['prompt_type']??'secret';
+        $tm=$type_map[$ptype]??$type_map['secret'];
+        $badgeClsMap=['secret'=>'tb-scp','unreleased'=>'tb-urp','insta_viral'=>'tb-ivp','already_uploaded'=>'tb-aup'];
+        $badgeCls=$badgeClsMap[$ptype]??'tb-scp';
+      ?>
+      <tr id="row-existing-<?= (int)$p['id'] ?>" data-search="<?= htmlspecialchars(strtolower($p['title']??'')) ?>" class="<?= $isActive?'row-active':'' ?>">
+        <td><img loading="lazy" src="<?= htmlspecialchars($p['image_path']??'') ?>" class="p-thumb" alt=""></td>
+        <td style="font-weight:700;color:var(--text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($p['title']??'') ?></td>
+        <td><span class="type-badge <?= $badgeCls ?>"><i class="<?= $tm['icon'] ?>"></i> <?= $tm['label'] ?></span></td>
+        <td style="font-weight:800;color:var(--red)"><?= (int)$p['likes_count'] ?></td>
+        <td><input type="checkbox" class="potd-toggle" <?= $isActive?'checked':'' ?> onchange="togglePotd('existing',<?= (int)$p['id'] ?>,this)" title="Set as POTD"></td>
+      </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
     </div>
-</header>
+    <p id="pm-empty-existing" style="display:none;text-align:center;color:var(--muted);padding:16px 0;font-size:.85rem"><i class="fa-solid fa-magnifying-glass"></i> No prompts match.</p>
+  </div>
 
-<div class="pm-wrap">
-
-    <?php if ($msg): ?>
-        <div class="pm-flash-ok"><?= htmlspecialchars($msg) ?></div>
-    <?php endif; ?>
-    <?php if ($err): ?>
-        <div class="pm-flash-err"><?= htmlspecialchars($err) ?></div>
-    <?php endif; ?>
-
-    <div class="pm-header">
-        <div class="pm-title">
-            <i class="fa-solid fa-star" style="color:#f0c040;"></i>
-            Prompt of the Day Manager
-        </div>
-        <div class="badge" style="margin:0;transform:rotate(0);background:#fff3cd;padding:8px 20px;font-size:1rem;border:2px solid var(--text-color);">
-            <?= count($prompts) + count($customs) ?> Total
-        </div>
+  <!-- CUSTOM POTD -->
+  <?php if(!empty($customs)): ?>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><i class="fa-solid fa-pen-nib"></i> Custom POTD Entries</div>
+      <?php if($active_custom_id): ?><div class="active-badge"><i class="fa-solid fa-star"></i> Active Custom #<?= $active_custom_id ?></div><?php endif; ?>
     </div>
-
-    <p class="pm-sub">
-        <i class="fa-solid fa-circle-info"></i>
-        Turn ON the toggle to make any prompt the active <strong>Prompt of the Day</strong>. Only one can be active at a time. You can also add a custom prompt below.
-    </p>
-
-    <input type="text" class="pm-search" id="pm-search" placeholder="&#128269;  Search by title..." oninput="filterPotdTable(this.value)">
-
-    <!-- ====== EXISTING PROMPTS TABLE ====== -->
-    <div class="pm-card">
-        <table class="pm-table" id="pm-table-existing">
-            <thead>
-                <tr>
-                    <th style="width:68px;">Cover</th>
-                    <th>Title</th>
-                    <th style="width:110px;">Type</th>
-                    <th style="width:60px;text-align:center;"><i class="fa-solid fa-star"></i></th>
-                    <th style="width:100px;text-align:center;">POTD</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($prompts as $p):
-                $pt = $p["prompt_type"] ?? "secret";
-                $tinfo = $type_map[$pt] ?? $type_map["secret"];
-                $title = htmlspecialchars($p["title"]);
-                $img = htmlspecialchars($p["image_path"]);
-                $id = (int)$p["id"];
-                $likes = (int)$p["likes_count"];
-                $is_on = $p["is_featured"] ? true : false;
-            ?>
-            <tr data-search="<?= strtolower($title) ?>" class="<?= $is_on ? 'row-active' : '' ?>" id="row-existing-<?= $id ?>">
-                <td><img loading="lazy" src="<?= $img ?>" class="pm-cover" alt="Cover"></td>
-                <td>
-                    <div class="pm-title-cell"><?= $title ?></div>
-                    <div class="pm-likes"><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:.75rem;"></i> <?= $likes ?> likes</div>
-                </td>
-                <td>
-                    <span class="type-pill" style="background:<?= $tinfo["bg"] ?>;color:<?= $tinfo["color"] ?>;">
-                        <?= '<i class="' . $tinfo["icon"] . '"></i> ' . $tinfo["label"] ?>
-                    </span>
-                </td>
-                <td style="text-align:center;font-weight:800;color:#ff6b6b;"><?= $likes ?></td>
-                <td style="text-align:center;">
-                    <div class="toggle-wrap" style="justify-content:center;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" <?= $is_on ? 'checked' : '' ?> onchange="togglePotd('existing', <?= $id ?>, this)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-        <p class="pm-empty" id="pm-empty-existing">No prompts match your search.</p>
+    <div style="overflow-x:auto">
+    <table class="dtable" id="pm-table-custom">
+      <thead><tr><th>Image</th><th>Title</th><th>Source</th><th>Delete</th><th>POTD Toggle</th></tr></thead>
+      <tbody>
+      <?php foreach($customs as $c):
+        $cActive=(int)$c['id']===$active_custom_id;
+      ?>
+      <tr id="row-custom-<?= (int)$c['id'] ?>" data-search="<?= htmlspecialchars(strtolower($c['title']??'')) ?>" class="<?= $cActive?'row-active':'' ?>" style="transition:opacity .3s">
+        <td><?php if(!empty($c['image_url'])): ?><img loading="lazy" src="<?= htmlspecialchars($c['image_url']) ?>" class="p-thumb" alt=""><?php else: ?><div style="width:42px;height:42px;border-radius:9px;background:rgba(139,92,246,0.08);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-image" style="color:var(--muted)"></i></div><?php endif; ?></td>
+        <td style="font-weight:700;color:var(--text)"><?= htmlspecialchars($c['title']??'') ?></td>
+        <td><span style="font-size:.68rem;color:var(--muted);font-weight:700"><i class="fa-solid fa-pen-nib"></i> Custom</span></td>
+        <td><button class="del-btn" onclick="deleteCustomPotd(<?= (int)$c['id'] ?>,this)"><i class="fa-solid fa-trash"></i> Delete</button></td>
+        <td><input type="checkbox" class="potd-toggle" <?= $cActive?'checked':'' ?> onchange="togglePotd('custom',<?= (int)$c['id'] ?>,this)"></td>
+      </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
     </div>
+  </div>
+  <?php endif; ?>
 
-    <!-- ====== CUSTOM POTD TABLE ====== -->
-    <?php if (count($customs) > 0): ?>
-    <div class="pm-section-divider">
-        <div class="line"></div>
-        <div class="label"><i class="fa-solid fa-wand-magic-sparkles"></i> Custom POTD Entries</div>
-        <div class="line"></div>
-    </div>
+  <!-- ADD CUSTOM POTD FORM -->
+  <div class="card">
+    <div class="card-head"><div class="card-title"><i class="fa-solid fa-plus"></i> Add Custom POTD</div></div>
+    <form method="POST" action="potd_manager.php">
+      <input type="hidden" name="add_custom_potd" value="1">
+      <div class="form-group">
+        <label class="form-label">Title <span style="color:var(--red)">*</span></label>
+        <input type="text" name="custom_title" class="form-input" placeholder="e.g. Today's Special Prompt" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prompt Text <span style="color:var(--red)">*</span></label>
+        <textarea name="custom_text" class="form-input" placeholder="Enter the full prompt text here..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL <span style="color:var(--muted)">(optional)</span></label>
+        <input type="text" name="custom_image" class="form-input" placeholder="https://example.com/image.jpg">
+      </div>
+      <button type="submit" class="btn-submit"><i class="fa-solid fa-plus"></i> Add Custom POTD</button>
+    </form>
+  </div>
+</main>
 
-    <div class="pm-card">
-        <table class="pm-table" id="pm-table-custom">
-            <thead>
-                <tr>
-                    <th style="width:68px;">Image</th>
-                    <th>Title</th>
-                    <th style="width:100px;">Source</th>
-                    <th style="width:80px;text-align:center;">Actions</th>
-                    <th style="width:100px;text-align:center;">POTD</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($customs as $c):
-                $c_id = (int)$c["id"];
-                $c_title = htmlspecialchars($c["title"]);
-                $c_img = htmlspecialchars($c["image_url"]);
-                $c_on = $c["is_active"] ? true : false;
-            ?>
-            <tr data-search="<?= strtolower($c_title) ?>" class="<?= $c_on ? 'row-active' : '' ?>" id="row-custom-<?= $c_id ?>">
-                <td>
-                    <?php if ($c_img): ?>
-                        <img loading="lazy" src="<?= $c_img ?>" class="pm-cover" alt="Custom" onerror="this.style.display='none'">
-                    <?php else: ?>
-                        <div class="pm-cover" style="display:flex;align-items:center;justify-content:center;background:#f3e8ff;font-size:1.2rem;">?</div>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <div class="pm-title-cell"><?= $c_title ?></div>
-                    <div class="pm-likes" style="color:#7c3aed;"><i class="fa-solid fa-pen-nib" style="font-size:.7rem;"></i> Custom entry</div>
-                </td>
-                <td><span class="custom-pill"><i class="fa-solid fa-wand-magic-sparkles"></i> Custom</span></td>
-                <td style="text-align:center;">
-                    <button class="pm-del-btn" onclick="deleteCustomPotd(<?= $c_id ?>, this)" title="Delete">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </td>
-                <td style="text-align:center;">
-                    <div class="toggle-wrap" style="justify-content:center;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" <?= $c_on ? 'checked' : '' ?> onchange="togglePotd('custom', <?= $c_id ?>, this)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <?php endif; ?>
-
-    <!-- ====== ADD CUSTOM POTD FORM ====== -->
-    <div class="pm-section-divider">
-        <div class="line"></div>
-        <div class="label"><i class="fa-solid fa-plus"></i> Add Custom POTD</div>
-        <div class="line"></div>
-    </div>
-
-    <div class="pm-form-card">
-        <h2><i class="fa-solid fa-wand-magic-sparkles" style="color:#7c3aed;"></i> Add Custom Prompt of the Day</h2>
-        <form method="POST" action="potd_manager.php">
-            <input type="hidden" name="add_custom_potd" value="1">
-            <div class="pm-fg">
-                <label>Title *</label>
-                <input type="text" name="custom_title" placeholder="e.g. Romantic Beach Sunset Prompt" required>
-            </div>
-            <div class="pm-fg">
-                <label>Prompt Text *</label>
-                <textarea name="custom_text" placeholder="Enter the full prompt text here..." required></textarea>
-            </div>
-            <div class="pm-fg">
-                <label>Image URL (optional)</label>
-                <input type="text" name="custom_image" placeholder="https://example.com/image.jpg">
-            </div>
-            <button type="submit" class="pm-submit">
-                <i class="fa-solid fa-plus"></i> Add Custom POTD
-            </button>
-        </form>
-    </div>
-
-</div>
+<nav class="mob-nav">
+  <a href="dashboard.php" class="mn-link"><i class="fa-solid fa-gauge-high"></i><span>Home</span></a>
+  <a href="manage_prompts.php" class="mn-link"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Prompts</span></a>
+  <a href="user_management.php" class="mn-link"><i class="fa-solid fa-users"></i><span>Users</span></a>
+  <a href="analytics.php" class="mn-link"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
+  <a href="upload_prompt.php" class="mn-link" style="color:var(--accent2)"><i class="fa-solid fa-plus"></i><span>Upload</span></a>
+</nav>
 
 <script>
-// Toggle POTD
-function togglePotd(type, id, checkbox) {
-    var active = checkbox.checked ? 1 : 0;
+window.addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('sp').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+(function(){const c=document.getElementById('pc');if(!c)return;const ctx=c.getContext('2d');let W,H,pts=[];function rs(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}rs();window.addEventListener('resize',rs);class P{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.2+.3;this.a=Math.random()*.35+.1;const cols=['139,92,246','244,114,182','34,211,238'];this.col=cols[Math.floor(Math.random()*cols.length)]}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(${this.col},${this.a})`;ctx.fill()}}for(let i=0;i<50;i++)pts.push(new P());function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw()});requestAnimationFrame(loop)}loop();})();
 
-    // Immediately uncheck all other toggles visually
-    document.querySelectorAll('.pm-table input[type="checkbox"]').forEach(function(cb) {
-        if (cb !== checkbox) {
-            cb.checked = false;
-            cb.closest('tr').classList.remove('row-active');
-        }
-    });
-
-    // Add/remove active class on this row
-    var row = checkbox.closest('tr');
-    if (active) {
-        row.classList.add('row-active');
-    } else {
-        row.classList.remove('row-active');
-    }
-
-    fetch('potd_toggle.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'type=' + type + '&id=' + id + '&active=' + active
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        if (!d.success) {
-            alert('Error toggling POTD');
-            checkbox.checked = !checkbox.checked;
-        }
-    })
-    .catch(function() {
-        alert('Network error');
-        checkbox.checked = !checkbox.checked;
-    });
+function togglePotd(type,id,checkbox){
+  const active=checkbox.checked?1:0;
+  fetch('potd_toggle.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`type=${type}&id=${id}&active=${active}`})
+  .then(r=>r.json()).then(d=>{
+    if(d.success){
+      // Deactivate all rows
+      document.querySelectorAll('#pm-table-existing tbody tr, #pm-table-custom tbody tr').forEach(r=>{
+        r.classList.remove('row-active');
+        const cb=r.querySelector('.potd-toggle');if(cb)cb.checked=false;
+      });
+      // Activate toggled row
+      if(active){const row=document.getElementById('row-'+type+'-'+id);if(row){row.classList.add('row-active');checkbox.checked=true}}
+    } else {checkbox.checked=!checkbox.checked;alert('Could not update POTD. Please try again.')}
+  }).catch(()=>{checkbox.checked=!checkbox.checked;alert('Network error.')});
 }
 
-// Delete custom POTD
-function deleteCustomPotd(id, btn) {
-    if (!confirm('Delete this custom POTD entry?')) return;
-
-    fetch('potd_delete_custom.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'id=' + id
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        if (d.success) {
-            var row = btn.closest('tr');
-            row.style.transition = 'opacity .3s';
-            row.style.opacity = '0';
-            setTimeout(function() { row.remove(); }, 300);
-        } else {
-            alert('Error deleting');
-        }
-    });
+function deleteCustomPotd(id,btn){
+  if(!confirm('Delete this custom POTD entry?'))return;
+  fetch('potd_delete_custom.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'id='+id})
+  .then(r=>r.json()).then(d=>{
+    if(d.success){const row=document.getElementById('row-custom-'+id);if(row){row.style.opacity='0';setTimeout(()=>row.remove(),300)}}
+    else alert('Could not delete. Please try again.');
+  }).catch(()=>alert('Network error.'));
 }
 
-// Search filter
-function filterPotdTable(query) {
-    query = query.toLowerCase().trim();
-    var tables = ['pm-table-existing', 'pm-table-custom'];
-    tables.forEach(function(tid) {
-        var tbl = document.getElementById(tid);
-        if (!tbl) return;
-        var rows = tbl.querySelectorAll('tbody tr');
-        var found = 0;
-        rows.forEach(function(row) {
-            var match = (row.dataset.search || '').includes(query);
-            row.style.display = match ? '' : 'none';
-            if (match) found++;
-        });
-    });
-    // Show/hide empty for existing table
-    var allExisting = document.querySelectorAll('#pm-table-existing tbody tr');
-    var anyVisible = false;
-    allExisting.forEach(function(r) { if (r.style.display !== 'none') anyVisible = true; });
-    var emptyEl = document.getElementById('pm-empty-existing');
-    if (emptyEl) emptyEl.style.display = anyVisible ? 'none' : 'block';
+function filterPotdTable(query){
+  const q=query.toLowerCase();
+  let vis1=0,vis2=0;
+  document.querySelectorAll('#pm-table-existing tbody tr').forEach(r=>{const m=!q||(r.dataset.search||'').includes(q);r.style.display=m?'':'none';if(m)vis1++;});
+  document.querySelectorAll('#pm-table-custom tbody tr').forEach(r=>{const m=!q||(r.dataset.search||'').includes(q);r.style.display=m?'':'none';if(m)vis2++;});
+  const e=document.getElementById('pm-empty-existing');if(e)e.style.display=vis1===0?'block':'none';
 }
 </script>
-</body>
 </html>
+
