@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -84,7 +84,9 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
 <title>User Management — Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+</script>
 <?php include_once "gtag.php"; ?>
 <style>
 :root{--bg:#07060f;--surface:#0f0d1e;--surface2:#15122a;--border:rgba(139,92,246,0.18);--border2:rgba(139,92,246,0.08);--accent:#8b5cf6;--accent2:#c084fc;--pink:#f472b6;--cyan:#22d3ee;--green:#4ade80;--yellow:#fbbf24;--orange:#fb923c;--red:#f87171;--text:#e2e0ff;--muted:#9490bb;--font:'Inter',sans-serif}
@@ -244,13 +246,68 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 @media(max-width:768px){#c-dot,#c-ring{display:none!important}}
 .c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
 .c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}</style>
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}/* MOBILE TOPBAR */
+.mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
+.mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
+.mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.mob-home-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;background:rgba(34,211,238,0.08);color:var(--cyan);border:1px solid rgba(34,211,238,0.2);flex-shrink:0}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:265px;background:rgba(7,6,15,0.99);border-right:1px solid var(--border);z-index:600;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}.drawer-overlay.open{display:block}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px;border-bottom:1px solid var(--border2)}
+.drawer-brand{font-size:.8rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.drawer-close{width:32px;height:32px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem}
+.drawer-user{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border2)}
+.d-av-ph2{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
+.d-uname{font-size:.85rem;font-weight:800}.d-role2{font-size:.65rem;color:var(--accent2);font-weight:700;text-transform:uppercase}
+.drawer-nav2{flex:1;overflow-y:auto;padding:8px 10px}
+.d-sec2{font-size:.6rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 8px 5px}
+.d-link2{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;margin-bottom:2px}
+.d-link2:hover,.d-link2.active{background:rgba(139,92,246,0.1);color:var(--accent2)}.d-link2 i{width:18px;text-align:center}
+.drawer-bot{padding:12px 10px;border-top:1px solid var(--border2)}
+.d-out{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--red);text-decoration:none}
+.d-out:hover{background:rgba(248,113,113,0.08)}
+@media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0!important;padding-bottom:90px!important}.mob-topbar{display:flex!important}.topbar{display:none!important}.mob-nav{display:flex!important}}
+</style>
 </head>
 <body>
 <div id="c-dot"></div>
 <div id="c-ring"></div>
 <div id="sp"></div>
 <canvas id="pc"></canvas>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="sideDrawer">
+  <div class="drawer-head"><div class="drawer-brand">Arigato Admin</div><div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div></div>
+  <div class="drawer-user">
+    <div class="d-av-ph2" id="d-letter">A</div>
+    <div><div class="d-uname" id="d-name">Admin</div><div class="d-role2">Admin</div></div>
+  </div>
+  <nav class="drawer-nav2">
+    <div class="d-sec2">Overview</div>
+    <a href="dashboard.php" class="d-link2 "><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="analytics.php" class="d-link2 "><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <div class="d-sec2">Content</div>
+    <a href="upload_prompt.php" class="d-link2 "><i class="fa-solid fa-upload"></i> Upload Prompt</a>
+    <a href="manage_prompts.php" class="d-link2 "><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
+    <a href="prompt_links.php" class="d-link2 "><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="potd_manager.php" class="d-link2 "><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <div class="d-sec2">Blog</div>
+    <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
+    <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus"></i> New Post</a>
+    <div class="d-sec2">Users</div>
+    <a href="user_management.php" class="d-link2 active"><i class="fa-solid fa-users"></i> Users</a>
+    <div class="d-sec2">Tools</div>
+    <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
+  </nav>
+  <div class="drawer-bot"><a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div>
+</div>
+
+<!-- MOBILE TOP BAR -->
+<div class="mob-topbar">
+  <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
+  <div class="mob-page-title"><i class="fa-solid fa-users" style="-webkit-text-fill-color:var(--accent2);margin-right:6px"></i>User Management</div>
+  <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
+</div>
 
 <aside class="sidebar">
   <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
@@ -398,7 +455,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   }
   function ghostPage(d){ var tp=Math.ceil(ghostData.length/ghostPerPage); ghostCurPage=Math.max(0,Math.min(tp-1,ghostCurPage+d)); renderGhost(); }
   renderGhost();
-  </script>
+  function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+</script>
   <?php endif; ?>
 
   <!-- ALL USERS TABLE -->
@@ -598,6 +657,9 @@ function setCsel(id,val,lbl){
   if(sel){sel.value=val;sel.dispatchEvent(new Event('change'));}
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.csel-wrap'))document.querySelectorAll('.csel-wrap.open').forEach(el=>el.classList.remove('open'));});
+function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
 </script>
 </html>
+
 

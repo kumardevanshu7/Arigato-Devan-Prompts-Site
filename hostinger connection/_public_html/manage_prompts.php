@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -176,7 +176,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .mn-link.active,.mn-link:hover{color:var(--accent2)}
 .mn-link i{font-size:1.1rem}
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}}
-@media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}.bulk-type-btns{gap:6px}.btn span{display:none}}
+@media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0;padding:14px 14px 90px}.mob-nav{display:flex!important}.mob-topbar{display:flex!important}.topbar{display:none}.p-actions{display:none!important}.p-dot-wrap{display:block!important}.bulk-type-btns{gap:6px}}
+/* MOBILE TOPBAR */
+.mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
+.mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
+.mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.mob-home-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;background:rgba(34,211,238,0.08);color:var(--cyan);border:1px solid rgba(34,211,238,0.2);flex-shrink:0}
+/* DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:265px;background:rgba(7,6,15,0.99);border-right:1px solid var(--border);z-index:600;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drawer-overlay.open{display:block}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px;border-bottom:1px solid var(--border2)}
+.drawer-brand{font-size:.8rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.drawer-close{width:32px;height:32px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem}
+.drawer-user{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border2)}
+.d-av-ph2{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
+.d-uname{font-size:.85rem;font-weight:800}
+.d-role2{font-size:.65rem;color:var(--accent2);font-weight:700;text-transform:uppercase}
+.drawer-nav2{flex:1;overflow-y:auto;padding:8px 10px}
+.d-sec2{font-size:.6rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 8px 5px}
+.d-link2{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;margin-bottom:2px}
+.d-link2:hover,.d-link2.active{background:rgba(139,92,246,0.1);color:var(--accent2)}
+.d-link2 i{width:18px;text-align:center}
+.drawer-bot{padding:12px 10px;border-top:1px solid var(--border2)}
+.d-out{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--red);text-decoration:none}
+.d-out:hover{background:rgba(248,113,113,0.08)}
+/* THREE-DOT DROPDOWN */
+.p-actions-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.p-dot-wrap{position:relative;display:none}
+.p-dot-btn{width:34px;height:34px;border-radius:9px;background:rgba(139,92,246,0.08);border:1px solid var(--border);color:var(--accent2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .2s}
+.p-dot-btn:hover{background:rgba(139,92,246,0.15)}
+.p-dropdown{display:none;position:absolute;right:0;top:40px;background:rgba(10,9,20,0.98);border:1px solid var(--border);border-radius:13px;padding:6px;min-width:175px;z-index:200;box-shadow:0 12px 40px rgba(0,0,0,0.5);backdrop-filter:blur(16px)}
+.p-dropdown.open{display:block}
+.pd-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;font-size:.82rem;font-weight:700;color:var(--text);text-decoration:none;cursor:pointer;transition:background .15s;border:none;background:transparent;width:100%;font-family:var(--font)}
+.pd-item:hover{background:rgba(139,92,246,0.08)}
+.pd-del:hover{background:rgba(248,113,113,0.08)!important}
 /* CUSTOM CURSOR */
 *{cursor:none!important}
 #c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
@@ -194,6 +229,47 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 <div id="c-ring"></div>
 <div id="sp"></div>
 <canvas id="pc"></canvas>
+
+<!-- MOBILE DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="sideDrawer">
+  <div class="drawer-head">
+    <div class="drawer-brand">Arigato Admin</div>
+    <div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div>
+  </div>
+  <div class="drawer-user">
+    <div class="d-av-ph2"><?= strtoupper(substr($__sn,0,1)) ?></div>
+    <div><div class="d-uname"><?= htmlspecialchars($__sn) ?></div><div class="d-role2">Admin</div></div>
+  </div>
+  <nav class="drawer-nav2">
+    <div class="d-sec2">Overview</div>
+    <a href="dashboard.php" class="d-link2"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="analytics.php" class="d-link2"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <div class="d-sec2">Content</div>
+    <a href="upload_prompt.php" class="d-link2"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
+    <a href="manage_prompts.php" class="d-link2 active"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
+    <a href="prompt_links.php" class="d-link2"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="potd_manager.php" class="d-link2"><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <div class="d-sec2">Blog</div>
+    <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
+    <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus"></i> New Post</a>
+    <div class="d-sec2">Users</div>
+    <a href="user_management.php" class="d-link2"><i class="fa-solid fa-users"></i> Users</a>
+    <div class="d-sec2">Tools</div>
+    <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
+  </nav>
+  <div class="drawer-bot">
+    <a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </div>
+</div>
+
+<!-- MOBILE TOP BAR -->
+<div class="mob-topbar">
+  <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
+  <div class="mob-page-title"><i class="fa-solid fa-list-check" style="-webkit-text-fill-color:var(--accent2);margin-right:6px"></i>Manage Prompts</div>
+  <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
+</div>
+
 <aside class="sidebar">
   <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
   <div class="sb-admin">
@@ -276,10 +352,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
           <?php foreach(array_filter(array_map('trim',explode(',',$p['tag']??''))) as $tg): ?><span class="p-tag-pill"><?= htmlspecialchars($tg) ?></span><?php endforeach; ?>
         </div>
       </div>
-      <div class="p-actions">
-        <button id="feat-btn-<?= $item_id ?>" onclick="featurePrompt(<?= $item_id ?>)" class="btn btn-yellow"><i class="fa-solid fa-star"></i> <span>POTD</span></button>
-        <a href="edit_prompt.php?id=<?= $item_id ?>" class="btn btn-cyan"><i class="fa-solid fa-pen"></i> <span>Edit</span></a>
-        <button onclick="confirmDelete(<?= $item_id ?>, '<?= addslashes($p['title']??'') ?>')" class="btn btn-red"><i class="fa-solid fa-trash"></i></button>
+      <div class="p-actions-wrap">
+        <div class="p-actions">
+          <button id="feat-btn-<?= $item_id ?>" onclick="featurePrompt(<?= $item_id ?>)" class="btn btn-yellow"><i class="fa-solid fa-star"></i> <span>POTD</span></button>
+          <a href="edit_prompt.php?id=<?= $item_id ?>" class="btn btn-cyan"><i class="fa-solid fa-pen"></i> <span>Edit</span></a>
+          <button onclick="confirmDelete(<?= $item_id ?>, '<?= addslashes($p['title']??'') ?>')" class="btn btn-red"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div class="p-dot-wrap">
+          <button class="p-dot-btn" onclick="togglePDrop(this)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+          <div class="p-dropdown">
+            <a href="edit_prompt.php?id=<?= $item_id ?>" class="pd-item"><i class="fa-solid fa-pen" style="color:var(--cyan)"></i> Edit Prompt</a>
+            <button class="pd-item" onclick="featurePrompt(<?= $item_id ?>);closePDrops()"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Toggle POTD</button>
+            <button class="pd-item pd-del" onclick="confirmDelete(<?= $item_id ?>,'<?= addslashes($p['title']??'') ?>');closePDrops()"><i class="fa-solid fa-trash" style="color:var(--red)"></i> Delete</button>
+          </div>
+        </div>
       </div>
     </div>
     <?php endforeach; ?>
@@ -443,6 +529,14 @@ document.getElementById('bulk-form')?.addEventListener('submit',function(e){
   if(!_bulkAction||cnt===0){e.preventDefault();return}
   if(!confirm(`Change ${cnt} prompt(s) to type: ${_bulkAction}?`))e.preventDefault();
 });
+
+// Mobile drawer
+function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+// Three-dot dropdown
+function togglePDrop(btn){var dd=btn.nextElementSibling;var wasOpen=dd.classList.contains('open');closePDrops();if(!wasOpen)dd.classList.add('open');}
+function closePDrops(){document.querySelectorAll('.p-dropdown.open').forEach(function(d){d.classList.remove('open')});}
+document.addEventListener('click',function(e){if(!e.target.closest('.p-dot-wrap'))closePDrops();});
 </script>
 </html>
 
