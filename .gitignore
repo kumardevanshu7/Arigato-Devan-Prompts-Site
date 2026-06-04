@@ -6,7 +6,7 @@ firebase_auth.php
 .htaccess
 
 # ===== LOCAL ONLY — NEVER UPLOAD =====
-dev_dashboard.html
+/dev_dashboard/
 
 # ===== PRIVATE FOLDER =====
 /private/
