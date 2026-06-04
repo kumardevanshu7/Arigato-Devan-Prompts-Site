@@ -3,7 +3,7 @@ db.php
 firebase_auth.php
 
 # ===== SERVER CONFIG — NEVER SYNC =====
-.htaccess
+
 
 # ===== PRIVATE FOLDER =====
 /private/

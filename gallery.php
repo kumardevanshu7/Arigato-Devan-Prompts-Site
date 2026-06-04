@@ -12,6 +12,7 @@ $page       = max(1, (int)($_GET['page'] ?? 1));
 $per_page   = 20;
 $tag_filter = trim(strtolower($_GET['tag'] ?? ''));
 $tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . $tag_filter . '%' : null;
+$_page_canonical = 'https://arigatodevan.com/gallery.php' . (($tag_filter && $tag_filter !== 'all') ? '?tag=' . urlencode($tag_filter) : '');
 $offset     = ($page - 1) * $per_page;
 
 // Count total for pagination
@@ -76,7 +77,7 @@ function sessionAvatar()
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan Prompts</title>
     <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
-    <link rel="canonical" href="https://arigatodevan.com/gallery.php">
+
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

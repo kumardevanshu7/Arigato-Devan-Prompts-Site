@@ -10,6 +10,9 @@ ErrorDocument 404 /404.php
 # ─── sitemap.xml → sitemap.php ──────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # --- 301 Redirects
+    RewriteRule ^terms/?$ /terms.php [R=301,L]
+    RewriteRule ^prompts/?$ /gallery.php [R=301,L]
     RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
     # ─── Clean prompt URLs: /prompts/kiss-in-rain → prompt.php?slug=kiss-in-rain
     RewriteRule ^prompts/([a-z0-9-]+)/?$ prompt.php?slug=$1 [L,QSA]

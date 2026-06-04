@@ -47,7 +47,6 @@ Disallow: /uploads/
 Disallow: /profiledp/
 Disallow: /toplogo/
 Disallow: /private/
-Disallow: /gallery.php?tag=
 Disallow: /gallery.php?page=
 
 # Sitemap location

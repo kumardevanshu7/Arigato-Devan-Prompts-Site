@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+$_page_canonical = 'https://arigatodevan.com/';
 // Guard: if logged in but onboarding not done, force setup
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
@@ -215,7 +216,7 @@ try {
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
-                    <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo">
+                    <img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo" fetchpriority="high">
                 </div>
                 <div class="logo-back">
                     <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
@@ -866,12 +867,7 @@ try {
                                  htmlspecialchars($p["prompt_text"]) .
                                  '"'
                              : "" ?>>
-                        <img loading="lazy" src="<?= htmlspecialchars(
-                            $p["image_path"],
-                        ) ?>" class="card-bg-image" alt="Prompt Image" <?= $index <
-3
-    ? ""
-    : 'loading="lazy"' ?>>
+                        <img src="<?= htmlspecialchars($p["image_path"]) ?>" class="card-bg-image" alt="Prompt Image" <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
 
                         <?php if (!$p["is_unlocked"]): ?>
                             <div class="card-lock-icon">
