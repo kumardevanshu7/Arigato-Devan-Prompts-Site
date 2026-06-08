@@ -73,6 +73,7 @@ function sessionAvatar()
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#c084fc">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan Prompts</title>
@@ -89,6 +90,11 @@ function sessionAvatar()
     <meta name="twitter:title" content="Gallery — All AI Couple Prompts | Arigato Devan">
     <meta name="twitter:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites — only on Arigato Devan! ✨">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <!-- Canonical -->
+    <link rel="canonical" href="<?= htmlspecialchars($_page_canonical) ?>">
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.min.css?v=20260601">
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
         <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -554,3 +560,4 @@ function sessionAvatar()
 </div>
 </body>
 </html>
+

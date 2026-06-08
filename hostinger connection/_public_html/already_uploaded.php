@@ -30,6 +30,9 @@ if (isset($_SESSION["user_id"])) {
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Already Uploaded Prompts &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! 📱">
@@ -408,3 +411,4 @@ document.querySelectorAll('.card').forEach(function(card) {
     }, { once: true });
 });
 </script></body></html>
+

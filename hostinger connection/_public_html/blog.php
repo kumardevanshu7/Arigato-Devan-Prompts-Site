@@ -56,15 +56,66 @@ $read_time = max(1, (int)ceil($word_count / 200));
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars($blog["meta_title"] ?? $blog["title"]) ?> &ndash; Arigato Devan Prompts</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
 ) ?>">
 <?php if ($blog["tags"]): ?><meta name="keywords" content="<?= htmlspecialchars(
     $blog["tags"],
 ) ?>"><?php endif; ?>
+<?php
+    $blog_url     = 'https://arigatodevan.com/blog.php?slug=' . urlencode($blog['slug']);
+    $blog_og_img  = !empty($blog['image_path'])
+                    ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/')
+                    : 'https://arigatodevan.com/landingpics/lan9.webp';
+    $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
+    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' – Arigato Devan');
+?>
+<!-- Canonical -->
+<link rel="canonical" href="<?= $blog_url ?>">
+<!-- Favicon -->
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Arigato Devan Prompts">
+<meta property="og:title" content="<?= $blog_og_title ?>">
+<meta property="og:description" content="<?= $blog_og_desc ?>">
+<meta property="og:image" content="<?= $blog_og_img ?>">
+<meta property="og:url" content="<?= $blog_url ?>">
+<meta property="article:published_time" content="<?= date('c', strtotime($blog['created_at'])) ?>">
+<meta property="article:modified_time" content="<?= date('c', strtotime($blog['updated_at'] ?? $blog['created_at'])) ?>">
+<meta property="article:author" content="<?= htmlspecialchars($blog['author_name'] ?? 'Arigato Devan') ?>">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= $blog_og_title ?>">
+<meta name="twitter:description" content="<?= $blog_og_desc ?>">
+<meta name="twitter:image" content="<?= $blog_og_img ?>">
+<!-- BlogPosting Schema -->
+<script type="application/ld+json">
+<?= json_encode([
+    '@context'      => 'https://schema.org',
+    '@type'         => 'BlogPosting',
+    'headline'      => $blog['title'],
+    'description'   => strip_tags($blog['meta_description'] ?? $blog['description'] ?? ''),
+    'url'           => $blog_url,
+    'image'         => $blog_og_img,
+    'datePublished' => date('c', strtotime($blog['created_at'])),
+    'dateModified'  => date('c', strtotime($blog['updated_at'] ?? $blog['created_at'])),
+    'author'        => ['@type' => 'Person', 'name' => $blog['author_name'] ?? 'Arigato Devan'],
+    'publisher'     => [
+        '@type' => 'Organization',
+        'name'  => 'Arigato Devan',
+        'url'   => 'https://arigatodevan.com',
+        'logo'  => ['@type' => 'ImageObject', 'url' => 'https://arigatodevan.com/toplogo/logo01.webp'],
+    ],
+    'inLanguage'    => 'en',
+    'keywords'      => $blog['tags'] ?? '',
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+</script>
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Blog Post Viewer */
@@ -1701,3 +1752,4 @@ if (typeof gtag !== 'undefined') {
 }
 </script>
 </body></html>
+

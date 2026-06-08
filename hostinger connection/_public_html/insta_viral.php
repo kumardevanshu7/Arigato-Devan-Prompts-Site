@@ -31,6 +31,9 @@ if (isset($_SESSION["user_id"])) {
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; Arigato Devan Prompts</title>
 <meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
@@ -519,3 +522,4 @@ document.querySelectorAll('.card').forEach(function(card) {
     }, { once: true });
 });
 </script></body></html>
+

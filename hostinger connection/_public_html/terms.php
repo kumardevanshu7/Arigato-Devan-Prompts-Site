@@ -2,9 +2,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c084fc">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service &ndash; Arigato Devan Prompts</title>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="Arigato Devan Prompts">
+    <meta property="og:description" content="Discover the best AI prompts for Instagram Reels.">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta property="og:url" content="https://arigatodevan.com/terms.php">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="description" content="Terms of Service for Arigato Devan PromptVerse. Usage rules, ownership, and platform guidelines.">
     <link rel="canonical" href="https://arigatodevan.com/terms.php">
     <link rel="stylesheet" href="style.min.css?v=20260601">
@@ -121,3 +131,4 @@
     </footer>
 </body>
 </html>
+

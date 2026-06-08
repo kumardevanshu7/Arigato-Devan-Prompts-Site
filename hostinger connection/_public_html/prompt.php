@@ -82,6 +82,7 @@ function sessionAvatar() {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#c084fc">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
@@ -92,6 +93,9 @@ function sessionAvatar() {
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:url" content="<?= $canonical ?>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="<?= $og_img ?>">
@@ -636,3 +640,4 @@ function sessionAvatar() {
     </script>
 </body>
 </html>
+

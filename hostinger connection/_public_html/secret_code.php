@@ -25,8 +25,18 @@ if (empty($_SESSION["oauth_state"])) {
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Secret Code Reels &mdash; Arigato Devan Prompts</title>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="Arigato Devan Prompts">
+    <meta property="og:description" content="Discover the best AI prompts for Instagram Reels.">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta property="og:url" content="https://arigatodevan.com/secret_code.php">
+    <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Unlock exclusive secret prompts on PromptVerse with a 6-character code.">
     <link rel="canonical" href="https://arigatodevan.com/secret_code.php">
 <link rel="stylesheet" href="style.min.css?v=20260601">
@@ -429,3 +439,4 @@ document.querySelectorAll('.sc-filter-btn').forEach(btn=>{btn.addEventListener('
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 </style>
 </body></html>
+

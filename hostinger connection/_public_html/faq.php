@@ -7,6 +7,9 @@
     <title>FAQ &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Frequently asked questions about Arigato Devan Prompts — how to unlock secret codes, use AI tools, and get the best couple AI content for Instagram Reels.">
     <link rel="canonical" href="https://arigatodevan.com/faq.php">
+    <meta name="theme-color" content="#c084fc">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="FAQ — Arigato Devan Prompts">
@@ -114,7 +117,6 @@
             <a href="gallery.php">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
             <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
             <a href="faq.php" title="FAQ" class="active" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>

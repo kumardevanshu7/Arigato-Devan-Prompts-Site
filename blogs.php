@@ -37,11 +37,14 @@ arsort($all_tags);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
@@ -1456,3 +1459,4 @@ if (dotsToggle && header) {
 }
 </script>
 </body></html>
+

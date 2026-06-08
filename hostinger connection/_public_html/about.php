@@ -2,11 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#c084fc">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse — a platform crafting beautiful AI prompts for couples and creative souls.">
     <link rel="canonical" href="https://arigatodevan.com/about.php">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
     <meta property="og:title" content="About Us — Arigato Devan PromptVerse">
@@ -198,3 +201,5 @@ setTimeout(function() {
 </script>
 </body>
 </html>
+
+
