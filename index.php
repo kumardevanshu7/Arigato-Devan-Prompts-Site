@@ -8,6 +8,19 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     exit();
 }
 
+// Fetch approved testimonials for slider
+$testimonials = [];
+try {
+    $tStmt = $pdo->query("
+        SELECT f.feedback_text, f.rating, u.username, u.avatar, u.profile_image, u.gender
+        FROM feedbacks f
+        LEFT JOIN users u ON f.user_id = u.id
+        WHERE f.show_on_homepage = 1
+        ORDER BY f.submitted_at DESC
+    ");
+    $testimonials = $tStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $testimonials = []; }
+
 // Fetch ONLY secret prompts for Home page
 if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
@@ -388,6 +401,71 @@ try {
         <div class="landing-center">
 
             <!-- Sticker Tags row -->
+            <?php if (!empty($testimonials)): ?>
+            <!-- ══ MINI COLORFUL TESTIMONIALS ══ -->
+            <div style="width:100%;max-width:760px;margin:0 auto 28px;padding:0 10px;">
+                <p style="text-align:center;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.22em;color:#9490bb;margin-bottom:16px;font-family:'Inter',sans-serif;">✦ What our users say ✦</p>
+                <div id="miniTestiTrack" style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 4px 14px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory;">
+                <?php
+                $mc = [['#ffd6e7','#f9a8d4','#831843'],['#d0f4de','#86efac','#14532d'],['#e8d5f5','#c4b5fd','#4c1d95'],['#fff3cd','#fde68a','#78350f'],['#cfe2ff','#93c5fd','#1e3a5f'],['#fde8c0','#fdba74','#7c2d12']];
+                $t_emojis2=['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
+                foreach ($testimonials as $ti => $t2):
+                    $ci = $ti % count($mc);
+                    $bg = $mc[$ci][0]; $bc = $mc[$ci][1]; $tc = $mc[$ci][2];
+                    $r2 = max(0,min(10,(int)$t2['rating']));
+                    $em2 = $t_emojis2[$r2];
+                    $tname2 = htmlspecialchars($t2['username'] ?? 'User');
+                    $tav2   = $t2['profile_image'] ?? $t2['avatar'] ?? '';
+                    $tseed2 = urlencode($t2['username'] ?? 'user');
+                    $tg2 = strtolower(trim($t2['gender'] ?? ''));
+                    $tgi2 = in_array($tg2,['male','m']) ? '♂' : (in_array($tg2,['female','f']) ? '♀' : '');
+                    $shorttext = mb_strlen($t2['feedback_text']) > 68 ? mb_substr($t2['feedback_text'],0,68).'…' : $t2['feedback_text'];
+                    // Floating quote separator between cards (not before first)
+                    if ($ti > 0):
+                ?>
+                <!-- Floating quote separator -->
+                <div class="testi-sep" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;width:38px;user-select:none;pointer-events:none;">
+                    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:2.4rem;font-weight:700;color:rgba(139,92,246,0.35);animation:quoteFloat <?= 2 + ($ti * 0.3) ?>s ease-in-out infinite;display:block;line-height:1;">❝</span>
+                </div>
+                <?php endif; ?>
+                <!-- Card -->
+                <div style="min-width:210px;max-width:210px;background:<?= $bg ?>;border:2px solid <?= $bc ?>;border-radius:20px;padding:12px 14px 10px;flex-shrink:0;scroll-snap-align:start;box-shadow:3px 3px 0 <?= $bc ?>;transition:transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+                    <!-- Rating badge -->
+                    <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.78);border-radius:100px;padding:2px 10px;font-size:.68rem;font-weight:900;color:<?= $tc ?>;margin-bottom:8px;border:1px solid <?= $bc ?>;"><?= $em2 ?> <?= $r2 ?>/10</div>
+                    <!-- Quote text -->
+                    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:.95rem;font-style:italic;color:#1a1410;line-height:1.5;margin-bottom:10px;"><?= htmlspecialchars($shorttext) ?></p>
+                    <!-- Divider -->
+                    <div style="height:1px;background:<?= $bc ?>;opacity:0.4;margin-bottom:9px;"></div>
+                    <!-- User row -->
+                    <div style="display:flex;align-items:center;gap:7px;">
+                        <div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:2px solid <?= $bc ?>;flex-shrink:0;background:#eee;">
+                            <?php if ($tav2): ?>
+                            <img src="<?= htmlspecialchars($tav2) ?>" style="width:100%;height:100%;object-fit:cover;" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= $tseed2 ?>'">
+                            <?php else: ?>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=<?= $tseed2 ?>" style="width:100%;height:100%;object-fit:cover;" alt="">
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <div style="font-family:'Inter',sans-serif;font-size:.7rem;font-weight:800;color:#1a1410;"><?= $tname2 ?><?= $tgi2 ? ' <span style="opacity:.65">'.$tgi2.'</span>' : '' ?></div>
+                            <div style="font-size:.58rem;color:<?= $tc ?>;font-weight:700;opacity:.7;">Arigato User</div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+                </div>
+                <style>
+                #miniTestiTrack::-webkit-scrollbar{display:none}
+                @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&display=swap');
+                @keyframes quoteFloat {
+                    0%,100% { transform: translateY(0) rotate(-8deg) scale(1); }
+                    50%     { transform: translateY(-10px) rotate(8deg) scale(1.15); }
+                }
+                </style>
+            </div>
+            <?php endif; ?>
+
+
+
             <div class="sticker-row">
                 <div class="sticker sticker-new"><i class="fa-solid fa-wand-magic-sparkles"></i> NEW</div>
                 <div class="sticker sticker-hot"><i class="fa-solid fa-fire"></i> HOT</div>
@@ -937,7 +1015,7 @@ try {
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="feedback.php">FEEDBACK</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 
     <!-- Unlock Modal - No longer restricted by session so guests can see the "login to save" features -->

@@ -104,6 +104,17 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // User Feedbacks table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS feedbacks (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        feedback_text TEXT NOT NULL,
+        rating TINYINT NOT NULL DEFAULT 0,
+        show_on_homepage TINYINT(1) NOT NULL DEFAULT 0,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_user_feedback (user_id)
+    )");
+
     // ─── Run ALTER TABLE migrations only once per session (not every page load) ─
     if (empty($_SESSION['_db_migrations_done'])) {
         $blog_alters = [
