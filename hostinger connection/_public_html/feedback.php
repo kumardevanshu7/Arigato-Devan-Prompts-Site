@@ -24,7 +24,8 @@ $uStmt->execute([$user_id]);
 $user = $uStmt->fetch(PDO::FETCH_ASSOC);
 $username     = htmlspecialchars($user['username'] ?? 'Friend');
 $gender       = strtolower(trim($user['gender'] ?? ''));
-$profile_img  = $user['profile_image'] ?? $user['avatar'] ?? '';
+// Avatar: prefer uploaded avatar over Google profile_image
+$profile_img  = (!empty($user['avatar']) ? $user['avatar'] : ($user['profile_image'] ?? ''));
 
 // Gender icon
 $gender_icon = match(true) {
@@ -59,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$already_submitted) {
     $word_count = str_word_count($feedback_text);
     if ($word_count < 3) {
         $error_msg = "Please write at least 3 words.";
-    } elseif ($word_count > 50) {
-        $error_msg = "Please keep it under 50 words.";
+    } elseif ($word_count > 20) {
+        $error_msg = "Please keep it under 20 words.";
     } elseif ($rating < 0 || $rating > 10) {
         $error_msg = "Please select a valid rating.";
     } else {
@@ -104,25 +105,25 @@ $avatar_url = avatarUrl($profile_img, $username);
    ROOT & RESET
 ══════════════════════════════════════════════════ */
 :root {
-    --cream:   #faf8f3;
-    --cream2:  #f3efe6;
+    --cream:   #eef2ff;
+    --cream2:  #e0e7ff;
     --ink:     #1a1410;
-    --ink2:    #3d352c;
-    --muted:   #8c7f72;
-    --border:  rgba(60,45,30,0.12);
-    --accent:  #c084fc;
-    --gold:    #d4a853;
+    --ink2:    #3730a3;
+    --muted:   #6366f1;
+    --border:  rgba(99,102,241,0.18);
+    --accent:  #818cf8;
+    --gold:    #a5b4fc;
     --red-soft:#e05555;
     --serif:   'Cormorant Garamond', Georgia, serif;
     --sans:    'Inter', sans-serif;
     --card-r:  28px;
-    --shadow:  0 32px 80px rgba(60,45,30,0.13), 0 8px 24px rgba(60,45,30,0.08);
+    --shadow:  0 24px 60px rgba(99,102,241,0.15), 0 8px 24px rgba(99,102,241,0.1);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { height: 100%; }
 body {
     min-height: 100%;
-    background: var(--cream);
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 40%, #ede9fe 70%, #dbeafe 100%);
     font-family: var(--sans);
     color: var(--ink);
     overflow-x: hidden;
@@ -176,32 +177,32 @@ body {
     position: fixed;
     top: 50%;
     font-family: var(--serif);
-    font-size: clamp(48px, 7vw, 88px);
+    font-size: clamp(80px, 12vw, 150px);
     font-weight: 700;
     font-style: italic;
     color: transparent;
-    -webkit-text-stroke: 1.5px rgba(192,132,252,0.24);
+    -webkit-text-stroke: 2px rgba(99,102,241,0.18);
     white-space: nowrap;
     pointer-events: none;
     z-index: 0;
-    text-shadow: 0 0 40px rgba(192,132,252,0.15), 0 0 90px rgba(192,132,252,0.08);
+    text-shadow: 0 0 60px rgba(99,102,241,0.12), 0 0 120px rgba(99,102,241,0.06);
     user-select: none;
     letter-spacing: .06em;
     writing-mode: vertical-rl;
     text-orientation: mixed;
 }
 .bg-side-left {
-    left: 16px;
+    left: 8px;
     transform: translateY(-50%) rotate(180deg);
 }
 .bg-side-right {
-    right: 16px;
+    right: 8px;
     transform: translateY(-50%);
 }
 @media (max-width: 600px) {
-    .bg-side-word { font-size: 36px; }
-    .bg-side-left { left: 4px; }
-    .bg-side-right { right: 4px; }
+    .bg-side-word { font-size: 60px; }
+    .bg-side-left { left: 2px; }
+    .bg-side-right { right: 2px; }
 }
 
 /* ══════════════════════════════════════════════════
@@ -223,11 +224,12 @@ body {
    PAGE WRAPPER
 ══════════════════════════════════════════════════ */
 .page-wrap {
-    min-height: 100vh;
+    height: 100vh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 80px 20px 60px;
+    padding: 0 20px;
     position: relative; z-index: 1;
+    overflow: hidden;
 }
 
 /* ══════════════════════════════════════════════════
@@ -239,22 +241,22 @@ body {
     text-transform: uppercase; letter-spacing: .18em;
     color: var(--muted);
     border: 1px solid var(--border); border-radius: 100px;
-    padding: 5px 14px; margin-bottom: 32px;
-    background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+    padding: 5px 14px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
 }
 
 /* ══════════════════════════════════════════════════
    MAIN CARD
 ══════════════════════════════════════════════════ */
 .feedback-card {
-    width: 100%; max-width: 560px;
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(28px) saturate(160%);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.9);
+    width: 100%; max-width: 520px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1.5px solid rgba(165,180,252,0.4);
     border-radius: var(--card-r);
     box-shadow: var(--shadow);
-    padding: 44px 40px 40px;
+    padding: 28px 32px 24px;
     position: relative; overflow: hidden;
     animation: cardIn .55s cubic-bezier(.34,1.56,.64,1) both;
 }
@@ -274,14 +276,14 @@ body {
 ══════════════════════════════════════════════════ */
 .avatar-wrap {
     display: flex; flex-direction: column; align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
 }
 /* Rainbow ring — only the RING rotates, not the image */
 .avatar-ring {
-    width: 88px; height: 88px;
+    width: 72px; height: 72px;
     border-radius: 50%;
     position: relative;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     flex-shrink: 0;
 }
 .avatar-ring::before {
@@ -324,60 +326,82 @@ body {
    CARD HEADING
 ══════════════════════════════════════════════════ */
 .card-heading {
-    text-align: center; margin-bottom: 28px;
+    text-align: center; margin-bottom: 14px;
 }
 .card-title {
     font-family: var(--serif);
-    font-size: 1.95rem; font-weight: 700; font-style: italic;
+    font-size: 1.65rem; font-weight: 700; font-style: italic;
     color: var(--ink); line-height: 1.2;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 .card-sub {
-    font-size: .8rem; color: var(--muted); font-weight: 500;
+    font-size: .75rem; color: var(--muted); font-weight: 500;
     line-height: 1.5;
 }
 
 /* ══════════════════════════════════════════════════
    TEXTAREA + WORD COUNT
 ══════════════════════════════════════════════════ */
-.field-wrap { position: relative; margin-bottom: 8px; }
+.field-wrap { position: relative; margin-bottom: 6px; }
+/* Mood tags */
+.mood-tags {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    margin-bottom: 12px;
+}
+.mood-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.8);
+    border: 1.5px solid rgba(165,180,252,0.5);
+    border-radius: 100px;
+    font-size: .72rem; font-weight: 700;
+    color: #4338ca; cursor: pointer;
+    transition: all .18s;
+    user-select: none;
+}
+.mood-tag:hover, .mood-tag.active {
+    background: rgba(165,180,252,0.3);
+    border-color: #818cf8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+}
 .feedback-textarea {
     width: 100%;
-    min-height: 130px;
-    background: rgba(250,248,243,0.8);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 16px 18px;
+    min-height: 88px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid rgba(165,180,252,0.35);
+    border-radius: 14px;
+    padding: 12px 14px;
     font-family: var(--sans);
-    font-size: .92rem; color: var(--ink);
+    font-size: .9rem; color: #1e1b4b;
     resize: none; outline: none;
     transition: border-color .2s, box-shadow .2s;
-    line-height: 1.65;
+    line-height: 1.6;
 }
-.feedback-textarea::placeholder { color: var(--muted); }
+.feedback-textarea::placeholder { color: #a5b4fc; }
 .feedback-textarea:focus {
-    border-color: rgba(192,132,252,0.5);
-    box-shadow: 0 0 0 3px rgba(192,132,252,0.1);
+    border-color: rgba(129,140,248,0.7);
+    box-shadow: 0 0 0 3px rgba(129,140,248,0.15);
 }
 .word-count-row {
     display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 22px;
+    align-items: center; margin-bottom: 14px;
 }
 .word-count {
-    font-size: .72rem; font-weight: 700; color: var(--muted);
+    font-size: .7rem; font-weight: 700; color: var(--muted);
     transition: color .2s;
 }
 .word-count.over  { color: var(--red-soft); }
 .word-count.good  { color: #22c55e; }
 .word-hint {
-    font-size: .68rem; color: var(--muted); font-style: italic;
+    font-size: .66rem; color: var(--muted); font-style: italic;
 }
 
 /* ══════════════════════════════════════════════════
    EMOJI RATING
 ══════════════════════════════════════════════════ */
 .rating-section {
-    margin-bottom: 28px;
+    margin-bottom: 14px;
     opacity: 0; transform: translateY(10px);
     transition: opacity .35s ease, transform .35s ease;
     pointer-events: none;
@@ -587,14 +611,15 @@ body {
    MOBILE
 ══════════════════════════════════════════════════ */
 @media (max-width: 600px) {
-    .feedback-card { padding: 32px 22px 28px; border-radius: 22px; }
-    .card-title { font-size: 1.6rem; }
-    .emoji-btn { font-size: 1.05rem; padding: 6px 1px 4px; border-radius: 9px; }
-    .emoji-num { font-size: .42rem; }
-    .avatar-ring { width: 72px; height: 72px; }
-    .user-name { font-size: 1.2rem; }
-    .back-link { top: 14px; left: 14px; font-size: .72rem; padding: 6px 12px; }
-    .page-wrap { padding: 70px 14px 50px; }
+    .feedback-card { padding: 20px 16px 18px; border-radius: 20px; max-width: 95vw; }
+    .card-title { font-size: 1.35rem; }
+    .emoji-btn { font-size: .95rem; padding: 5px 1px 4px; border-radius: 8px; }
+    .emoji-num { font-size: .38rem; }
+    .avatar-ring { width: 58px; height: 58px; }
+    .user-name { font-size: 1.1rem; }
+    .back-link { top: 12px; left: 12px; font-size: .68rem; padding: 5px 10px; }
+    .page-wrap { height: 100dvh; overflow: hidden; }
+    .feedback-textarea { min-height: 72px; }
 }
 </style>
 </head>
@@ -733,19 +758,27 @@ body {
         <?php endif; ?>
 
         <form method="POST" id="feedbackForm">
+            <!-- Mood Tags -->
+            <div class="mood-tags" id="moodTags">
+                <span class="mood-tag" onclick="toggleMood(this)">🔥 Loved the prompts</span>
+                <span class="mood-tag" onclick="toggleMood(this)">✨ Clean UI</span>
+                <span class="mood-tag" onclick="toggleMood(this)">💡 Need more features</span>
+                <span class="mood-tag" onclick="toggleMood(this)">⚡ Super fast</span>
+                <span class="mood-tag" onclick="toggleMood(this)">❤️ Keep going!</span>
+            </div>
             <div class="field-wrap">
                 <textarea
                     class="feedback-textarea"
                     name="feedback_text"
                     id="feedbackText"
-                    placeholder="Tell us about your experience — what do you love? what can improve? (3–50 words)"
-                    maxlength="600"
+                    placeholder="Your thoughts in 3–20 words..."
+                    maxlength="300"
                 ><?= htmlspecialchars($_POST['feedback_text'] ?? '') ?></textarea>
             </div>
 
             <div class="word-count-row">
-                <span class="word-count" id="wordCount">0 / 50 words</span>
-                <span class="word-hint">min 3 · max 50 words</span>
+                <span class="word-count" id="wordCount">0 / 20 words</span>
+                <span class="word-hint">min 3 · max 20 words</span>
             </div>
 
             <!-- EMOJI RATING -->
@@ -802,17 +835,28 @@ function countWords(str) {
     return s.split(/\s+/).filter(w => w.length > 0).length;
 }
 
+function toggleMood(el) {
+    el.classList.toggle('active');
+    // Append/remove tag text to textarea
+    const txt = document.getElementById('feedbackText');
+    const tag = el.textContent.trim().split(' ').slice(1).join(' '); // remove emoji
+    if (el.classList.contains('active')) {
+        const cur = txt.value.trim();
+        txt.value = cur ? cur + ' ' + tag : tag;
+    }
+    updateWordCount();
+}
+
 function updateWordCount() {
     const txt  = document.getElementById('feedbackText').value;
     const wc   = countWords(txt);
     const el   = document.getElementById('wordCount');
     const rating = document.getElementById('ratingSection');
-    const submitBtn = document.getElementById('submitBtn');
 
-    el.textContent = wc + ' / 50 words';
+    el.textContent = wc + ' / 20 words';
     el.classList.remove('over','good');
 
-    if (wc > 50) {
+    if (wc > 20) {
         el.classList.add('over');
     } else if (wc >= 3) {
         el.classList.add('good');
@@ -837,21 +881,63 @@ function selectRating(r) {
 function checkSubmit() {
     const txt = document.getElementById('feedbackText').value;
     const wc  = countWords(txt);
-    const ok  = wc >= 3 && wc <= 50 && selectedRating >= 0;
+    const ok  = wc >= 3 && wc <= 20 && selectedRating >= 0;
     document.getElementById('submitBtn').disabled = !ok;
 }
 
 document.getElementById('feedbackText')?.addEventListener('input', updateWordCount);
-
-// Init
 updateWordCount();
 
-// Form submit loading state
+// Form submit loading + confetti on success
 document.getElementById('feedbackForm')?.addEventListener('submit', function() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...';
 });
+
+// ── CONFETTI on success ──
+(function(){
+    if (!document.querySelector('.success-state')) return;
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#818cf8','#a5b4fc','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa'];
+    const pieces = Array.from({length:120}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        r: Math.random() * 6 + 3,
+        d: Math.random() * 120 + 60,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 10 - 5,
+        tiltAngle: 0,
+        tiltSpeed: Math.random() * 0.1 + 0.04
+    }));
+    let angle = 0, frame = 0;
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        angle += 0.01;
+        pieces.forEach(p => {
+            p.tiltAngle += p.tiltSpeed;
+            p.y += (Math.cos(angle + p.d) + 2);
+            p.x += Math.sin(angle) * 1.2;
+            p.tilt = Math.sin(p.tiltAngle) * 12;
+            ctx.beginPath();
+            ctx.lineWidth = p.r;
+            ctx.strokeStyle = p.color;
+            ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+            ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+            ctx.stroke();
+            if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+        });
+        frame++;
+        if (frame < 220) requestAnimationFrame(draw);
+        else canvas.remove();
+    }
+    draw();
+})();
 </script>
 </body>
 </html>

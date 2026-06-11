@@ -178,9 +178,9 @@ header {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: clamp(6px, 1.5vw, 28px);
+    gap: clamp(4px, 1.2vw, 20px);
     font-weight: 600;
-    font-size: clamp(0.78rem, 0.95vw, 1rem);
+    font-size: clamp(0.75rem, 0.9vw, 0.95rem);
     flex-wrap: nowrap;
 }
 
@@ -267,13 +267,20 @@ header {
     .nav-dropdown {
         position: static;
     }
+    /* Fix: header must allow overflow so dropdown doesn't clip */
+    header:has(.nav-dropdown.open) {
+        overflow: visible;
+    }
     .nav-dropdown-menu {
-        left: 0;
-        right: 0;
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: auto;
         transform: none;
-        width: 100%;
-        border-radius: 0 0 20px 20px;
-        top: 100%;
+        width: auto;
+        border-radius: 16px;
+        z-index: 2000;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18), 6px 6px 0 #2d2a35;
     }
 }
 

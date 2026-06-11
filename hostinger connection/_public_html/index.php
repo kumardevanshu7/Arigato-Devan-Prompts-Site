@@ -1015,7 +1015,7 @@ try {
 
     <footer>
         <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="feedback.php">FEEDBACK</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="feedback.php">FEEDBACK</a><a href="testimonials.php">TESTIMONIALS</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
     </footer>
 
     <!-- Unlock Modal - No longer restricted by session so guests can see the "login to save" features -->
