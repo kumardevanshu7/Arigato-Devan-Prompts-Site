@@ -152,7 +152,7 @@ function sessionAvatar() {
         .pp-extra-title { font-size:clamp(1.2rem,3vw,1.6rem); font-weight:900; margin-bottom:16px; line-height:1.2; }
         @media(max-width:700px){.pp-extra-layout{flex-direction:column;} .pp-extra-img-col{width:100%;max-width:300px;}}
         .pp-info-col { flex: 1; min-width: 0; }
-        .pp-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+        .pp-title { color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.5); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; text-align: left; }
         /* -- Task Card -- */
         .pp-task-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 32px 28px; box-shadow: var(--shadow-comic); text-align: center; }
         .pp-task-icon { font-size: 3rem; margin-bottom: 12px; }
@@ -209,10 +209,10 @@ function sessionAvatar() {
         .pp-related { margin-top: 48px; }
         .pp-related h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; }
         .pp-rel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .pp-rel-card { display: block; text-decoration: none; color: inherit; border-radius: 16px; overflow: hidden; border: var(--border-width) solid var(--text-color); box-shadow: var(--shadow-comic); transition: all .2s; background: var(--card-bg); }
-        .pp-rel-card:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-3px); }
-        .pp-rel-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
-        .pp-rel-card-title { padding: 10px 12px; font-weight: 800; font-size: 0.8rem; line-height: 1.3; }
+        .pp-rel-card { display: block; text-decoration: none; color: #fff; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 6px 15px rgba(0,0,0,0.3); transition: all .2s; background: rgba(30, 30, 35, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .pp-rel-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateY(-3px); border-color: rgba(255,255,255,0.4); }
+        .pp-rel-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .pp-rel-card-title { padding: 12px 14px; font-weight: 800; font-size: 0.85rem; line-height: 1.3; color: #fff; }
         /* -- Mobile -- */
         @media (max-width: 768px) {
             .pp-layout { flex-direction: column; }

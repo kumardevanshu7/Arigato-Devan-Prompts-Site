@@ -4,6 +4,7 @@ require_once "db.php";
 
 $total_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
 $total_followers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +147,7 @@ $total_followers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn()
     </div>
     <div class="about-stats-row">
         <div class="about-stat"><div class="stat-num"><?= $total_prompts ?>+</div><div class="stat-label">Prompts</div></div>
+        <div class="about-stat"><div class="stat-num"><?= $total_unlocks ?>+</div><div class="stat-label">Unlocks</div></div>
         <div class="about-stat"><div class="stat-num"><?= $total_followers ?>+</div><div class="stat-label">Followers</div></div>
     </div>
     <div class="about-bio-card">
