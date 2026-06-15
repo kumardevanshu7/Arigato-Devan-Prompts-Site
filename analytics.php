@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -91,7 +91,7 @@ $age_perf = sqAll($pdo, "SELECT p.title, DATEDIFF(NOW(),p.created_at) as age, CO
 // -- Power users (5+ unlocks) --
 $power_users = sqAll($pdo, "SELECT u.username, u.email, COUNT(up.id) as cnt FROM users u JOIN unlocked_prompts up ON u.id=up.user_id GROUP BY u.id,u.username,u.email HAVING cnt >= 5 ORDER BY cnt DESC LIMIT 15");
 
-// -- Churn risk (active 8ï¿½30 days ago, not in last 7 days) --
+// -- Churn risk (active 8?30 days ago, not in last 7 days) --
 $churn_users = sqAll($pdo, "SELECT username, email, last_active FROM users WHERE last_active >= DATE_SUB(NOW(),INTERVAL 30 DAY) AND last_active < DATE_SUB(NOW(),INTERVAL 7 DAY) ORDER BY last_active ASC LIMIT 10");
 
 // -- Dead prompts (0 unlocks in last 30 days) --
@@ -120,7 +120,7 @@ $blog_data   = json_encode(array_column($top_blogs, "views"));
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analytics â€” Arigato Admin</title>
+<title>Analytics — Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
@@ -337,7 +337,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="scard s-green"><div class="sc-icon"><i class="fa-solid fa-user-plus"></i></div><div class="sc-val" data-val="<?= $monthly_u ?>"><?= $monthly_u ?></div><div class="sc-lbl">Users (30d)</div></div>
     <div class="scard s-yellow"><div class="sc-icon"><i class="fa-solid fa-route"></i></div><div class="sc-val" data-val="<?= round($avg_journey) ?>"><?= round($avg_journey) ?></div><div class="sc-lbl">Avg Journey (days)</div></div>
     <?php if($most_liked_r): ?>
-    <div class="scard s-pink s-span2"><div class="sc-icon"><i class="fa-solid fa-trophy"></i></div><div class="sc-val" style="font-size:1rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px"><?= htmlspecialchars($most_liked['title']??'â€”') ?></div><div class="sc-lbl">Most Liked Prompt â€” <?= (int)($most_liked['likes_count']??0) ?> Likes</div></div>
+    <div class="scard s-pink s-span2"><div class="sc-icon"><i class="fa-solid fa-trophy"></i></div><div class="sc-val" style="font-size:1rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px"><?= htmlspecialchars($most_liked['title']??'—') ?></div><div class="sc-lbl">Most Liked Prompt — <?= (int)($most_liked['likes_count']??0) ?> Likes</div></div>
     <?php endif; ?>
   </div>
 

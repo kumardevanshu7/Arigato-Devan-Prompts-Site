@@ -1,6 +1,6 @@
-ï»¿<?php
+<?php
 /**
- * card.php â€” Universal shareable card link with rich OG previews
+ * card.php — Universal shareable card link with rich OG previews
  * Usage: card.php?id=123
  *
  * - Renders Open Graph + Twitter Card meta tags so when this URL
@@ -74,23 +74,23 @@ $isBot = (bool) preg_match(
 );
 
 if (!$isBot) {
-    // Real user â€” instant redirect, no flicker
+    // Real user — instant redirect, no flicker
     header("Location: {$redirectUrl}", true, 302);
     exit();
 }
 
-// Bot / crawler â€” render OG preview page WITHOUT any redirect
+// Bot / crawler — render OG preview page WITHOUT any redirect
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title><?= htmlspecialchars($title) ?> â€” Arigato Devan Prompts</title>
+<title><?= htmlspecialchars($title) ?> — Arigato Devan Prompts</title>
 
 <!-- Open Graph (WhatsApp / Facebook / Instagram / iMessage / Telegram) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="<?= htmlspecialchars($title) ?> â€” Arigato Devan">
+<meta property="og:title" content="<?= htmlspecialchars($title) ?> — Arigato Devan">
 <meta property="og:description" content="<?= htmlspecialchars($description) ?>">
 <meta property="og:image" content="<?= htmlspecialchars($img) ?>">
 <meta property="og:image:secure_url" content="<?= htmlspecialchars($img) ?>">
@@ -99,7 +99,7 @@ if (!$isBot) {
 
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<?= htmlspecialchars($title) ?> â€” Arigato Devan">
+<meta name="twitter:title" content="<?= htmlspecialchars($title) ?> — Arigato Devan">
 <meta name="twitter:description" content="<?= htmlspecialchars($description) ?>">
 <meta name="twitter:image" content="<?= htmlspecialchars($img) ?>">
 

@@ -293,6 +293,7 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px}}
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-topbar{display:flex!important}}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:18px 14px}}
+body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 </head>
 <body>

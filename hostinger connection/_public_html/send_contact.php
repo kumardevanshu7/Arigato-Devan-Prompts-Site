@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Content-Type: application/json');
 
 $name  = trim(strip_tags($_POST['name']  ?? ''));
@@ -19,7 +19,7 @@ $admin_email = 'devansh.grow@gmail.com';
 $from_domain = 'noreply@arigatodevan.com';
 $site_name   = 'Arigato Devan PromptVerse';
 
-// ── Email to Admin ──
+// -- Email to Admin --
 $admin_subject = "New Contact Message from {$name}";
 $admin_body = '<!DOCTYPE html><html><head><meta charset="UTF-8">
 <style>
@@ -56,8 +56,8 @@ $admin_headers .= "X-Mailer: PHP/" . phpversion();
 
 $admin_sent = mail($admin_email, $admin_subject, $admin_body, $admin_headers);
 
-// ── Confirmation Email to User ──
-$user_subject = "We received your message — {$site_name}";
+// -- Confirmation Email to User --
+$user_subject = "We received your message � {$site_name}";
 
 $user_body_html = '<!DOCTYPE html><html><head><meta charset="UTF-8">
 <style>

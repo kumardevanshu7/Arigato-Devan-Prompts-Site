@@ -469,7 +469,7 @@ $type_map = [
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.min.js?v=20260601"></script>
+<script defer src="script.min.js?v=20260616"></script>
 <script>
 (function () {
     const popup = document.getElementById('sp-confirm-remove');

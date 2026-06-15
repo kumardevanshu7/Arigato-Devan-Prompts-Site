@@ -1256,7 +1256,7 @@ footer .footer-links a:hover {
   <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
 </footer>
 
-<script defer src="script.min.js?v=20260601"></script>
+<script defer src="script.min.js?v=20260616"></script>
 <script>
 function filterByTag(tag, btn) {
   // Update active pill

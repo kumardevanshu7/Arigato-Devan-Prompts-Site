@@ -5,6 +5,8 @@ require_once "db.php";
 $total_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
 $total_followers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $total_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
+$total_copies = (int)$pdo->query("SELECT COALESCE(SUM(copy_count),0) FROM prompts")->fetchColumn();
+$total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -149,6 +151,8 @@ $total_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetc
         <div class="about-stat"><div class="stat-num"><?= $total_prompts ?>+</div><div class="stat-label">Prompts</div></div>
         <div class="about-stat"><div class="stat-num"><?= $total_unlocks ?>+</div><div class="stat-label">Unlocks</div></div>
         <div class="about-stat"><div class="stat-num"><?= $total_followers ?>+</div><div class="stat-label">Followers</div></div>
+        <div class="about-stat"><div class="stat-num"><?= $total_copies ?>+</div><div class="stat-label">Copies</div></div>
+        <div class="about-stat"><div class="stat-num"><?= $total_views ?>+</div><div class="stat-label">Views</div></div>
     </div>
     <div class="about-bio-card">
         <h2><i class="fa-solid fa-user" style="margin-right:8px;color:#c084fc;"></i>About Me</h2>

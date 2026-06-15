@@ -622,13 +622,7 @@ body {
     .feedback-textarea { min-height: 72px; }
 }
 </style>
-    <style>
-        html, body { background: transparent !important; height: 100%; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
-    </style>
+
 </head>
 <body>
 <div class="bg-lines"></div>
@@ -663,11 +657,11 @@ body {
                     <span class="gender-icon"><?= $gender_icon ?></span>
                 </div>
             </div>
-            <div class="success-icon">âœ“</div>
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
             <div class="success-title">Thank you, <?= $username ?>!</div>
             <div class="success-sub">
                 Your feedback means a lot. <br>
-                Arigato Devan ko better banane mein help ki tumne. ðŸ’œ
+                Arigato Devan ko better banane mein help ki tumne. <i class="fa-solid fa-heart" style="color: #a855f7;"></i>
             </div>
             <div class="success-note">
                 <i class="fa-solid fa-clock"></i>
@@ -713,7 +707,7 @@ body {
                 </div>
             </div>
 
-            <div class="cooldown-title">Already shared! ðŸŽ‰</div>
+            <div class="cooldown-title">Already shared! <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i></div>
             <div class="cooldown-sub">
                 Tumhara feedback record ho gaya hai.<br>
                 <?= $cooldown_days_left ?> din baad phir se share kar sakte ho.
@@ -724,11 +718,23 @@ body {
                 <div class="prev-fb-label">Your last feedback</div>
                 <div class="prev-fb-text">"<?= htmlspecialchars($existing['feedback_text']) ?>"</div>
                 <?php
-                $emojis = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
+                $icons = [
+                    '<i class="fa-solid fa-face-sad-cry" style="color:#ef4444"></i>',
+                    '<i class="fa-solid fa-face-sad-tear" style="color:#f87171"></i>',
+                    '<i class="fa-solid fa-face-frown" style="color:#fb923c"></i>',
+                    '<i class="fa-solid fa-face-frown-open" style="color:#fbbf24"></i>',
+                    '<i class="fa-solid fa-face-meh" style="color:#facc15"></i>',
+                    '<i class="fa-solid fa-face-smile" style="color:#a3e635"></i>',
+                    '<i class="fa-solid fa-face-smile-beam" style="color:#4ade80"></i>',
+                    '<i class="fa-solid fa-face-laugh" style="color:#34d399"></i>',
+                    '<i class="fa-solid fa-face-laugh-beam" style="color:#10b981"></i>',
+                    '<i class="fa-solid fa-face-grin-stars" style="color:#0ea5e9"></i>',
+                    '<i class="fa-solid fa-star" style="color:#eab308"></i>'
+                ];
                 $r = (int)($existing['rating'] ?? 0);
                 $clamp = max(0, min(10, $r));
                 ?>
-                <div class="prev-fb-rating"><?= $emojis[$clamp] ?> Rating: <?= $clamp ?>/10</div>
+                <div class="prev-fb-rating"><?= $icons[$clamp] ?> Rating: <?= $clamp ?>/10</div>
             </div>
             <?php endif; ?>
 
@@ -754,7 +760,7 @@ body {
 
         <div class="card-heading">
             <div class="card-title">How's your experience?</div>
-            <div class="card-sub">Share what you think â€” honest feedback helps us grow.</div>
+            <div class="card-sub">Share what you think - honest feedback helps us grow.</div>
         </div>
 
         <?php if ($error_msg): ?>
@@ -767,25 +773,25 @@ body {
         <form method="POST" id="feedbackForm">
             <!-- Mood Tags -->
             <div class="mood-tags" id="moodTags">
-                <span class="mood-tag" onclick="toggleMood(this)">ðŸ”¥ Loved the prompts</span>
-                <span class="mood-tag" onclick="toggleMood(this)">âœ¨ Clean UI</span>
-                <span class="mood-tag" onclick="toggleMood(this)">ðŸ’¡ Need more features</span>
-                <span class="mood-tag" onclick="toggleMood(this)">âš¡ Super fast</span>
-                <span class="mood-tag" onclick="toggleMood(this)">â¤ï¸ Keep going!</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-fire" style="color: #f97316;"></i> Loved the prompts</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-wand-magic-sparkles" style="color: #eab308;"></i> Clean UI</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-lightbulb" style="color: #eab308;"></i> Need more features</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-bolt" style="color: #eab308;"></i> Super fast</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Keep going!</span>
             </div>
             <div class="field-wrap">
                 <textarea
                     class="feedback-textarea"
                     name="feedback_text"
                     id="feedbackText"
-                    placeholder="Your thoughts in 3â€“20 words..."
+                    placeholder="Your thoughts in 3-20 words..."
                     maxlength="300"
                 ><?= htmlspecialchars($_POST['feedback_text'] ?? '') ?></textarea>
             </div>
 
             <div class="word-count-row">
                 <span class="word-count" id="wordCount">0 / 20 words</span>
-                <span class="word-hint">min 3 Â· max 20 words</span>
+                <span class="word-hint">min 3 &middot; max 20 words</span>
             </div>
 
             <!-- EMOJI RATING -->
@@ -796,8 +802,20 @@ body {
                 </div>
                 <div class="emoji-row" id="emojiRow">
                     <?php
-                    $emojis_list = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
-                    foreach ($emojis_list as $i => $em):
+                    $icons_list = [
+                        '<i class="fa-solid fa-face-sad-cry" style="color:#ef4444"></i>',
+                        '<i class="fa-solid fa-face-sad-tear" style="color:#f87171"></i>',
+                        '<i class="fa-solid fa-face-frown" style="color:#fb923c"></i>',
+                        '<i class="fa-solid fa-face-frown-open" style="color:#fbbf24"></i>',
+                        '<i class="fa-solid fa-face-meh" style="color:#facc15"></i>',
+                        '<i class="fa-solid fa-face-smile" style="color:#a3e635"></i>',
+                        '<i class="fa-solid fa-face-smile-beam" style="color:#4ade80"></i>',
+                        '<i class="fa-solid fa-face-laugh" style="color:#34d399"></i>',
+                        '<i class="fa-solid fa-face-laugh-beam" style="color:#10b981"></i>',
+                        '<i class="fa-solid fa-face-grin-stars" style="color:#0ea5e9"></i>',
+                        '<i class="fa-solid fa-star" style="color:#eab308"></i>'
+                    ];
+                    foreach ($icons_list as $i => $em):
                     ?>
                     <button type="button" class="emoji-btn" data-rating="<?= $i ?>" onclick="selectRating(<?= $i ?>)">
                         <?= $em ?>
@@ -821,17 +839,17 @@ body {
 
 <script>
 const ratingDescs = [
-    "0 â€” That bad? We're so sorry ðŸ˜”",
-    "1 â€” Really rough. We'll work on it.",
-    "2 â€” Not great. Your input helps!",
-    "3 â€” Below expectations. Noted.",
-    "4 â€” Could be better. Fair enough.",
-    "5 â€” Decent! Room to improve.",
-    "6 â€” Good! We're getting there.",
-    "7 â€” Pretty good! Glad you like it.",
-    "8 â€” Great experience! Thank you!",
-    "9 â€” Loved it! You made our day ðŸ™Œ",
-    "10 â€” Perfect! You're amazing! â­"
+    "0 - That bad? We\'re so sorry",
+    "1 - Really rough. We\'ll work on it.",
+    "2 - Not great. Your input helps!",
+    "3 - Below expectations. Noted.",
+    "4 - Could be better. Fair enough.",
+    "5 - Decent! Room to improve.",
+    "6 - Good! We\'re getting there.",
+    "7 - Pretty good! Glad you like it.",
+    "8 - Great experience! Thank you!",
+    "9 - Loved it! You made our day",
+    "10 - Perfect! You\'re amazing!"
 ];
 
 let selectedRating = -1;
@@ -846,7 +864,7 @@ function toggleMood(el) {
     el.classList.toggle('active');
     // Append/remove tag text to textarea
     const txt = document.getElementById('feedbackText');
-    const tag = el.textContent.trim().split(' ').slice(1).join(' '); // remove emoji
+    const tag = el.textContent.trim(); // Get text without icon tags
     if (el.classList.contains('active')) {
         const cur = txt.value.trim();
         txt.value = cur ? cur + ' ' + tag : tag;

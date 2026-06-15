@@ -362,7 +362,7 @@ if (isset($_SESSION["user_id"])) {
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.min.js?v=20260601"></script>
+<script defer src="script.min.js?v=20260616"></script>
 <script>
 // Background Scroll Logic
 const bgLayers = document.querySelectorAll('.bg-layer');

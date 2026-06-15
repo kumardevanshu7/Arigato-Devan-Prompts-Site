@@ -614,7 +614,7 @@ function sessionAvatar()
       });
     })();
     </script>
-        <script defer src="script.min.js?v=20260601"></script>
+        <script defer src="script.min.js?v=20260616"></script>
         <script>
 
         // Card click → navigate to clean prompt URL (with fade-out)

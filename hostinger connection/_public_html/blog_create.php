@@ -876,6 +876,7 @@ header .admin-avatar {
 .editor-wrapper.active {
     display: block;
 }
+body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 <noscript>
 body {

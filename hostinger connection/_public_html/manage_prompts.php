@@ -9,6 +9,15 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     exit();
 }
 
+// -- AJAX Toggle Trial --
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_trial_id'], $_POST['is_trial'])) {
+    $tid = intval($_POST['toggle_trial_id']);
+    $val = intval($_POST['is_trial']);
+    $pdo->prepare("UPDATE prompts SET is_trial = ? WHERE id = ?")->execute([$val, $tid]);
+    echo "OK";
+    exit;
+}
+
 // -- Bulk toggle (checkbox + publish/unpublish) --
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'], $_POST['selected_ids'])) {
     $ids = array_map('intval', (array)$_POST['selected_ids']);
@@ -222,7 +231,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 @media(max-width:768px){#c-dot,#c-ring{display:none!important}}
 .c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
 .c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}</style>
+@media(max-width:768px){#c-dot,#c-ring{display:none!important}}body::before, body::after { display: none !important; background-image: none !important; }
+</style>
 </head>
 <body>
 <div id="c-dot"></div>
@@ -346,7 +356,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
         <div class="p-title"><?= htmlspecialchars($p['title']??'Untitled') ?></div>
         <div class="p-meta">
           <span class="type-badge <?= $binfo['cls'] ?>"><?= $binfo['lbl'] ?></span>
-          <?php if(!empty($p['is_trial'])): ?><span class="type-badge tb-trial">TRIAL</span><?php endif; ?>
+          <?php if($ptype === 'secret' && !empty($p['secret_code'])): ?><span class="type-badge" style="background:rgba(192,132,252,0.1);color:#c084fc;border-color:rgba(192,132,252,0.25);font-family:monospace;cursor:pointer;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($p['secret_code']) ?>');alert('Code copied!');" title="Click to copy code"><?= htmlspecialchars($p['secret_code']) ?></span><?php endif; ?>
+          <span class="type-badge tb-trial" style="cursor:pointer;<?= empty($p['is_trial']) ? 'opacity:0.4;background:transparent;border-style:dashed;' : '' ?>" onclick="openTrialModal(<?= $item_id ?>, <?= empty($p['is_trial']) ? '0' : '1' ?>)"><?= empty($p['is_trial']) ? '+ Trial' : 'TRIAL' ?></span>
           <?php if(!empty($p['is_featured'])): ?><span class="type-badge" style="background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.25)"><i class="fa-solid fa-star" style="font-size:.55rem"></i> POTD</span><?php endif; ?>
           <?php if(!empty($p['likes_count'])): ?><span style="font-size:.68rem;color:var(--muted)"><i class="fa-solid fa-heart" style="color:var(--red)"></i> <?= $p['likes_count'] ?></span><?php endif; ?>
           <?php foreach(array_filter(array_map('trim',explode(',',$p['tag']??''))) as $tg): ?><span class="p-tag-pill"><?= htmlspecialchars($tg) ?></span><?php endforeach; ?>
@@ -537,6 +548,56 @@ function closeDrawer(){document.getElementById('sideDrawer').classList.remove('o
 function togglePDrop(btn){var dd=btn.nextElementSibling;var wasOpen=dd.classList.contains('open');closePDrops();if(!wasOpen)dd.classList.add('open');}
 function closePDrops(){document.querySelectorAll('.p-dropdown.open').forEach(function(d){d.classList.remove('open')});}
 document.addEventListener('click',function(e){if(!e.target.closest('.p-dot-wrap'))closePDrops();});
+
+let currentTrialId = 0;
+function openTrialModal(id, currentState) {
+  currentTrialId = id;
+  document.getElementById('trial-toggle-switch').checked = (currentState == 1);
+  document.getElementById('trial-modal').style.display = 'flex';
+}
+function closeTrialModal() {
+  document.getElementById('trial-modal').style.display = 'none';
+}
+function saveTrialModal() {
+  const isTrial = document.getElementById('trial-toggle-switch').checked ? 1 : 0;
+  fetch('manage_prompts.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'toggle_trial_id=' + currentTrialId + '&is_trial=' + isTrial
+  }).then(r => r.text()).then(txt => {
+    if (txt.includes('OK')) {
+      location.reload();
+    } else {
+      alert('Error updating trial status.');
+    }
+  });
+}
+
+
+let currentTrialId = 0;
+function openTrialModal(id, currentState) {
+  currentTrialId = id;
+  document.getElementById('trial-toggle-switch').checked = (currentState == 1);
+  document.getElementById('trial-modal').style.display = 'flex';
+}
+function closeTrialModal() {
+  document.getElementById('trial-modal').style.display = 'none';
+}
+function saveTrialModal() {
+  const isTrial = document.getElementById('trial-toggle-switch').checked ? 1 : 0;
+  fetch('manage_prompts.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'toggle_trial_id=' + currentTrialId + '&is_trial=' + isTrial
+  }).then(r => r.text()).then(txt => {
+    if (txt.includes('OK')) {
+      location.reload();
+    } else {
+      alert('Error updating trial status.');
+    }
+  });
+}
+
 </script>
 </html>
 

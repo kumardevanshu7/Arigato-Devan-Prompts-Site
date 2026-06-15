@@ -298,6 +298,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   /* Card padding tighter */
   .card{padding:16px;border-radius:14px}
 }
+body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 </head>
 <body>

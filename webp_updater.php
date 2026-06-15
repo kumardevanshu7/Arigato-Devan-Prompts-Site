@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 function updateFile($filepath) {
     if (!file_exists($filepath)) return;
     $content = file_get_contents($filepath);

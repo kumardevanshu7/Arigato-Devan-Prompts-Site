@@ -1614,7 +1614,7 @@ function checkFirstUnlock() {
 }
 
 /* =========================================================
-   PROFILE DROPDOWN  +  STREAK BADGE  +  NEW BADGE
+   PROFILE MODAL (Centered for both Mobile & Desktop)
    ========================================================= */
 (function () {
   if (typeof isLoggedIn === "undefined" || !isLoggedIn) return;
@@ -1625,20 +1625,14 @@ function checkFirstUnlock() {
   var profileLink = headerRight.querySelector('a[href="profile.php"]');
   if (!profileLink) return;
 
-  // Wrap profileLink in a relative-positioned container
-  var wrap = document.createElement("div");
-  wrap.className = "profile-dd-wrap";
-  wrap.style.cssText = "position:relative;display:inline-block;cursor:pointer;";
-  profileLink.parentNode.insertBefore(wrap, profileLink);
-  wrap.appendChild(profileLink);
-
   // Make the avatar non-navigating (we handle click ourselves)
   profileLink.addEventListener("click", function (e) {
     e.preventDefault();
+    openModal();
   });
 
-  /* ── Build the menu content (shared by dropdown + modal) ── */
-  function buildMenuContent(container, isMobile) {
+  /* ── Build the menu content ── */
+  function buildMenuContent(container) {
     container.innerHTML = "";
 
     // ── ADMIN label (only for admins) ──
@@ -1656,7 +1650,7 @@ function checkFirstUnlock() {
     var streakRow = document.createElement("div");
     streakRow.style.cssText =
       "display:none;align-items:center;gap:8px;padding:12px 16px;background:#fff8e0;border-bottom:1px solid var(--border-color,#eae3f2);font-weight:800;font-size:.88rem;color:#7a5800;";
-    streakRow.id = isMobile ? "dd-streak-row-modal" : "dd-streak-row";
+    streakRow.id = "modal-streak-row";
     container.appendChild(streakRow);
 
     // ── Menu links ──
@@ -1696,36 +1690,10 @@ function checkFirstUnlock() {
   }
 
   /* ══════════════════════════════════════════════
-     DESKTOP DROPDOWN (position:absolute)
-  ══════════════════════════════════════════════ */
-  var menu = document.createElement("div");
-  menu.className = "profile-dd-menu";
-  menu.style.cssText = [
-    "position:absolute",
-    "top:calc(100% + 10px)",
-    "right:0",
-    "min-width:220px",
-    "background:var(--card-bg,#fff)",
-    "border:var(--border-width,3px) solid var(--text-color,#2d2a35)",
-    "border-radius:18px",
-    "box-shadow:5px 5px 0 var(--text-color,#2d2a35)",
-    "overflow:hidden",
-    "z-index:3000",
-    "opacity:0",
-    "transform:translateY(-8px) scale(.97)",
-    "pointer-events:none",
-    "transition:opacity .2s,transform .2s",
-    "font-family:var(--font-main,Outfit,sans-serif)",
-  ].join(";");
-
-  var desktopStreak = buildMenuContent(menu, false);
-  wrap.appendChild(menu);
-
-  /* ══════════════════════════════════════════════
-     MOBILE MODAL (centered overlay with ✕)
+     MODAL OVERLAY
   ══════════════════════════════════════════════ */
   var overlay = document.createElement("div");
-  overlay.id = "profile-mobile-modal";
+  overlay.id = "profile-centered-modal";
   overlay.style.cssText = [
     "display:none",
     "position:fixed",
@@ -1782,7 +1750,7 @@ function checkFirstUnlock() {
   modalTitle.textContent = "My Account";
 
   var modalContent = document.createElement("div");
-  var mobileStreak = buildMenuContent(modalContent, true);
+  var modalStreak = buildMenuContent(modalContent);
 
   modalBox.appendChild(closeBtn);
   modalBox.appendChild(modalTitle);
@@ -1790,64 +1758,41 @@ function checkFirstUnlock() {
   overlay.appendChild(modalBox);
   document.body.appendChild(overlay);
 
-  // Add modal pop-in animation
-  var modalStyle = document.createElement("style");
-  modalStyle.textContent = "@keyframes modalPopIn{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}";
-  document.head.appendChild(modalStyle);
+  // Add modal pop-in animation if it doesn't exist
+  if (!document.getElementById("modal-pop-style")) {
+    var modalStyle = document.createElement("style");
+    modalStyle.id = "modal-pop-style";
+    modalStyle.textContent = "@keyframes modalPopIn{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}";
+    document.head.appendChild(modalStyle);
+  }
 
   /* ── Toggle logic ── */
-  function isMobileView() { return window.innerWidth <= 640; }
-
-  function openDD() {
-    if (isMobileView()) {
-      overlay.style.display = "flex";
-      // Re-animate
-      modalBox.style.animation = "none";
-      requestAnimationFrame(function() {
-        modalBox.style.animation = "modalPopIn .2s cubic-bezier(.34,1.56,.64,1) both";
-      });
-    } else {
-      menu.style.opacity = "1";
-      menu.style.transform = "translateY(0) scale(1)";
-      menu.style.pointerEvents = "all";
-    }
-    wrap.classList.add("open");
+  function openModal() {
+    overlay.style.display = "flex";
+    modalBox.style.animation = "none";
+    requestAnimationFrame(function() {
+      modalBox.style.animation = "modalPopIn .2s cubic-bezier(.34,1.56,.64,1) both";
+    });
   }
-  function closeDD() {
-    menu.style.opacity = "0";
-    menu.style.transform = "translateY(-8px) scale(.97)";
-    menu.style.pointerEvents = "none";
+  function closeModal() {
     overlay.style.display = "none";
-    wrap.classList.remove("open");
   }
 
-  wrap.addEventListener("click", function (e) {
-    e.stopPropagation();
-    wrap.classList.contains("open") ? closeDD() : openDD();
-  });
-  closeBtn.addEventListener("click", closeDD);
+  closeBtn.addEventListener("click", closeModal);
   overlay.addEventListener("click", function (e) {
-    if (e.target === overlay) closeDD();
-  });
-  document.addEventListener("click", function (e) {
-    if (!wrap.contains(e.target)) closeDD();
+    if (e.target === overlay) closeModal();
   });
   document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeDD();
+    if (e.key === "Escape") closeModal();
   });
 
   /* ── Fetch streak + new prompts ── */
   fetch("user_data.php")
     .then(function (r) { return r.json(); })
     .then(function (data) {
-      var streakHTML = data.streak >= 1
-        ? '<span style="font-size:1.1rem;">🔥</span><span>' + data.streak + " Day Streak!</span>"
-        : "";
-      if (streakHTML) {
-        desktopStreak.innerHTML = streakHTML;
-        desktopStreak.style.display = "flex";
-        mobileStreak.innerHTML = streakHTML;
-        mobileStreak.style.display = "flex";
+      if (data.streak >= 1) {
+        modalStreak.innerHTML = '<span style="font-size:1.1rem;">🔥</span><span>' + data.streak + " Day Streak!</span>";
+        modalStreak.style.display = "flex";
       }
       // NEW dot on avatar
       if (data.new_prompts > 0) {

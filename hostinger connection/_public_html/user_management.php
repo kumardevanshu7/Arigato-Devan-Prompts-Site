@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 require_once "db.php";
@@ -81,7 +81,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Management â€” Arigato Admin</title>
+<title>User Management — Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
@@ -369,7 +369,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <div class="dual-grid">
     <div class="card" style="margin-bottom:0">
       <div class="card-head">
-        <div class="card-title"><i class="fa-solid fa-chart-line"></i> User Growth â€” Last 30 Days</div>
+        <div class="card-title"><i class="fa-solid fa-chart-line"></i> User Growth — Last 30 Days</div>
       </div>
       <canvas id="growthChart" height="160"></canvas>
     </div>
@@ -505,7 +505,7 @@ function closeDrawer(){document.getElementById('sideDrawer').classList.remove('o
       <tr data-search="<?= htmlspecialchars(strtolower(($u['username']??'').' '.($u['email']??''))) ?>" data-role="<?= $u['role']??'user' ?>" data-gender="<?= $genderFilter ?>">
         <td style="font-size:.7rem;color:var(--muted);font-weight:700"><?= $idx+1 ?></td>
         <td><img loading="lazy" src="<?= htmlspecialchars($u_avatar) ?>" class="u-av" alt=""></td>
-        <td><div class="u-n"><?= htmlspecialchars($u['username']??'â€”') ?></div><div class="u-e"><?= htmlspecialchars($u['email']??'') ?></div></td>
+        <td><div class="u-n"><?= htmlspecialchars($u['username']??'—') ?></div><div class="u-e"><?= htmlspecialchars($u['email']??'') ?></div></td>
         <td class="<?= $ug==='male'?'gi-m':($ug==='female'?'gi-f':'gi-a') ?>"><i class="fa-solid fa-<?= $ug==='male'?'mars':($ug==='female'?'venus':'user-astronaut') ?>"></i> <?= $isAlien?'Alien':ucfirst($ug) ?></td>
         <td><span class="rbadge <?= $u['role']==='admin'?'rb-a':'rb-u' ?>"><?= strtoupper($u['role']??'user') ?></span></td>
         <td style="font-size:.72rem;color:var(--muted)"><?= $jdt->format('d M Y') ?><br><span style="opacity:.6;font-size:.65rem"><?= $jdt->format('h:i A') ?></span></td>
@@ -605,7 +605,7 @@ function renderPage(page){
   getAllRows().forEach(r=>r.style.display='none');
   rows.forEach((r,i)=>r.style.display=(i>=start&&i<end)?'':'none');
   document.getElementById('um-empty').style.display=total===0?'block':'none';
-  document.getElementById('um-info').textContent=total===0?'':`Showing ${Math.min(start+1,total)}â€“${Math.min(end,total)} of ${total}`;
+  document.getElementById('um-info').textContent=total===0?'':`Showing ${Math.min(start+1,total)}–${Math.min(end,total)} of ${total}`;
   renderPagination(page,pages,total);
 }
 function renderPagination(page,pages,total){
@@ -628,8 +628,8 @@ function openActivity(uid){
     if(!data.ok)return;const u=data.user;
     const av=u.avatar||'https://api.dicebear.com/7.x/avataaars/svg?seed='+encodeURIComponent(u.email||'x');
     document.getElementById('act-avatar').src=av;
-    document.getElementById('act-name').textContent=u.username||'â€”';
-    document.getElementById('act-email').textContent=u.email||'â€”';
+    document.getElementById('act-name').textContent=u.username||'—';
+    document.getElementById('act-email').textContent=u.email||'—';
     const la=u.last_active?new Date(u.last_active.replace(' ','T')+'Z'):null;
     document.getElementById('act-last-active').textContent=la?la.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Never';
     document.getElementById('act-unlocks').textContent=data.unlock_list.length;
@@ -637,7 +637,7 @@ function openActivity(uid){
     document.getElementById('act-likes').textContent=data.likes_count;
     const list=document.getElementById('act-unlock-list');list.innerHTML='';
     if(data.unlock_list.length===0){list.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:8px 0">No prompts unlocked yet.</div>'}
-    else{data.unlock_list.forEach(p=>{const d=document.createElement('div');d.style.cssText='background:rgba(139,92,246,0.07);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text)';d.innerHTML='<i class="fa-solid fa-lock-open" style="color:var(--accent2);margin-right:6px;font-size:.65rem"></i>'+(p.title||'â€”');list.appendChild(d)})}
+    else{data.unlock_list.forEach(p=>{const d=document.createElement('div');d.style.cssText='background:rgba(139,92,246,0.07);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text)';d.innerHTML='<i class="fa-solid fa-lock-open" style="color:var(--accent2);margin-right:6px;font-size:.65rem"></i>'+(p.title||'—');list.appendChild(d)})}
     document.getElementById('act-loading').style.display='none';document.getElementById('act-content').style.display='block';
   });
 }

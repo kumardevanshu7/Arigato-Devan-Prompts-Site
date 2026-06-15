@@ -1101,7 +1101,7 @@ try {
         ? "true"
         : "false" ?>;
 const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") ? "true" : "false" ?>;</script>
-        <script defer src="script.js?v=20260615"></script>
+        <script defer src="script.js?v=20260616"></script>
                 <script>
 
         // Background Scroll Logic

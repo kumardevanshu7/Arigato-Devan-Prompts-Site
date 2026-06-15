@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -15,7 +15,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Prompt — Arigato Admin</title>
+<title>Upload Prompt � Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php include_once "gtag.php"; ?>
@@ -149,6 +149,7 @@ textarea.form-input{resize:vertical;min-height:100px}
 .d-out{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--red);text-decoration:none}
 .d-out:hover{background:rgba(248,113,113,0.08)}
 @media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0!important;padding-bottom:90px!important}.mob-topbar{display:flex!important}.topbar{display:none!important}.mob-nav{display:flex!important}}
+body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 </head>
 <body>
@@ -284,7 +285,7 @@ textarea.form-input{resize:vertical;min-height:100px}
         </div>
         <div id="tag-suggestions">
           <?php
-          try { $stmt=$pdo->query("SELECT tag FROM prompts"); $all_tags=[]; while($row=$stmt->fetch()){$tarr=explode(",",$row["tag"]);foreach($tarr as $t){$t=trim(strtolower($t));if($t&&strlen($t)>1)$all_tags[$t]=true;}} $all_tags=array_keys($all_tags);sort($all_tags); foreach(array_slice($all_tags,0,30) as $t): ?><span class="tag-sug" onclick="addTag('<?= htmlspecialchars($t) ?>')"><?= htmlspecialchars($t) ?></span><?php endforeach; } catch(Exception $e) {}
+          try { $stmt=$pdo->query("SELECT tag FROM prompts ORDER BY created_at DESC LIMIT 200"); $all_tags=[]; while($row=$stmt->fetch()){$tarr=explode(",",$row["tag"]);foreach($tarr as $t){$t=trim(strtolower($t));if($t&&strlen($t)>1)$all_tags[$t]=true;}} $all_tags=array_keys($all_tags);sort($all_tags); foreach(array_slice($all_tags,0,30) as $t): ?><span class="tag-sug" onclick="addTag('<?= htmlspecialchars($t) ?>')"><?= htmlspecialchars($t) ?></span><?php endforeach; } catch(Exception $e) {}
           ?>
         </div>
       </div>
@@ -472,7 +473,20 @@ function addTag(tag){
   tagInputField.value='';
 }
 window.removeTag=function(index){tags.splice(index,1);renderTags();}
-tagInputField.addEventListener('keydown',function(e){
+
+  // Autocomplete Filter for Tags
+  tagInputField.addEventListener('input', function() {
+    const val = this.value.trim().toLowerCase();
+    const suggestions = document.querySelectorAll('.tag-sug');
+    suggestions.forEach(s => {
+      if(val === '' || s.textContent.toLowerCase().includes(val)) {
+        s.style.display = 'inline-block';
+      } else {
+        s.style.display = 'none';
+      }
+    });
+  });
+  tagInputField.addEventListener('keydown',function(e){
   if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(this.value);}
   else if(e.key==='Backspace'&&this.value===''&&tags.length>0){tags.pop();renderTags();}
 });

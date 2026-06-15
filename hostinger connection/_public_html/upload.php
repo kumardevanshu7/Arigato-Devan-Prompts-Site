@@ -8,32 +8,48 @@ function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $qualit
     $info = @getimagesize($src);
     if (!$info) return $src;
     [$origW, $origH, $type] = [$info[0], $info[1], $info[2]];
-    $img = match($type) {
-        IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
-        IMAGETYPE_PNG  => @imagecreatefrompng($src),
-        IMAGETYPE_WEBP => @imagecreatefromwebp($src),
-        IMAGETYPE_GIF  => @imagecreatefromgif($src),
-        default        => false,
-    };
+
+    // Check actual GD WebP compile-time support (not just function_exists)
+    $gdInfo      = function_exists('gd_info') ? gd_info() : [];
+    $webpSupport = !empty($gdInfo['WebP Support']);
+
+    // Load source image
+    if ($type === IMAGETYPE_JPEG) {
+        $img = @imagecreatefromjpeg($src);
+    } elseif ($type === IMAGETYPE_PNG) {
+        $img = @imagecreatefrompng($src);
+    } elseif ($type === IMAGETYPE_GIF) {
+        $img = @imagecreatefromgif($src);
+    } elseif ($type === IMAGETYPE_WEBP && $webpSupport) {
+        $img = @imagecreatefromwebp($src);
+    } else {
+        return $src; // unsupported type or WebP without GD support
+    }
     if (!$img) return $src;
-    // Calculate new dimensions (maintain aspect ratio)
-    $ratio = min($maxW / $origW, $maxH / $origH, 1.0); // never upscale
+
+    // Calculate new dimensions (maintain aspect ratio, never upscale)
+    $ratio = min($maxW / $origW, $maxH / $origH, 1.0);
     $newW = (int)round($origW * $ratio);
     $newH = (int)round($origH * $ratio);
     $resized = imagecreatetruecolor($newW, $newH);
-    // Preserve transparency for PNG/WebP
     imagealphablending($resized, false);
     imagesavealpha($resized, true);
     imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
     imagedestroy($img);
-    // Save as WebP, replace original
-    $dest = preg_replace('/\.[^.]+$/', '.webp', $src);
-    imagewebp($resized, $dest, $quality);
+
+    // Save as WebP if supported, else JPEG fallback
+    if ($webpSupport) {
+        $dest = preg_replace('/\.[^.]+$/', '.webp', $src);
+        imagewebp($resized, $dest, $quality);
+    } else {
+        $dest = preg_replace('/\.[^.]+$/', '.jpg', $src);
+        imagejpeg($resized, $dest, $quality);
+    }
     imagedestroy($resized);
-    // Remove original if different extension
     if ($dest !== $src && file_exists($src)) @unlink($src);
     return $dest;
 }
+
 
 // Protect endpoint — must be logged in AND be an admin
 if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
