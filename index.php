@@ -360,7 +360,7 @@ try {
             <?php if (isset($_SESSION["user_id"])): ?>
                 <?php if ($_SESSION["role"] === "admin"): ?>
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <a href="profile.php" title="Edit Profile">
+                        <a href="profile.php" title="Edit Profile" id="admin-profile-avatar-link">
                             <?= renderAvatar(
                                 $_SESSION["profile_image"] ?? "",
                                 "admin-avatar",
@@ -368,7 +368,6 @@ try {
                                 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
                             ) ?>
                         </a>
-                        <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
@@ -723,7 +722,7 @@ try {
             <svg style="vertical-align: middle; margin-right: 5px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             FRESH DROPS!
         </div>
-        <h1>UNLOCK<br>THE <span class="highlight">MAGIC.</span></h1>
+        <h1 style="color:#ffffff;text-shadow:0 2px 20px rgba(0,0,0,0.6);">UNLOCK<br>THE <span class="highlight" style="color:#f9a8d4;text-shadow:0 0 24px rgba(249,168,212,0.7);">MAGIC.</span></h1>
         <div class="search-bar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" placeholder="SEARCH PROMPTS...">
@@ -1086,8 +1085,9 @@ try {
 
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
         ? "true"
-        : "false" ?>;</script>
-        <script defer src="script.min.js?v=20260601"></script>
+        : "false" ?>;
+const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") ? "true" : "false" ?>;</script>
+        <script defer src="script.js?v=20260615"></script>
                 <script>
 
         // Background Scroll Logic
