@@ -264,6 +264,13 @@ $type_map = [
         @media (max-width: 600px) { .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
     </style>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
 
@@ -333,7 +340,7 @@ $type_map = [
                 </div>
                 Saved Prompts
             </div>
-            <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
+            <div class="sp-sub">All prompts you've unlocked â€” <span id="sp-counter"><?= $total ?></span> saved so far</div>
             <div class="sp-filters">
                 <?php if($stats['secret'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-lock"></i> Secret <?= $stats['secret'] ?></span><?php endif; ?>
                 <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-fire"></i> Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
@@ -604,7 +611,7 @@ $type_map = [
     });
 })();
 
-// Card click → navigate to prompt page
+// Card click â†’ navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

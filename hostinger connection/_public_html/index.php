@@ -723,10 +723,24 @@ try {
             FRESH DROPS!
         </div>
         <h1 style="color:#ffffff;text-shadow:0 2px 20px rgba(0,0,0,0.6);">UNLOCK<br>THE <span class="highlight" style="color:#f9a8d4;text-shadow:0 0 24px rgba(249,168,212,0.7);">MAGIC.</span></h1>
-        <div class="search-bar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" placeholder="SEARCH PROMPTS...">
-        </div>
+        <!-- Gallery Browse Card -->
+        <a href="gallery.php" id="gallery-browse-card" style="display:block;text-decoration:none;max-width:520px;margin:0 auto 8px;padding:18px 24px;background:rgba(255,255,255,0.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:2px solid rgba(255,255,255,0.3);border-radius:22px;box-shadow:0 6px 30px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.2);transition:all .2s ease;color:#fff;">
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:52px;height:52px;background:linear-gradient(135deg,#f9a8d4 0%,#c084fc 100%);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.45rem;flex-shrink:0;box-shadow:0 4px 16px rgba(192,132,252,0.45);">
+                    <i class="fa-solid fa-images"></i>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:1rem;font-weight:900;color:#fff;margin-bottom:4px;text-shadow:0 1px 8px rgba(0,0,0,0.5);letter-spacing:.2px;">Browse the Complete Prompt Gallery</div>
+                    <div style="font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.72);letter-spacing:.3px;">Explore all secret, viral &amp; unreleased AI prompts ✨</div>
+                </div>
+                <i class="fa-solid fa-arrow-right" style="font-size:1rem;color:rgba(255,255,255,0.6);flex-shrink:0;transition:transform .2s;"></i>
+            </div>
+        </a>
+        <style>
+        #gallery-browse-card:hover{transform:translate(-2px,-3px);box-shadow:0 10px 40px rgba(0,0,0,0.38),6px 6px 0 rgba(255,255,255,0.18),inset 0 1px 0 rgba(255,255,255,0.25);background:rgba(255,255,255,0.18);}
+        #gallery-browse-card:hover .fa-arrow-right{transform:translateX(4px);}
+        #gallery-browse-card:active{transform:translate(1px,1px);}
+        </style>
         <!-- Surprise Me Button -->
         <a href="surprise_me.php" class="surprise-me-btn" style="display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:14px 26px;background:var(--secondary-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;box-shadow:var(--shadow-comic);text-decoration:none;transition:all .15s ease;">
             <i class="fa-solid fa-dice"></i>
@@ -1087,7 +1101,7 @@ try {
         ? "true"
         : "false" ?>;
 const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") ? "true" : "false" ?>;</script>
-        <script defer src="script.min.js?v=20260615"></script>
+        <script defer src="script.js?v=20260615"></script>
                 <script>
 
         // Background Scroll Logic

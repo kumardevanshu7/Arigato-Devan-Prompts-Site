@@ -31,6 +31,13 @@
         @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-card h1 { font-size: 1.8rem; } }
     </style>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
     <!-- Aurora Background -->

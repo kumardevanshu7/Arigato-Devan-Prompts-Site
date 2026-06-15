@@ -16,15 +16,15 @@ try {
     $testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) { $testimonials = []; }
 
-$emojis = ['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
+$emojis = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Testimonials — Arigato Devan Prompts</title>
-<meta name="description" content="See what real users say about Arigato Devan Prompts — honest feedback from our community.">
+<title>Testimonials â€” Arigato Devan Prompts</title>
+<meta name="description" content="See what real users say about Arigato Devan Prompts â€” honest feedback from our community.">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -39,7 +39,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ── Background ── */
+/* â”€â”€ Background â”€â”€ */
 .testi-bg {
     position: fixed; inset: 0; z-index: 0;
     background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 35%, #fdf4ff 65%, #fff8f0 100%);
@@ -60,7 +60,7 @@ body {
     background-size: 28px 28px;
 }
 
-/* ── Back link ── */
+/* â”€â”€ Back link â”€â”€ */
 .back-link {
     position: fixed; top: 20px; left: 24px; z-index: 100;
     display: inline-flex; align-items: center; gap: 7px;
@@ -73,7 +73,7 @@ body {
 }
 .back-link:hover { color: #1a1a2e; transform: translateX(-3px); }
 
-/* ── Page Layout ── */
+/* â”€â”€ Page Layout â”€â”€ */
 .page-root {
     position: relative; z-index: 1;
     min-height: 100vh;
@@ -82,7 +82,7 @@ body {
     padding: 60px 24px 80px;
 }
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .testi-header {
     text-align: center;
     margin-bottom: 60px;
@@ -109,7 +109,7 @@ body {
     line-height: 1.7; max-width: 460px; margin: 0 auto;
 }
 
-/* ── Main Layout: avatars left, card right ── */
+/* â”€â”€ Main Layout: avatars left, card right â”€â”€ */
 .testi-main {
     display: grid;
     grid-template-columns: 120px 1fr;
@@ -120,7 +120,7 @@ body {
     min-height: 380px;
 }
 
-/* ── Avatar Column ── */
+/* â”€â”€ Avatar Column â”€â”€ */
 .avatar-col {
     display: flex;
     flex-direction: column;
@@ -150,7 +150,7 @@ body {
     object-fit: cover; display: block;
 }
 
-/* ── Quote Card ── */
+/* â”€â”€ Quote Card â”€â”€ */
 .quote-card {
     background: #fff;
     border-radius: 28px;
@@ -251,7 +251,7 @@ body {
     font-size: 1.4rem; color: #9ca3af;
 }
 
-/* ── Mobile ── */
+/* â”€â”€ Mobile â”€â”€ */
 @media (max-width: 680px) {
     .testi-main {
         grid-template-columns: 1fr;
@@ -278,6 +278,13 @@ body {
     .deco-quote { font-size: 5rem; top: 10px; right: 16px; }
 }
 </style>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
 <div class="testi-bg"></div>
@@ -337,7 +344,7 @@ body {
             $r0 = max(0, min(10, (int)($t0['rating'] ?? 0)));
             $em0 = $emojis[$r0];
             $g0 = strtolower(trim($t0['gender'] ?? ''));
-            $gi0 = in_array($g0,['male','m']) ? ' ♂' : (in_array($g0,['female','f']) ? ' ♀' : '');
+            $gi0 = in_array($g0,['male','m']) ? ' â™‚' : (in_array($g0,['female','f']) ? ' â™€' : '');
             ?>
             <p class="quote-text" id="quoteText"><?= htmlspecialchars($t0['feedback_text']) ?></p>
             <div class="quote-divider"></div>
@@ -376,7 +383,7 @@ const testimonials = <?= json_encode(array_map(function($t) {
     ];
 }, $testimonials)) ?>;
 
-const emojis = ['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
+const emojis = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
 let current = 0;
 let autoTimer = null;
 
@@ -402,7 +409,7 @@ function switchTo(idx) {
         const t = testimonials[idx];
         const r = Math.max(0, Math.min(10, t.rating));
         const g = (t.gender || '').toLowerCase().trim();
-        const gi = ['male','m'].includes(g) ? ' ♂' : (['female','f'].includes(g) ? ' ♀' : '');
+        const gi = ['male','m'].includes(g) ? ' â™‚' : (['female','f'].includes(g) ? ' â™€' : '');
 
         document.getElementById('quoteText').textContent = t.feedback_text;
         document.getElementById('authorName').textContent = t.username + gi;

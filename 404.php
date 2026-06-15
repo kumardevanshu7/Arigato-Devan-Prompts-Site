@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 — Page Nahi Mila | Arigato Devan</title>
+    <title>404 â€” Page Nahi Mila | Arigato Devan</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -34,7 +34,7 @@
             position: relative;
         }
 
-        /* ── Floating Particles ── */
+        /* â”€â”€ Floating Particles â”€â”€ */
         .particle {
             position: fixed;
             pointer-events: none;
@@ -49,7 +49,7 @@
             100% { transform: translateY(-15vh) rotate(540deg) scale(1.1); opacity: 0; }
         }
 
-        /* ── Page Wrapper ── */
+        /* â”€â”€ Page Wrapper â”€â”€ */
         .err-page {
             position: relative;
             z-index: 10;
@@ -59,7 +59,7 @@
             width: 100%;
         }
 
-        /* ── Floating Character ── */
+        /* â”€â”€ Floating Character â”€â”€ */
         .err-char {
             font-size: 4.5rem;
             display: block;
@@ -72,7 +72,7 @@
             50%       { transform: translateY(-20px) rotate(6deg); }
         }
 
-        /* ── Speech Bubble (arrow pointing DOWN toward character) ── */
+        /* â”€â”€ Speech Bubble (arrow pointing DOWN toward character) â”€â”€ */
         .bubble {
             position: relative;
             display: inline-block;
@@ -105,7 +105,7 @@
             z-index: 1;
         }
 
-        /* ── Glitch 404 ── */
+        /* â”€â”€ Glitch 404 â”€â”€ */
         .err-num {
             font-size: clamp(5.5rem, 22vw, 10.5rem);
             font-weight: 900;
@@ -151,7 +151,7 @@
             86%          { transform: translate(0); }
         }
 
-        /* ── Error Badge ── */
+        /* â”€â”€ Error Badge â”€â”€ */
         .err-badge {
             display: inline-block;
             background: var(--red);
@@ -167,7 +167,7 @@
             margin-bottom: 18px;
         }
 
-        /* ── Title & Desc ── */
+        /* â”€â”€ Title & Desc â”€â”€ */
         .err-title {
             font-size: clamp(1.5rem, 5vw, 2.1rem);
             font-weight: 900;
@@ -181,7 +181,7 @@
             margin-bottom: 34px;
         }
 
-        /* ── Buttons ── */
+        /* â”€â”€ Buttons â”€â”€ */
         .err-btns {
             display: flex;
             gap: 14px;
@@ -216,7 +216,7 @@
         .err-btn-home     { background: var(--purple); }
         .err-btn-surprise { background: var(--yellow); }
 
-        /* ── Decorative comic dots ── */
+        /* â”€â”€ Decorative comic dots â”€â”€ */
         .comic-dots {
             position: fixed;
             inset: 0;
@@ -226,12 +226,19 @@
             background-size: 28px 28px;
         }
 
-        /* ── Responsive ── */
+        /* â”€â”€ Responsive â”€â”€ */
         @media (max-width: 480px) {
             .err-page { padding: 30px 16px 50px; }
             .err-char  { font-size: 3.5rem; }
             .bubble    { font-size: .85rem; padding: 10px 16px; }
         }
+    </style>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
     </style>
 </head>
 <body>

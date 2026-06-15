@@ -5,19 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Frequently asked questions about Arigato Devan Prompts — how to unlock secret codes, use AI tools, and get the best couple AI content for Instagram Reels.">
+    <meta name="description" content="Frequently asked questions about Arigato Devan Prompts â€” how to unlock secret codes, use AI tools, and get the best couple AI content for Instagram Reels.">
     <link rel="canonical" href="https://arigatodevan.com/faq.php">
     <meta name="theme-color" content="#c084fc">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="FAQ — Arigato Devan Prompts">
+    <meta property="og:title" content="FAQ â€” Arigato Devan Prompts">
     <meta property="og:description" content="Got questions? We have answers. Learn how Secret Code, Unreleased, Insta Viral and Already Uploaded prompts work on Arigato Devan.">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/faq.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="FAQ — Arigato Devan Prompts">
+    <meta name="twitter:title" content="FAQ â€” Arigato Devan Prompts">
     <meta name="twitter:description" content="Got questions? We have answers. Learn how to use Arigato Devan Prompts.">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <!-- FAQ Schema Markup -->
@@ -28,23 +28,23 @@
       "mainEntity": [
         {"@type":"Question","name":"What is a Secret Code prompt?","acceptedAnswer":{"@type":"Answer","text":"A Secret Code is a 6-letter code hidden inside an Instagram Reel. Drop a comment on the reel and the code arrives in your DMs automatically via Auto-DM. Enter it on the site to unlock the exclusive prompt."}},
         {"@type":"Question","name":"How do I unlock a Secret Code prompt?","acceptedAnswer":{"@type":"Answer","text":"Go to the Instagram Reel, drop any comment, the code arrives in your DMs via Auto-DM, copy it, paste it in the Secret Code box on the site, and the prompt is unlocked!"}},
-        {"@type":"Question","name":"Where does the prompt appear after unlocking?","acceptedAnswer":{"@type":"Answer","text":"It appears right there on the Secret Code page — no need to go anywhere else."}},
-        {"@type":"Question","name":"What are Unreleased prompts?","acceptedAnswer":{"@type":"Answer","text":"These are prompts that were created but didn't make it to Instagram — too experimental or just didn't feel right. Instead of deleting them, they are shared here exclusively."}},
-        {"@type":"Question","name":"How do I unlock Unreleased prompts?","acceptedAnswer":{"@type":"Answer","text":"No code needed. Without login — 90 heart taps to unlock. With Google login — just 20 taps."}},
-        {"@type":"Question","name":"What are Insta Viral prompts?","acceptedAnswer":{"@type":"Answer","text":"These are prompts spotted going viral on Instagram — trending reels everyone is using, collected and curated here for you."}},
-        {"@type":"Question","name":"Which AI tool should I use?","acceptedAnswer":{"@type":"Answer","text":"Gemini (Google) works best — 90% of prompts are optimized for Gemini. ChatGPT tends to add too many restrictions on romantic and couple content."}},
-        {"@type":"Question","name":"What is the Already Uploaded section?","acceptedAnswer":{"@type":"Answer","text":"Before the site existed, prompts were shared via Notion and Instagram Reels. This section is that archive — all old prompts brought together here."}},
+        {"@type":"Question","name":"Where does the prompt appear after unlocking?","acceptedAnswer":{"@type":"Answer","text":"It appears right there on the Secret Code page â€” no need to go anywhere else."}},
+        {"@type":"Question","name":"What are Unreleased prompts?","acceptedAnswer":{"@type":"Answer","text":"These are prompts that were created but didn't make it to Instagram â€” too experimental or just didn't feel right. Instead of deleting them, they are shared here exclusively."}},
+        {"@type":"Question","name":"How do I unlock Unreleased prompts?","acceptedAnswer":{"@type":"Answer","text":"No code needed. Without login â€” 90 heart taps to unlock. With Google login â€” just 20 taps."}},
+        {"@type":"Question","name":"What are Insta Viral prompts?","acceptedAnswer":{"@type":"Answer","text":"These are prompts spotted going viral on Instagram â€” trending reels everyone is using, collected and curated here for you."}},
+        {"@type":"Question","name":"Which AI tool should I use?","acceptedAnswer":{"@type":"Answer","text":"Gemini (Google) works best â€” 90% of prompts are optimized for Gemini. ChatGPT tends to add too many restrictions on romantic and couple content."}},
+        {"@type":"Question","name":"What is the Already Uploaded section?","acceptedAnswer":{"@type":"Answer","text":"Before the site existed, prompts were shared via Notion and Instagram Reels. This section is that archive â€” all old prompts brought together here."}},
         {"@type":"Question","name":"Is this site free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free for now. No subscriptions, no hidden charges."}},
         {"@type":"Question","name":"Is Google login required?","acceptedAnswer":{"@type":"Answer","text":"Not at all. You can browse and unlock prompts without logging in. Login benefits: save and like prompts, and unlock Unreleased prompts with just 20 taps instead of 90."}},
-        {"@type":"Question","name":"Is my data safe?","acceptedAnswer":{"@type":"Answer","text":"100% safe. Only your name and email are collected — nothing else. Everything is secured through Google's own services."}},
-        {"@type":"Question","name":"Why does the same prompt give different results?","acceptedAnswer":{"@type":"Answer","text":"AI tools generate results using probability and creativity — the same prompt produces a different output every time. Try 2-3 times to find your perfect shot."}},
+        {"@type":"Question","name":"Is my data safe?","acceptedAnswer":{"@type":"Answer","text":"100% safe. Only your name and email are collected â€” nothing else. Everything is secured through Google's own services."}},
+        {"@type":"Question","name":"Why does the same prompt give different results?","acceptedAnswer":{"@type":"Answer","text":"AI tools generate results using probability and creativity â€” the same prompt produces a different output every time. Try 2-3 times to find your perfect shot."}},
         {"@type":"Question","name":"Can I use prompts for commercial projects?","acceptedAnswer":{"@type":"Answer","text":"Yes! Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content."}}
       ]
     }
     </script>
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
-        /* ── Clean FAQ Layout - Complete Override ── */
+        /* â”€â”€ Clean FAQ Layout - Complete Override â”€â”€ */
         body { background: #fdfcfd !important; color: #101828 !important; }
         body::before { display: none !important; background: none !important; } /* Kill global background */
         
@@ -57,7 +57,7 @@
             align-items: flex-start;
         }
 
-        /* ── Sidebar ── */
+        /* â”€â”€ Sidebar â”€â”€ */
         .faq-sidebar {
             width: 300px;
             flex-shrink: 0;
@@ -154,7 +154,7 @@
             box-shadow: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
         }
 
-        /* ── Main Content ── */
+        /* â”€â”€ Main Content â”€â”€ */
         .faq-content {
             flex: 1;
             min-width: 0;
@@ -178,7 +178,7 @@
             max-width: 700px;
         }
 
-        /* ── Category heading ── */
+        /* â”€â”€ Category heading â”€â”€ */
         .faq-cat-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -192,7 +192,7 @@
         }
         .faq-cat-title i { color: #98a2b3; font-size: 1.2rem; }
 
-        /* ── FAQ Item — Accordion ── */
+        /* â”€â”€ FAQ Item â€” Accordion â”€â”€ */
         .faq-item {
             background: #fdfcfd;
             border-bottom: 1px solid #eaecf0;
@@ -269,6 +269,13 @@
         }
     </style>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
 
@@ -400,8 +407,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!"
-                    data-hi="Ye seedha <strong>Secret Code page pe hi</strong> dikhega — kahin aur dhoondne ki zaroorat nahi!">It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!</div></div>
+                    data-en="It appears <strong>right there on the Secret Code page</strong> â€” no need to navigate anywhere else!"
+                    data-hi="Ye seedha <strong>Secret Code page pe hi</strong> dikhega â€” kahin aur dhoondne ki zaroorat nahi!">It appears <strong>right there on the Secret Code page</strong> â€” no need to navigate anywhere else!</div></div>
             </div>
 
             <!-- UNRELEASED -->
@@ -415,8 +422,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively."
-                    data-hi="Ye wo prompts hain jo <strong>banaaye gaye the par Instagram pe kabhi post nahi hue</strong>. Shayad feed ke liye theek nahi lage. Inhe delete karne ke bajaay, sirf site pe share kiya jata hai.">These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively.</div></div>
+                    data-en="These are prompts that were <strong>created but never posted</strong> on Instagram â€” too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively."
+                    data-hi="Ye wo prompts hain jo <strong>banaaye gaye the par Instagram pe kabhi post nahi hue</strong>. Shayad feed ke liye theek nahi lage. Inhe delete karne ke bajaay, sirf site pe share kiya jata hai.">These are prompts that were <strong>created but never posted</strong> on Instagram â€” too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively.</div></div>
             </div>
 
             <div class="faq-item">
@@ -427,8 +434,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href='login.php'>Login here →</a>"
-                    data-hi="Isme koi code nahi chahiye!<br><strong>Bina login:</strong> 90 heart taps karne honge unlock karne ke liye.<br><strong>Google Login ke sath:</strong> Sirf 20 taps. Bahut aasan! <a href='login.php'>Yahan login karein →</a>">No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href="login.php">Login here →</a></div></div>
+                    data-en="No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href='login.php'>Login here â†’</a>"
+                    data-hi="Isme koi code nahi chahiye!<br><strong>Bina login:</strong> 90 heart taps karne honge unlock karne ke liye.<br><strong>Google Login ke sath:</strong> Sirf 20 taps. Bahut aasan! <a href='login.php'>Yahan login karein â†’</a>">No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href="login.php">Login here â†’</a></div></div>
             </div>
 
             <!-- INSTA VIRAL -->
@@ -442,8 +449,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!"
-                    data-hi="Ye wo prompts hain jo aaj kal <strong>Instagram pe viral</strong> ho rahe hain. Trending reels se collect karke yahan laaye gaye hain taaki aap bhi inhe use kar sakein!">These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!</div></div>
+                    data-en="These are prompts <strong>spotted going viral on Instagram</strong> â€” trending reels that everyone is using right now. Collected, curated, and brought here for you!"
+                    data-hi="Ye wo prompts hain jo aaj kal <strong>Instagram pe viral</strong> ho rahe hain. Trending reels se collect karke yahan laaye gaye hain taaki aap bhi inhe use kar sakein!">These are prompts <strong>spotted going viral on Instagram</strong> â€” trending reels that everyone is using right now. Collected, curated, and brought here for you!</div></div>
             </div>
 
             <div class="faq-item">
@@ -454,8 +461,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here."
-                    data-hi="Bilkul! Ye <strong>asli viral reels ke hi prompts</strong> hain. Agar aapne koi AI couple reel dekhi hai jo bohot trend kar rahi hai, uska prompt aapko yahan zaroor mil jayega.">Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here.</div></div>
+                    data-en="Absolutely! These are <strong>actual prompts from viral reels</strong> â€” real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here."
+                    data-hi="Bilkul! Ye <strong>asli viral reels ke hi prompts</strong> hain. Agar aapne koi AI couple reel dekhi hai jo bohot trend kar rahi hai, uska prompt aapko yahan zaroor mil jayega.">Absolutely! These are <strong>actual prompts from viral reels</strong> â€” real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here.</div></div>
             </div>
 
             <div class="faq-item">
@@ -466,8 +473,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="<strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content."
-                    data-hi="<strong>Gemini (Google)</strong> sabse best hai — 90% prompts Gemini ke liye hi banaye gaye hain. Ye romantic aur hot visuals bina zyada restrictions ke banata hai. ChatGPT aisi images ko block kar deta hai."><strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content.</div></div>
+                    data-en="<strong>Gemini (Google)</strong> is the best â€” 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content."
+                    data-hi="<strong>Gemini (Google)</strong> sabse best hai â€” 90% prompts Gemini ke liye hi banaye gaye hain. Ye romantic aur hot visuals bina zyada restrictions ke banata hai. ChatGPT aisi images ko block kar deta hai."><strong>Gemini (Google)</strong> is the best â€” 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content.</div></div>
             </div>
 
             <!-- ALREADY UPLOADED -->
@@ -481,8 +488,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections."
-                    data-hi="Is site ke banne se pehle prompts sirf <strong>Notion aur Instagram Reels</strong> pe milte the. Ye section purane sabhi prompts ka archive hai — ek hi jagah. Naye prompts yahan nahi aayenge, wo seedha main sections mein jayenge.">Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections.</div></div>
+                    data-en="Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive â€” every old prompt, all in one place. New prompts won't come here; they go straight to the main sections."
+                    data-hi="Is site ke banne se pehle prompts sirf <strong>Notion aur Instagram Reels</strong> pe milte the. Ye section purane sabhi prompts ka archive hai â€” ek hi jagah. Naye prompts yahan nahi aayenge, wo seedha main sections mein jayenge.">Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive â€” every old prompt, all in one place. New prompts won't come here; they go straight to the main sections.</div></div>
             </div>
 
             <div class="faq-item">
@@ -493,8 +500,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="Yes, absolutely! Use them as many times as you want — no restrictions."
-                    data-hi="Haan bilkul! Jitni baar chaho inhe use karo — koi limit nahi hai.">Yes, absolutely! Use them as many times as you want — no restrictions.</div></div>
+                    data-en="Yes, absolutely! Use them as many times as you want â€” no restrictions."
+                    data-hi="Haan bilkul! Jitni baar chaho inhe use karo â€” koi limit nahi hai.">Yes, absolutely! Use them as many times as you want â€” no restrictions.</div></div>
             </div>
 
             <!-- GENERAL -->
@@ -520,8 +527,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="New prompts are added <strong>every 2–3 days</strong>. Follow <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> on Instagram to get notified first!"
-                    data-hi="Har <strong>2–3 din</strong> mein naye prompts aate hain. Sabse pehle jaanne ke liye Instagram pe <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> follow karo!">New prompts are added <strong>every 2–3 days</strong>. Follow <a href="https://www.instagram.com/arigato.devan/" target="_blank">@arigato.devan</a> on Instagram to get notified first!</div></div>
+                    data-en="New prompts are added <strong>every 2â€“3 days</strong>. Follow <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> on Instagram to get notified first!"
+                    data-hi="Har <strong>2â€“3 din</strong> mein naye prompts aate hain. Sabse pehle jaanne ke liye Instagram pe <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> follow karo!">New prompts are added <strong>every 2â€“3 days</strong>. Follow <a href="https://www.instagram.com/arigato.devan/" target="_blank">@arigato.devan</a> on Instagram to get notified first!</div></div>
             </div>
 
             <div class="faq-item">
@@ -532,8 +539,8 @@
                     <i class="fa-solid fa-chevron-down faq-arrow"></i>
                 </button>
                 <div class="faq-a"><div class="faq-a-inner"
-                    data-en="AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result."
-                    data-hi="AI tools <strong>probability aur creativity</strong> se output generate karte hain — same prompt, alag result har baar. Ye actually ek <strong>feature hai, bug nahi!</strong> 2–3 baar try karo aur apna favourite result choose karo.">AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result.</div></div>
+                    data-en="AI tools generate images using <strong>probability and creativity</strong> â€” even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2â€“3 times and pick your favourite result."
+                    data-hi="AI tools <strong>probability aur creativity</strong> se output generate karte hain â€” same prompt, alag result har baar. Ye actually ek <strong>feature hai, bug nahi!</strong> 2â€“3 baar try karo aur apna favourite result choose karo.">AI tools generate images using <strong>probability and creativity</strong> â€” even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2â€“3 times and pick your favourite result.</div></div>
             </div>
 
             <div class="faq-item">

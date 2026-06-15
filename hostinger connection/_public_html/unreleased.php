@@ -38,18 +38,18 @@ if (isset($_SESSION["user_id"])) {
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unreleased Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta name="description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
     <link rel="canonical" href="https://arigatodevan.com/unreleased.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Unreleased Prompts — Arigato Devan">
-<meta property="og:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta property="og:title" content="Unreleased Prompts â€” Arigato Devan">
+<meta property="og:description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/unreleased.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Unreleased Prompts — Arigato Devan">
-<meta name="twitter:description" content="Exclusive unreleased AI couple prompts — unlock before anyone else! Show love &amp; get early access. 🌟">
+<meta name="twitter:title" content="Unreleased Prompts â€” Arigato Devan">
+<meta name="twitter:description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -61,6 +61,13 @@ if (isset($_SESSION["user_id"])) {
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Unreleased Prompts","item":"https://arigatodevan.com/unreleased.php"}]}
     </script>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
 
@@ -398,7 +405,7 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
     });
 });
 
-// Card click → navigate to prompt page
+// Card click â†’ navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

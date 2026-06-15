@@ -58,7 +58,7 @@ $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? ''
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
-$page_title   = htmlspecialchars($p["title"]) . " � AI Prompt | Arigato Devan";
+$page_title   = htmlspecialchars($p["title"]) . " ï¿½ AI Prompt | Arigato Devan";
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
@@ -89,7 +89,7 @@ function sessionAvatar() {
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $meta_desc ?>">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> � Arigato Devan">
+    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> ï¿½ Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
@@ -227,6 +227,13 @@ function sessionAvatar() {
         }
     </style>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
     <header>
@@ -313,7 +320,7 @@ function sessionAvatar() {
                         <?php if (isset($_SESSION['user_id'])): ?>
                         <p>Tap the heart <strong>20 times</strong> to unlock this prompt.</p>
                         <?php else: ?>
-                        <p>Tap the heart <strong>90 times</strong> to unlock � or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
+                        <p>Tap the heart <strong>90 times</strong> to unlock ï¿½ or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
                         <?php endif; ?>
                         <div class="pp-love-area">
                             <button id="pp-love-btn" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
@@ -609,7 +616,7 @@ function sessionAvatar() {
             const url = window.location.href;
             const title = <?= json_encode($p['title']) ?>;
             if (navigator.share) {
-                try { await navigator.share({ title: title + ' � Arigato Devan', url: url }); return; } catch(e) {}
+                try { await navigator.share({ title: title + ' ï¿½ Arigato Devan', url: url }); return; } catch(e) {}
             }
             navigator.clipboard.writeText(url).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';

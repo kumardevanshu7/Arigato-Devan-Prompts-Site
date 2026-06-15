@@ -110,8 +110,12 @@ function sessionAvatar()
         .tag-sort-btn:hover:not(.active){background:var(--card-bg);}
         .tag-toggle-btn{display:flex;align-items:center;gap:6px;padding:5px 14px;font-size:.72rem;font-weight:800;font-family:var(--font-main);background:var(--card-bg);color:var(--text-color);border:2px solid var(--text-color);border-radius:14px;cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:2px 2px 0 var(--text-color);}
         .tag-toggle-btn:hover{background:var(--primary-color);}
-        .tag-filter-container{transition:max-height .35s ease,opacity .3s ease,margin .3s ease;max-height:500px;opacity:1;overflow:hidden;}
+        .tag-filter-container{transition:max-height .35s ease,opacity .3s ease,margin .3s ease;max-height:280px;opacity:1;overflow:hidden;margin-bottom:30px;}
         .tag-filter-container.tags-hidden{max-height:0!important;opacity:0;margin-bottom:0!important;pointer-events:none;}
+        .tag-scroll-inner{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:4px 2px 14px;max-height:220px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--primary-color) transparent;}
+        .tag-scroll-inner::-webkit-scrollbar{width:5px;}
+        .tag-scroll-inner::-webkit-scrollbar-track{background:transparent;}
+        .tag-scroll-inner::-webkit-scrollbar-thumb{background:var(--primary-color);border-radius:99px;}
         .gallery-header {
             display: flex;
             align-items: center;
@@ -193,6 +197,17 @@ function sessionAvatar()
         .gallery-no-results .no-res-emoji { font-size: 3rem; margin-bottom: 12px; }
         .gallery-no-results h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; }
         .gallery-no-results p { font-weight: 600; opacity: .65; }
+        /* ─── Autocomplete dropdown ─── */
+        .search-autocomplete{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card-bg);border:var(--border-width,3px) solid var(--text-color);border-radius:18px;box-shadow:5px 5px 0 var(--text-color);overflow:hidden;z-index:500;font-family:var(--font-main);}
+        .ac-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border-color,#eae3f2);transition:background .12s;}
+        .ac-item:last-child{border-bottom:none;}
+        .ac-item.active,.ac-item:hover{background:var(--bg-color);}
+        .ac-badge{flex-shrink:0;font-size:.58rem;font-weight:900;padding:3px 8px;border-radius:20px;color:#fff;letter-spacing:.5px;text-transform:uppercase;}
+        .ac-info{flex:1;min-width:0;}
+        .ac-title{font-size:.88rem;font-weight:800;color:var(--text-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .ac-tags{font-size:.72rem;font-weight:600;color:#888;margin-top:2px;}
+        .ac-arrow{font-size:.7rem;color:var(--text-color);opacity:.4;flex-shrink:0;}
+        .ac-header{padding:8px 16px 6px;font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#aaa;border-bottom:1px solid var(--border-color,#eae3f2);}
     </style>
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -282,7 +297,6 @@ function sessionAvatar()
                                 'style="transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"',
                             ) ?>
                         </a>
-                        <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
                     </div>
                 <?php else: ?>
                     <a href="profile.php" title="Edit Profile" style="color:var(--text-color);display:flex;align-items:center;gap:8px;">
@@ -315,7 +329,9 @@ function sessionAvatar()
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off">
             <button class="search-clear-btn" id="search-clear-btn" title="Clear search" onclick="clearGallerySearch()">✕</button>
+            <div class="search-autocomplete" id="search-autocomplete"></div>
         </div>
+
 
         <?php if (count($prompts) === 0): ?>
             <p style="text-align:center;font-weight:700;font-size:1.2rem;margin-top:60px;">No prompts yet. Check back soon!</p>
@@ -336,12 +352,21 @@ function sessionAvatar()
               </div>
             </div>
 
-            <div class="tag-filter-container" id="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:30px;">
+            <div class="tag-filter-container" id="tag-filter-container">
+                <div class="tag-scroll-inner" id="tag-scroll-inner">
                 <a href="gallery.php" class="tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" data-label="All" data-count="9999" style="background:<?= !$tag_filter || $tag_filter === 'all' ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-decoration:none;color:var(--text-color);">All</a>
-                <?php foreach ($all_tags as $t): ?>
-                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" data-label="<?= htmlspecialchars(ucfirst($t)) ?>" data-count="<?= $tag_counts[$t] ?? 0 ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;text-decoration:none;color:var(--text-color);"><?= htmlspecialchars(ucfirst($t)) ?></a>
+                <?php
+                $badge_colors = ['#c084fc','#f43f5e','#fb923c','#22c55e','#0ea5e9','#f59e0b','#8b5cf6','#ec4899','#14b8a6','#ef4444'];
+                $ci = 0;
+                foreach ($all_tags as $t):
+                    $bc = $badge_colors[$ci % count($badge_colors)]; $ci++;
+                ?>
+                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" data-label="<?= htmlspecialchars(ucfirst($t)) ?>" data-count="<?= $tag_counts[$t] ?? 0 ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 14px 8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;text-decoration:none;color:var(--text-color);display:inline-flex;align-items:center;gap:7px;"><?= htmlspecialchars(ucfirst($t)) ?><span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;background:<?= $bc ?>;color:#fff;border-radius:99px;font-size:.65rem;font-weight:900;line-height:1;box-shadow:1px 1px 0 rgba(0,0,0,0.25);"><?= $tag_counts[$t] ?? 0 ?></span></a>
                 <?php endforeach; ?>
+
+                </div>
             </div>
+
 
             <div class="gallery-grid" id="card-stack">
             <?php foreach ($prompts as $p):
@@ -542,15 +567,16 @@ function sessionAvatar()
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"]) ? "true" : "false" ?>;</script>
     <script>
     (function(){
-      var container = document.getElementById('tag-filter-container');
-      var toggleBtn = document.getElementById('tag-toggle-btn');
+      var container  = document.getElementById('tag-filter-container');
+      var inner      = document.getElementById('tag-scroll-inner');
+      var toggleBtn  = document.getElementById('tag-toggle-btn');
       var toggleIcon = document.getElementById('tag-toggle-icon');
-      var toggleLabel = document.getElementById('tag-toggle-label');
-      var sortBtns = document.querySelectorAll('.tag-sort-btn');
-      if (!container || !toggleBtn) return;
+      var toggleLabel= document.getElementById('tag-toggle-label');
+      var sortBtns   = document.querySelectorAll('.tag-sort-btn');
+      if (!container || !toggleBtn || !inner) return;
 
       function getTags() {
-        return Array.from(container.querySelectorAll('.tag-filter-btn:not([data-label="All"])'));
+        return Array.from(inner.querySelectorAll('.tag-filter-btn:not([data-label="All"])'));
       }
 
       function sortTags(type) {
@@ -561,7 +587,7 @@ function sessionAvatar()
           if (type === 'pop') return (parseInt(b.dataset.count)||0) - (parseInt(a.dataset.count)||0);
           return 0;
         });
-        tags.forEach(function(t){ container.appendChild(t); });
+        tags.forEach(function(t){ inner.appendChild(t); });
         sortBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.sort === type); });
         try { localStorage.setItem('tagbar_sort', type); } catch(e){}
       }
@@ -618,29 +644,25 @@ function sessionAvatar()
             });
         });
 
-        // ── Gallery live search ──
+        // ── Gallery autocomplete search ──
         (function() {
-            var inp = document.getElementById('gallery-search');
-            var clearBtn = document.getElementById('search-clear-btn');
-            var countBadge = document.getElementById('gallery-count-badge');
+            var inp       = document.getElementById('gallery-search');
+            var clearBtn  = document.getElementById('search-clear-btn');
+            var countBadge= document.getElementById('gallery-count-badge');
             var noResults = document.getElementById('gallery-no-results');
+            var ac        = document.getElementById('search-autocomplete');
             if (!inp) return;
 
-            inp.addEventListener('input', function() {
-                filterGallery();
-            });
+            var cards = Array.from(document.querySelectorAll('.gallery-grid .card'));
+            var activeIdx = -1;
+            var acMatches = [];
 
-            window.clearGallerySearch = function() {
-                inp.value = '';
-                filterGallery();
-                inp.focus();
-            };
+            function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-            function filterGallery() {
-                var q = inp.value.trim().toLowerCase();
-                clearBtn.classList.toggle('visible', q.length > 0);
+            var typeLabels  = {secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED'};
+            var typeColors  = {secret_code:'#c084fc',unreleased:'#fb923c',insta_viral:'#f43f5e',already_uploaded:'#22c55e'};
 
-                var cards = document.querySelectorAll('.gallery-grid .card');
+            function filterGallery(q) {
                 var visible = 0;
                 cards.forEach(function(card) {
                     var title = (card.dataset.title || '').toLowerCase();
@@ -649,12 +671,111 @@ function sessionAvatar()
                     card.style.display = match ? '' : 'none';
                     if (match) visible++;
                 });
-
                 if (countBadge) countBadge.textContent = visible + ' Prompts';
-                if (noResults) noResults.classList.toggle('show', visible === 0 && q.length > 0);
+                if (noResults)  noResults.classList.toggle('show', visible === 0 && q.length > 0);
+                clearBtn.classList.toggle('visible', q.length > 0);
             }
+
+            function buildAC(q) {
+                if (!q) { hideAC(); return; }
+                acMatches = cards.filter(function(card) {
+                    var title = (card.dataset.title || '').toLowerCase();
+                    var tags  = (card.dataset.tags  || '').toLowerCase();
+                    return title.includes(q) || tags.includes(q);
+                }).slice(0, 7);
+                if (!acMatches.length) { hideAC(); return; }
+
+                ac.innerHTML = '<div class="ac-header"><i class="fa-solid fa-magnifying-glass" style="margin-right:5px;"></i>Suggestions</div>';
+                acMatches.forEach(function(card, i) {
+                    var type     = card.dataset.promptType || 'secret_code';
+                    var label    = typeLabels[type] || 'PROMPT';
+                    var color    = typeColors[type] || '#c084fc';
+                    var tagList  = (card.dataset.tags || '').split(',').slice(0,3).map(function(t){ return t.trim(); }).filter(Boolean).join(' · ');
+                    var item = document.createElement('div');
+                    item.className = 'ac-item';
+                    item.innerHTML =
+                        '<div class="ac-badge" style="background:'+color+'">'+label+'</div>'+
+                        '<div class="ac-info">'+
+                          '<div class="ac-title">'+escHTML(card.dataset.title || '')+'</div>'+
+                          (tagList ? '<div class="ac-tags">'+escHTML(tagList)+'</div>' : '')+
+                        '</div>'+
+                        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+                    item.addEventListener('mouseover', function(){ setActive(i); });
+                    item.addEventListener('mousedown', function(e){
+                        e.preventDefault();
+                        pickSuggestion(acMatches[i]);
+                    });
+                    ac.appendChild(item);
+                });
+                activeIdx = -1;
+                ac.style.display = 'block';
+            }
+
+            function setActive(i) {
+                activeIdx = i;
+                ac.querySelectorAll('.ac-item').forEach(function(el, idx){
+                    el.classList.toggle('active', idx === i);
+                });
+            }
+
+            function pickSuggestion(card) {
+                inp.value = card.dataset.title || '';
+                hideAC();
+                filterGallery(inp.value.trim().toLowerCase());
+                // Scroll to card + highlight
+                card.style.display = '';
+                setTimeout(function(){
+                    card.scrollIntoView({ behavior:'smooth', block:'center' });
+                    card.style.outline = '3px solid var(--primary-color)';
+                    card.style.outlineOffset = '3px';
+                    setTimeout(function(){ card.style.outline=''; card.style.outlineOffset=''; }, 1800);
+                }, 80);
+            }
+
+            function hideAC() {
+                ac.style.display = 'none';
+                ac.innerHTML = '';
+                activeIdx = -1;
+                acMatches = [];
+            }
+
+            inp.addEventListener('input', function(){
+                var q = inp.value.trim().toLowerCase();
+                filterGallery(q);
+                buildAC(q);
+            });
+
+            inp.addEventListener('keydown', function(e){
+                var items = ac.querySelectorAll('.ac-item');
+                if (ac.style.display !== 'block' || !items.length) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault(); setActive(Math.min(activeIdx+1, items.length-1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault(); setActive(Math.max(activeIdx-1, -1));
+                } else if (e.key === 'Enter' && activeIdx >= 0) {
+                    e.preventDefault(); if (acMatches[activeIdx]) pickSuggestion(acMatches[activeIdx]);
+                } else if (e.key === 'Escape') {
+                    hideAC();
+                }
+            });
+
+            inp.addEventListener('focus', function(){
+                if (inp.value.trim().length > 0) buildAC(inp.value.trim().toLowerCase());
+            });
+
+            document.addEventListener('click', function(e){
+                if (!e.target.closest('.gallery-search-wrap')) hideAC();
+            });
+
+            window.clearGallerySearch = function() {
+                inp.value = '';
+                filterGallery('');
+                hideAC();
+                inp.focus();
+            };
         })();
     </script>
+
 
 <!-- No-results state -->
 <div class="gallery-no-results" id="gallery-no-results">

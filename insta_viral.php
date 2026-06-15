@@ -36,18 +36,18 @@ if (isset($_SESSION["user_id"])) {
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Insta Viral Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<meta name="description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ðŸ”¥">
     <link rel="canonical" href="https://arigatodevan.com/insta_viral.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Insta Viral Reels Prompts — Arigato Devan">
-<meta property="og:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<meta property="og:title" content="Insta Viral Reels Prompts â€” Arigato Devan">
+<meta property="og:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ðŸ”¥">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/insta_viral.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Insta Viral Reels Prompts — Arigato Devan">
-<meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! 🔥">
+<meta name="twitter:title" content="Insta Viral Reels Prompts â€” Arigato Devan">
+<meta name="twitter:description" content="The most viral AI couple prompts for Instagram Reels. Go viral with Arigato Devan! ðŸ”¥">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -144,6 +144,13 @@ if (isset($_SESSION["user_id"])) {
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Insta Viral Prompts","item":"https://arigatodevan.com/insta_viral.php"}]}
     </script>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body class="page-gallery">
 
@@ -500,7 +507,7 @@ document.querySelectorAll('.iv-filter-btn').forEach(btn => {
     });
 });
 
-// Card click → navigate to prompt page
+// Card click â†’ navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

@@ -102,7 +102,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["onboarding_complete"] = 1;
 
         // Fire GA4 event then redirect
-        ?><!DOCTYPE html><html><head><?php include_once "gtag.php"; ?></head><body>
+        ?><!DOCTYPE html><html><head><?php include_once "gtag.php"; ?>    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
+</head><body>
         <script>
         if(typeof gtag!=='undefined') gtag('event','onboarding_complete',{user_id:<?= (int)$_SESSION["user_id"] ?>});
         setTimeout(function(){ window.location.replace('index.php'); }, 300);
@@ -431,6 +438,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </style>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
     <div class="ob-wrap" style="background:transparent;">

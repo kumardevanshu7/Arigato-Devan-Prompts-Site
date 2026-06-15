@@ -18,7 +18,7 @@ require_once "db.php";
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/privacy.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
+    <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse â€” how we collect, use and protect your data.">
     <link rel="canonical" href="https://arigatodevan.com/privacy.php">
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
@@ -33,6 +33,13 @@ require_once "db.php";
         @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-title { font-size: 1.5rem; } }
     </style>
     <?php include_once "gtag.php"; ?>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
     <!-- Aurora Background -->
@@ -99,7 +106,7 @@ require_once "db.php";
         <p>We do <strong>not</strong> sell, rent, or share your personal data with any third party for commercial purposes.</p>
 
         <h2>3. Google Sign-In & Firebase Authentication</h2>
-        <p>We use <strong>Firebase Authentication</strong> (by Google LLC) for secure login via Google OAuth 2.0. We request only your basic profile — name and email. We do <strong>not</strong> access your Google Drive, Gmail, contacts, or any other Google services.</p>
+        <p>We use <strong>Firebase Authentication</strong> (by Google LLC) for secure login via Google OAuth 2.0. We request only your basic profile â€” name and email. We do <strong>not</strong> access your Google Drive, Gmail, contacts, or any other Google services.</p>
         <p>Google's privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></p>
 
         <h2>4. Google Analytics</h2>

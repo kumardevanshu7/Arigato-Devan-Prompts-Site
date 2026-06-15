@@ -2,106 +2,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta name="theme-color" content="#c084fc">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Get in touch with Arigato Devan � we'd love to hear from you. Send us your queries, feedback, or suggestions.">
-    <link rel="canonical" href="https://arigatodevan.com/contact.php">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Contact Us � Arigato Devan PromptVerse">
-    <meta property="og:description" content="Have a question or feedback? Contact Arigato Devan � we reply within 24 hours.">
-    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <meta property="og:url" content="https://arigatodevan.com/contact.php">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Contact Us � Arigato Devan PromptVerse">
-    <meta name="twitter:description" content="Have a question or feedback? Contact Arigato Devan � we reply within 24 hours.">
-    <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta name="description" content="Get in touch with Arigato Devan. We'd love to hear your feedback, suggestions, or answer any questions you have about our AI prompts.">
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
-        .contact-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 100px; }
-
-        /* Layout */
-        .contact-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 28px; align-items: start; }
-
-        /* Left info card */
-        .contact-info { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 36px 30px; box-shadow: var(--shadow-comic); }
-        .contact-info h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 8px; }
-        .contact-info .ci-sub { font-size: .88rem; color: #777; font-weight: 600; margin-bottom: 28px; line-height: 1.6; }
-        .ci-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
-        .ci-icon { width: 42px; height: 42px; border-radius: 12px; border: 2.5px solid var(--text-color); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 2px 2px 0 var(--text-color); }
-        .ci-icon.purple { background: var(--primary-color); }
-        .ci-icon.yellow { background: var(--secondary-color); }
-        .ci-icon.pink   { background: #fce7f3; }
-        .ci-text strong { display: block; font-size: .88rem; font-weight: 900; }
-        .ci-text span   { font-size: .82rem; color: #777; font-weight: 600; }
-
-        .contact-social { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
-        .cs-btn { background: var(--bg-color); border: 2px solid var(--text-color); border-radius: 10px; padding: 8px 16px; font-family: var(--font-main); font-weight: 800; font-size: .78rem; text-decoration: none; color: var(--text-color); box-shadow: 2px 2px 0 var(--text-color); display: inline-flex; align-items: center; gap: 6px; transition: all .15s; }
-        .cs-btn:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 var(--text-color); }
-
-        /* Right form card */
-        .contact-form-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 36px 32px; box-shadow: var(--shadow-comic); }
-        .contact-form-card h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 22px; }
-
-        .cf-group { margin-bottom: 20px; }
-        .cf-group label { display: block; font-size: .82rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; color: var(--text-color); }
-        .cf-group input, .cf-group textarea, .cf-group select {
-            width: 100%; padding: 13px 16px; border: 2.5px solid var(--text-color); border-radius: 14px;
-            font-family: var(--font-main); font-size: .95rem; font-weight: 600;
-            background: var(--bg-color); color: var(--text-color); outline: none;
-            box-shadow: 3px 3px 0 var(--text-color); transition: all .2s; box-sizing: border-box;
+        /* ─── Force transparent body so wallpaper shows ─── */
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: transparent !important;
         }
-        .cf-group input:focus, .cf-group textarea:focus, .cf-group select:focus { transform: translateY(-1px); box-shadow: 4px 4px 0 var(--text-color); }
-        .cf-group textarea { resize: vertical; min-height: 130px; }
+        /* ─── Anime Wallpaper Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: url('backgroundwally/only-homepage-pic.webp');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(0,0,0,0.52);
+            pointer-events: none;
+        }
+        @media (max-width: 640px) {
+            body::before {
+                background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp');
+                background-position: center center;
+            }
+        }
+        .aurora-bg { display: none !important; }
 
-        .cf-submit { width: 100%; padding: 15px; background: var(--primary-color); border: 2.5px solid var(--text-color); border-radius: 14px; font-family: var(--font-main); font-weight: 900; font-size: 1rem; cursor: pointer; box-shadow: 4px 4px 0 var(--text-color); transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .cf-submit:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 var(--text-color); }
-        .cf-submit:active { transform: translateY(0); box-shadow: 2px 2px 0 var(--text-color); }
+        /* ─── Contact Page Styles ─── */
+        .contact-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+            position: relative;
+            z-index: 1;
+            color: #fff;
+        }
 
-        /* Sending popup */
-        #sending-popup { display: none; position: fixed; inset: 0; background: rgba(45,42,53,.6); backdrop-filter: blur(8px); z-index: 3000; align-items: center; justify-content: center; }
-        .sp-box { background: var(--card-bg); border: 3px solid var(--text-color); border-radius: 24px; padding: 40px 36px; text-align: center; box-shadow: 8px 8px 0 var(--text-color); max-width: 340px; width: 90%; }
-        .sp-spinner { width: 56px; height: 56px; border: 5px solid var(--primary-color); border-top-color: var(--text-color); border-radius: 50%; animation: sp-spin .8s linear infinite; margin: 0 auto 20px; }
+        .editorial-title {
+            font-size: clamp(4rem, 8vw, 6.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Left Info */
+        .contact-info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .ci-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ci-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ci-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+        a.ci-value:hover { text-decoration: underline; }
+
+        .ci-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .ci-footer-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .ci-footer-links a { color: #fff; text-decoration: none; }
+        .ci-footer-links a:hover { text-decoration: underline; }
+
+        /* Right Form Card */
+        .contact-form-glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .cf-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cf-group label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cf-group input, .cf-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            outline: none;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .cf-group input::placeholder, .cf-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cf-group input:focus, .cf-group textarea:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .cf-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .cf-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #c084fc, #ec4899);
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-weight: 900;
+            font-size: 1.05rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(192, 132, 252, 0.4);
+            margin-top: 10px;
+        }
+
+        .cf-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(192, 132, 252, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+            .editorial-title {
+                margin-bottom: 40px;
+                text-align: left;
+            }
+            .contact-form-glass {
+                padding: 30px 20px;
+            }
+        }
+        
+        /* Modals / Popups (kept from original) */
+        #sending-popup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 3000; align-items: center; justify-content: center; }
+        .sp-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(16px); border-radius: 24px; padding: 40px 36px; text-align: center; color: #fff; max-width: 340px; width: 90%; }
+        .sp-spinner { width: 56px; height: 56px; border: 5px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: sp-spin .8s linear infinite; margin: 0 auto 20px; }
         @keyframes sp-spin { to { transform: rotate(360deg); } }
         .sp-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 6px; }
-        .sp-sub { font-size: .85rem; color: #888; font-weight: 600; }
+        .sp-sub { font-size: .85rem; color: rgba(255,255,255,0.7); font-weight: 600; }
 
-        /* Success popup */
-        #success-popup { display: none; position: fixed; inset: 0; background: rgba(45,42,53,.6); backdrop-filter: blur(8px); z-index: 3000; align-items: center; justify-content: center; }
-        .suc-box { background: var(--card-bg); border: 3px solid var(--text-color); border-radius: 24px; padding: 40px 36px; text-align: center; box-shadow: 8px 8px 0 var(--text-color); max-width: 380px; width: 90%; }
-        .suc-icon { width: 72px; height: 72px; background: #d1fae5; border: 3px solid var(--text-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #15803d; margin: 0 auto 20px; box-shadow: 3px 3px 0 var(--text-color); }
+        #success-popup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 3000; align-items: center; justify-content: center; }
+        .suc-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(16px); border-radius: 24px; padding: 40px 36px; text-align: center; color: #fff; max-width: 380px; width: 90%; }
+        .suc-icon { width: 72px; height: 72px; background: rgba(34, 197, 94, 0.2); border: 2px solid #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #22c55e; margin: 0 auto 20px; }
         .suc-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; }
-        .suc-msg { font-size: .88rem; color: #666; font-weight: 600; line-height: 1.6; margin-bottom: 24px; }
-        .suc-btn { background: var(--primary-color); border: 2.5px solid var(--text-color); border-radius: 12px; padding: 11px 28px; font-family: var(--font-main); font-weight: 800; font-size: .92rem; cursor: pointer; box-shadow: 3px 3px 0 var(--text-color); transition: all .15s; }
-        .suc-btn:hover { transform: translateY(-1px); box-shadow: 4px 4px 0 var(--text-color); }
+        .suc-msg { font-size: .88rem; color: rgba(255,255,255,0.8); font-weight: 600; line-height: 1.6; margin-bottom: 24px; }
+        .suc-btn { background: #fff; color: #000; border: none; border-radius: 12px; padding: 11px 28px; font-family: var(--font-main); font-weight: 800; font-size: .92rem; cursor: pointer; transition: all .15s; }
+        .suc-btn:hover { transform: translateY(-1px); }
 
-        /* Error msg */
-        #form-error { display: none; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; padding: 12px 16px; font-size: .88rem; font-weight: 700; color: #b91c1c; margin-top: 14px; }
+        #form-error { display: none; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 12px; padding: 12px 16px; font-size: .88rem; font-weight: 700; color: #fca5a5; margin-top: 14px; text-align: center; }
 
-        @media (max-width: 700px) {
-            .contact-layout { grid-template-columns: 1fr; }
-            .contact-wrap { padding: 20px 14px 80px; }
-        }
     </style>
     <?php include_once "gtag.php"; ?>
 </head>
 <body>
-<!-- Aurora -->
-<div class="aurora-bg" aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;">
-    <div style="position:absolute;width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);border-radius:50%;filter:blur(90px);opacity:.55;top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;"></div>
-    <div style="position:absolute;width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);border-radius:50%;filter:blur(90px);opacity:.55;bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;"></div>
-    <div style="position:absolute;width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);border-radius:50%;filter:blur(90px);opacity:.55;top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;"></div>
-</div>
-<style>
-.aurora-bg~*{position:relative;z-index:1;}
-@keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
-@keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
-@keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
-</style>
 
 <header>
     <div class="logo-area" style="cursor:pointer;" onclick="window.location='index.php'">
@@ -127,73 +248,58 @@
 </header>
 
 <div class="contact-wrap">
-
-    <!-- Page title -->
-    <div style="text-align:center;margin-bottom:32px;">
-        <div style="font-size:2.2rem;font-weight:900;display:inline-flex;align-items:center;gap:12px;">
-            <i class="fa-solid fa-envelope" style="color:var(--primary-color);"></i> Contact Us
-        </div>
-        <div style="font-size:.95rem;color:#888;font-weight:600;margin-top:6px;">We'd love to hear from you � usually reply within 24 hours.</div>
-    </div>
+    
+    <h1 class="editorial-title">Contact me</h1>
 
     <div class="contact-layout">
 
-        <!-- Left: Info -->
-        <div class="contact-info">
-            <h2>Get in Touch</h2>
-            <p class="ci-sub">Have a question, suggestion, or just want to say hi? Drop us a message and we'll get back to you as soon as possible.</p>
+        <!-- Left Info Block -->
+        <div class="contact-info-block">
+            <div class="ci-item">
+                <span class="ci-label">Email (required)</span>
+                <a href="mailto:devansh.grow@gmail.com" class="ci-value">devansh.grow@gmail.com</a>
+            </div>
+            
+            <div class="ci-divider"></div>
 
             <div class="ci-item">
-                <div class="ci-icon purple"><i class="fa-solid fa-envelope"></i></div>
-                <div class="ci-text">
-                    <strong>Email</strong>
-                    <span>devansh.grow@gmail.com</span>
-                </div>
-            </div>
-            <div class="ci-item">
-                <div class="ci-icon yellow"><i class="fa-brands fa-instagram"></i></div>
-                <div class="ci-text">
-                    <strong>Instagram</strong>
-                    <span>@arigato.devan</span>
-                </div>
-            </div>
-            <div class="ci-item">
-                <div class="ci-icon pink"><i class="fa-solid fa-clock"></i></div>
-                <div class="ci-text">
-                    <strong>Response Time</strong>
-                    <span>Usually within 24 hours</span>
-                </div>
+                <span class="ci-label">Instagram</span>
+                <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="ci-value">@arigato.devan</a>
             </div>
 
-            <div class="contact-social">
-                <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="cs-btn">
-                    <i class="fa-brands fa-instagram"></i> Instagram
-                </a>
-                <a href="about.php" class="cs-btn">
-                    <i class="fa-solid fa-user"></i> About Us
-                </a>
+            <div class="ci-divider"></div>
+
+            <div class="ci-item">
+                <span class="ci-label">Response Time</span>
+                <span class="ci-value">Usually within 24 hours</span>
+            </div>
+
+            <div class="ci-footer-links">
+                <a href="about.php">About Me</a>
+                <a href="gallery.php">Gallery</a>
+                <a href="privacy.php">Privacy</a>
             </div>
         </div>
 
-        <!-- Right: Form -->
-        <div class="contact-form-card">
-            <h2><i class="fa-solid fa-paper-plane" style="color:var(--primary-color);"></i> Send a Message</h2>
+        <!-- Right Form Block -->
+        <div class="contact-form-glass">
             <form id="contact-form" novalidate>
                 <div class="cf-group">
-                    <label for="cf-name"><i class="fa-solid fa-user"></i> Your Name</label>
-                    <input type="text" id="cf-name" name="name" placeholder="Enter your name" required maxlength="100">
+                    <label for="cf-name">Name</label>
+                    <input type="text" id="cf-name" name="name" placeholder="Your name" required maxlength="100">
                 </div>
+                
                 <div class="cf-group">
-                    <label for="cf-email"><i class="fa-solid fa-envelope"></i> Your Email</label>
-                    <input type="email" id="cf-email" name="email" placeholder="your@email.com" required maxlength="200">
+                    <label for="cf-email">Email</label>
+                    <input type="email" id="cf-email" name="email" placeholder="Your email" required maxlength="200">
                 </div>
+                
                 <div class="cf-group">
-                    <label for="cf-query"><i class="fa-solid fa-circle-question"></i> What's Your Query?</label>
-                    <textarea id="cf-query" name="query" placeholder="Type your message here..." required maxlength="2000"></textarea>
+                    <label for="cf-query">Message</label>
+                    <textarea id="cf-query" name="query" placeholder="How can we help?" required maxlength="2000"></textarea>
                 </div>
-                <button type="submit" class="cf-submit">
-                    <i class="fa-solid fa-paper-plane"></i> Send Message
-                </button>
+                
+                <button type="submit" class="cf-submit">Submit Message</button>
                 <div id="form-error"></div>
             </form>
         </div>
@@ -215,14 +321,21 @@
     <div class="suc-box">
         <div class="suc-icon"><i class="fa-solid fa-check"></i></div>
         <div class="suc-title">Message Sent!</div>
-        <div class="suc-msg">Your message has been sent successfully.<br>Admin aapka message review karega aur jaldi reply karega.</div>
-        <button class="suc-btn" onclick="closeSucessPopup()"><i class="fa-solid fa-arrow-left"></i> Back to Home</button>
+        <div class="suc-msg">Your message has been sent successfully.<br>We'll get back to you soon.</div>
+        <button class="suc-btn" onclick="closeSucessPopup()">Back to Home</button>
     </div>
 </div>
 
-<footer>
+<footer style="color:#fff; border-top:1px solid rgba(255,255,255,0.1); background:transparent;">
     <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
+    <div class="footer-links">
+        <a href="about.php" style="color:rgba(255,255,255,0.7);">ABOUT</a>
+        <a href="contact.php" style="color:rgba(255,255,255,0.7);">CONTACT</a>
+        <a href="faq.php" style="color:rgba(255,255,255,0.7);">FAQ</a>
+        <a href="privacy.php" style="color:rgba(255,255,255,0.7);">PRIVACY POLICY</a>
+        <a href="disclaimer.php" style="color:rgba(255,255,255,0.7);">DISCLAIMER</a>
+        <a href="terms.php" style="color:rgba(255,255,255,0.7);">TERMS OF SERVICE</a>
+    </div>
 </footer>
 
 <script>
@@ -238,6 +351,7 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
         errEl.textContent = 'Please fill in all fields.';
         errEl.style.display = 'block'; return;
     }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errEl.textContent = 'Please enter a valid email address.';
         errEl.style.display = 'block'; return;
@@ -277,4 +391,3 @@ function closeSucessPopup() {
 </script>
 </body>
 </html>
-

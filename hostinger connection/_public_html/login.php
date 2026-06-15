@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 // Handle logout
 if (isset($_GET["logout"])) {
@@ -26,11 +26,36 @@ unset($_SESSION["error_msg"]);
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
-        /* &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; Login Page Root &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; */
-        html,
-        body {
-            height: 100%;
+        /* ─── Force transparent body so wallpaper shows ─── */
+        html, body {
             margin: 0;
+            height: 100%;
+            background: transparent !important;
+        }
+        /* ─── Anime Wallpaper Background (same as homepage) ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: url('backgroundwally/only-homepage-pic.webp');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(0,0,0,0.52);
+            pointer-events: none;
+        }
+        @media (max-width: 640px) {
+            body::before {
+                background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp');
+                background-position: center center;
+            }
         }
 
         .login-root {
@@ -39,19 +64,12 @@ unset($_SESSION["error_msg"]);
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            background: var(--bg-color);
+            background: transparent;
         }
 
-        /* Filmstrip bg (lighter version) */
+        /* Filmstrip bg — hidden, replaced by wallpaper */
         .login-filmstrip {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 0;
+            display: none;
         }
 
         .login-filmstrip .filmstrip-row {
@@ -59,14 +77,7 @@ unset($_SESSION["error_msg"]);
         }
 
         .login-filmstrip-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            background: radial-gradient(ellipse 80% 80% at 50% 50%,
-                    rgba(253, 251, 247, 0.97) 0%,
-                    rgba(253, 251, 247, 0.93) 45%,
-                    rgba(253, 251, 247, 0.7) 70%,
-                    rgba(253, 251, 247, 0.25) 100%);
+            display: none;
         }
 
         /* &mdash; Minimal Login Header &mdash; */
@@ -543,18 +554,10 @@ unset($_SESSION["error_msg"]);
             <div class="aurora-blob blob4"></div>
         </div>
         <style>
-        .aurora-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#fdf6ff;}
-        .aurora-blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.55;}
-        .blob1{width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;}
-        .blob2{width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;}
-        .blob3{width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;}
-        .blob4{width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);bottom:10%;left:10%;animation:auroraFloat4 13s ease-in-out infinite;}
-        @keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
-        @keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
-        @keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
-        @keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-10%) scale(1.05);}}
+        .aurora-bg{display:none!important;}
         .login-root>*:not(.aurora-bg){position:relative;z-index:1;}
         </style>
+
 
         <!-- Header -->
         <header class="login-header">

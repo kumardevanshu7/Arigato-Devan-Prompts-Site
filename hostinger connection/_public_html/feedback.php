@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$already_submitted) {
     } else {
         try {
             if ($existing) {
-                // cooldown expired — update
+                // cooldown expired â€” update
                 $upd = $pdo->prepare("UPDATE feedbacks SET feedback_text=?, rating=?, show_on_homepage=0, submitted_at=NOW() WHERE user_id=?");
                 $upd->execute([$feedback_text, $rating, $user_id]);
             } else {
@@ -95,15 +95,15 @@ $avatar_url = avatarUrl($profile_img, $username);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Share Feedback — Arigato Devan</title>
+<title>Share Feedback â€” Arigato Devan</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ROOT & RESET
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 :root {
     --cream:   #eef2ff;
     --cream2:  #e0e7ff;
@@ -130,9 +130,9 @@ body {
     position: relative;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    BACKGROUND TEXTURE
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .bg-lines {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image:
@@ -170,9 +170,9 @@ body {
     50%{transform:translate(-5%,-5%) scale(1.08);}
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    BACKGROUND WATERMARK SIDES
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .bg-side-word {
     position: fixed;
     top: 50%;
@@ -205,9 +205,9 @@ body {
     .bg-side-right { right: 2px; }
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    BACK LINK
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .back-link {
     position: fixed; top: 20px; left: 24px; z-index: 100;
     display: inline-flex; align-items: center; gap: 7px;
@@ -220,9 +220,9 @@ body {
 }
 .back-link:hover { color: var(--ink); transform: translateX(-2px); }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PAGE WRAPPER
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-wrap {
     height: 100vh;
     display: flex; flex-direction: column;
@@ -232,9 +232,9 @@ body {
     overflow: hidden;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SECTION LABEL
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .section-label {
     display: inline-flex; align-items: center; gap: 6px;
     font-family: var(--sans); font-size: .65rem; font-weight: 800;
@@ -245,9 +245,9 @@ body {
     background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAIN CARD
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .feedback-card {
     width: 100%; max-width: 520px;
     background: rgba(255, 255, 255, 0.78);
@@ -271,14 +271,14 @@ body {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
 }
 
-/* ══════════════════════════════════════════════════
-   AVATAR — RAINBOW BORDER
-══════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   AVATAR â€” RAINBOW BORDER
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .avatar-wrap {
     display: flex; flex-direction: column; align-items: center;
     margin-bottom: 14px;
 }
-/* Rainbow ring — only the RING rotates, not the image */
+/* Rainbow ring â€” only the RING rotates, not the image */
 .avatar-ring {
     width: 72px; height: 72px;
     border-radius: 50%;
@@ -322,9 +322,9 @@ body {
 }
 .gender-icon { font-size: 1rem; }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    CARD HEADING
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .card-heading {
     text-align: center; margin-bottom: 14px;
 }
@@ -339,9 +339,9 @@ body {
     line-height: 1.5;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TEXTAREA + WORD COUNT
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .field-wrap { position: relative; margin-bottom: 6px; }
 /* Mood tags */
 .mood-tags {
@@ -397,9 +397,9 @@ body {
     font-size: .66rem; color: var(--muted); font-style: italic;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    EMOJI RATING
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .rating-section {
     margin-bottom: 14px;
     opacity: 0; transform: translateY(10px);
@@ -457,9 +457,9 @@ body {
     transition: all .2s;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SUBMIT BUTTON
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .submit-btn {
     width: 100%;
     padding: 16px;
@@ -486,9 +486,9 @@ body {
     opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ERROR MESSAGE
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .error-msg {
     background: rgba(224,85,85,0.08);
     border: 1px solid rgba(224,85,85,0.25);
@@ -499,9 +499,9 @@ body {
     display: flex; align-items: center; gap: 8px;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SUCCESS STATE
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .success-state {
     text-align: center; padding: 10px 0;
     animation: fadeIn .4s ease both;
@@ -547,9 +547,9 @@ body {
 }
 .back-home-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,20,16,0.22); }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COOLDOWN STATE
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .cooldown-state {
     text-align: center; padding: 10px 0;
     animation: fadeIn .4s ease both;
@@ -607,9 +607,9 @@ body {
     margin-top: 8px; font-size: .82rem; color: var(--muted); font-weight: 600;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MOBILE
-══════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 600px) {
     .feedback-card { padding: 20px 16px 18px; border-radius: 20px; max-width: 95vw; }
     .card-title { font-size: 1.35rem; }
@@ -622,6 +622,13 @@ body {
     .feedback-textarea { min-height: 72px; }
 }
 </style>
+    <style>
+        html, body { background: transparent !important; height: 100%; margin: 0; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
+        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
+        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
+        .aurora-bg { display: none !important; }
+    </style>
 </head>
 <body>
 <div class="bg-lines"></div>
@@ -643,7 +650,7 @@ body {
     <div class="feedback-card" id="mainCard">
 
         <?php if ($success_msg === 'submitted'): ?>
-        <!-- ── SUCCESS STATE ── -->
+        <!-- â”€â”€ SUCCESS STATE â”€â”€ -->
         <div class="success-state">
             <div class="avatar-wrap">
                 <div class="avatar-ring">
@@ -656,11 +663,11 @@ body {
                     <span class="gender-icon"><?= $gender_icon ?></span>
                 </div>
             </div>
-            <div class="success-icon">✓</div>
+            <div class="success-icon">âœ“</div>
             <div class="success-title">Thank you, <?= $username ?>!</div>
             <div class="success-sub">
                 Your feedback means a lot. <br>
-                Arigato Devan ko better banane mein help ki tumne. 💜
+                Arigato Devan ko better banane mein help ki tumne. ðŸ’œ
             </div>
             <div class="success-note">
                 <i class="fa-solid fa-clock"></i>
@@ -673,7 +680,7 @@ body {
         </div>
 
         <?php elseif ($already_submitted): ?>
-        <!-- ── COOLDOWN STATE ── -->
+        <!-- â”€â”€ COOLDOWN STATE â”€â”€ -->
         <div class="cooldown-state">
             <div class="avatar-wrap">
                 <div class="avatar-ring">
@@ -706,7 +713,7 @@ body {
                 </div>
             </div>
 
-            <div class="cooldown-title">Already shared! 🎉</div>
+            <div class="cooldown-title">Already shared! ðŸŽ‰</div>
             <div class="cooldown-sub">
                 Tumhara feedback record ho gaya hai.<br>
                 <?= $cooldown_days_left ?> din baad phir se share kar sakte ho.
@@ -717,7 +724,7 @@ body {
                 <div class="prev-fb-label">Your last feedback</div>
                 <div class="prev-fb-text">"<?= htmlspecialchars($existing['feedback_text']) ?>"</div>
                 <?php
-                $emojis = ['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
+                $emojis = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
                 $r = (int)($existing['rating'] ?? 0);
                 $clamp = max(0, min(10, $r));
                 ?>
@@ -731,7 +738,7 @@ body {
         </div>
 
         <?php else: ?>
-        <!-- ── FORM STATE ── -->
+        <!-- â”€â”€ FORM STATE â”€â”€ -->
 
         <div class="avatar-wrap">
             <div class="avatar-ring">
@@ -747,7 +754,7 @@ body {
 
         <div class="card-heading">
             <div class="card-title">How's your experience?</div>
-            <div class="card-sub">Share what you think — honest feedback helps us grow.</div>
+            <div class="card-sub">Share what you think â€” honest feedback helps us grow.</div>
         </div>
 
         <?php if ($error_msg): ?>
@@ -760,25 +767,25 @@ body {
         <form method="POST" id="feedbackForm">
             <!-- Mood Tags -->
             <div class="mood-tags" id="moodTags">
-                <span class="mood-tag" onclick="toggleMood(this)">🔥 Loved the prompts</span>
-                <span class="mood-tag" onclick="toggleMood(this)">✨ Clean UI</span>
-                <span class="mood-tag" onclick="toggleMood(this)">💡 Need more features</span>
-                <span class="mood-tag" onclick="toggleMood(this)">⚡ Super fast</span>
-                <span class="mood-tag" onclick="toggleMood(this)">❤️ Keep going!</span>
+                <span class="mood-tag" onclick="toggleMood(this)">ðŸ”¥ Loved the prompts</span>
+                <span class="mood-tag" onclick="toggleMood(this)">âœ¨ Clean UI</span>
+                <span class="mood-tag" onclick="toggleMood(this)">ðŸ’¡ Need more features</span>
+                <span class="mood-tag" onclick="toggleMood(this)">âš¡ Super fast</span>
+                <span class="mood-tag" onclick="toggleMood(this)">â¤ï¸ Keep going!</span>
             </div>
             <div class="field-wrap">
                 <textarea
                     class="feedback-textarea"
                     name="feedback_text"
                     id="feedbackText"
-                    placeholder="Your thoughts in 3–20 words..."
+                    placeholder="Your thoughts in 3â€“20 words..."
                     maxlength="300"
                 ><?= htmlspecialchars($_POST['feedback_text'] ?? '') ?></textarea>
             </div>
 
             <div class="word-count-row">
                 <span class="word-count" id="wordCount">0 / 20 words</span>
-                <span class="word-hint">min 3 · max 20 words</span>
+                <span class="word-hint">min 3 Â· max 20 words</span>
             </div>
 
             <!-- EMOJI RATING -->
@@ -789,7 +796,7 @@ body {
                 </div>
                 <div class="emoji-row" id="emojiRow">
                     <?php
-                    $emojis_list = ['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
+                    $emojis_list = ['ðŸ˜­','ðŸ˜¢','ðŸ˜Ÿ','ðŸ˜•','ðŸ™‚','ðŸ˜Š','ðŸ˜„','ðŸ˜','ðŸ¤©','ðŸ”¥','â­'];
                     foreach ($emojis_list as $i => $em):
                     ?>
                     <button type="button" class="emoji-btn" data-rating="<?= $i ?>" onclick="selectRating(<?= $i ?>)">
@@ -814,17 +821,17 @@ body {
 
 <script>
 const ratingDescs = [
-    "0 — That bad? We're so sorry 😔",
-    "1 — Really rough. We'll work on it.",
-    "2 — Not great. Your input helps!",
-    "3 — Below expectations. Noted.",
-    "4 — Could be better. Fair enough.",
-    "5 — Decent! Room to improve.",
-    "6 — Good! We're getting there.",
-    "7 — Pretty good! Glad you like it.",
-    "8 — Great experience! Thank you!",
-    "9 — Loved it! You made our day 🙌",
-    "10 — Perfect! You're amazing! ⭐"
+    "0 â€” That bad? We're so sorry ðŸ˜”",
+    "1 â€” Really rough. We'll work on it.",
+    "2 â€” Not great. Your input helps!",
+    "3 â€” Below expectations. Noted.",
+    "4 â€” Could be better. Fair enough.",
+    "5 â€” Decent! Room to improve.",
+    "6 â€” Good! We're getting there.",
+    "7 â€” Pretty good! Glad you like it.",
+    "8 â€” Great experience! Thank you!",
+    "9 â€” Loved it! You made our day ðŸ™Œ",
+    "10 â€” Perfect! You're amazing! â­"
 ];
 
 let selectedRating = -1;
@@ -895,7 +902,7 @@ document.getElementById('feedbackForm')?.addEventListener('submit', function() {
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...';
 });
 
-// ── CONFETTI on success ──
+// â”€â”€ CONFETTI on success â”€â”€
 (function(){
     if (!document.querySelector('.success-state')) return;
     const canvas = document.createElement('canvas');
