@@ -44,43 +44,228 @@
     </script>
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
-        .faq-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 100px; }
+        /* ── Clean FAQ Layout - Complete Override ── */
+        body { background: #fdfcfd !important; color: #101828 !important; }
+        body::before { display: none !important; background: none !important; } /* Kill global background */
+        
+        .faq-page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 32px 140px;
+            display: flex;
+            gap: 80px;
+            align-items: flex-start;
+        }
 
-        .faq-hero { text-align: center; margin-bottom: 36px; }
-        .faq-hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; color: var(--text-color); margin: 0 0 10px; }
-        .faq-hero p { font-size: .95rem; font-weight: 600; color: var(--subtext-color, #7D7887); max-width: 500px; margin: 0 auto 20px; }
+        /* ── Sidebar ── */
+        .faq-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 120px;
+        }
+        .faq-sidebar-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #101828;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            font-family: var(--font-main, 'Inter', sans-serif);
+        }
+        .faq-sidebar-desc {
+            font-size: 1rem;
+            color: #475467;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .faq-sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 32px;
+        }
+        .faq-sidebar-link {
+            text-decoration: none;
+            color: #475467;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .faq-sidebar-link:hover {
+            background: #f9fafb;
+            color: #101828;
+        }
+        .faq-sidebar-link.active {
+            background: #f9fafb;
+            color: #101828;
+            font-weight: 700;
+        }
+        .faq-sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .faq-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: .95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.05);
+        }
+        .faq-btn-primary { background: #1570ef; color: #fff; border-color: #1570ef; }
+        .faq-btn-primary:hover { background: #175cd3; border-color: #175cd3; }
+        .faq-btn-secondary { background: #fff; color: #344054; border-color: #d0d5dd; }
+        .faq-btn-secondary:hover { background: #f9fafb; color: #101828; }
 
-        /* Lang toggle */
-        .lang-toggle { display: inline-flex; border: 2.5px solid var(--text-color); border-radius: 12px; overflow: hidden; box-shadow: 3px 3px 0 var(--text-color); }
-        .lang-btn { padding: 8px 22px; font-family: var(--font-main, 'Outfit', sans-serif); font-weight: 800; font-size: .85rem; cursor: pointer; border: none; background: var(--card-bg, #fff); color: var(--text-color); transition: background .2s, color .2s; }
-        .lang-btn.active { background: var(--primary-color, #c084fc); color: var(--text-color); }
+        /* Lang toggle in sidebar */
+        .lang-toggle-clean {
+            display: flex;
+            background: #f2f4f7;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+        .lang-btn-clean {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #667085;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .lang-btn-clean.active {
+            background: #fff;
+            color: #344054;
+            box-shadow: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+        }
 
-        /* Category heading */
-        .faq-cat { display: flex; align-items: center; gap: 10px; margin: 36px 0 14px; }
-        .faq-cat-icon { width: 38px; height: 38px; border-radius: 10px; border: 2.5px solid var(--text-color); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-        .faq-cat h2 { font-size: 1rem; font-weight: 900; color: var(--text-color); margin: 0; text-transform: uppercase; letter-spacing: .06em; }
+        /* ── Main Content ── */
+        .faq-content {
+            flex: 1;
+            min-width: 0;
+            padding-top: 10px;
+        }
+        .faq-header {
+            margin-bottom: 64px;
+        }
+        .faq-header h1 {
+            font-size: clamp(2.5rem, 5vw, 3.8rem);
+            font-weight: 800;
+            color: #101828;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+        .faq-header p {
+            font-size: 1.25rem;
+            color: #475467;
+            line-height: 1.6;
+            max-width: 700px;
+        }
 
-        /* FAQ item */
-        .faq-item { background: var(--card-bg, #fff); border: 2.5px solid var(--text-color); border-radius: 16px; margin-bottom: 10px; box-shadow: 4px 4px 0 var(--text-color); overflow: hidden; transition: box-shadow .15s; }
-        .faq-item:hover { box-shadow: 5px 5px 0 var(--text-color); }
-        .faq-q { width: 100%; background: none; border: none; text-align: left; padding: 16px 20px; font-family: var(--font-main, 'Outfit', sans-serif); font-weight: 800; font-size: .93rem; color: var(--text-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .faq-q .faq-arrow { flex-shrink: 0; font-size: .8rem; color: var(--primary-color, #c084fc); transition: transform .25s; }
-        .faq-item.open .faq-arrow { transform: rotate(180deg); }
-        .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .25s; }
-        .faq-item.open .faq-a { max-height: 300px; }
-        .faq-a-inner { padding: 0 20px 16px; font-size: .88rem; font-weight: 600; color: var(--subtext-color, #555); line-height: 1.65; border-top: 1.5px dashed var(--primary-color, #c084fc); padding-top: 12px; margin-top: 0; }
-        .faq-a-inner strong { color: var(--text-color); }
+        /* ── Category heading ── */
+        .faq-cat-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #101828;
+            margin: 64px 0 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eaecf0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .faq-cat-title i { color: #98a2b3; font-size: 1.2rem; }
 
-        /* Cat icon colors */
-        .cat-secret  { background: #ffe3fb; color: #9b59b6; }
-        .cat-unreleased { background: #fff3e0; color: #e67e22; }
-        .cat-viral   { background: #fce4ec; color: #e91e63; }
-        .cat-uploaded { background: #e8f5e9; color: #2e7d32; }
-        .cat-general { background: #e8eaf6; color: #3f51b5; }
+        /* ── FAQ Item — Accordion ── */
+        .faq-item {
+            background: #fdfcfd;
+            border-bottom: 1px solid #eaecf0;
+            margin-bottom: 0;
+            overflow: hidden;
+            transition: all .3s ease;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-q {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 24px 0;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #101828;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            line-height: 1.5;
+        }
+        .faq-item.open {
+            background: #f9fafb;
+            border-radius: 12px;
+            border-bottom: none;
+            padding: 0 24px;
+            margin: 16px -24px;
+            box-shadow: 0 1px 3px rgba(16,24,40,0.02);
+        }
+        .faq-item.open .faq-q {
+            padding: 24px 0 12px;
+        }
+        .faq-arrow {
+            color: #98a2b3;
+            transition: transform .3s ease;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+            color: #1570ef;
+        }
+        .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .faq-item.open .faq-a { max-height: 600px; }
+        .faq-a-inner {
+            padding: 0 0 24px;
+            font-size: 1.05rem;
+            color: #475467;
+            line-height: 1.6;
+        }
+        .faq-a-inner strong { color: #344054; font-weight: 600; }
+        .faq-a-inner a { color: #1570ef; text-decoration: none; font-weight: 600; }
+        .faq-a-inner a:hover { text-decoration: underline; }
 
+        @media (max-width: 992px) {
+            .faq-page-container { flex-direction: column; padding: 48px 24px 80px; gap: 48px; }
+            .faq-sidebar { width: 100%; position: static; }
+            .faq-sidebar-actions { flex-direction: row; }
+            .faq-btn { flex: 1; }
+            .faq-header h1 { font-size: 2.5rem; }
+            .faq-item.open { margin: 16px 0; padding: 0 16px; }
+        }
         @media (max-width: 600px) {
-            .faq-q { font-size: .86rem; padding: 14px 16px; }
-            .faq-a-inner { font-size: .83rem; padding: 0 16px 14px; padding-top: 10px; }
+            .faq-header h1 { font-size: 2rem; }
+            .faq-header p { font-size: 1.1rem; }
+            .faq-q { font-size: 1.05rem; padding: 20px 0; }
+            .faq-a-inner { font-size: 1rem; }
         }
     </style>
     <?php include_once "gtag.php"; ?>
@@ -139,9 +324,9 @@
             <?php if (isset($_SESSION["user_id"])): ?>
                 <a href="profile.php" title="Profile" style="display:flex;align-items:center;">
                     <?php if (!empty($_SESSION["profile_image"])): ?>
-                        <img loading="lazy" src="<?= htmlspecialchars($_SESSION["profile_image"]) ?>" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--primary-color);" loading="lazy">
+                        <img loading="lazy" src="<?= htmlspecialchars($_SESSION["profile_image"]) ?>" referrerpolicy="no-referrer" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--primary-color);">
                     <?php else: ?>
-                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-color);border:2px solid var(--text-color);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;"><?= strtoupper(substr($_SESSION["name"] ?? "U", 0, 1)) ?></div>
+                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-color);border:2px solid var(--text-color);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;"><?= strtoupper(substr($_SESSION["username"] ?? "U", 0, 1)) ?></div>
                     <?php endif; ?>
                 </a>
             <?php else: ?>
@@ -150,287 +335,233 @@
         </div>
     </header>
 
-    <main class="faq-wrap">
+    <div class="faq-page-container">
 
-        <!-- Hero -->
-        <div class="faq-hero">
-            <h1><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h1>
-            <p>Everything you need to know about Arigato Devan Prompts — answered.</p>
-            <div class="lang-toggle">
-                <button class="lang-btn active" id="btn-en" onclick="setLang('en')"><i class="fa-solid fa-language"></i> English</button>
-                <button class="lang-btn" id="btn-hi" onclick="setLang('hi')"><i class="fa-solid fa-language"></i> Hinglish</button>
+        <!-- Sidebar -->
+        <aside class="faq-sidebar">
+            <div class="faq-sidebar-title">Frequently Asked Questions</div>
+            <div class="faq-sidebar-desc">Quick answers to questions you may have about Arigato Devan Prompts. Can't find what you're looking for?</div>
+            <div class="lang-toggle-clean">
+                <button class="lang-btn-clean active" id="btn-en" onclick="setLang('en')">English</button>
+                <button class="lang-btn-clean" id="btn-hi" onclick="setLang('hi')">Hinglish</button>
             </div>
-        </div>
+            <div class="faq-sidebar-links">
+                <a href="#secret-code" class="faq-sidebar-link active">Secret Code</a>
+                <a href="#unreleased" class="faq-sidebar-link">Unreleased</a>
+                <a href="#viral" class="faq-sidebar-link">Insta Viral</a>
+                <a href="#uploaded" class="faq-sidebar-link">Already Uploaded</a>
+                <a href="#general" class="faq-sidebar-link">General</a>
+            </div>
+            <div class="faq-sidebar-actions">
+                <a href="how_to_use.php" class="faq-btn faq-btn-secondary">Documentation</a>
+                <a href="contact.php" class="faq-btn faq-btn-primary">Get in touch</a>
+            </div>
+        </aside>
 
-        <!-- SECRET CODE -->
-        <div class="faq-cat">
-            <div class="faq-cat-icon cat-secret"><i class="fa-solid fa-lock"></i></div>
-            <h2>Secret Code</h2>
-        </div>
+        <!-- Main Content -->
+        <main class="faq-content">
+            <div class="faq-header">
+                <h1>Frequently Asked Questions</h1>
+                <p>We provide a secure, powerful platform to get the absolute best AI prompts directly from viral Instagram reels.</p>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="What is a Secret Code prompt?"
-                    data-hi="Secret Code prompt kya hota hai?">What is a Secret Code prompt?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked! <i class='fa-solid fa-party-horn'></i>"
-                data-hi="Secret Code ek <strong>6-letter ka code</strong> hota hai jo Instagram Reel ke andar chhupa hota hai. Reel pe comment karo &rarr; code apne aap Auto-DM se DM mein aa jaata hai &rarr; site pe enter karo &rarr; exclusive prompt unlock! <i class='fa-solid fa-party-horn'></i>">
-                A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked! <i class="fa-solid fa-party-horn"></i>
-            </div></div>
-        </div>
+            <!-- SECRET CODE -->
+            <div class="faq-cat-title" id="secret-code">Secret Code</div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="How do I unlock a Secret Code prompt?"
-                    data-hi="Isko unlock karne ke liye kya karna hoga?">How do I unlock a Secret Code prompt?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked! <i class='fa-solid fa-lock-open'></i>"
-                data-hi="<strong>Step 1:</strong> Instagram Reel pe jaao &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Koi bhi comment karo &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Auto-DM se code DM mein aayega &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy karo &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Site ke Secret Code box mein paste karo &nbsp;&rarr;&nbsp; Prompt unlock! <i class='fa-solid fa-lock-open'></i>">
-                <strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked! <i class="fa-solid fa-lock-open"></i>
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="What is a Secret Code prompt?"
+                        data-hi="Secret Code prompt kya hota hai?">What is a Secret Code prompt?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked!"
+                    data-hi="Har reel mein ek <strong>6-letter ka code</strong> chhipa hota hai. Reel pe comment karo &rarr; code aapke DM mein automatically aayega &rarr; use yahan site pe daalo &rarr; aur exclusive prompt unlock ho jayega!">A Secret Code is a <strong>6-letter code</strong> hidden inside an Instagram Reel. Drop a comment on the reel &rarr; the code arrives in your DMs automatically via Auto-DM &rarr; enter it on the site &rarr; exclusive prompt unlocked!</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Where does the prompt appear after unlocking?"
-                    data-hi="Unlock karne ke baad prompt kaahan milega?">Where does the prompt appear after unlocking?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!"
-                data-hi="Wahi <strong>Secret Code page pe turant show ho jaata hai</strong> — kahin aur jaane ki zaroorat nahi!">
-                It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="How do I unlock a Secret Code prompt?"
+                        data-hi="Isko unlock karne ke liye kya karna hoga?">How do I unlock a Secret Code prompt?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="<strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked!"
+                    data-hi="<strong>Step 1:</strong> Instagram Reel pe jao &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Koi bhi comment karo &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code aapke DM mein aayega &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy karo &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Site pe Secret Code box mein paste karo &nbsp;&rarr;&nbsp; Prompt unlocked!"><strong>Step 1:</strong> Go to the Instagram Reel &nbsp;&rarr;&nbsp; <strong>Step 2:</strong> Drop any comment &nbsp;&rarr;&nbsp; <strong>Step 3:</strong> Code arrives in DMs via Auto-DM &nbsp;&rarr;&nbsp; <strong>Step 4:</strong> Copy it &nbsp;&rarr;&nbsp; <strong>Step 5:</strong> Paste in the Secret Code box on this site &nbsp;&rarr;&nbsp; Prompt unlocked!</div></div>
+            </div>
 
-        <!-- UNRELEASED -->
-        <div class="faq-cat">
-            <div class="faq-cat-icon cat-unreleased"><i class="fa-solid fa-star"></i></div>
-            <h2>Unreleased</h2>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Where does the prompt appear after unlocking?"
+                        data-hi="Unlock karne ke baad prompt kaahan milega?">Where does the prompt appear after unlocking?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!"
+                    data-hi="Ye seedha <strong>Secret Code page pe hi</strong> dikhega — kahin aur dhoondne ki zaroorat nahi!">It appears <strong>right there on the Secret Code page</strong> — no need to navigate anywhere else!</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="What are Unreleased prompts?"
-                    data-hi="Unreleased prompts kya hote hain?">What are Unreleased prompts?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively."
-                data-hi="Ye woh prompts hain jo <strong>banaye gaye lekin Instagram pe post nahi hue</strong> — thoda alag the, ya feed ke liye sahi nahi lage. Delete karne ki jagah yahan share kar diye gaye!">
-                These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively.
-            </div></div>
-        </div>
+            <!-- UNRELEASED -->
+            <div class="faq-cat-title" id="unreleased">Unreleased</div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="How do I unlock Unreleased prompts?"
-                    data-hi="Inhe unlock karne ka tarika kya hai?">How do I unlock Unreleased prompts?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href='login.php' style='color:var(--primary-color);font-weight:800;'>Login here →</a>"
-                data-hi="Koi code nahi chahiye! <br><strong>Bina login:</strong> 90 heart taps lagenge. <br><strong>Google login ke saath:</strong> Sirf 20 taps. Bas! <a href='login.php' style='color:var(--primary-color);font-weight:800;'>Login karo →</a>">
-                No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href="login.php" style="color:var(--primary-color);font-weight:800;">Login here →</a>
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="What are Unreleased prompts?"
+                        data-hi="Unreleased prompts kya hote hain?">What are Unreleased prompts?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively."
+                    data-hi="Ye wo prompts hain jo <strong>banaaye gaye the par Instagram pe kabhi post nahi hue</strong>. Shayad feed ke liye theek nahi lage. Inhe delete karne ke bajaay, sirf site pe share kiya jata hai.">These are prompts that were <strong>created but never posted</strong> on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively.</div></div>
+            </div>
 
-        <!-- INSTA VIRAL -->
-        <div class="faq-cat">
-            <div class="faq-cat-icon cat-viral"><i class="fa-brands fa-instagram"></i></div>
-            <h2>Insta Viral</h2>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="How do I unlock Unreleased prompts?"
+                        data-hi="Inhe unlock karne ka tarika kya hai?">How do I unlock Unreleased prompts?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href='login.php'>Login here →</a>"
+                    data-hi="Isme koi code nahi chahiye!<br><strong>Bina login:</strong> 90 heart taps karne honge unlock karne ke liye.<br><strong>Google Login ke sath:</strong> Sirf 20 taps. Bahut aasan! <a href='login.php'>Yahan login karein →</a>">No code needed here! <br><strong>Without login:</strong> 90 heart taps to unlock. <br><strong>With Google login:</strong> Just 20 taps. Simple! <a href="login.php">Login here →</a></div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="What are Insta Viral prompts?"
-                    data-hi="Insta Viral prompts kya hain?">What are Insta Viral prompts?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!"
-                data-hi="Ye woh prompts hain jo <strong>Instagram pe viral ho rahe hain</strong> — trending reels jo abhi sabh use kar rahe hain. Collect karke, curate karke, yahan laaye gaye!">
-                These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!
-            </div></div>
-        </div>
+            <!-- INSTA VIRAL -->
+            <div class="faq-cat-title" id="viral">Insta Viral</div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Are these actually viral on Instagram?"
-                    data-hi="Ye sach mein Instagram pe viral hote hain?">Are these actually viral on Instagram?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here."
-                data-hi="Bilkul! Ye <strong>actual viral reels ke prompts</strong> hain — real trending content. Agar koi couple AI reel boom kar rahi thi, uska prompt yahan mil jaayega.">
-                Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="What are Insta Viral prompts?"
+                        data-hi="Insta Viral prompts kya hain?">What are Insta Viral prompts?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!"
+                    data-hi="Ye wo prompts hain jo aaj kal <strong>Instagram pe viral</strong> ho rahe hain. Trending reels se collect karke yahan laaye gaye hain taaki aap bhi inhe use kar sakein!">These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Which AI tool should I use for these prompts?"
-                    data-hi="Inhe kis AI tool mein use karein?">Which AI tool should I use for these prompts?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content."
-                data-hi="<strong>Gemini (Google)</strong> best hai — 90% prompts Gemini ke liye optimize hain. Zyada detailed aur hot romantic visuals banata hai, restrictions kaafi kam hain. ChatGPT couple content pe bahut restrictions lagata hai.">
-                <strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Are these actually viral on Instagram?"
+                        data-hi="Ye sach mein Instagram pe viral hote hain?">Are these actually viral on Instagram?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here."
+                    data-hi="Bilkul! Ye <strong>asli viral reels ke hi prompts</strong> hain. Agar aapne koi AI couple reel dekhi hai jo bohot trend kar rahi hai, uska prompt aapko yahan zaroor mil jayega.">Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here.</div></div>
+            </div>
 
-        <!-- ALREADY UPLOADED -->
-        <div class="faq-cat">
-            <div class="faq-cat-icon cat-uploaded"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <h2>Already Uploaded</h2>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Which AI tool should I use for these prompts?"
+                        data-hi="Inhe kis AI tool mein use karein?">Which AI tool should I use for these prompts?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="<strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content."
+                    data-hi="<strong>Gemini (Google)</strong> sabse best hai — 90% prompts Gemini ke liye hi banaye gaye hain. Ye romantic aur hot visuals bina zyada restrictions ke banata hai. ChatGPT aisi images ko block kar deta hai."><strong>Gemini (Google)</strong> is the best — 90% of prompts are optimized for Gemini. It generates stunning, hot romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content.</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="What is the Already Uploaded section?"
-                    data-hi='"Already Uploaded" section kya hai?'>What is the Already Uploaded section?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections."
-                data-hi="Site aane se pehle prompts <strong>Notion aur Instagram Reels</strong> pe share hote the. Ye section usi ka poora archive hai — saare purane prompts ek hi jagah. Naye prompts yahan nahi aayenge; woh seedhe main sections mein jaate hain.">
-                Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections.
-            </div></div>
-        </div>
+            <!-- ALREADY UPLOADED -->
+            <div class="faq-cat-title" id="uploaded">Already Uploaded</div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Can I reuse Already Uploaded prompts?"
-                    data-hi="Kya main ye prompts dobara use kar sakta hoon?">Can I reuse Already Uploaded prompts?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="Yes, absolutely! Use them as many times as you want — no restrictions."
-                data-hi="Haan, bilkul! Jitni baar chahein use karo — koi restriction nahi.">
-                Yes, absolutely! Use them as many times as you want — no restrictions.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="What is the Already Uploaded section?"
+                        data-hi='"Already Uploaded" section kya hai?'>What is the Already Uploaded section?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections."
+                    data-hi="Is site ke banne se pehle prompts sirf <strong>Notion aur Instagram Reels</strong> pe milte the. Ye section purane sabhi prompts ka archive hai — ek hi jagah. Naye prompts yahan nahi aayenge, wo seedha main sections mein jayenge.">Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections.</div></div>
+            </div>
 
-        <!-- GENERAL -->
-        <div class="faq-cat">
-            <div class="faq-cat-icon cat-general"><i class="fa-solid fa-circle-info"></i></div>
-            <h2>General</h2>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Can I reuse Already Uploaded prompts?"
+                        data-hi="Kya main ye prompts dobara use kar sakta hoon?">Can I reuse Already Uploaded prompts?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="Yes, absolutely! Use them as many times as you want — no restrictions."
+                    data-hi="Haan bilkul! Jitni baar chaho inhe use karo — koi limit nahi hai.">Yes, absolutely! Use them as many times as you want — no restrictions.</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Is this site completely free?"
-                    data-hi="Kya ye site bilkul free hai?">Is this site completely free?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Yes, 100% free for now!</strong> No subscriptions, no hidden charges. Enjoy unlimited access."
-                data-hi="<strong>Haan, abhi ke liye 100% free hai!</strong> Koi subscription nahi, koi hidden charge nahi. Jee bhar ke use karo.">
-                <strong>Yes, 100% free for now!</strong> No subscriptions, no hidden charges. Enjoy unlimited access.
-            </div></div>
-        </div>
+            <!-- GENERAL -->
+            <div class="faq-cat-title" id="general">General</div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Is Google login required?"
-                    data-hi="Google se login karna zaroori hai?">Is Google login required?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="Not at all! You can browse and unlock prompts <strong>without logging in</strong>. But login unlocks extra benefits: save &amp; like prompts, and unlock Unreleased prompts with just <strong>20 taps</strong> instead of 90."
-                data-hi="Bilkul nahi! Bina login ke bhi prompts dekh aur unlock kar sakte ho. Lekin login ke fayde hain: prompts save aur like kar sakte ho, aur Unreleased prompts sirf <strong>20 taps</strong> mein unlock ho jaate hain (bina login 90 taps lagte hain).">
-                Not at all! You can browse and unlock prompts <strong>without logging in</strong>. But login unlocks extra benefits: save &amp; like prompts, and unlock Unreleased prompts with just <strong>20 taps</strong> instead of 90.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Is this site completely free?"
+                        data-hi="Kya ye site bilkul free hai?">Is this site completely free?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="<strong>Yes, 100% free for now!</strong> No subscriptions, no hidden charges. Enjoy unlimited access."
+                    data-hi="<strong>Haan, abhi ke liye ye 100% free hai!</strong> Koi subscription ya hidden charges nahi hain. Unlimited use karein."><strong>Yes, 100% free for now!</strong> No subscriptions, no hidden charges. Enjoy unlimited access.</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Is my data safe?"
-                    data-hi="Mera data safe hai?">Is my data safe?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>100% safe.</strong> Only your name and email are collected — nothing else. Everything is secured through Google's own infrastructure."
-                data-hi="<strong>100% safe.</strong> Sirf tumhara naam aur email liya jaata hai — aur kuch nahi. Sab kuch Google ki apni secure infrastructure pe hai.">
-                <strong>100% safe.</strong> Only your name and email are collected — nothing else. Everything is secured through Google's own infrastructure.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="How often are new prompts added?"
+                        data-hi="Naye prompts kitne frequently aate hain?">How often are new prompts added?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="New prompts are added <strong>every 2–3 days</strong>. Follow <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> on Instagram to get notified first!"
+                    data-hi="Har <strong>2–3 din</strong> mein naye prompts aate hain. Sabse pehle jaanne ke liye Instagram pe <a href='https://www.instagram.com/arigato.devan/' target='_blank'>@arigato.devan</a> follow karo!">New prompts are added <strong>every 2–3 days</strong>. Follow <a href="https://www.instagram.com/arigato.devan/" target="_blank">@arigato.devan</a> on Instagram to get notified first!</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="How often are new prompts added?"
-                    data-hi="Naye prompts kitne frequently aate hain?">How often are new prompts added?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="New prompts are added <strong>every 2–3 days</strong>. Follow <a href='https://www.instagram.com/arigato.devan/' target='_blank' style='color:var(--primary-color);font-weight:800;'>@arigato.devan</a> on Instagram to get notified first!"
-                data-hi="Har <strong>2–3 din</strong> mein naye prompts aate hain. Sabse pehle jaanne ke liye Instagram pe <a href='https://www.instagram.com/arigato.devan/' target='_blank' style='color:var(--primary-color);font-weight:800;'>@arigato.devan</a> follow karo!">
-                New prompts are added <strong>every 2–3 days</strong>. Follow <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="color:var(--primary-color);font-weight:800;">@arigato.devan</a> on Instagram to get notified first!
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Why does the same prompt give different results each time?"
+                        data-hi="Same prompt se result alag alag kyun aata hai?">Why does the same prompt give different results each time?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result."
+                    data-hi="AI tools <strong>probability aur creativity</strong> se output generate karte hain — same prompt, alag result har baar. Ye actually ek <strong>feature hai, bug nahi!</strong> 2–3 baar try karo aur apna favourite result choose karo.">AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result.</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Why does the same prompt give different results each time?"
-                    data-hi="Same prompt se result alag alag kyun aata hai?">Why does the same prompt give different results each time?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result."
-                data-hi="AI tools <strong>probability aur creativity</strong> se output generate karte hain — same prompt, alag result har baar. Ye actually ek <strong>feature hai, bug nahi!</strong> 2–3 baar try karo aur apna favourite result choose karo.">
-                AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result.
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="Is Google login required?"
+                        data-hi="Google se login karna zaroori hai?">Is Google login required?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="Not at all! You can browse and unlock prompts <strong>without logging in</strong>. But login unlocks extra benefits: save &amp; like prompts, and unlock Unreleased prompts with just <strong>20 taps</strong> instead of 90."
+                    data-hi="Nahi! Aap <strong>bina login kiye</strong> bhi prompts dhoondh aur unlock kar sakte hain. Par login karne se fayde hain: prompts ko save aur like karna, aur Unreleased prompts ko sirf <strong>20 taps</strong> mein unlock karna.">Not at all! You can browse and unlock prompts <strong>without logging in</strong>. But login unlocks extra benefits: save &amp; like prompts, and unlock Unreleased prompts with just <strong>20 taps</strong> instead of 90.</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="Can I use these prompts for commercial projects?"
-                    data-hi="Kya inhe commercial use ke liye use kar sakte hain?">Can I use these prompts for commercial projects?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="<strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! <i class='fa-solid fa-rocket'></i>"
-                data-hi="<strong>Haan!</strong> Instagram Reels, YouTube Shorts ya kisi bhi personal/commercial creative content ke liye freely use kar sakte ho. Banao dhamaka! <i class='fa-solid fa-rocket'></i>">
-                <strong>Yes!</strong> Use them freely for Instagram Reels, YouTube Shorts, or any personal or commercial creative content. Go create! <i class="fa-solid fa-rocket"></i>
-            </div></div>
-        </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFAQ(this)">
+                    <span class="faq-qtext"
+                        data-en="What is a streak and how do I increase it?"
+                        data-hi="Streak kya hoti hai aur kaise badhayein?">What is a streak and how do I increase it?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner"
+                    data-en="Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent &mdash; the longer the streak, the more satisfying it feels!"
+                    data-hi="Har din login karne pe <strong>streak 1 badhti hai</strong>. Ek din miss kiya &mdash; reset! Consistent rehna &mdash; jitni lambi streak, utna zyada maza!">Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent!</div></div>
+            </div>
 
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFAQ(this)">
-                <span class="faq-qtext"
-                    data-en="What is a streak and how do I increase it?"
-                    data-hi="Streak kya hoti hai aur kaise badhayein?">What is a streak and how do I increase it?</span>
-                <i class="fa-solid fa-chevron-down faq-arrow"></i>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner"
-                data-en="Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent &mdash; the longer the streak, the more satisfying it feels! <i class='fa-solid fa-fire'></i>"
-                data-hi="Har din login karne pe <strong>streak 1 badhti hai</strong>. Ek din miss kiya &mdash; reset! Consistent rehna &mdash; jitni lambi streak, utna zyada maza! <i class='fa-solid fa-fire'></i>">
-                Your <strong>streak increases by 1 every day you log in</strong>. Miss a single day and it resets to zero. Stay consistent! <i class="fa-solid fa-fire"></i>
-            </div></div>
-        </div>
-
-    </main>
+        </main>
+    </div>
 
     <footer>
         <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>

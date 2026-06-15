@@ -146,97 +146,241 @@ $has_current_assets = !empty($current_asset_title) || !empty($current_asset_imag
 $current_extra_arr  = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $ep2_data = $current_extra_arr[0] ?? null;
 $ep3_data = $current_extra_arr[1] ?? null;
-?><!DOCTYPE html><html lang="en"><head>
+?>
+<?php $admin_name = $_SESSION['username'] ?? 'Admin'; ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Prompt &mdash; Admin</title><link rel="stylesheet" href="style.min.css?v=20260601">
+<title>Edit Prompt &mdash; Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<?php include_once "gtag.php"; ?>
 <style>
-body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding:40px 30px 100px}
-.edit-page-title{font-size:2rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
-.edit-page-sub{color:#7D7887;font-weight:600;margin-bottom:28px;font-size:.95rem}
-.edit-card{background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:24px;padding:36px;box-shadow:var(--shadow-comic)}
-.edit-card h2{font-size:1.4rem;font-weight:900;margin-bottom:24px;padding-bottom:14px;border-bottom:2px dashed var(--border-color)}
+/* ── Admin Dark Variables ── */
+:root{
+  --adm-bg:#07060f;--adm-surface:#0f0d1e;--adm-surface2:#15122a;
+  --adm-border:rgba(139,92,246,0.18);--adm-border2:rgba(139,92,246,0.08);
+  --adm-accent:#8b5cf6;--adm-accent2:#c084fc;
+  --adm-pink:#f472b6;--adm-red:#f87171;--adm-green:#4ade80;
+  --adm-text:#e2e0ff;--adm-muted:#9490bb;
+  --adm-font:'Inter',sans-serif;--adm-mono:'JetBrains Mono',monospace;
+  /* Form variables mapped to dark theme */
+  --bg-color:#0f0d1e;--card-bg:#15122a;--text-color:#e2e0ff;
+  --border-color:rgba(139,92,246,0.35);--border-width:1.5px;
+  --primary-color:#8b5cf6;--primary-dark:#a78bfa;
+  --shadow-comic:4px 4px 0 rgba(139,92,246,0.3);
+  --shadow-comic-hover:5px 5px 0 rgba(139,92,246,0.5);
+  --font-main:var(--adm-font);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);overflow-x:hidden;min-height:100vh}
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,6,15,0.98);border-right:1px solid var(--adm-border);z-index:200;display:flex;flex-direction:column}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--adm-border2)}
+.sb-brand{font-size:.72rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
+.sb-brand i{-webkit-text-fill-color:#a78bfa;font-size:1rem}
+.sb-admin{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--adm-border2)}
+.sb-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--adm-accent);flex-shrink:0}
+.sb-av-ph{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--adm-accent),var(--adm-pink));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;flex-shrink:0}
+.sb-uname{font-size:.78rem;font-weight:800;color:var(--adm-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-role{font-size:.6rem;font-weight:700;color:var(--adm-accent2);text-transform:uppercase;letter-spacing:.1em}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.sb-nav::-webkit-scrollbar{width:2px}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--adm-accent);border-radius:10px}
+.sb-sec{font-size:.58rem;font-weight:900;color:var(--adm-muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 10px 5px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--adm-muted);text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:1px}
+.sb-link:hover{background:rgba(139,92,246,0.08);color:var(--adm-text)}
+.sb-link.active{background:rgba(139,92,246,0.15);color:var(--adm-accent2);border-color:var(--adm-border)}
+.sb-link i{width:16px;text-align:center;flex-shrink:0}
+.sb-bottom{padding:12px 8px;border-top:1px solid var(--adm-border2)}
+.sb-logout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:700;color:var(--adm-red);text-decoration:none;transition:all .2s}
+.sb-logout:hover{background:rgba(248,113,113,0.1)}
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;padding:28px 32px 80px;position:relative}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.tb-title{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--adm-accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;display:flex;align-items:center;gap:10px}
+.tb-title i{-webkit-text-fill-color:var(--adm-accent2);font-size:1.2rem}
+.tb-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;border:1px solid;transition:all .2s;cursor:pointer;font-family:var(--adm-font)}
+.tb-back{background:rgba(139,92,246,0.07);color:var(--adm-accent2);border-color:rgba(139,92,246,0.2)}
+.tb-back:hover{background:rgba(139,92,246,0.15)}
+/* MOBILE TOPBAR */
+.mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--adm-border2);padding:13px 16px;align-items:center;gap:12px}
+.mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--adm-border);display:flex;align-items:center;justify-content:center;color:var(--adm-accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
+.mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--adm-accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.mob-back-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;background:rgba(139,92,246,0.08);color:var(--adm-accent2);border:1px solid rgba(139,92,246,0.2);flex-shrink:0}
+/* MOBILE DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:265px;background:rgba(7,6,15,0.99);border-right:1px solid var(--adm-border);z-index:600;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drawer-overlay.open{display:block}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px;border-bottom:1px solid var(--adm-border2)}
+.drawer-brand{font-size:.8rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.drawer-close{width:32px;height:32px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--adm-red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;font-family:var(--adm-font)}
+.drawer-user{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--adm-border2)}
+.d-av{width:40px;height:40px;border-radius:50%;border:2px solid var(--adm-accent);object-fit:cover;flex-shrink:0}
+.d-av-ph{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--adm-accent),var(--adm-pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
+.d-uname{font-size:.85rem;font-weight:800;color:var(--adm-text)}
+.d-role{font-size:.65rem;color:var(--adm-accent2);font-weight:700;text-transform:uppercase}
+.drawer-nav{flex:1;overflow-y:auto;padding:8px 10px}
+.d-sec{font-size:.6rem;font-weight:900;color:var(--adm-muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 8px 5px}
+.d-link{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:600;color:var(--adm-muted);text-decoration:none;transition:all .2s;margin-bottom:2px}
+.d-link:hover,.d-link.active{background:rgba(139,92,246,0.1);color:var(--adm-accent2)}
+.d-link i{width:18px;text-align:center}
+.drawer-bottom{padding:12px 10px;border-top:1px solid var(--adm-border2)}
+.d-logout{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--adm-red);text-decoration:none}
+.d-logout:hover{background:rgba(248,113,113,0.08)}
+/* FORM STYLES */
+.edit-wrap{max-width:820px;margin:0 auto}
+.edit-page-title{font-size:1.5rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px;color:var(--adm-text)}
+.edit-page-sub{color:var(--adm-muted);font-weight:600;margin-bottom:28px;font-size:.9rem}
+.edit-card{background:var(--adm-surface);border:1px solid var(--adm-border);border-radius:20px;padding:32px;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.edit-card h2{font-size:1.1rem;font-weight:900;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--adm-border2);color:var(--adm-text)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .form-group{margin-bottom:18px}
-.form-group label{display:block;font-weight:800;margin-bottom:7px;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px}
-.form-group input,.form-group textarea,.form-group select{width:100%;padding:11px 15px;border:var(--border-width) solid var(--text-color);border-radius:12px;font-family:var(--font-main);font-size:.95rem;font-weight:600;background:var(--bg-color);color:var(--text-color);box-shadow:var(--shadow-comic);outline:none;transition:all .2s;box-sizing:border-box}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--primary-dark);box-shadow:var(--shadow-comic-hover);transform:translateY(-1px)}
+.form-group label{display:block;font-weight:700;margin-bottom:7px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--adm-muted)}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:11px 15px;border:1px solid var(--adm-border);border-radius:10px;font-family:var(--adm-font);font-size:.9rem;font-weight:500;background:rgba(255,255,255,0.04);color:var(--adm-text);outline:none;transition:all .2s;box-sizing:border-box}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--adm-accent);box-shadow:0 0 0 3px rgba(139,92,246,0.15);background:rgba(139,92,246,0.05)}
 .form-group textarea{resize:vertical;min-height:110px}
-.img-preview{display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-color);border:2px dashed var(--border-color);border-radius:12px;margin-bottom:10px}
-.bwi-selector{display:flex;gap:12px;flex-wrap:wrap;}
-.bwi-btn{display:inline-flex;align-items:center;gap:8px;border:var(--border-width) solid var(--text-color);border-radius:14px;padding:12px 22px;cursor:pointer;font-family:var(--font-main);font-weight:900;font-size:1rem;transition:all .2s;user-select:none;}
-.bwi-btn input[type=radio]{display:none;}
-.bwi-banana-opt{background:#fffaed;color:#7a5800;}
-.bwi-banana-opt.bwi-selected{background:#ffe066;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
-.bwi-chatgpt-opt{background:#f0faf7;color:#10a37f;}
-.bwi-chatgpt-opt.bwi-selected{background:#10a37f;color:#fff;box-shadow:3px 3px 0 var(--text-color);transform:translateY(-2px);}
-.img-preview img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--text-color)}
-.img-preview span{font-size:.85rem;font-weight:600;color:#7D7887}
-.file-upload-wrapper{display:flex;align-items:center;gap:14px;background:var(--bg-color);padding:10px 15px;border:var(--border-width) solid var(--text-color);border-radius:12px;box-shadow:var(--shadow-comic)}
-.file-upload-btn{background:var(--primary-color);color:var(--text-color);padding:7px 14px;border:2px solid var(--text-color);border-radius:8px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:2px 2px 0 var(--text-color);white-space:nowrap;font-size:.88rem}
-.file-upload-name{font-weight:600;color:#7D7887;font-size:.88rem}
-.flash-error{background:#ffe6e6;color:#a70000;padding:14px;border:var(--border-width) solid var(--text-color);border-radius:12px;font-weight:800;margin-bottom:18px;box-shadow:3px 3px 0 var(--text-color)}
+.form-group select option{background:var(--adm-surface)}
+.img-preview{display:flex;align-items:center;gap:14px;padding:12px;background:rgba(255,255,255,0.03);border:1px dashed var(--adm-border);border-radius:10px;margin-bottom:10px}
+.img-preview img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--adm-border)}
+.img-preview span{font-size:.85rem;font-weight:600;color:var(--adm-muted)}
+.file-upload-wrapper{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);padding:10px 15px;border:1px solid var(--adm-border);border-radius:10px}
+.file-upload-btn{background:rgba(139,92,246,0.12);color:var(--adm-accent2);padding:7px 14px;border:1px solid rgba(139,92,246,0.3);border-radius:8px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:.85rem;font-family:var(--adm-font)}
+.file-upload-btn:hover{background:rgba(139,92,246,0.2)}
+.file-upload-name{font-weight:600;color:var(--adm-muted);font-size:.85rem}
+.flash-error{background:rgba(248,113,113,0.08);color:var(--adm-red);padding:14px;border:1px solid rgba(248,113,113,0.25);border-radius:12px;font-weight:700;margin-bottom:18px}
 .btn-row{display:flex;gap:14px;margin-top:8px}
-.btn-cancel{display:inline-flex;align-items:center;justify-content:center;padding:14px 22px;background:var(--bg-color);color:var(--text-color);border:var(--border-width) solid var(--text-color);border-radius:14px;font-family:var(--font-main);font-weight:800;font-size:1rem;text-decoration:none;box-shadow:var(--shadow-comic);transition:all .2s;flex:1;text-align:center}
-.btn-cancel:hover{transform:translateY(-2px);box-shadow:var(--shadow-comic-hover)}
-.type-info-box{padding:12px 16px;border-radius:12px;font-size:.85rem;font-weight:700;margin-top:8px;border:2px dashed var(--border-color);display:flex;align-items:center;gap:8px}
-.type-info-box.secret{background:#fff0f0;border-color:#ff8787;color:#c0392b}
-.type-info-box.unreleased{background:#fff8e0;border-color:#f0c040;color:#7a5c00}
-.type-info-box.viral{background:#e8f9ef;border-color:#5cb85c;color:#1a5c30}
-@media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:22px 18px}}
-.assets-toggle-label{display:inline-flex;align-items:center;gap:10px;cursor:pointer;background:#f0f7ff;padding:12px 20px;border-radius:12px;border:2px dashed #5b9bd5;color:#1a4f8a;font-weight:900;font-size:.95rem;transition:all .2s;user-select:none;}
-.assets-toggle-label:hover{background:#dceeff;}
-.assets-toggle-label input[type=checkbox]{width:18px!important;height:18px!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important;accent-color:#1a4f8a;cursor:pointer;flex-shrink:0;}
-.assets-fields-box{background:#f8fbff;border:2px solid #5b9bd5;border-radius:16px;padding:20px;margin-top:14px;}
-.asset-previews{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-.asset-preview-thumb{width:80px;height:80px;border-radius:10px;overflow:hidden;border:2px solid var(--text-color);}
-.asset-preview-thumb img{width:100%;height:100%;object-fit:cover;}
-.type-selector{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap}
-.e-type-card{flex:1;min-width:100px;border:var(--border-width) solid var(--text-color);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;font-family:var(--font-main);font-weight:800;font-size:.85rem;transition:all .2s;background:#fff;position:relative}
-.e-type-card:hover{transform:translateY(-2px);box-shadow:4px 4px 0 var(--text-color)}
+.btn-cancel{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;background:rgba(255,255,255,0.04);color:var(--adm-muted);border:1px solid var(--adm-border);border-radius:12px;font-family:var(--adm-font);font-weight:700;font-size:.9rem;text-decoration:none;transition:all .2s;flex:1;text-align:center}
+.btn-cancel:hover{border-color:var(--adm-accent);color:var(--adm-text)}
+.btn-primary-adm{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;background:rgba(139,92,246,0.15);color:var(--adm-accent2);border:1px solid rgba(139,92,246,0.35);border-radius:12px;font-family:var(--adm-font);font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;flex:2}
+.btn-primary-adm:hover{background:rgba(139,92,246,0.25);box-shadow:0 0 20px rgba(139,92,246,0.2)}
+.type-info-box{padding:12px 16px;border-radius:10px;font-size:.83rem;font-weight:700;margin-top:8px;border:1px solid var(--adm-border);display:flex;align-items:center;gap:8px;color:var(--adm-muted);background:rgba(255,255,255,0.02)}
+.type-info-box.secret{background:rgba(248,113,113,0.06);border-color:rgba(248,113,113,0.25);color:var(--adm-red)}
+.type-info-box.unreleased{background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.25);color:#fbbf24}
+.type-info-box.viral{background:rgba(74,222,128,0.06);border-color:rgba(74,222,128,0.25);color:var(--adm-green)}
+.bwi-selector{display:flex;gap:10px;flex-wrap:wrap}
+.bwi-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--adm-border);border-radius:12px;padding:10px 18px;cursor:pointer;font-family:var(--adm-font);font-weight:700;font-size:.9rem;transition:all .2s;user-select:none;background:rgba(255,255,255,0.03);color:var(--adm-muted)}
+.bwi-btn input[type=radio]{display:none}
+.bwi-banana-opt.bwi-selected{background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.4);color:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,0.1)}
+.bwi-chatgpt-opt.bwi-selected{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.35);color:var(--adm-green);box-shadow:0 0 12px rgba(74,222,128,0.1)}
+.type-selector{display:flex;gap:8px;flex-wrap:wrap}
+.e-type-card{flex:1;min-width:100px;border:1px solid var(--adm-border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:700;font-size:.82rem;transition:all .2s;background:rgba(255,255,255,0.03);color:var(--adm-muted);position:relative}
+.e-type-card:hover{border-color:var(--adm-accent);color:var(--adm-text);transform:translateY(-2px)}
 .e-type-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
-.e-type-card.sel-secret{background:#ffe3e3;border-color:#d03030;color:#d03030;box-shadow:4px 4px 0 #d03030}
-.e-type-card.sel-unreleased{background:#fff4cc;border-color:#e6a800;color:#7a5800;box-shadow:4px 4px 0 #e6a800}
-.e-type-card.sel-viral{background:#e3f7ff;border-color:#007ab8;color:#004f7a;box-shadow:4px 4px 0 #007ab8}
-.e-type-card.sel-uploaded{background:#e6f2ff;border-color:#00509e;color:#00509e;box-shadow:4px 4px 0 #00509e}
-.extra-prompt-box{background:#faf6ff;border:2px dashed #c084fc;border-radius:16px;padding:20px;margin-top:10px;margin-bottom:10px;}
-.extra-prompt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.extra-prompt-num{font-weight:900;color:#7c3aed;font-size:.95rem;}
-.extra-remove-btn{background:#ffe3e3;border:2px solid #d03030;color:#d03030;border-radius:8px;padding:5px 12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--font-main);}
-.extra-add-btn{display:inline-flex;align-items:center;gap:6px;background:#f0f7ff;border:2px dashed #5b9bd5;color:#1a4f8a;border-radius:12px;padding:10px 20px;font-weight:900;font-size:.9rem;cursor:pointer;margin-top:10px;font-family:var(--font-main);transition:background .2s;}
-.extra-add-btn:hover{background:#dceeff;}
+.e-type-card.sel-secret{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.4);color:var(--adm-red)}
+.e-type-card.sel-unreleased{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35);color:#fbbf24}
+.e-type-card.sel-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:#22d3ee}
+.e-type-card.sel-uploaded{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.3);color:var(--adm-green)}
+.extra-prompt-box{background:rgba(192,132,252,0.05);border:1px dashed rgba(192,132,252,0.35);border-radius:14px;padding:18px;margin-top:10px;margin-bottom:10px}
+.extra-prompt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.extra-prompt-num{font-weight:800;color:var(--adm-accent2);font-size:.88rem}
+.extra-remove-btn{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);color:var(--adm-red);border-radius:8px;padding:5px 12px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:var(--adm-font)}
+.extra-add-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(139,92,246,0.07);border:1px dashed rgba(139,92,246,0.3);color:var(--adm-accent2);border-radius:10px;padding:9px 18px;font-weight:700;font-size:.88rem;cursor:pointer;margin-top:10px;font-family:var(--adm-font);transition:background .2s}
+.extra-add-btn:hover{background:rgba(139,92,246,0.14)}
+.assets-toggle-label{display:inline-flex;align-items:center;gap:10px;cursor:pointer;background:rgba(34,211,238,0.05);padding:12px 18px;border-radius:10px;border:1px dashed rgba(34,211,238,0.3);color:#22d3ee;font-weight:700;font-size:.88rem;transition:all .2s;user-select:none}
+.assets-toggle-label:hover{background:rgba(34,211,238,0.09)}
+.assets-toggle-label input[type=checkbox]{width:16px!important;height:16px!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important;accent-color:#22d3ee;cursor:pointer;flex-shrink:0}
+.assets-fields-box{background:rgba(255,255,255,0.02);border:1px solid rgba(34,211,238,0.2);border-radius:14px;padding:18px;margin-top:12px}
+.asset-previews{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.asset-preview-thumb{width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid var(--adm-border)}
+.asset-preview-thumb img{width:100%;height:100%;object-fit:cover}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--adm-bg)}
+::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
+/* RESPONSIVE */
+@media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-topbar{display:flex!important}}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:18px 14px}}
 </style>
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
+</head>
+<body>
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <?php include_once "gtag.php"; ?>
-</head><body>
-<header>
-  <div class="logo-area"  style="cursor:pointer">
-    <div class="logo-flipper">
-      <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-      <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
-    </div>
-    <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+<!-- MOBILE DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="sideDrawer">
+  <div class="drawer-head">
+    <div class="drawer-brand">Arigato Admin</div>
+    <div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div>
   </div>
-  <nav class="nav-links">
-    <a href="index.php">HOME</a>
-    <a href="dashboard.php">DASHBOARD</a>
+  <div class="drawer-user">
+    <?php $sav2=!empty($_SESSION['profile_image'])?htmlspecialchars($_SESSION['profile_image']):''; ?>
+    <?php if($sav2): ?><img src="<?= $sav2 ?>" class="d-av" alt="" referrerpolicy="no-referrer">
+    <?php else: ?><div class="d-av-ph"><?= strtoupper(substr($admin_name,0,1)) ?></div><?php endif; ?>
+    <div><div class="d-uname"><?= htmlspecialchars($admin_name) ?></div><div class="d-role">Admin</div></div>
+  </div>
+  <nav class="drawer-nav">
+    <div class="d-sec">Overview</div>
+    <a href="dashboard.php" class="d-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="analytics.php" class="d-link"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <div class="d-sec">Content</div>
+    <a href="upload_prompt.php" class="d-link"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
+    <a href="manage_prompts.php" class="d-link active"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
+    <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <div class="d-sec">Blog</div>
+    <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
+    <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
+    <div class="d-sec">Community</div>
+    <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
+    <div class="d-sec">Users</div>
+    <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
+    <div class="d-sec">Tools</div>
+    <a href="index.php" class="d-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
-  <div class="header-right">
-    <div class="header-divider"></div>
-    <div style="display:flex; align-items:center; gap:8px;">
-      <a href="profile.php" title="Edit Profile">
-        <img loading="lazy" src="<?= htmlspecialchars(
-            $_SESSION["profile_image"] ?? "",
-        ) ?>" class="admin-avatar" alt="Admin" referrerpolicy="no-referrer" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(-5deg)'" onmouseout="this.style.transform=''">
-      </a>
-      <a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a>
-    </div>
-    <a href="login.php?logout=1" class="logout">
-      <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
-    </a>
+  <div class="drawer-bottom">
+    <a href="login.php?logout=1" class="d-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
   </div>
-</header>
+</div>
+
+<!-- MOBILE TOPBAR -->
+<div class="mob-topbar">
+  <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
+  <div class="mob-page-title"><i class="fa-solid fa-pencil" style="-webkit-text-fill-color:var(--adm-accent2);margin-right:6px"></i>Edit Prompt</div>
+  <a href="dashboard.php" class="mob-back-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div>
+  </div>
+  <div class="sb-admin">
+    <?php $sav=!empty($_SESSION['profile_image'])?htmlspecialchars($_SESSION['profile_image']):''; ?>
+    <?php if($sav): ?><img src="<?= $sav ?>" class="sb-av" alt="" referrerpolicy="no-referrer">
+    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($admin_name,0,1)) ?></div><?php endif; ?>
+    <div><div class="sb-uname"><?= htmlspecialchars($admin_name) ?></div><div class="sb-role">Admin</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
+    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
+    <div class="sb-sec">Content</div>
+    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
+    <a href="manage_prompts.php" class="sb-link active"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
+    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
+    <div class="sb-sec">Blog</div>
+    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
+    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
+    <div class="sb-sec">Community</div>
+    <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
+    <div class="sb-sec">Users</div>
+    <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+    <div class="sb-sec">Tools</div>
+    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
+  </nav>
+  <div class="sb-bottom">
+    <a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title"><i class="fa-solid fa-pencil"></i> Edit Prompt</div>
+    <a href="dashboard.php" class="tb-btn tb-back"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+  </div>
+
 
 <div class="edit-wrap">
   <div class="edit-page-title"><i class="fa-solid fa-pencil"></i> Edit Prompt</div>
@@ -538,7 +682,7 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
 
       <div class="btn-row">
         <a href="dashboard.php" class="btn-cancel"><i class="fa-solid fa-arrow-left"></i> Cancel</a>
-        <button type="submit" class="comic-btn" style="flex:2;background:var(--secondary-color)">Save Changes <i class="fa-solid fa-check"></i></button>
+        <button type="submit" class="btn-primary-adm">Save Changes <i class="fa-solid fa-check"></i></button>
       </div>
     </form>
   </div>
@@ -691,16 +835,27 @@ body{background:var(--bg-color)}.edit-wrap{max-width:820px;margin:0 auto;padding
             const label = document.getElementById('trial-toggle-label');
             const info = document.getElementById('trial-info-box');
             if (cb.checked) {
-                label.style.background = '#fff3e0';
-                label.style.borderColor = '#f97316';
-                label.style.color = '#c2410c';
-                info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+                label.style.background = 'rgba(251,191,36,0.12)';
+                label.style.borderColor = 'rgba(251,191,36,0.4)';
+                label.style.color = '#fbbf24';
+                info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#fbbf24;"></i> <strong style="color:#fbbf24;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
             } else {
-                label.style.background = '#f5f5f5';
-                label.style.borderColor = '#ccc';
-                label.style.color = '#666';
-                info.innerHTML = '<i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Appears normally on the site.';
+                label.style.background = 'rgba(34,211,238,0.05)';
+                label.style.borderColor = 'rgba(34,211,238,0.3)';
+                label.style.color = '#22d3ee';
+                info.innerHTML = '<i class="fa-solid fa-eye" style="color:#4ade80;"></i> <strong style="color:#4ade80;">Visible</strong> &mdash; Appears normally on the site.';
             }
         }
+
+        // Mobile drawer
+        function openDrawer() {
+            document.getElementById('sideDrawer').classList.add('open');
+            document.getElementById('drawerOverlay').classList.add('open');
+        }
+        function closeDrawer() {
+            document.getElementById('sideDrawer').classList.remove('open');
+            document.getElementById('drawerOverlay').classList.remove('open');
+        }
 </script>
+</main>
 </body></html>

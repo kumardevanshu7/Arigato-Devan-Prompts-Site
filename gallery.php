@@ -118,7 +118,7 @@ function sessionAvatar()
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
         .gallery-title { font-size: 2rem; font-weight: 900; }
         .gallery-count {
@@ -130,6 +130,69 @@ function sessionAvatar()
             font-size: 0.9rem;
             box-shadow: 2px 2px 0px var(--text-color);
         }
+        /* Search bar */
+        .gallery-search-wrap {
+            position: relative;
+            margin-bottom: 22px;
+        }
+        .gallery-search-wrap .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-color);
+            font-size: 1rem;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        #gallery-search {
+            width: 100%;
+            padding: 13px 18px 13px 46px;
+            border: var(--border-width) solid var(--text-color);
+            border-radius: 20px;
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: 4px 4px 0 var(--text-color);
+            outline: none;
+            transition: box-shadow 0.2s, transform 0.2s;
+            box-sizing: border-box;
+        }
+        #gallery-search:focus {
+            box-shadow: 5px 5px 0 var(--text-color);
+            transform: translateY(-1px);
+        }
+        #gallery-search::placeholder { opacity: 0.55; font-weight: 600; }
+        .search-clear-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            border: 2px solid var(--text-color);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: .7rem;
+            font-weight: 900;
+            color: var(--text-color);
+            box-shadow: 2px 2px 0 var(--text-color);
+        }
+        .search-clear-btn.visible { display: flex; }
+        .gallery-no-results {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+        .gallery-no-results.show { display: block; }
+        .gallery-no-results .no-res-emoji { font-size: 3rem; margin-bottom: 12px; }
+        .gallery-no-results h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; }
+        .gallery-no-results p { font-weight: 600; opacity: .65; }
     </style>
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -244,7 +307,14 @@ function sessionAvatar()
     <div class="container" style="padding-top:40px;">
         <div class="gallery-header">
             <h1 class="gallery-title">All Prompts <span class="highlight">Gallery</span></h1>
-            <div class="gallery-count"><?= $total ?> Prompts</div>
+            <div class="gallery-count" id="gallery-count-badge"><?= $total ?> Prompts</div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="gallery-search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off">
+            <button class="search-clear-btn" id="search-clear-btn" title="Clear search" onclick="clearGallerySearch()">✕</button>
         </div>
 
         <?php if (count($prompts) === 0): ?>
@@ -547,7 +617,51 @@ function sessionAvatar()
                 }, { once: true });
             });
         });
+
+        // ── Gallery live search ──
+        (function() {
+            var inp = document.getElementById('gallery-search');
+            var clearBtn = document.getElementById('search-clear-btn');
+            var countBadge = document.getElementById('gallery-count-badge');
+            var noResults = document.getElementById('gallery-no-results');
+            if (!inp) return;
+
+            inp.addEventListener('input', function() {
+                filterGallery();
+            });
+
+            window.clearGallerySearch = function() {
+                inp.value = '';
+                filterGallery();
+                inp.focus();
+            };
+
+            function filterGallery() {
+                var q = inp.value.trim().toLowerCase();
+                clearBtn.classList.toggle('visible', q.length > 0);
+
+                var cards = document.querySelectorAll('.gallery-grid .card');
+                var visible = 0;
+                cards.forEach(function(card) {
+                    var title = (card.dataset.title || '').toLowerCase();
+                    var tags  = (card.dataset.tags  || '').toLowerCase();
+                    var match = !q || title.includes(q) || tags.includes(q);
+                    card.style.display = match ? '' : 'none';
+                    if (match) visible++;
+                });
+
+                if (countBadge) countBadge.textContent = visible + ' Prompts';
+                if (noResults) noResults.classList.toggle('show', visible === 0 && q.length > 0);
+            }
+        })();
     </script>
+
+<!-- No-results state -->
+<div class="gallery-no-results" id="gallery-no-results">
+    <div class="no-res-emoji">🔍</div>
+    <h3>No prompts found</h3>
+    <p>Try a different keyword or clear the search</p>
+</div>
 
 <!-- Wrong Code Comic Popup -->
 <div id="wrong-code-popup">

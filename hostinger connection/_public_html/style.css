@@ -77,6 +77,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: clamp(8px, 1.5vw, 24px);
     position: sticky;
     top: 16px;
     z-index: 100;
@@ -2003,7 +2004,7 @@ footer {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: var(--bg-color);
+    background: #0d0d0d; /* dark fallback while image loads */
 }
 
 /* ---- FILM STRIP BACKGROUND ---- */

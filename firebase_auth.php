@@ -85,17 +85,24 @@ try {
         $google_id === "5RDnMAipOwZTA21JJCnkH2V4E492" ? "admin" : "user";
 
     if ($user) {
-        // Update user's avatar and google_id if missing/changed, and strictly enforce role
+        // Only update google_id and role — do NOT overwrite avatar/profile_image.
+        // If the user has already gone through onboarding, they chose a custom avatar.
+        // Overwriting with Google's photoUrl would destroy that choice on every login.
         $stmt = $pdo->prepare(
-            "UPDATE users SET google_id = ?, avatar = ?, profile_image = ?, role = ? WHERE id = ?",
+            "UPDATE users SET google_id = ?, role = ? WHERE id = ?",
         );
-        $stmt->execute([$google_id, $avatar, $avatar, $user_role, $user["id"]]);
+        $stmt->execute([$google_id, $user_role, $user["id"]]);
+
+        // Use the custom avatar from DB; fall back to Google photo only for brand-new accounts
+        $db_avatar = $user["avatar"] ?? "";
+        $db_profile_image = $user["profile_image"] ?? "";
+        $resolved_avatar = $db_avatar ?: $db_profile_image ?: $avatar;
 
         $_SESSION["user_id"] = $user["id"];
         $_SESSION["username"] = $user["username"] ?? $name;
         $_SESSION["email"] = $user["email"];
         $_SESSION["role"] = $user_role;
-        $_SESSION["profile_image"] = $avatar;
+        $_SESSION["profile_image"] = $resolved_avatar;
         $_SESSION["onboarding_complete"] = $user["onboarding_complete"];
     } else {
         // Register new user

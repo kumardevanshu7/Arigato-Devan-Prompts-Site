@@ -226,6 +226,62 @@ try {
     .pw-text{display:flex;flex-direction:column;}
     .pw-hi{font-size:.92rem;font-weight:900;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.4);}
     .pw-sub{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.7);margin-top:1px;}
+
+    /* ========= HOMEPAGE FULL-PAGE FIXED BACKGROUND ========= */
+    /* Covers header + content + footer as one seamless wallpaper */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background-image: url('backgroundwally/only-homepage-pic.webp');
+        background-size: cover;
+        background-position: center top;
+        background-repeat: no-repeat;
+    }
+    /* Dark overlay so all elements stay readable */
+    body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: rgba(0,0,0,0.50);
+        pointer-events: none;
+    }
+    /* Mobile: switch to portrait image */
+    @media (max-width: 640px) {
+        body::before {
+            background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp');
+            background-position: center center;
+        }
+    }
+    /* ======================================================== */
+
+    /* ---- Hero heading: visible on dark background ---- */
+    .landing-comic-h1 {
+        color: #ffffff;
+        text-shadow: 0 2px 24px rgba(0,0,0,0.7);
+    }
+    /* "Couple AI" stroke — white outline instead of dark */
+    .h1-stroke {
+        -webkit-text-stroke: 3px #ffffff;
+        color: transparent;
+        filter: drop-shadow(0 0 12px rgba(255,255,255,0.35));
+    }
+    /* "Content" highlight — vivid accent color + glow */
+    .h1-highlight {
+        color: #f9a8d4;
+        text-shadow: 0 0 30px rgba(249,168,212,0.6);
+    }
+    .h1-highlight::after {
+        background: rgba(249,168,212,0.35);
+    }
+    /* Subtext, "How it Works" label — readable on dark */
+    .landing-comic-sub {
+        color: rgba(255,255,255,0.88);
+        text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    }
+    /* -------------------------------------------------- */
     </style>
 </head>
 <body>
@@ -337,64 +393,12 @@ try {
     <!-- ============ LANDING PAGE (LOGGED OUT) ============ -->
     <div class="landing-page-root" style="background:transparent;">
 
-        <!-- Aurora Mesh Gradient Background -->
-        <div class="aurora-bg" aria-hidden="true">
-            <div class="aurora-blob blob1"></div>
-            <div class="aurora-blob blob2"></div>
-            <div class="aurora-blob blob3"></div>
-            <div class="aurora-blob blob4"></div>
-        </div>
         <style>
         .sp-strip{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:22px auto 0;padding:13px 26px;max-width:380px;background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);border:2.5px solid var(--text-color,#2d2a35);border-radius:28px;box-shadow:4px 4px 0 var(--text-color,#2d2a35);}
         .sp-item{display:flex;flex-direction:column;align-items:center;gap:1px;}
         .sp-num{font-size:1.35rem;font-weight:900;color:var(--text-color,#2d2a35);line-height:1;}
         .sp-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#888;}
         .sp-dot{font-size:.7rem;color:#ccc;font-weight:900;}
-        .aurora-bg {
-            position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
-            background:#fdf6ff;
-        }
-        .aurora-blob {
-            position:absolute;border-radius:50%;filter:blur(90px);opacity:0.55;
-        }
-        .blob1 {
-            width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);
-            top:-15%;left:-10%;
-            animation:auroraFloat1 12s ease-in-out infinite;
-        }
-        .blob2 {
-            width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);
-            bottom:-20%;right:-10%;
-            animation:auroraFloat2 15s ease-in-out infinite;
-        }
-        .blob3 {
-            width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);
-            top:30%;right:5%;
-            animation:auroraFloat3 10s ease-in-out infinite;
-        }
-        .blob4 {
-            width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);
-            bottom:10%;left:10%;
-            animation:auroraFloat4 13s ease-in-out infinite;
-        }
-        @keyframes auroraFloat1 {
-            0%,100%{transform:translate(0,0) scale(1);}
-            33%{transform:translate(6%,8%) scale(1.08);}
-            66%{transform:translate(-4%,5%) scale(0.95);}
-        }
-        @keyframes auroraFloat2 {
-            0%,100%{transform:translate(0,0) scale(1);}
-            33%{transform:translate(-8%,-6%) scale(1.06);}
-            66%{transform:translate(5%,-3%) scale(0.97);}
-        }
-        @keyframes auroraFloat3 {
-            0%,100%{transform:translate(0,0) scale(1);}
-            50%{transform:translate(-10%,8%) scale(1.1);}
-        }
-        @keyframes auroraFloat4 {
-            0%,100%{transform:translate(0,0) scale(1);}
-            50%{transform:translate(8%,-10%) scale(1.05);}
-        }
         </style>
 
         <!-- Center Hero Content -->
@@ -438,11 +442,12 @@ try {
                     <div style="height:1px;background:<?= $bc ?>;opacity:0.4;margin-bottom:9px;"></div>
                     <!-- User row -->
                     <div style="display:flex;align-items:center;gap:7px;">
-                        <div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:2px solid <?= $bc ?>;flex-shrink:0;background:#eee;">
+                        <div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:2px solid <?= $bc ?>;flex-shrink:0;background:#eee;display:flex;align-items:center;justify-content:center;">
                             <?php if ($tav2): ?>
-                            <img src="<?= htmlspecialchars($tav2) ?>" style="width:100%;height:100%;object-fit:cover;" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= $tseed2 ?>'">
+                            <img src="<?= htmlspecialchars($tav2) ?>" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;" alt="" onerror="this.style.display='none';this.parentNode.querySelector('.av-fallback').style.display='flex'">
+                            <span class="av-fallback" style="display:none;font-size:.7rem;font-weight:900;color:<?= $tc ?>;text-transform:uppercase;"><?= strtoupper(substr($t2['username'] ?? 'U', 0, 1)) ?></span>
                             <?php else: ?>
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=<?= $tseed2 ?>" style="width:100%;height:100%;object-fit:cover;" alt="">
+                            <span style="font-size:.7rem;font-weight:900;color:<?= $tc ?>;text-transform:uppercase;"><?= strtoupper(substr($t2['username'] ?? 'U', 0, 1)) ?></span>
                             <?php endif; ?>
                         </div>
                         <div>
