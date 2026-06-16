@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 ?>
@@ -61,7 +61,7 @@ require_once "db.php";
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="index.php">HOME</a>
+        <a href="digital_store/index.php">SHOP</a>
         <a href="blogs.php">BLOG</a>
     </nav>
     <div class="header-right">

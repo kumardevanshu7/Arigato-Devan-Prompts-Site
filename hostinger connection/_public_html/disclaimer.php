@@ -1,4 +1,4 @@
-<?php session_start(); ?>
+﻿<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,7 +57,7 @@
             <div class="logo-text">ARIGATO<br>DEVAN</div>
         </div>
         <nav class="nav-links">
-            <a href="index.php">HOME</a>
+            <a href="digital_store/index.php">SHOP</a>
             <a href="gallery.php">GALLERY</a>
         </nav>
     </header>

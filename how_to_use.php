@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $_page_canonical = 'https://arigatodevan.com/how_to_use.php';
 session_start();
 require_once "db.php";
@@ -218,7 +218,7 @@ $cats = [
     <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
   </div>
   <nav class="nav-links">
-    <a href="index.php">HOME</a>
+    <a href="digital_store/index.php">SHOP</a>
     <a href="gallery.php">GALLERY</a>
     <a href="blogs.php">BLOGS</a>
     <a href="how_to_use.php" style="background:var(--primary-color);border:2px solid var(--text-color);border-radius:20px;box-shadow:3px 3px 0 var(--text-color);padding:6px 14px;"><i class="fa-solid fa-book-open"></i> GUIDE</a>

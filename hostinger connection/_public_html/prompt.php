@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -245,7 +245,7 @@ function sessionAvatar() {
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
         <nav class="nav-links">
-            <a href="index.php">HOME</a>
+            <a href="digital_store/index.php">SHOP</a>
             <a href="gallery.php" class="active">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
         </nav>

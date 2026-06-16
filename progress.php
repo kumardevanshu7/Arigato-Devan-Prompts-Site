@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 $curPage = basename($_SERVER["PHP_SELF"]);
@@ -224,7 +224,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="index.php">HOME</a>
+        <a href="digital_store/index.php">SHOP</a>
         <a href="gallery.php">GALLERY</a>
         <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Growth Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>

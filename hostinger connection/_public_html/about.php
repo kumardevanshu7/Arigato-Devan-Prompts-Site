@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 
@@ -104,7 +104,7 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="index.php">HOME</a>
+        <a href="digital_store/index.php">SHOP</a>
         <a href="gallery.php">GALLERY</a>
         <a href="contact.php">CONTACT</a>
     </nav>

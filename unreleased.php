@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -90,7 +90,7 @@ if (isset($_SESSION["user_id"])) {
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="index.php">HOME</a>
+        <a href="digital_store/index.php">SHOP</a>
         <a href="gallery.php">GALLERY</a>
         <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 $curPage = 'faq.php';
@@ -212,7 +212,7 @@ if (isset($_SESSION['user_id'])) {
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
         <nav class="nav-links">
-            <a href="index.php">HOME</a>
+            <a href="digital_store/index.php">SHOP</a>
             <a href="gallery.php">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
             <a href="faq.php" title="FAQ" class="active" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
@@ -372,7 +372,7 @@ if (isset($_SESSION['user_id'])) {
                 <a href="about.php">About</a>
                 <a href="contact.php">Contact</a>
                 <a href="blogs.php">Blogs</a>
-                <a href="index.php">Home</a>
+                <a href="digital_store/index.php">SHOP</a>
             </div>
             <div class="footer-col">
                 <h3>Legal</h3>

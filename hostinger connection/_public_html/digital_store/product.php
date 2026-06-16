@@ -1,0 +1,229 @@
+<?php 
+session_start();
+
+// SOFT LAUNCH GATE
+$allowed_emails = [
+    'devansh.grow@gmail.com', 
+    'thisisdevanshu7@gmail.com', 
+    'kaira.nyxzy@gmail.com'
+];
+$user_email = isset($_SESSION['email']) ? strtolower($_SESSION['email']) : '';
+
+if (!in_array($user_email, $allowed_emails)) {
+    include 'coming_soon.php';
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Details — Arigato Store</title>
+  <meta name="description" content="View prompt details, sample images, and unlock this premium AI prompt."/>
+  <link rel="stylesheet" href="css/store.css"/>
+</head>
+<body>
+
+<!-- =========== HEADER =========== -->
+<?php include 'store_nav.php'; ?>
+
+<?php
+require_once '../db.php';
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if (!$id || !isset($pdo)) {
+    header('Location: index.php');
+    exit;
+}
+
+// Fetch product details
+$stmt = $pdo->prepare("SELECT * FROM store_products WHERE id = ? AND active = 1");
+$stmt->execute([$id]);
+$p = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$p) {
+    header('Location: index.php');
+    exit;
+}
+
+// Fetch product images
+$img_stmt = $pdo->prepare("SELECT filename FROM store_product_images WHERE product_id = ? ORDER BY sort_order ASC");
+$img_stmt->execute([$id]);
+$images = $img_stmt->fetchAll(PDO::FETCH_COLUMN);
+
+if (empty($images)) {
+    $images = ['../assets/placeholder.svg'];
+} else {
+    foreach ($images as &$img) {
+        $img = 'assets/images/' . $img;
+    }
+}
+$p['images'] = $images;
+
+$disc_pct = $p['price'] > 0 ? round((($p['price'] - $p['discount']) / $p['price']) * 100) : 0;
+
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'];
+$base_url = $protocol . $host . '/digital_store/success.php?product_id=' . $p['id'];
+$return_url = urlencode($base_url);
+$buy_url    = $p['super_url'] ? $p['super_url'] : '#';
+
+// Check if user has purchased this product
+$is_purchased = false;
+if ($user_email) {
+    $chk = $pdo->prepare("SELECT id FROM store_purchases WHERE buyer_email = ? AND product_id = ? LIMIT 1");
+    $chk->execute([$user_email, $id]);
+    if ($chk->fetch()) {
+        $is_purchased = true;
+    }
+}
+?>
+
+<!-- =========== PRODUCT PAGE =========== -->
+<main class="product-page">
+
+  <!-- Back -->
+  <a href="index.php" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Store
+  </a>
+
+  <div class="product-layout">
+
+    <!-- ===== LEFT: IMAGE SLIDER ===== -->
+    <div>
+      <div class="slider-wrap" id="mainSlider">
+        <div class="slider-track" id="sliderTrack">
+          <?php foreach ($p['images'] as $img): ?>
+            <img class="slide" src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($p['title']) ?> preview" loading="lazy"/>
+          <?php endforeach; ?>
+        </div>
+
+        <!-- Prev / Next -->
+        <button class="slider-btn slider-prev" id="sliderPrev" aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="slider-btn slider-next" id="sliderNext" aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <!-- Dots -->
+        <div class="slider-dots" id="sliderDots">
+          <?php for ($i = 0; $i < count($p['images']); $i++): ?>
+            <button class="slider-dot <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>" aria-label="Slide <?= $i+1 ?>"></button>
+          <?php endfor; ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: PRODUCT INFO ===== -->
+    <div class="product-info">
+
+      <!-- Category -->
+      <p class="product-category"><?= htmlspecialchars($p['category']) ?></p>
+
+      <!-- Title -->
+      <h1 class="product-title"><?= htmlspecialchars($p['title']) ?></h1>
+
+      <!-- Pricing -->
+      <div class="product-pricing-row">
+        <span class="product-price-new">₹<?= $p['discount'] ?></span>
+        <span class="product-price-original">₹<?= $p['price'] ?></span>
+        <span class="product-discount-badge"><?= $disc_pct ?>% off</span>
+      </div>
+
+      <!-- Features -->
+      <div class="product-features">
+        <p class="features-label">What you get</p>
+        <?php 
+          $features = ['5 stunning sample outputs included','Instant delivery after purchase','Lifetime access, no expiry'];
+        ?>
+        <?php foreach ($features as $feat): ?>
+          <div class="feature-item">
+            <span class="feature-icon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span><?= htmlspecialchars($feat) ?></span>
+          </div>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- Blurred Prompt Preview -->
+      <div class="prompt-preview">
+        <div class="prompt-header">
+          <div class="prompt-header-label">
+            <div class="prompt-dots">
+              <span></span><span></span><span></span>
+            </div>
+            prompt.txt
+          </div>
+          <?php if ($is_purchased): ?>
+            <span style="font-size:0.72rem;color:var(--success);font-weight:600;">Unlocked</span>
+          <?php else: ?>
+            <span style="font-size:0.72rem;color:var(--text-muted);">Locked</span>
+          <?php endif; ?>
+        </div>
+        <div class="prompt-body">
+          <?php if ($is_purchased): ?>
+            <p class="prompt-text" style="filter: blur(0px); user-select: auto; color: var(--text-primary); font-weight:500; font-size:1.05rem;"><?= htmlspecialchars($p['prompt_text']) ?></p>
+          <?php else: ?>
+            <p class="prompt-text"><?= htmlspecialchars($p['prompt_text']) ?></p>
+            <div class="prompt-lock-overlay">
+              <span class="prompt-lock-icon">🔒</span>
+              <span class="prompt-lock-text">Buy this to unlock the prompt</span>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Buy Button or Unlocked Badge -->
+      <?php if ($is_purchased): ?>
+        <div class="buy-btn" style="background:var(--success); cursor:default; justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="margin-left:8px;">Purchased & Unlocked</span>
+        </div>
+      <?php else: ?>
+        <a href="<?= htmlspecialchars($buy_url) ?>" class="buy-btn" target="_blank" rel="noopener noreferrer">
+          Unlock for &#8377;<?= $p['discount'] ?> 
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      <?php endif; ?>
+
+      <!-- How to Use -->
+      <?php if (!empty($p['how_to_use'])): ?>
+      <div class="how-to-use-box" style="margin-top:40px; padding:24px; border:1px solid var(--border-dark); border-radius:12px; background:var(--bg);">
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.1rem; margin-bottom:12px; color:var(--text-primary);">How to Use</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6; white-space:pre-wrap; font-family:'Inter',sans-serif;"><?= htmlspecialchars($p['how_to_use']) ?></p>
+      </div>
+      <?php endif; ?>
+
+      <!-- Trust Badges -->
+      <div class="trust-badges">
+        <span class="trust-item">🔒 Secure Payment</span>
+        <span class="trust-item">⚡ Instant Access</span>
+        <span class="trust-item">♾️ Lifetime Use</span>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- =========== FOOTER =========== -->
+<footer class="store-footer">
+  <div class="store-footer-inner">
+    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<?php include 'store_firebase_js.php'; ?>
+</body>
+</html>
