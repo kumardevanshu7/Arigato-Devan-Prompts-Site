@@ -1060,7 +1060,7 @@ footer .footer-links a:hover {
     </div>
     
     <nav class="nav-links desktop-only">
-      <a href="digital_store/index.php">SHOP</a>
+      <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
       <a href="gallery.php">GALLERY</a>
       <a href="blogs.php" class="active">BLOGS</a>
       <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
@@ -1251,10 +1251,7 @@ footer .footer-links a:hover {
 </div>
 <?php endif; ?>
 
-<footer>
-  <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-  <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
-</footer>
+<?php include 'footer.php'; ?>
 
 <script defer src="script.min.js?v=20260616"></script>
 <script>

@@ -166,6 +166,8 @@ $buyer_email = $tok['buyer_email'] ?? '';
       color: var(--text-primary);
       white-space: pre-wrap;
       word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
     }
 
     /* Copy button */
@@ -336,6 +338,34 @@ $buyer_email = $tok['buyer_email'] ?? '';
 <main>
   <div class="vp-wrap">
 
+    <!-- Important Note Box -->
+    <div style="background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #92400E; font-size: 0.88rem; line-height: 1.6; position: relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#B45309; font-size: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Important Note
+        </div>
+        <button onclick="document.getElementById('note-en').style.display='none'; document.getElementById('note-hi').style.display='block'; this.style.display='none';" id="btn-hi" style="background:#FEF3C7; border:1px solid #FDE68A; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600; color:#92400E; cursor:pointer;">Translate to Hinglish</button>
+      </div>
+
+      <div id="note-en">
+        <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+          <li><strong>File not showing?</strong> Check your email's <em>Promotions</em> tab (usually next to Primary). SuperProfile sends a backup copy there.</li>
+          <li><strong>Logged-in users:</strong> You can always access your prompts securely from the <em>My Purchases</em> section on the top right.</li>
+          <li><strong>Best Practice:</strong> Always log in before making a purchase for permanent access to your files.</li>
+        </ul>
+      </div>
+
+      <div id="note-hi" style="display:none;">
+        <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+          <li><strong>File nahi dikh rahi?</strong> Apne email ka <em>Promotions</em> tab check karein (Primary ke bagal mein). SuperProfile wahan ek backup bhejta hai.</li>
+          <li><strong>Logged-in users:</strong> Aap hamesha apne prompts upar right side mein <em>My Purchases</em> section se access kar sakte hain.</li>
+          <li><strong>Best Practice:</strong> Hamesha login karke hi purchase karein taaki aapki files humesha safe aur accessible rahein.</li>
+        </ul>
+        <button onclick="document.getElementById('note-hi').style.display='none'; document.getElementById('note-en').style.display='block'; document.getElementById('btn-hi').style.display='block';" style="margin-top:12px; background:transparent; border:none; color:#B45309; font-size:0.75rem; font-weight:600; cursor:pointer; text-decoration:underline; padding:0;">Read in English</button>
+      </div>
+    </div>
+
     <!-- Header -->
     <div class="vp-header">
       <div class="vp-check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -365,37 +395,9 @@ $buyer_email = $tok['buyer_email'] ?? '';
       <span id="vp_copyTxt">Copy Prompt</span>
     </button>
 
-    <!-- Downloads -->
-    <?php $hasPdf = !empty($p['pdf_file']); $hasDrive = !empty($p['drive_url']); ?>
-    <?php if ($hasPdf || $hasDrive): ?>
-    <div class="vp-downloads">
-      <?php if ($hasPdf): ?>
-      <a href="assets/pdfs/<?= htmlspecialchars($p['pdf_file']) ?>" download class="vp-dl-btn">
-        <div class="dl-icon dl-pdf">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9F1239" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        </div>
-        <div>
-          <div style="font-size:0.9rem;color:var(--text-primary);">Download PDF Guide</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Detailed step-by-step instructions</div>
-        </div>
-        <svg style="margin-left:auto;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-      </a>
-      <?php endif; ?>
+    <!-- The Note Box used to be here, moved to top -->
 
-      <?php if ($hasDrive): ?>
-      <a href="<?= htmlspecialchars($p['drive_url']) ?>" target="_blank" rel="noopener noreferrer" class="vp-dl-btn">
-        <div class="dl-icon dl-drive">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        </div>
-        <div>
-          <div style="font-size:0.9rem;color:var(--text-primary);">View on Google Drive</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Open full guide in Drive</div>
-        </div>
-        <svg style="margin-left:auto;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
-      <?php endif; ?>
-    </div>
-    <?php endif; ?>
+    <!-- Downloads section removed -->
 
     <!-- Meta -->
     <div class="vp-meta">
@@ -414,16 +416,7 @@ $buyer_email = $tok['buyer_email'] ?? '';
 <?php endif; ?>
 
 <!-- Footer -->
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script>
   function vpCopy() {

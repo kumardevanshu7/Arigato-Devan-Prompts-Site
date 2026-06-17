@@ -151,8 +151,8 @@ if ($user_email) {
       </div>
 
       <!-- Blurred Prompt Preview -->
-      <div class="prompt-preview">
-        <div class="prompt-header">
+      <div class="prompt-preview" style="max-height: <?= $is_purchased ? '400px' : '250px' ?>; overflow-y: <?= $is_purchased ? 'auto' : 'hidden' ?>;">
+        <div class="prompt-header" style="position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px);">
           <div class="prompt-header-label">
             <div class="prompt-dots">
               <span></span><span></span><span></span>
@@ -160,17 +160,23 @@ if ($user_email) {
             prompt.txt
           </div>
           <?php if ($is_purchased): ?>
-            <span style="font-size:0.72rem;color:var(--success);font-weight:600;">Unlocked</span>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:0.72rem;color:var(--success);font-weight:600;">Unlocked</span>
+              <button onclick="copyProductPrompt(this)" style="display:flex;align-items:center;gap:4px;font-size:0.7rem;font-weight:600;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text-primary);cursor:pointer;transition:all 0.2s;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
           <?php else: ?>
             <span style="font-size:0.72rem;color:var(--text-muted);">Locked</span>
           <?php endif; ?>
         </div>
         <div class="prompt-body">
           <?php if ($is_purchased): ?>
-            <p class="prompt-text" style="filter: blur(0px); user-select: auto; color: var(--text-primary); font-weight:500; font-size:1.05rem;"><?= htmlspecialchars($p['prompt_text']) ?></p>
+            <p id="theActualPrompt" class="prompt-text" style="filter: blur(0px); user-select: auto; color: var(--text-primary); font-weight:500; font-size:1.05rem; padding-bottom:20px;"><?= htmlspecialchars($p['prompt_text']) ?></p>
           <?php else: ?>
             <p class="prompt-text"><?= htmlspecialchars($p['prompt_text']) ?></p>
-            <div class="prompt-lock-overlay">
+            <div class="prompt-lock-overlay" style="background: linear-gradient(to bottom, rgba(253,251,247,0) 0%, rgba(253,251,247,0.9) 60%, var(--bg-card) 100%);">
               <span class="prompt-lock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:bottom;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
               <span class="prompt-lock-text">Buy this to unlock the prompt</span>
             </div>
@@ -180,10 +186,13 @@ if ($user_email) {
 
       <!-- Buy Button or Unlocked Badge -->
       <?php if ($is_purchased): ?>
-        <button id="viewSecureBtn" class="buy-btn" style="border:none; cursor:pointer; width:100%; background:var(--text-primary); color:#fff;" onclick="openPurchase(<?= $p['id'] ?>, '<?= htmlspecialchars($p['secret_key'] ?? '') ?>', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span style="margin-left:8px;">View Prompt & Guide</span>
-        </button>
+        <div style="background: #F0FAF4; border: 1.5px solid #BBF7D0; border-radius: 12px; padding: 16px 20px; margin-top: 24px; text-align: center;">
+          <div style="color: #166534; font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            You have successfully purchased this item
+          </div>
+          <p style="color: #15803D; font-size: 0.85rem; line-height: 1.5; margin-bottom: 0;">The complete prompt is unlocked above.</p>
+        </div>
       <?php else: ?>
 
         <!-- Email popup (for guest users only) -->
@@ -229,6 +238,20 @@ if ($user_email) {
             }
           }
 
+          function showPreview(imgSrc) {
+            // optional logic here for future features
+          }
+
+          function copyProductPrompt(btn) {
+            const txt = document.getElementById('theActualPrompt').innerText;
+            navigator.clipboard.writeText(txt).then(() => {
+              const orig = btn.innerHTML;
+              btn.innerHTML = '<span style="color:var(--success)">Copied! ✓</span>';
+              setTimeout(() => btn.innerHTML = orig, 2000);
+            });
+          }
+
+          // Handle guest checkout email
           function proceedWithEmail() {
             const email = document.getElementById('guestEmail')?.value.trim() || '';
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -319,16 +342,7 @@ if ($user_email) {
 </main>
 
 <!-- =========== FOOTER =========== -->
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script src="js/store.js"></script>
 <?php include 'store_firebase_js.php'; ?>

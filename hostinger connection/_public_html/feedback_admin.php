@@ -153,7 +153,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .fb-date{font-size:.62rem;font-weight:600;color:var(--muted);margin-left:auto}
 .fb-rating{display:inline-flex;align-items:center;gap:5px;background:rgba(139,92,246,0.08);border:1px solid var(--border2);border-radius:100px;padding:3px 10px;font-size:.72rem;font-weight:800;color:var(--accent2);margin-bottom:10px}
 .fb-text{font-size:.88rem;color:var(--muted);line-height:1.65;font-style:italic;}
-.fb-text::before{content:'" '}.fb-text::after{content:' "'}
 
 /* Actions */
 .fb-actions{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
@@ -229,11 +228,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .toast.ok{border-color:rgba(74,222,128,0.4);color:var(--green)}
 .toast.err{border-color:rgba(248,113,113,0.4);color:var(--red)}
 
-/* Cursor */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
+/* Cursor removed to prevent overlapping circle issue */
 
 @media(max-width:768px){
     .sidebar{display:none}.main{margin-left:0;padding:14px 14px 90px}
@@ -250,8 +245,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 </style>
 </head>
 <body>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
 <div id="sp"></div>
 <div class="toast" id="toast"></div>
 

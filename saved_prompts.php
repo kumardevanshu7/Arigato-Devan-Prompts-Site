@@ -314,7 +314,7 @@ $type_map = [
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="digital_store/index.php">SHOP</a>
+        <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
         <a href="gallery.php">GALLERY</a>
     </nav>
     <div class="header-right">
@@ -448,10 +448,7 @@ $type_map = [
     </div>
 </div>
 
-<footer>
-    <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
-</footer>
+<?php include 'footer.php'; ?>
 
 <!-- Remove-Saved Confirm Popup -->
 <div id="sp-confirm-remove" style="display:none;position:fixed;inset:0;background:rgba(45,42,53,.5);backdrop-filter:blur(8px);z-index:3500;align-items:center;justify-content:center;">

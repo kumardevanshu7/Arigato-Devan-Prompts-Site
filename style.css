@@ -78,11 +78,23 @@ header {
     justify-content: space-between;
     align-items: center;
     gap: clamp(8px, 1.5vw, 24px);
-    position: sticky;
-    top: 16px;
     z-index: 100;
     box-shadow: 6px 6px 0px var(--text-color);
     min-height: 0;
+}
+
+/* Glowing Shop button for nav */
+.shop-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: navBorderGlow 2s infinite alternate;
+    border-radius: 20px;
+    padding: 6px 12px;
+}
+@keyframes navBorderGlow {
+    from { box-shadow: 0 0 2px rgba(192,132,252,0.3), inset 0 0 2px rgba(192,132,252,0.2); border: 1.5px solid rgba(192,132,252,0.4); }
+    to { box-shadow: 0 0 10px rgba(192,132,252,0.8), inset 0 0 10px rgba(192,132,252,0.5); border: 1.5px solid rgba(192,132,252,1); }
 }
 
 .logo-area {
@@ -368,9 +380,12 @@ header {
 .admin-avatar {
     width: 35px;
     height: 35px;
+    min-width: 35px;
+    min-height: 35px;
     border-radius: 50%;
     border: 2px solid var(--primary-color);
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Hero Section */
@@ -2582,6 +2597,9 @@ footer {
     .admin-avatar {
         width: 30px;
         height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        flex-shrink: 0;
     }
 
     /* ─ Logged-in Hero ─ */

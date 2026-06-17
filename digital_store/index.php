@@ -196,24 +196,29 @@ $total = count($products);
 </section>
 
 <!-- =========== FOOTER =========== -->
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script src="js/store.js"></script>
 <script>
   // Filter pills
   document.querySelectorAll('.filter-pill').forEach(pill => {
     pill.addEventListener('click', function() {
+      // Update active state
       document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
       this.classList.add('active');
+      
+      // Filter logic
+      const selectedCat = this.getAttribute('data-cat');
+      const products = document.querySelectorAll('.product-card');
+      
+      products.forEach(product => {
+        let cats = (product.getAttribute('data-cat') || '').split(',').map(c => c.trim());
+        if (selectedCat === 'all' || cats.includes(selectedCat)) {
+          product.style.display = '';
+        } else {
+          product.style.display = 'none';
+        }
+      });
     });
   });
 </script>

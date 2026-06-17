@@ -142,16 +142,7 @@ $purchases = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 </main>
 
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script>
   function openPurchase(pid, secret, btn) {

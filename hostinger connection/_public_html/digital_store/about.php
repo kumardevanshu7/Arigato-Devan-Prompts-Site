@@ -298,8 +298,13 @@
         So I started building ones that actually perform — tested, refined, 
         and ready to use the moment you buy them."
       </p>
-      <div class="creator-name">Devan</div>
-      <div class="creator-role">Founder, Arigato Store</div>
+      <div style="display:flex; align-items:center; gap:12px; position:relative; z-index:1;">
+        <img src="../aboutmepics/new.webp" alt="Devan" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:1px solid var(--border);">
+        <div>
+          <div class="creator-name">Devan</div>
+          <div class="creator-role">Founder, Arigato Store</div>
+        </div>
+      </div>
     </div>
   </div>
 

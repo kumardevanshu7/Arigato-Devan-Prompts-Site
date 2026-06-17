@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $_page_canonical = 'https://arigatodevan.com/';
@@ -300,7 +300,7 @@ try {
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
         <nav class="nav-links">
-            <a href="digital_store/index.php">SHOP</a>
+            <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
             <a href="gallery.php">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
         <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
@@ -408,7 +408,7 @@ try {
             <!-- ══ MINI COLORFUL TESTIMONIALS ══ -->
             <div style="width:100%;max-width:760px;margin:0 auto 28px;padding:0 10px;">
                 <p style="text-align:center;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.22em;color:#9490bb;margin-bottom:16px;font-family:'Inter',sans-serif;">✦ What our users say ✦</p>
-                <div id="miniTestiTrack" style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 4px 14px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory;">
+                <div id="miniTestiTrack" style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:12px 12px 24px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory;">
                 <?php
                 $mc = [['#ffd6e7','#f9a8d4','#831843'],['#d0f4de','#86efac','#14532d'],['#e8d5f5','#c4b5fd','#4c1d95'],['#fff3cd','#fde68a','#78350f'],['#cfe2ff','#93c5fd','#1e3a5f'],['#fde8c0','#fdba74','#7c2d12']];
                 $t_emojis2=['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
@@ -420,6 +420,10 @@ try {
                     $tname2 = htmlspecialchars($t2['username'] ?? 'User');
                     $tav2   = $t2['profile_image'] ?? $t2['avatar'] ?? '';
                     $tseed2 = urlencode($t2['username'] ?? 'user');
+                    if ($tav2 && !str_starts_with($tav2, 'http')) {
+                        $tav2 = ltrim($tav2, '.');
+                        $tav2 = ltrim($tav2, '/');
+                    }
                     $tg2 = strtolower(trim($t2['gender'] ?? ''));
                     $tgi2 = in_array($tg2,['male','m']) ? '♂' : (in_array($tg2,['female','f']) ? '♀' : '');
                     $shorttext = mb_strlen($t2['feedback_text']) > 68 ? mb_substr($t2['feedback_text'],0,68).'…' : $t2['feedback_text'];
@@ -1031,10 +1035,7 @@ try {
     </div>
     <?php endif; ?>
 
-    <footer>
-        <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="feedback.php">FEEDBACK</a><a href="testimonials.php">TESTIMONIALS</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
-    </footer>
+    <?php include 'footer.php'; ?>
 
     <!-- Unlock Modal - No longer restricted by session so guests can see the "login to save" features -->
     <div id="unlock-modal" class="modal-overlay" style="display:none;">
