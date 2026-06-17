@@ -185,10 +185,89 @@ if ($user_email) {
           <span style="margin-left:8px;">Purchased & Unlocked</span>
         </div>
       <?php else: ?>
-        <a href="<?= htmlspecialchars($buy_url) ?>" class="buy-btn" target="_blank" rel="noopener noreferrer">
-          Unlock for &#8377;<?= $p['discount'] ?> 
+
+        <!-- Email popup (for guest users only) -->
+        <?php if (!$user_email): ?>
+        <div id="emailPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;">
+          <div style="background:var(--bg-card); border:1.5px solid var(--border); border-radius:16px; padding:32px 28px; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div style="font-size:2rem; margin-bottom:12px;">🔐</div>
+            <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Enter your email</h3>
+            <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:20px; line-height:1.6;">After payment, your prompt will also be sent to this email — so you can always access it later.</p>
+            <input type="email" id="guestEmail" placeholder="you@email.com"
+              style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;background:var(--bg);color:var(--text-primary);outline:none;margin-bottom:16px;box-sizing:border-box;"/>
+            <button id="guestProceedBtn" onclick="proceedWithEmail()"
+              style="width:100%;padding:13px;background:var(--text-primary);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;">
+              Continue to Payment →
+            </button>
+            <button onclick="document.getElementById('emailPopup').style.display='none'"
+              style="margin-top:12px;background:none;border:none;color:var(--text-muted);font-size:0.83rem;cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <button id="unlockBtn" onclick="handleUnlock()"
+          class="buy-btn" style="border:none; cursor:pointer; width:100%;">
+          Unlock for &#8377;<?= $p['discount'] ?>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        </button>
+
+        <script>
+          const PRODUCT_ID  = <?= (int)$p['id'] ?>;
+          const SUPER_URL   = <?= json_encode($buy_url) ?>;
+          const IS_LOGGED_IN = <?= $user_email ? 'true' : 'false' ?>;
+
+          function handleUnlock() {
+            if (IS_LOGGED_IN) {
+              // Logged-in user: set session token, then redirect
+              initAndRedirect('');
+            } else {
+              // Guest: show email popup
+              document.getElementById('emailPopup').style.display = 'flex';
+              setTimeout(() => document.getElementById('guestEmail')?.focus(), 100);
+            }
+          }
+
+          function proceedWithEmail() {
+            const email = document.getElementById('guestEmail')?.value.trim() || '';
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              alert('Please enter a valid email address.');
+              return;
+            }
+            document.getElementById('emailPopup').style.display = 'none';
+            initAndRedirect(email);
+          }
+
+          function initAndRedirect(email) {
+            const btn = document.getElementById('unlockBtn');
+            if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+
+            const fd = new FormData();
+            fd.append('product_id', PRODUCT_ID);
+            if (email) fd.append('email', email);
+
+            fetch('init_purchase.php', { method: 'POST', body: fd })
+              .then(r => r.json())
+              .then(data => {
+                if (data.ok) {
+                  window.location.href = SUPER_URL;
+                } else {
+                  alert(data.msg || 'Something went wrong. Please try again.');
+                  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                }
+              })
+              .catch(() => {
+                // Fallback: redirect anyway (session might not set, but at least they can pay)
+                window.location.href = SUPER_URL;
+              });
+          }
+
+          // Allow Enter key in email input
+          document.addEventListener('DOMContentLoaded', () => {
+            const inp = document.getElementById('guestEmail');
+            if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') proceedWithEmail(); });
+          });
+        </script>
+
       <?php endif; ?>
 
       <!-- How to Use -->

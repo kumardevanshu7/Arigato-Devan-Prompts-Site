@@ -56,6 +56,22 @@ try {
         $pdo->exec("ALTER TABLE store_products ADD COLUMN how_to_use TEXT DEFAULT '' AFTER prompt_text");
     } catch (PDOException $e) { /* column already exists */ }
 
+    // Add secret_key column if upgrading existing DB
+    try {
+        $pdo->exec("ALTER TABLE store_products ADD COLUMN secret_key VARCHAR(16) NOT NULL DEFAULT '' AFTER super_url");
+    } catch (PDOException $e) { /* column already exists */ }
+
+    // Ensure store_purchases table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS store_purchases (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        product_id     INT NOT NULL,
+        buyer_email    VARCHAR(255) NOT NULL,
+        payment_id     VARCHAR(100) DEFAULT '',
+        purchased_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+        INDEX (buyer_email),
+        INDEX (product_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
     $pdo->exec("CREATE TABLE IF NOT EXISTS store_product_images (
         id         INT AUTO_INCREMENT PRIMARY KEY,
         product_id INT NOT NULL,
@@ -89,6 +105,16 @@ function uploadImages(array $files, int $product_id, PDO $pdo): void {
     }
 }
 
+// ---- SECRET KEY GENERATOR ----
+function generateSecretKey(): string {
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $key = '';
+    for ($i = 0; $i < 16; $i++) {
+        $key .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return $key;
+}
+
 // ---- ADD PRODUCT ----
 if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $title    = trim($_POST['title']    ?? '');
@@ -99,13 +125,13 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $badge    = trim($_POST['badge']    ?? '');
     $badge_t  = trim($_POST['badge_type']?? '');
     $url      = trim($_POST['super_url']?? '');
-
     $how_to_use = trim($_POST['how_to_use'] ?? '');
+    $secret_key = generateSecretKey(); // auto-generate unique secret
 
     if ($title && $price && $prompt) {
         try {
-            $pdo->prepare("INSERT INTO store_products (title,category,price,discount,prompt_text,how_to_use,badge,badge_type,super_url) VALUES (?,?,?,?,?,?,?,?,?)")
-                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url]);
+            $pdo->prepare("INSERT INTO store_products (title,category,price,discount,prompt_text,how_to_use,badge,badge_type,super_url,secret_key) VALUES (?,?,?,?,?,?,?,?,?,?)")
+                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$secret_key]);
             $new_id = $pdo->lastInsertId();
 
             // Handle image uploads
@@ -113,7 +139,7 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 uploadImages($_FILES['images'], $new_id, $pdo);
             }
 
-            $msg = "Product \"$title\" added successfully!";
+            $msg = "Product \"$title\" added successfully! Secret key: <code>$secret_key</code>";
         } catch (PDOException $e) {
             $msg      = "Error: " . $e->getMessage();
             $msg_type = 'error';
@@ -161,11 +187,19 @@ if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $badge    = trim($_POST['badge']    ?? '');
     $badge_t  = trim($_POST['badge_type']?? '');
     $url      = trim($_POST['super_url']?? '');
-
     $how_to_use = trim($_POST['how_to_use'] ?? '');
 
     if ($edit_id && $title && $price && $prompt) {
         try {
+            // If product has no secret_key yet, generate one now
+            $chk_sk = $pdo->prepare("SELECT secret_key FROM store_products WHERE id = ?");
+            $chk_sk->execute([$edit_id]);
+            $existing_sk = $chk_sk->fetchColumn();
+            if (empty($existing_sk)) {
+                $pdo->prepare("UPDATE store_products SET secret_key = ? WHERE id = ?")
+                    ->execute([generateSecretKey(), $edit_id]);
+            }
+
             $pdo->prepare("UPDATE store_products SET title=?,category=?,price=?,discount=?,prompt_text=?,how_to_use=?,badge=?,badge_type=?,super_url=? WHERE id=?")
                 ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$edit_id]);
 
@@ -678,7 +712,7 @@ if (isset($_GET['edit'])) {
   <!-- ===== TOAST MESSAGE ===== -->
   <?php if ($msg): ?>
     <div class="admin-toast <?= $msg_type ?>">
-      <?= htmlspecialchars($msg) ?>
+      <?= $msg /* intentionally allows HTML for secret key <code> */ ?>
     </div>
   <?php endif; ?>
 
@@ -726,6 +760,7 @@ if (isset($_GET['edit'])) {
           <th>Discount</th>
           <th>Imgs</th>
           <th>Status</th>
+          <th>SuperProfile Redirect URL</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -759,6 +794,24 @@ if (isset($_GET['edit'])) {
             <span class="status-badge <?= $prod['active'] ? 'active' : 'inactive' ?>">
               <?= $prod['active'] ? 'Live' : 'Hidden' ?>
             </span>
+          </td>
+          <td>
+            <?php
+              // Build the ready-to-copy SuperProfile redirect URL
+              $sk = $prod['secret_key'] ?? '';
+              if (empty($sk)) {
+                  // Generate and save one if missing (for old products)
+                  $sk = generateSecretKey();
+                  $pdo->prepare("UPDATE store_products SET secret_key=? WHERE id=?")->execute([$sk, $prod['id']]);
+              }
+              $redirect_url = 'https://arigatodevan.com/digital_store/success.php?product_id=' . $prod['id'] . '&secret=' . $sk;
+            ?>
+            <div style="display:flex;align-items:center;gap:6px;max-width:320px;">
+              <input type="text" id="sk_<?= $prod['id'] ?>" value="<?= htmlspecialchars($redirect_url) ?>"
+                readonly style="font-size:0.7rem;padding:6px 10px;font-family:'DM Mono',monospace;flex:1;min-width:0;"/>
+              <button onclick="copyUrl('sk_<?= $prod['id'] ?>', this)"
+                style="flex-shrink:0;padding:6px 10px;font-size:0.72rem;font-weight:600;border-radius:6px;border:1.5px solid var(--border-dark);background:var(--bg);cursor:pointer;white-space:nowrap;">Copy</button>
+            </div>
           </td>
           <td>
             <div class="action-btns">
@@ -966,6 +1019,19 @@ if (isset($_GET['edit'])) {
   // Toast auto-hide
   const toast = document.querySelector('.admin-toast');
   if (toast) setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; }, 4000);
+
+  // Copy SuperProfile redirect URL
+  function copyUrl(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    navigator.clipboard.writeText(inp.value).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      btn.style.background = '#F0FAF4';
+      btn.style.color = '#166534';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2500);
+    });
+  }
 </script>
 
 </body>
