@@ -61,6 +61,16 @@ try {
         $pdo->exec("ALTER TABLE store_products ADD COLUMN secret_key VARCHAR(16) NOT NULL DEFAULT '' AFTER super_url");
     } catch (PDOException $e) { /* column already exists */ }
 
+    // Add pdf_file column if upgrading existing DB
+    try {
+        $pdo->exec("ALTER TABLE store_products ADD COLUMN pdf_file VARCHAR(255) DEFAULT '' AFTER secret_key");
+    } catch (PDOException $e) { /* column already exists */ }
+
+    // Add drive_url column if upgrading existing DB
+    try {
+        $pdo->exec("ALTER TABLE store_products ADD COLUMN drive_url VARCHAR(500) DEFAULT '' AFTER pdf_file");
+    } catch (PDOException $e) { /* column already exists */ }
+
     // Ensure store_purchases table exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS store_purchases (
         id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,11 +89,41 @@ try {
         sort_order TINYINT DEFAULT 0,
         FOREIGN KEY (product_id) REFERENCES store_products(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    // View tokens table
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS store_view_tokens (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            token VARCHAR(32) NOT NULL UNIQUE,
+            product_id INT NOT NULL,
+            buyer_email VARCHAR(255) NOT NULL,
+            used TINYINT(1) DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX (token)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    } catch (PDOException $e) { /* already exists */ }
+
+    // Support tickets table
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS store_support_tickets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            order_id VARCHAR(100) DEFAULT '',
+            issue_type VARCHAR(50) DEFAULT '',
+            sub_type VARCHAR(100) DEFAULT '',
+            description TEXT NOT NULL,
+            screenshot VARCHAR(255) DEFAULT '',
+            status VARCHAR(20) DEFAULT 'open',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    } catch (PDOException $e) { /* already exists */ }
+
 } catch (PDOException $e) {
     // Table might already exist, continue
 }
 
-// ---- UPLOAD HELPER ----
+// ---- UPLOAD HELPER (Images) ----
 function uploadImages(array $files, int $product_id, PDO $pdo): void {
     $uploadDir = __DIR__ . '/assets/images/';
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
@@ -103,6 +143,20 @@ function uploadImages(array $files, int $product_id, PDO $pdo): void {
             ->execute([$product_id, $filename, $order]);
         $order++;
     }
+}
+
+// ---- UPLOAD HELPER (PDFs) ----
+function uploadPdf(array $file, int $product_id): string {
+    $uploadDir = __DIR__ . '/assets/pdfs/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    if ($file['error'] !== UPLOAD_ERR_OK) return '';
+    if ($file['type'] !== 'application/pdf') return '';
+    if ($file['size'] > 10 * 1024 * 1024) return ''; // 10MB max
+
+    $filename = 'guide_' . $product_id . '_' . time() . '.pdf';
+    move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
+    return $filename;
 }
 
 // ---- SECRET KEY GENERATOR ----
@@ -126,17 +180,26 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $badge_t  = trim($_POST['badge_type']?? '');
     $url      = trim($_POST['super_url']?? '');
     $how_to_use = trim($_POST['how_to_use'] ?? '');
+    $drive_url = trim($_POST['drive_url'] ?? '');
     $secret_key = generateSecretKey(); // auto-generate unique secret
 
     if ($title && $price && $prompt) {
         try {
-            $pdo->prepare("INSERT INTO store_products (title,category,price,discount,prompt_text,how_to_use,badge,badge_type,super_url,secret_key) VALUES (?,?,?,?,?,?,?,?,?,?)")
-                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$secret_key]);
+            $pdo->prepare("INSERT INTO store_products (title,category,price,discount,prompt_text,how_to_use,badge,badge_type,super_url,secret_key,drive_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$secret_key,$drive_url]);
             $new_id = $pdo->lastInsertId();
 
             // Handle image uploads
             if (!empty($_FILES['images']['tmp_name'][0])) {
                 uploadImages($_FILES['images'], $new_id, $pdo);
+            }
+            
+            // Handle PDF upload
+            if (!empty($_FILES['pdf_file']['tmp_name'])) {
+                $pdf = uploadPdf($_FILES['pdf_file'], $new_id);
+                if ($pdf) {
+                    $pdo->prepare("UPDATE store_products SET pdf_file = ? WHERE id = ?")->execute([$pdf, $new_id]);
+                }
             }
 
             $msg = "Product \"$title\" added successfully! Secret key: <code>$secret_key</code>";
@@ -176,6 +239,14 @@ if ($action === 'toggle' && isset($_GET['id'])) {
     $msg = "Product visibility updated.";
 }
 
+// ---- UPDATE TICKET STATUS ----
+if ($action === 'update_ticket' && isset($_GET['id']) && isset($_GET['status'])) {
+    $ticket_id = (int)$_GET['id'];
+    $status = $_GET['status'];
+    $pdo->prepare("UPDATE store_support_tickets SET status = ? WHERE id = ?")->execute([$status, $ticket_id]);
+    $msg = "Ticket status updated to " . strtoupper($status) . ".";
+}
+
 // ---- EDIT PRODUCT ----
 if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $edit_id  = (int)($_POST['edit_id'] ?? 0);
@@ -188,6 +259,7 @@ if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $badge_t  = trim($_POST['badge_type']?? '');
     $url      = trim($_POST['super_url']?? '');
     $how_to_use = trim($_POST['how_to_use'] ?? '');
+    $drive_url = trim($_POST['drive_url'] ?? '');
 
     if ($edit_id && $title && $price && $prompt) {
         try {
@@ -200,11 +272,18 @@ if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     ->execute([generateSecretKey(), $edit_id]);
             }
 
-            $pdo->prepare("UPDATE store_products SET title=?,category=?,price=?,discount=?,prompt_text=?,how_to_use=?,badge=?,badge_type=?,super_url=? WHERE id=?")
-                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$edit_id]);
+            $pdo->prepare("UPDATE store_products SET title=?,category=?,price=?,discount=?,prompt_text=?,how_to_use=?,badge=?,badge_type=?,super_url=?,drive_url=? WHERE id=?")
+                ->execute([$title,$category,$price,$discount,$prompt,$how_to_use,$badge,$badge_t,$url,$drive_url,$edit_id]);
 
             if (!empty($_FILES['images']['tmp_name'][0])) {
                 uploadImages($_FILES['images'], $edit_id, $pdo);
+            }
+
+            if (!empty($_FILES['pdf_file']['tmp_name'])) {
+                $pdf = uploadPdf($_FILES['pdf_file'], $edit_id);
+                if ($pdf) {
+                    $pdo->prepare("UPDATE store_products SET pdf_file = ? WHERE id = ?")->execute([$pdf, $edit_id]);
+                }
             }
 
             $msg = "Product updated!";
@@ -264,6 +343,37 @@ if (isset($_GET['edit'])) {
       margin: 0 auto;
       padding: 40px clamp(16px, 4vw, 60px) 80px;
     }
+
+    /* Custom File Input */
+    .custom-file-wrapper { position: relative; display: inline-block; width: 100%; }
+    .custom-file-input { opacity: 0; width: 0.1px; height: 0.1px; position: absolute; }
+    .custom-file-label {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: var(--bg); cursor: pointer;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-primary);
+      transition: all 0.2s; width: max-content;
+    }
+    .custom-file-label:hover { border-color: var(--text-primary); }
+    .custom-file-name { font-size: 0.8rem; color: var(--text-muted); margin-left: 12px; }
+    
+    /* 3 Dots Menu */
+    .action-menu-container { position: relative; display: inline-block; }
+    .action-menu-btn { background: none; border: none; padding: 4px 8px; cursor: pointer; border-radius: 4px; color: var(--text-muted); }
+    .action-menu-btn:hover { background: var(--bg); color: var(--text-primary); }
+    .action-dropdown {
+      display: none; position: absolute; right: 0; top: 100%; min-width: 120px;
+      background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 6px; z-index: 10;
+    }
+    .action-dropdown.show { display: block; }
+    .action-dropdown a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      color: var(--text-primary); text-decoration: none; font-size: 0.85rem; border-radius: 4px; font-weight: 500;
+    }
+    .action-dropdown a:hover { background: var(--bg); }
+    .action-dropdown a.btn-delete { color: #9F1239; }
+    .action-dropdown a.btn-delete:hover { background: #FFF1F2; }
 
     /* Page header */
     .admin-page-header {
@@ -341,7 +451,6 @@ if (isset($_GET['edit'])) {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-card);
-      overflow: hidden;
       margin-bottom: 40px;
     }
 
@@ -777,7 +886,7 @@ if (isset($_GET['edit'])) {
             <?php if ($thumb): ?>
               <img class="td-thumb" src="assets/images/<?= htmlspecialchars($thumb) ?>" alt="Thumb"/>
             <?php else: ?>
-              <div class="td-thumb-placeholder">🖼️</div>
+              <div class="td-thumb-placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
             <?php endif; ?>
           </td>
           <td class="td-title"><?= htmlspecialchars($prod['title']) ?></td>
@@ -814,29 +923,105 @@ if (isset($_GET['edit'])) {
             </div>
           </td>
           <td>
-            <div class="action-btns">
-              <!-- Edit -->
-              <a href="?edit=<?= $prod['id'] ?>" class="btn-edit" title="Edit product">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Edit
-              </a>
-              <!-- Hide/Show -->
-              <a href="?action=toggle&id=<?= $prod['id'] ?>" class="btn-toggle"
-                 onclick="return confirm('Toggle visibility?')" title="<?= $prod['active'] ? 'Hide' : 'Show' ?>">
-                <?php if ($prod['active']): ?>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  Hide
-                <?php else: ?>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Show
-                <?php endif; ?>
-              </a>
-              <!-- Delete -->
-              <a href="?action=delete&id=<?= $prod['id'] ?>" class="btn-delete"
-                 onclick="return confirm('Delete \'<?= addslashes($prod['title']) ?>\' permanently?')" title="Delete">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-                Delete
-              </a>
+            <div class="action-menu-container">
+              <button class="action-menu-btn" onclick="toggleMenu('menu_<?= $prod['id'] ?>')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div id="menu_<?= $prod['id'] ?>" class="action-dropdown">
+                <a href="?edit=<?= $prod['id'] ?>" title="Edit product">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </a>
+                <a href="?action=toggle&id=<?= $prod['id'] ?>" onclick="return confirm('Toggle visibility?')">
+                  <?php if ($prod['active']): ?>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    Hide
+                  <?php else: ?>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Show
+                  <?php endif; ?>
+                </a>
+                <a href="?action=delete&id=<?= $prod['id'] ?>" class="btn-delete" onclick="return confirm('Delete \'<?= addslashes($prod['title']) ?>\' permanently?')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                  Delete
+                </a>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php endif; ?>
+  </div>
+
+  <!-- ===== SUPPORT TICKETS TABLE ===== -->
+  <?php
+    $tickets = [];
+    try {
+        $tickets = $pdo->query("SELECT * FROM store_support_tickets ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
+  ?>
+  <div class="products-table-wrap" style="margin-top: 40px;">
+    <div class="table-header">
+      <span class="table-title">Support Tickets</span>
+      <span style="font-size:0.78rem;color:var(--text-muted)"><?= count($tickets) ?> tickets</span>
+    </div>
+    <?php if (empty($tickets)): ?>
+      <div class="empty-state">
+        <div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="18"/></svg></div>
+        <p>No support tickets yet.</p>
+      </div>
+    <?php else: ?>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>User</th>
+          <th>Issue</th>
+          <th>Order ID</th>
+          <th>Screenshot</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($tickets as $t): ?>
+        <tr>
+          <td style="white-space:nowrap;"><?= date('M d, Y', strtotime($t['created_at'])) ?></td>
+          <td>
+            <strong><?= htmlspecialchars($t['name']) ?></strong><br>
+            <span style="font-size:0.8rem;color:var(--text-muted);"><?= htmlspecialchars($t['email']) ?></span>
+          </td>
+          <td>
+            <strong style="color:var(--text-primary);"><?= htmlspecialchars($t['issue_type']) ?></strong>
+            <?php if ($t['sub_type']): ?><br><span style="font-size:0.8rem;color:var(--text-muted);"><?= htmlspecialchars($t['sub_type']) ?></span><?php endif; ?>
+            <div style="font-size:0.82rem;margin-top:6px;max-width:260px;line-height:1.5;"><?= htmlspecialchars($t['description']) ?></div>
+          </td>
+          <td style="font-family:monospace;font-size:0.8rem;"><?= htmlspecialchars($t['order_id']) ?: '-' ?></td>
+          <td>
+            <?php if ($t['screenshot']): ?>
+              <a href="assets/tickets/<?= htmlspecialchars($t['screenshot']) ?>" target="_blank" style="font-size:0.8rem;color:var(--text-primary);font-weight:600;text-decoration:none;">View &rarr;</a>
+            <?php else: ?>
+              <span style="color:var(--text-muted);font-size:0.8rem;">None</span>
+            <?php endif; ?>
+          </td>
+          <td>
+            <?php
+              $bg = '#F1F5F9'; $color = '#64748B'; $border = '#E2E8F0';
+              if ($t['status'] === 'open') { $bg = '#FEF9C3'; $color = '#854D0E'; $border = '#FEF08A'; }
+              if ($t['status'] === 'progress') { $bg = '#DBEAFE'; $color = '#1E40AF'; $border = '#BFDBFE'; }
+              if ($t['status'] === 'resolved') { $bg = '#F0FAF4'; $color = '#166534'; $border = '#BBF7D0'; }
+            ?>
+            <div class="status-dropdown-wrap" style="position:relative; display:inline-block;">
+              <button type="button" class="status-badge" onclick="toggleStatusMenu(<?= $t['id'] ?>)" id="st-btn-<?= $t['id'] ?>" style="background:<?= $bg ?>; color:<?= $color ?>; border:1px solid <?= $border ?>; padding-right:24px; position:relative; cursor:pointer; min-width:96px; text-align:left;">
+                <span id="st-text-<?= $t['id'] ?>"><?= strtoupper($t['status']) ?></span>
+                <svg id="st-icon-<?= $t['id'] ?>" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="st-menu-<?= $t['id'] ?>" class="st-menu" style="display:none; position:absolute; top:100%; left:0; margin-top:4px; background:var(--bg-card); border:1.5px solid var(--border); border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.08); padding:6px; min-width:115px; z-index:50;">
+                <div onclick="updateStatus(<?= $t['id'] ?>, 'open')" style="padding:8px 12px; font-size:0.7rem; font-weight:700; color:#854D0E; background:#FEF9C3; border-radius:4px; cursor:pointer; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">OPEN</div>
+                <div onclick="updateStatus(<?= $t['id'] ?>, 'progress')" style="padding:8px 12px; font-size:0.7rem; font-weight:700; color:#1E40AF; background:#DBEAFE; border-radius:4px; cursor:pointer; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">PROGRESS</div>
+                <div onclick="updateStatus(<?= $t['id'] ?>, 'resolved')" style="padding:8px 12px; font-size:0.7rem; font-weight:700; color:#166534; background:#F0FAF4; border-radius:4px; cursor:pointer; text-transform:uppercase; letter-spacing:0.06em;">RESOLVED</div>
+              </div>
             </div>
           </td>
         </tr>
@@ -933,6 +1118,28 @@ if (isset($_GET['edit'])) {
         <textarea id="how_to_use" name="how_to_use"
                   placeholder="e.g. Step 1: Open ChatGPT or Midjourney&#10;Step 2: Paste the prompt&#10;Step 3: Adjust the settings as needed&#10;Step 4: Generate and enjoy!"
                   style="min-height:130px;"><?= htmlspecialchars($edit_product['how_to_use'] ?? '') ?></textarea>
+      </div>
+
+      <!-- Drive & PDF (Optional) -->
+      <div class="form-group full">
+        <label for="drive_url">Google Drive URL (Optional)</label>
+        <input type="url" id="drive_url" name="drive_url"
+               value="<?= htmlspecialchars($edit_product['drive_url'] ?? '') ?>"
+               placeholder="https://drive.google.com/drive/folders/..."/>
+      </div>
+      <div class="form-group full">
+        <label>Upload PDF Guide (Optional)</label>
+        <?php if (!empty($edit_product['pdf_file'])): ?>
+          <p style="font-size:0.8rem;color:var(--text-primary);margin-top:0;">Current PDF: <strong><?= htmlspecialchars($edit_product['pdf_file']) ?></strong></p>
+        <?php endif; ?>
+        <div class="custom-file-wrapper" style="display:flex;align-items:center;">
+          <input type="file" name="pdf_file" accept="application/pdf" id="pdfInput" class="custom-file-input" onchange="document.getElementById('pdfName').textContent = this.files[0] ? this.files[0].name : 'No file chosen'"/>
+          <label for="pdfInput" class="custom-file-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose PDF File
+          </label>
+          <span id="pdfName" class="custom-file-name">No file chosen</span>
+        </div>
       </div>
 
       <!-- Image Upload -->
@@ -1032,6 +1239,42 @@ if (isset($_GET['edit'])) {
       setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2500);
     });
   }
+  // Toggle 3-dots menu
+  function toggleMenu(id) {
+    document.querySelectorAll('.action-dropdown').forEach(m => { if(m.id !== id) m.classList.remove('show'); });
+    document.getElementById(id).classList.toggle('show');
+  }
+  // Toggle Ticket Status Menu
+  function toggleStatusMenu(id) {
+    document.querySelectorAll('.st-menu').forEach(m => {
+      if(m.id !== 'st-menu-'+id) m.style.display = 'none';
+    });
+    const menu = document.getElementById('st-menu-'+id);
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Update Ticket Status via AJAX
+  function updateStatus(id, status) {
+    document.getElementById('st-menu-'+id).style.display = 'none';
+    fetch(`admin.php?action=update_ticket&id=${id}&status=${status}`)
+      .then(() => {
+        const btn = document.getElementById(`st-btn-${id}`);
+        const text = document.getElementById(`st-text-${id}`);
+        text.innerText = status.toUpperCase();
+        if(status === 'open') { btn.style.background='#FEF9C3'; btn.style.color='#854D0E'; btn.style.borderColor='#FEF08A'; }
+        if(status === 'progress') { btn.style.background='#DBEAFE'; btn.style.color='#1E40AF'; btn.style.borderColor='#BFDBFE'; }
+        if(status === 'resolved') { btn.style.background='#F0FAF4'; btn.style.color='#166534'; btn.style.borderColor='#BBF7D0'; }
+      });
+  }
+
+  window.addEventListener('click', function(e) {
+    if (!e.target.closest('.action-menu-container')) {
+      document.querySelectorAll('.action-dropdown').forEach(m => m.classList.remove('show'));
+    }
+    if (!e.target.closest('.status-dropdown-wrap')) {
+      document.querySelectorAll('.st-menu').forEach(m => m.style.display = 'none');
+    }
+  });
 </script>
 
 </body>

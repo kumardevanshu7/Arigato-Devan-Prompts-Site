@@ -69,7 +69,7 @@ $total = count($products);
 <div class="marquee-strip">
   <div class="marquee-track">
     <?php
-      $items = ['Cinematic Landscapes', 'Portrait Photography', 'Cyberpunk Cities', 'Ethereal Forests', 'Editorial Fashion', 'Abstract Art', 'Architectural Interiors', 'Surreal Dreamscapes'];
+      $items = ['Hot CloseUp Couple Prompt', 'Cinematic Portrait Prompt', 'Aesthetic Outfit Prompt', 'Golden Hour Glow Prompt', 'Dark Moody Boudoir Prompt', 'Viral Reel Thumbnail Prompt', 'Fashion Editorial Prompt', 'Street Style Candid Prompt', 'Soft Glam Studio Prompt', 'Bold Colour Pop Prompt', 'Neon Night Out Prompt'];
       $html = '';
       foreach($items as $item) {
         $html .= '<span class="marquee-item">' . $item . ' <span class="marquee-dot">✦</span></span>';
@@ -200,9 +200,9 @@ $total = count($products);
   <div class="store-footer-inner">
     <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
     <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
+      <a href="privacy.php">Privacy Policy</a>
+      <a href="terms.php">Terms</a>
+      <a href="contact.php">Contact</a>
     </div>
   </div>
 </footer>

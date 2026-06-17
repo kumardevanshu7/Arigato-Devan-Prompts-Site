@@ -171,7 +171,7 @@ if ($user_email) {
           <?php else: ?>
             <p class="prompt-text"><?= htmlspecialchars($p['prompt_text']) ?></p>
             <div class="prompt-lock-overlay">
-              <span class="prompt-lock-icon">🔒</span>
+              <span class="prompt-lock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:bottom;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
               <span class="prompt-lock-text">Buy this to unlock the prompt</span>
             </div>
           <?php endif; ?>
@@ -180,17 +180,19 @@ if ($user_email) {
 
       <!-- Buy Button or Unlocked Badge -->
       <?php if ($is_purchased): ?>
-        <div class="buy-btn" style="background:var(--success); cursor:default; justify-content:center;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="margin-left:8px;">Purchased & Unlocked</span>
-        </div>
+        <button id="viewSecureBtn" class="buy-btn" style="border:none; cursor:pointer; width:100%; background:var(--text-primary); color:#fff;" onclick="openPurchase(<?= $p['id'] ?>, '<?= htmlspecialchars($p['secret_key'] ?? '') ?>', this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span style="margin-left:8px;">View Prompt & Guide</span>
+        </button>
       <?php else: ?>
 
         <!-- Email popup (for guest users only) -->
         <?php if (!$user_email): ?>
         <div id="emailPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;">
           <div style="background:var(--bg-card); border:1.5px solid var(--border); border-radius:16px; padding:32px 28px; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-            <div style="font-size:2rem; margin-bottom:12px;">🔐</div>
+            <div style="margin-bottom:12px;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
             <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Enter your email</h3>
             <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:20px; line-height:1.6;">After payment, your prompt will also be sent to this email — so you can always access it later.</p>
             <input type="email" id="guestEmail" placeholder="you@email.com"
@@ -261,6 +263,32 @@ if ($user_email) {
               });
           }
 
+          function openPurchase(pid, secret, btn) {
+            const origTxt = btn.innerHTML;
+            btn.innerHTML = 'Opening...';
+            btn.disabled = true;
+
+            const fd = new FormData();
+            fd.append('product_id', pid);
+
+            fetch('init_purchase.php', { method: 'POST', body: fd })
+              .then(res => res.json())
+              .then(data => {
+                if (data.ok) {
+                  window.location.href = 'success.php?product_id=' + pid + '&secret=' + secret;
+                } else {
+                  alert('Error: ' + data.msg);
+                  btn.innerHTML = origTxt;
+                  btn.disabled = false;
+                }
+              })
+              .catch(err => {
+                alert('Network error. Try again.');
+                btn.innerHTML = origTxt;
+                btn.disabled = false;
+              });
+          }
+
           // Allow Enter key in email input
           document.addEventListener('DOMContentLoaded', () => {
             const inp = document.getElementById('guestEmail');
@@ -295,9 +323,9 @@ if ($user_email) {
   <div class="store-footer-inner">
     <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
     <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
+      <a href="privacy.php">Privacy Policy</a>
+      <a href="terms.php">Terms</a>
+      <a href="contact.php">Contact</a>
     </div>
   </div>
 </footer>

@@ -33,7 +33,7 @@ if ($user_avatar && !str_starts_with($user_avatar, 'http')) {
     <!-- NAV LINKS -->
     <nav class="store-nav">
       <a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'nav-active' : '' ?>">Shop</a>
-      <a href="#">About</a>
+      <a href="about.php" class="<?= basename($_SERVER['PHP_SELF']) === 'about.php' ? 'nav-active' : '' ?>">About</a>
     </nav>
 
     <!-- RIGHT SIDE BUTTONS -->
