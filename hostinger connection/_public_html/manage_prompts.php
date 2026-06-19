@@ -124,6 +124,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .tb-urp{background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.25)}
 .tb-ivp{background:rgba(34,211,238,0.08);color:var(--cyan);border-color:rgba(34,211,238,0.2)}
 .tb-aup{background:rgba(96,165,250,0.08);color:#60a5fa;border-color:rgba(96,165,250,0.2)}
+.tb-drp{background:rgba(244,63,94,0.08);color:#f43f5e;border-color:rgba(244,63,94,0.2)}
 .tb-trial{background:rgba(74,222,128,0.1);color:var(--green);border-color:rgba(74,222,128,0.22)}
 .p-tag-pill{padding:2px 8px;background:rgba(139,92,246,0.08);border:1px solid var(--border2);border-radius:100px;font-size:.6rem;font-weight:700;color:var(--muted)}
 .p-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
@@ -156,6 +157,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .bt-ivp.sel{background:rgba(34,211,238,0.08)}
 .bt-aup{color:#60a5fa;border-color:rgba(96,165,250,0.25)}
 .bt-aup.sel{background:rgba(96,165,250,0.08)}
+.bt-drp{color:#f43f5e;border-color:rgba(244,63,94,0.25)}
+.bt-drp.sel{background:rgba(244,63,94,0.08)}
 .bt-all{color:var(--muted);border-color:var(--border2)}
 .bt-all:hover{color:var(--text);border-color:var(--border)}
 .bulk-list{max-height:300px;overflow-y:auto;border:1px solid var(--border2);border-radius:12px;padding:8px}
@@ -341,7 +344,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     </div>
     <div id="prompts-list">
     <?php
-    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP']];
+    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DIR']];
     foreach($prompts as $p):
       $ptype=$p['prompt_type']??'secret';
       $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];
@@ -444,6 +447,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
         <button type="button" class="bulk-type-btn bt-urp" onclick="setBulkAction('unreleased',this)"><i class="fa-solid fa-star"></i> Unreleased</button>
         <button type="button" class="bulk-type-btn bt-ivp" onclick="setBulkAction('insta_viral',this)"><i class="fa-brands fa-instagram"></i> Insta Viral</button>
         <button type="button" class="bulk-type-btn bt-aup" onclick="setBulkAction('already_uploaded',this)"><i class="fa-solid fa-clock-rotate-left"></i> Already Uploaded</button>
+        <button type="button" class="bulk-type-btn bt-drp" onclick="setBulkAction('direct',this)"><i class="fa-solid fa-hand-pointer"></i> Direct Prompt</button>
         <button type="button" class="bulk-type-btn bt-all" onclick="selectAllBulk()"><i class="fa-solid fa-check-double"></i> Select All</button>
       </div>
       <div class="bulk-list" id="bulk-list">
@@ -573,31 +577,7 @@ function saveTrialModal() {
   });
 }
 
-
-let currentTrialId = 0;
-function openTrialModal(id, currentState) {
-  currentTrialId = id;
-  document.getElementById('trial-toggle-switch').checked = (currentState == 1);
-  document.getElementById('trial-modal').style.display = 'flex';
-}
-function closeTrialModal() {
-  document.getElementById('trial-modal').style.display = 'none';
-}
-function saveTrialModal() {
-  const isTrial = document.getElementById('trial-toggle-switch').checked ? 1 : 0;
-  fetch('manage_prompts.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'toggle_trial_id=' + currentTrialId + '&is_trial=' + isTrial
-  }).then(r => r.text()).then(txt => {
-    if (txt.includes('OK')) {
-      location.reload();
-    } else {
-      alert('Error updating trial status.');
-    }
-  });
-}
-
 </script>
 </html>
+
 

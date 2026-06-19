@@ -1,18 +1,7 @@
-<?php 
+﻿<?php 
 session_start();
 
-// SOFT LAUNCH GATE
-$allowed_emails = [
-    'devansh.grow@gmail.com', 
-    'thisisdevanshu7@gmail.com', 
-    'kaira.nyxzy@gmail.com'
-];
-$user_email = isset($_SESSION['email']) ? strtolower($_SESSION['email']) : '';
 
-if (!in_array($user_email, $allowed_emails)) {
-    include 'coming_soon.php';
-    exit;
-}
 
 // Use site's existing DB connection
 require_once '../db.php';

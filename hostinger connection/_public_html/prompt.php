@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -37,6 +37,7 @@ $ptype    = match($db_type) {
     "insta_viral"     => "insta_viral",
     "unreleased"      => "unreleased",
     "already_uploaded"=> "already_uploaded",
+    "direct"          => "direct",
     default           => "secret_code"
 };
 $tinfo = [
@@ -44,6 +45,7 @@ $tinfo = [
     "unreleased"       => ["label" => "UNRELEASED",         "bg" => "#fff1b8", "color" => "#7a5c00"],
     "insta_viral"      => ["label" => "INSTA VIRAL",        "bg" => "#c8f5d4", "color" => "#1a5c30"],
     "already_uploaded" => ["label" => "ALREADY UPLOADED",   "bg" => "#e6f2ff", "color" => "#00509e"],
+    "direct"           => ["label" => "DIRECT PROMPT",      "bg" => "#ffe4e6", "color" => "#be123c"],
 ][$ptype];
 
 $rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
@@ -70,6 +72,7 @@ $type_page    = match($ptype) {
     'insta_viral'      => 'insta_viral.php',
     'unreleased'       => 'unreleased.php',
     'already_uploaded' => 'already_uploaded.php',
+    'direct'           => 'gallery.php', // Assuming there's no direct.php list page yet
     default            => 'gallery.php',
 };
 
@@ -236,40 +239,52 @@ function sessionAvatar() {
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo-area" id="logo-container" style="cursor:pointer;" onclick="window.location='index.php'">
-            <div class="logo-flipper">
-                <div class="logo-front"><img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo"></div>
-                <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt"></div>
-            </div>
-            <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-        </div>
-        <nav class="nav-links">
-            <a href="digital_store/index.php">SHOP</a>
-            <a href="gallery.php" class="active">GALLERY</a>
-            <a href="blogs.php">BLOGS</a>
-        </nav>
-        <div class="header-right">
-            <div class="header-divider"></div>
-            <?php if (isset($_SESSION["user_id"])): ?>
-                <?php if ($_SESSION["role"] === "admin"): ?>
-                    <a href="dashboard.php" style="color:var(--text-color);font-weight:800;">ADMIN</a>
-                <?php endif; ?>
-                <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
-            <?php else: ?>
-                <a href="login.php" class="comic-btn" style="display:inline-flex;align-items:center;font-size:0.85rem;padding:10px 18px;background:#fff;text-decoration:none;color:#000;">
-                    <i class="fa-brands fa-google" style="font-size:18px;"></i> Login
-                </a>
-            <?php endif; ?>
-        </div>
-    </header>
+      <div class="prompt-custom-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; margin: 15px auto 25px; max-width: 1100px; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--text-color); box-shadow: 4px 4px 0 var(--text-color); width: calc(100% - 40px); position: relative; z-index: 999;">
+          <div class="logo-area" onclick="location.href='index.php'" style="cursor:pointer; margin:0;">
+              <div class="logo-flipper">
+                  <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo"></div>
+                  <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt="Logo"></div>
+              </div>
+              <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+          </div>
+          
+          <div class="prompt-dots-menu" style="position:relative;">
+              <button id="prompt-nav-toggle" style="background:var(--bg-color); border:2px solid var(--text-color); border-radius:12px; padding:6px 14px; cursor:pointer; font-size:1.3rem; color:var(--text-color); box-shadow:2px 2px 0 var(--text-color); transition:all 0.15s; display:flex; align-items:center; justify-content:center;">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+              <div id="prompt-nav-dropdown" style="display:none; position:absolute; top:calc(100% + 10px); right:0; background:var(--card-bg); border:2px solid var(--text-color); border-radius:14px; box-shadow:4px 4px 0 var(--text-color); min-width:180px; z-index:1000; flex-direction:column; overflow:hidden;">
+                  <a href="index.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Home</a>
+                  <a href="gallery.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-images"></i> Gallery</a>
+                  <a href="digital_store/index.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-shop"></i> Shop</a>
+                  <a href="blogs.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
+                  <?php if(isset($_SESSION['user_id'])): ?>
+                  <a href="profile.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-user"></i> Profile</a>
+                  <?php endif; ?>
+              </div>
+          </div>
+      </div>
+      <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var toggle = document.getElementById('prompt-nav-toggle');
+          var dropdown = document.getElementById('prompt-nav-dropdown');
+          if(toggle && dropdown) {
+              toggle.addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+              });
+              document.addEventListener('click', function() {
+                  dropdown.style.display = 'none';
+              });
+              dropdown.addEventListener('click', function(e) {
+                  e.stopPropagation();
+              });
+          }
+      });
+      </script>
+
 
     <div class="pp-wrap">
-        <!-- Back -->
-        <div class="pp-back">
-            <a href="gallery.php"><i class="fa-solid fa-arrow-left"></i> Back to Gallery</a>
-        </div>
-
+  
         <div class="pp-layout">
             <!-- Image Column -->
             <div class="pp-img-col <?= ($ptype === 'unreleased' && !$is_unlocked) ? 'blurred' : '' ?>" id="pp-img-col">
@@ -346,6 +361,18 @@ function sessionAvatar() {
                             <button id="pp-love-btn-au" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-au" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
+                        </div>
+
+                    <?php elseif ($ptype === 'direct'): ?>
+                        <?php $req_taps = (int)($p['unlock_code'] ?: 9); ?>
+                        <div class="pp-task-icon"><i class="fa-solid fa-hand-pointer" style="color:#f43f5e"></i></div>
+                        <h3>Direct Unlock!</h3>
+                        <p>Tap the heart <strong><?= $req_taps ?> times</strong> to unlock this prompt!</p>
+                        <div class="pp-love-area">
+                            <button id="pp-love-btn-dir" class="pp-love-btn" style="color:#f43f5e;border-color:#f43f5e"><i class="fa-solid fa-heart"></i></button>
+                            <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-dir" style="width:0%;background:#f43f5e"></div></div>
+                            <div class="pp-love-progress"><span id="pp-tap-count-dir">0</span> / <?= $req_taps ?></div>
+                            <script>const DIR_REQ_TAPS = <?= $req_taps ?>;</script>
                         </div>
                     <?php endif; ?>
 
@@ -446,10 +473,7 @@ function sessionAvatar() {
         <?php endif; ?>
     </div>
 
-    <footer>
-        <div>&copy; 2026 ARIGATO DEVAN. KEEP CREATING.</div>
-        <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
-    </footer>
+    <?php include 'footer.php'; ?>
 
     <script>
     const promptId = <?= $id ?>;
@@ -551,6 +575,27 @@ function sessionAvatar() {
                 const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
                 if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
                 else { tapCountAu = 0; document.getElementById('pp-tap-count-au').textContent = '0'; document.getElementById('pp-progress-fill-au').style.width = '0%'; this.disabled = false; showError(res.message); }
+            }
+        });
+    }
+
+    // -- DIRECT PROMPT (configurable heart taps) --
+    const loveBtnDir = document.getElementById('pp-love-btn-dir');
+    if (loveBtnDir) {
+        let tapCountDir = 0;
+        const TAPS_DIR = typeof DIR_REQ_TAPS !== 'undefined' ? DIR_REQ_TAPS : 9;
+        loveBtnDir.addEventListener('click', async function() {
+            tapCountDir++;
+            document.getElementById('pp-tap-count-dir').textContent = tapCountDir;
+            document.getElementById('pp-progress-fill-dir').style.width = (tapCountDir / TAPS_DIR * 100) + '%';
+            this.style.transform = 'scale(1.35)';
+            setTimeout(() => this.style.transform = '', 120);
+            if (tapCountDir >= TAPS_DIR) {
+                this.disabled = true;
+                const fd = new FormData(); fd.append('action', 'direct'); fd.append('prompt_id', promptId);
+                const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
+                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
+                else { tapCountDir = 0; document.getElementById('pp-tap-count-dir').textContent = '0'; document.getElementById('pp-progress-fill-dir').style.width = '0%'; this.disabled = false; showError(res.message); }
             }
         });
     }

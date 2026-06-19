@@ -81,6 +81,7 @@ if (isset($_SESSION["user_id"])) {
     <div class="bg-creamy-overlay"></div>
 </div>
 
+<div class="nav-sticky-wrap" id="navStickyWrap">
 <header>
     <div class="logo-area" id="logo-container"  style="cursor:pointer">
         <div class="logo-flipper">
@@ -165,6 +166,7 @@ if (isset($_SESSION["user_id"])) {
         <?php endif; ?>
     </div>
 </header>
+</div><!-- /nav-sticky-wrap -->
 
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
@@ -423,5 +425,7 @@ document.querySelectorAll('.card').forEach(function(card) {
         }
     }, { once: true });
 });
-</script></body></html>
+</script><script>(function(){var nav=document.getElementById("navStickyWrap");if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener("scroll",function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add("nav-hidden");else nav.classList.remove("nav-hidden");lastY=y;ticking=false;});ticking=true;}},{passive:true});})();</script>
+</body></html>
+
 

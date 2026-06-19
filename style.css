@@ -64,6 +64,18 @@ body::before {
 body { animation: pageIn 0.25s ease; }
 
 /* Header */
+/* Sticky nav wrapper */
+.nav-sticky-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+.nav-sticky-wrap.nav-hidden {
+    transform: translateY(-120%);
+}
+
 header {
     background-color: rgba(253, 251, 247, 0.75);
     backdrop-filter: blur(16px);

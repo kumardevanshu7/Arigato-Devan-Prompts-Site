@@ -247,5 +247,35 @@ if ($action === "already_uploaded") {
     exit();
 }
 
+if ($action === "direct") {
+    if ($prompt_id <= 0) {
+        echo json_encode(["success" => false, "message" => "Missing data"]);
+        exit();
+    }
+
+    $stmt = $pdo->prepare("SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND prompt_type = 'direct'");
+    $stmt->execute([$prompt_id]);
+    $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($prompt) {
+        if (isset($_SESSION["user_id"])) {
+            try {
+                $pdo->prepare(
+                    "INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)",
+                )->execute([$_SESSION["user_id"], $prompt_id]);
+            } catch (PDOException $e) {
+            }
+        }
+        echo json_encode([
+            "success"       => true,
+            "prompt_text"   => $prompt["prompt_text"],
+            "extra_prompts" => json_decode($prompt["extra_prompts"] ?? '[]', true) ?: [],
+        ]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Prompt not found"]);
+    }
+    exit();
+}
+
 echo json_encode(["success" => false, "message" => "Invalid request"]);
 ?>

@@ -41,19 +41,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $prompt_type = trim($_POST["prompt_type"] ?? "secret");
-    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
     $is_secret = $prompt_type === "secret";
+    $is_direct = $prompt_type === "direct";
     $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
-    // Only validate code for secret type
+    // Validate codes based on type
     if ($is_secret) {
         $unlock_code = strtoupper(trim($_POST["unlock_code"] ?? ""));
         if (!$title || !$tag || !$prompt_text || strlen($unlock_code) !== 6) {
             $_SESSION["edit_error"] =
                 "All fields required. Code must be 6 chars.";
+            header("Location: edit_prompt.php?id=$id");
+            exit();
+        }
+    } else if ($is_direct) {
+        $unlock_code = $_POST["direct_taps"] ?? "9";
+        if (!$title || !$tag || !$prompt_text) {
+            $_SESSION["edit_error"] =
+                "Title, tags and prompt text are required.";
             header("Location: edit_prompt.php?id=$id");
             exit();
         }
@@ -149,6 +158,8 @@ $ep3_data = $current_extra_arr[1] ?? null;
 ?>
 <?php $admin_name = $_SESSION['username'] ?? 'Admin'; ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<style>html,body{background:#07060f!important}</style>
 <title>Edit Prompt &mdash; Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -171,7 +182,7 @@ $ep3_data = $current_extra_arr[1] ?? null;
   --font-main:var(--adm-font);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;background:#07060f}
 body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);overflow-x:hidden;min-height:100vh}
 /* SIDEBAR */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,6,15,0.98);border-right:1px solid var(--adm-border);z-index:200;display:flex;flex-direction:column}
@@ -198,7 +209,7 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 .main{margin-left:220px;min-height:100vh;padding:28px 32px 80px;position:relative}
 /* TOPBAR */
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
-.tb-title{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--adm-accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;display:flex;align-items:center;gap:10px}
+.tb-title{font-size:1.4rem;font-weight:900;color:var(--adm-text);flex:1;display:flex;align-items:center;gap:10px}
 .tb-title i{-webkit-text-fill-color:var(--adm-accent2);font-size:1.2rem}
 .tb-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;border:1px solid;transition:all .2s;cursor:pointer;font-family:var(--adm-font)}
 .tb-back{background:rgba(139,92,246,0.07);color:var(--adm-accent2);border-color:rgba(139,92,246,0.2)}
@@ -272,6 +283,11 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 .e-type-card.sel-unreleased{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35);color:#fbbf24}
 .e-type-card.sel-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:#22d3ee}
 .e-type-card.sel-uploaded{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.3);color:var(--adm-green)}
+.e-type-card.sel-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e}
+.tap-card{border:1px solid var(--adm-border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(255,255,255,0.03);position:relative;color:var(--adm-muted);flex:1;min-width:60px;}
+.tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--adm-text);}
+.tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
+.tap-card.sel-tap{background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.4);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.1);}
 .extra-prompt-box{background:rgba(192,132,252,0.05);border:1px dashed rgba(192,132,252,0.35);border-radius:14px;padding:18px;margin-top:10px;margin-bottom:10px}
 .extra-prompt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .extra-prompt-num{font-weight:800;color:var(--adm-accent2);font-size:.88rem}
@@ -384,7 +400,6 @@ body::before, body::after { display: none !important; background-image: none !im
 
 
 <div class="edit-wrap">
-  <div class="edit-page-title"><i class="fa-solid fa-pencil"></i> Edit Prompt</div>
   <div class="edit-page-sub">Editing: <strong><?= htmlspecialchars(
       $p["title"],
   ) ?></strong></div>
@@ -441,17 +456,21 @@ body::before, body::after { display: none !important; background-image: none !im
                 : "" ?> onchange="onEditTypeChange('already_uploaded')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-clock-rotate-left"></i></span><span>Already Uploaded</span>
           </label>
+          <label class="e-type-card <?= $current_prompt_type === "direct" ? "sel-direct" : "" ?>" id="e-card-direct">
+            <input type="radio" name="prompt_type" value="direct" <?= $current_prompt_type === "direct" ? "checked" : "" ?> onchange="onEditTypeChange('direct')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-hand-pointer"></i></span><span>Direct Prompt</span>
+          </label>
         </div>
       </div>
 
       <!-- Trial Reel Mode Toggle -->
       <div class="form-group" style="margin-top:4px;">
         <label style="display:block;font-weight:800;margin-bottom:7px;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;">Trial Reel Mode</label>
-        <label class="assets-toggle-label" id="trial-toggle-label" style="background:<?= ($p['is_trial'] ?? 0) ? '#fff3e0' : '#f5f5f5' ?>;border-color:<?= ($p['is_trial'] ?? 0) ? '#f97316' : '#ccc' ?>;color:<?= ($p['is_trial'] ?? 0) ? '#c2410c' : '#666' ?>;">
+        <label class="assets-toggle-label" id="trial-toggle-label" style="background:<?= ($p['is_trial'] ?? 0) ? 'rgba(251,191,36,0.12)' : 'rgba(34,211,238,0.05)' ?>;border-color:<?= ($p['is_trial'] ?? 0) ? 'rgba(251,191,36,0.4)' : 'rgba(34,211,238,0.3)' ?>;color:<?= ($p['is_trial'] ?? 0) ? '#fbbf24' : '#22d3ee' ?>;">
           <input type="checkbox" name="is_trial" id="is_trial" value="1" onchange="toggleTrialUI(this)" <?= ($p['is_trial'] ?? 0) ? 'checked' : '' ?>>
           <span><i class="fa-solid fa-flask"></i> Trial Mode &mdash; Hidden from site, direct link only</span>
         </label>
-        <div style="margin-top:8px;font-size:.78rem;color:#888;font-weight:600;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;" id="trial-info-box">
+        <div style="margin-top:8px;font-size:.78rem;font-weight:600;padding:8px 12px;background:var(--card-bg);border-radius:8px;border:1px dashed var(--border-color);" id="trial-info-box">
           <?php if ($p['is_trial'] ?? 0): ?>
           <i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.
           <?php else: ?>
@@ -468,8 +487,8 @@ body::before, body::after { display: none !important; background-image: none !im
 
       <div class="form-group">
           <label>Tags (Type and press Enter, comma, or click a suggestion)</label>
-          <div class="tag-input-container" style="display:flex; flex-wrap:wrap; gap:8px; padding:10px; border:var(--border-width) solid var(--text-color); border-radius:12px; background:#fff; min-height:50px; cursor:text;" onclick="document.getElementById('tag-input-field').focus()">
-              <input type="text" id="tag-input-field" placeholder="secret, couple, neon..." style="border:none; outline:none; background:transparent; flex-grow:1; min-width:150px; font-family:var(--font-main); font-size:1rem; padding:4px;">
+          <div class="tag-input-container" style="display:flex; flex-wrap:wrap; gap:8px; padding:10px; border:1px solid var(--adm-border); border-radius:12px; background:rgba(255,255,255,0.03); min-height:50px; cursor:text;" onclick="document.getElementById('tag-input-field').focus()">
+              <input type="text" id="tag-input-field" placeholder="secret, couple, neon..." style="border:none; outline:none; background:transparent; color:var(--adm-text); flex-grow:1; min-width:150px; font-family:var(--adm-font); font-size:1rem; padding:4px;">
           </div>
           <input type="hidden" id="e-tag" name="tag" value="<?= htmlspecialchars(
               $p["tag"],
@@ -510,11 +529,11 @@ body::before, body::after { display: none !important; background-image: none !im
         <div class="bwi-selector">
           <label class="bwi-btn bwi-banana-opt <?= $current_bwi === 'nano_banana' ? 'bwi-selected' : '' ?>" onclick="setBwi('nano_banana',this)">
             <input type="radio" name="best_works_in" value="nano_banana" <?= $current_bwi === 'nano_banana' ? 'checked' : '' ?>>
-            ?? Nano Banana
+            <i class="fa-solid fa-banana"></i> Nano Banana AI
           </label>
           <label class="bwi-btn bwi-chatgpt-opt <?= $current_bwi === 'chatgpt' ? 'bwi-selected' : '' ?>" onclick="setBwi('chatgpt',this)">
             <input type="radio" name="best_works_in" value="chatgpt" <?= $current_bwi === 'chatgpt' ? 'checked' : '' ?>>
-            ? ChatGPT
+            <i class="fa-solid fa-robot"></i> ChatGPT
           </label>
         </div>
       </div>
@@ -625,6 +644,34 @@ body::before, body::after { display: none !important; background-image: none !im
     : "" ?>>
       </div>
 
+      <!-- Direct Taps -->
+      <div class="form-group" id="direct-taps-group" style="<?= $is_direct ? "" : "display:none;" ?>;border:1px solid rgba(244,63,94,0.15);border-radius:12px;padding:14px;margin-bottom:18px;background:rgba(244,63,94,0.03)">
+        <label class="form-label" style="color:#f43f5e;margin-bottom:10px;display:block;"><i class="fa-solid fa-heart"></i> Heart Taps Required</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <?php $taps = $p['unlock_code'] ?? '9'; ?>
+          <label class="tap-card <?= $taps == '9' ? 'sel-tap' : '' ?>" id="tap-9">
+            <input type="radio" name="direct_taps" value="9" <?= $taps == '9' ? 'checked' : '' ?> onchange="onTapChange('9')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>9
+          </label>
+          <label class="tap-card <?= $taps == '11' ? 'sel-tap' : '' ?>" id="tap-11">
+            <input type="radio" name="direct_taps" value="11" <?= $taps == '11' ? 'checked' : '' ?> onchange="onTapChange('11')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>11
+          </label>
+          <label class="tap-card <?= $taps == '19' ? 'sel-tap' : '' ?>" id="tap-19">
+            <input type="radio" name="direct_taps" value="19" <?= $taps == '19' ? 'checked' : '' ?> onchange="onTapChange('19')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>19
+          </label>
+          <label class="tap-card <?= $taps == '21' ? 'sel-tap' : '' ?>" id="tap-21">
+            <input type="radio" name="direct_taps" value="21" <?= $taps == '21' ? 'checked' : '' ?> onchange="onTapChange('21')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>21
+          </label>
+          <label class="tap-card <?= $taps == '37' ? 'sel-tap' : '' ?>" id="tap-37">
+            <input type="radio" name="direct_taps" value="37" <?= $taps == '37' ? 'checked' : '' ?> onchange="onTapChange('37')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>37
+          </label>
+        </div>
+      </div>
+
       <!-- Assets Toggle -->
       <div class="form-group">
         <label>Assets <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — reference images shown after unlock)</span></label>
@@ -697,6 +744,7 @@ body::before, body::after { display: none !important; background-image: none !im
         const codeInput = document.getElementById('e-code');
         const reelLinkGroup = document.getElementById('reel-link-group');
         const reelLinkInput = document.getElementById('e-reel');
+        const directTapsGroup = document.getElementById('direct-taps-group');
 
         // Initialize from PHP
         let tags = <?= json_encode(array_values($current_tags)) ?>;
@@ -740,9 +788,9 @@ body::before, body::after { display: none !important; background-image: none !im
         });
 
         function onEditTypeChange(type) {
-            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded'};
-            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded'};
-            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded'].forEach(id => {
+            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct'};
+            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct'};
+            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.className = 'e-type-card';
             });
@@ -769,6 +817,15 @@ body::before, body::after { display: none !important; background-image: none !im
                 reelLinkGroup.style.display = 'none';
                 reelLinkInput.required = false;
             }
+            if (directTapsGroup) {
+                directTapsGroup.style.display = selectedType === 'direct' ? 'block' : 'none';
+            }
+        }
+
+        function onTapChange(val){
+            document.querySelectorAll('.tap-card').forEach(c=>c.classList.remove('sel-tap'));
+            const el = document.getElementById('tap-'+val);
+            if(el) el.classList.add('sel-tap');
         }
 
         // Initial render
@@ -782,10 +839,10 @@ body::before, body::after { display: none !important; background-image: none !im
 
         function toggleAssets(cb) {
             document.getElementById('assets-fields').style.display = cb.checked ? 'block' : 'none';
-            document.getElementById('assets-toggle-label').style.background = cb.checked ? '#dceeff' : '';
+            document.getElementById('assets-toggle-label').style.background = cb.checked ? 'rgba(34,211,238,0.09)' : '';
         }
         // Init toggle visual
-        (function(){ const cb = document.getElementById('has_assets'); if(cb && cb.checked) document.getElementById('assets-toggle-label').style.background='#dceeff'; })();
+        (function(){ const cb = document.getElementById('has_assets'); if(cb && cb.checked) document.getElementById('assets-toggle-label').style.background='rgba(34,211,238,0.09)'; })();
 
         // Description char counter
         document.getElementById('e-desc').addEventListener('input', function() {

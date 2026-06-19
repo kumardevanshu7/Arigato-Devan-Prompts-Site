@@ -2,7 +2,7 @@
 session_start();
 require_once "db.php";
 
-// ── Auto resize + convert to WebP on upload ──────────────────────────────────
+// â”€â”€ Auto resize + convert to WebP on upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $quality = 82): string {
     if (!file_exists($src)) return $src;
     $info = @getimagesize($src);
@@ -51,7 +51,7 @@ function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $qualit
 }
 
 
-// Protect endpoint — must be logged in AND be an admin
+// Protect endpoint â€” must be logged in AND be an admin
 if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
     header("Location: login.php");
     exit();
@@ -101,8 +101,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: upload_prompt.php");
             exit();
         }
+    } else if ($prompt_type === "direct") {
+        $unlock_code = trim($_POST["direct_taps"] ?? "9");
+        if (empty($title) || empty($tag) || empty($prompt_text)) {
+            $_SESSION["error_msg"] = "All fields are required!";
+            header("Location: upload_prompt.php");
+            exit();
+        }
     } else {
-        // No code needed for unreleased / insta_viral
+        // No code needed for unreleased / insta_viral / already_uploaded
         $unlock_code = "XXXXXX";
         if (empty($title) || empty($tag) || empty($prompt_text)) {
             $_SESSION["error_msg"] = "All fields are required!";
@@ -222,8 +229,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (file_exists(__DIR__ . '/fcm_notify.php')) {
                 require_once __DIR__ . '/fcm_notify.php';
                 @sendFCMNotification(
-                    '✨ New Prompt: ' . $title,
-                    'A new AI couple prompt just dropped! Tap to check it out. 💫',
+                    'âœ¨ New Prompt: ' . $title,
+                    'A new AI couple prompt just dropped! Tap to check it out. ðŸ’«',
                     'https://arigatodevan.com'
                 );
             }
@@ -244,3 +251,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit();
 }
 ?>
+

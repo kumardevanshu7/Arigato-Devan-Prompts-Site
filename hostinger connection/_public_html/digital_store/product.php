@@ -1,18 +1,7 @@
-<?php 
+﻿<?php 
 session_start();
 
-// SOFT LAUNCH GATE
-$allowed_emails = [
-    'devansh.grow@gmail.com', 
-    'thisisdevanshu7@gmail.com', 
-    'kaira.nyxzy@gmail.com'
-];
-$user_email = isset($_SESSION['email']) ? strtolower($_SESSION['email']) : '';
 
-if (!in_array($user_email, $allowed_emails)) {
-    include 'coming_soon.php';
-    exit;
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -342,16 +331,7 @@ if ($user_email) {
 </main>
 
 <!-- =========== FOOTER =========== -->
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script src="js/store.js"></script>
 <?php include 'store_firebase_js.php'; ?>

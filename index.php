@@ -287,6 +287,7 @@ try {
 <body>
 
 
+    <div class="nav-sticky-wrap" id="navStickyWrap">
     <header>
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
@@ -387,6 +388,7 @@ try {
             <?php endif; ?>
         </div>
     </header>
+    </div><!-- /nav-sticky-wrap -->
 
     <?php if (!isset($_SESSION["user_id"])): ?>
     <!-- ============ LANDING PAGE (LOGGED OUT) ============ -->
@@ -408,7 +410,7 @@ try {
             <!-- ══ MINI COLORFUL TESTIMONIALS ══ -->
             <div style="width:100%;max-width:760px;margin:0 auto 28px;padding:0 10px;">
                 <p style="text-align:center;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.22em;color:#9490bb;margin-bottom:16px;font-family:'Inter',sans-serif;">✦ What our users say ✦</p>
-                <div id="miniTestiTrack" style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:12px 12px 24px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory;">
+                <div id="miniTestiTrack" style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:24px 20px 40px;margin-bottom:-16px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory;">
                 <?php
                 $mc = [['#ffd6e7','#f9a8d4','#831843'],['#d0f4de','#86efac','#14532d'],['#e8d5f5','#c4b5fd','#4c1d95'],['#fff3cd','#fde68a','#78350f'],['#cfe2ff','#93c5fd','#1e3a5f'],['#fde8c0','#fdba74','#7c2d12']];
                 $t_emojis2=['😭','😢','😟','😕','🙂','😊','😄','😁','🤩','🔥','⭐'];
@@ -1153,6 +1155,9 @@ const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") 
         });
     });
     </script>
+<script>
+(function(){var nav=document.getElementById('navStickyWrap');if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add('nav-hidden');else nav.classList.remove('nav-hidden');lastY=y;ticking=false;});ticking=true;}},{passive:true});})();
+</script>
 </body>
 </html>
 

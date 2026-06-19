@@ -15,7 +15,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Prompt — Arigato Admin</title>
+<title>Upload Prompt â€” Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php include_once "gtag.php"; ?>
@@ -64,6 +64,11 @@ textarea.form-input{resize:vertical;min-height:100px}
 .type-card.selected-unreleased{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35);color:var(--yellow);box-shadow:0 0 0 2px rgba(251,191,36,0.08)}
 .type-card.selected-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:var(--cyan);box-shadow:0 0 0 2px rgba(34,211,238,0.07)}
 .type-card.selected-uploaded{background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.3);color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,0.07)}
+.type-card.selected-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.07)}
+.tap-card{border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--muted);flex:1;min-width:60px;}
+.tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--text);}
+.tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
+.tap-card.sel-tap{background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.4);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.1);}
 /* TAG INPUT */
 .tag-input-container{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:9px 14px;background:rgba(7,6,15,0.9);border:1px solid var(--border);border-radius:12px;min-height:44px;cursor:text;transition:border-color .2s}
 .tag-input-container:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,0.1)}
@@ -259,6 +264,10 @@ body::before, body::after { display: none !important; background-image: none !im
           <input type="radio" name="prompt_type" value="already_uploaded" onchange="onTypeChange('already_uploaded')">
           <i class="fa-solid fa-clock-rotate-left type-icon"></i> Already Uploaded
         </label>
+        <label class="type-card" id="card-direct">
+          <input type="radio" name="prompt_type" value="direct" onchange="onTypeChange('direct')">
+          <i class="fa-solid fa-hand-pointer type-icon"></i> Direct Prompt
+        </label>
       </div>
     </div>
 
@@ -285,7 +294,7 @@ body::before, body::after { display: none !important; background-image: none !im
         </div>
         <div id="tag-suggestions">
           <?php
-          try { $stmt=$pdo->query("SELECT tag FROM prompts ORDER BY created_at DESC LIMIT 200"); $all_tags=[]; while($row=$stmt->fetch()){$tarr=explode(",",$row["tag"]);foreach($tarr as $t){$t=trim(strtolower($t));if($t&&strlen($t)>1)$all_tags[$t]=true;}} $all_tags=array_keys($all_tags);sort($all_tags); foreach(array_slice($all_tags,0,30) as $t): ?><span class="tag-sug" onclick="addTag('<?= htmlspecialchars($t) ?>')"><?= htmlspecialchars($t) ?></span><?php endforeach; } catch(Exception $e) {}
+          try { $stmt=$pdo->query("SELECT tag FROM prompts"); $all_tags=[]; while($row=$stmt->fetch()){$tarr=explode(",",$row["tag"]);foreach($tarr as $t){$t=trim(strtolower($t));if($t&&strlen($t)>1)$all_tags[$t]=true;}} $all_tags=array_keys($all_tags);sort($all_tags); foreach($all_tags as $t): ?><span class="tag-sug" onclick="addTag('<?= htmlspecialchars($t) ?>')">+<?= htmlspecialchars($t) ?></span><?php endforeach; } catch(Exception $e) {}
           ?>
         </div>
       </div>
@@ -370,6 +379,33 @@ body::before, body::after { display: none !important; background-image: none !im
       <input type="text" id="unlock-code-input" name="unlock_code" class="form-input" maxlength="6" pattern="[A-Za-z0-9]{6}" placeholder="_ _ _ _ _ _">
     </div>
 
+    <!-- DIRECT TAPS -->
+    <div id="direct-taps-group" style="display:none;border:1px solid rgba(244,63,94,0.15);border-radius:12px;padding:14px;margin-bottom:18px;background:rgba(244,63,94,0.03)">
+      <label class="form-label" style="color:#f43f5e;margin-bottom:10px;display:block;"><i class="fa-solid fa-heart"></i> Heart Taps Required</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label class="tap-card sel-tap" id="tap-9">
+          <input type="radio" name="direct_taps" value="9" checked onchange="onTapChange('9')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>9
+        </label>
+        <label class="tap-card" id="tap-11">
+          <input type="radio" name="direct_taps" value="11" onchange="onTapChange('11')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>11
+        </label>
+        <label class="tap-card" id="tap-19">
+          <input type="radio" name="direct_taps" value="19" onchange="onTapChange('19')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>19
+        </label>
+        <label class="tap-card" id="tap-21">
+          <input type="radio" name="direct_taps" value="21" onchange="onTapChange('21')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>21
+        </label>
+        <label class="tap-card" id="tap-37">
+          <input type="radio" name="direct_taps" value="37" onchange="onTapChange('37')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>37
+        </label>
+      </div>
+    </div>
+
     <!-- REEL LINK -->
     <div id="reel-link-group" style="display:none;border:1px solid rgba(251,191,36,0.15);border-radius:12px;padding:14px;margin-bottom:18px;background:rgba(251,191,36,0.03)">
       <label class="form-label" style="color:var(--yellow)"><i class="fa-brands fa-instagram"></i> Reel Link (Instagram)</label>
@@ -444,17 +480,26 @@ const tagInputField=document.getElementById('tag-input-field');
 const hiddenTagInput=document.getElementById('tag');
 const codeGroup=document.getElementById('unlock-code-group');
 const codeInput=document.getElementById('unlock-code-input');
+const directTapsGroup=document.getElementById('direct-taps-group');
 const reelLinkGroup=document.getElementById('reel-link-group');
 const reelLinkInput=document.getElementById('reel_link');
 let tags=[];
 
 function onTypeChange(type){
   document.querySelectorAll('.type-card').forEach(c=>c.className='type-card');
-  if(type==='secret'){document.getElementById('card-secret').className='type-card selected-secret';codeGroup.style.display='block';codeInput.required=true;reelLinkGroup.style.display='block';reelLinkInput.required=true;}
-  else if(type==='unreleased'){document.getElementById('card-unreleased').className='type-card selected-unreleased';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';}
-  else if(type==='insta_viral'){document.getElementById('card-viral').className='type-card selected-viral';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';}
-  else if(type==='already_uploaded'){document.getElementById('card-uploaded').className='type-card selected-uploaded';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';}
+  if(type==='secret'){document.getElementById('card-secret').className='type-card selected-secret';codeGroup.style.display='block';codeInput.required=true;reelLinkGroup.style.display='block';reelLinkInput.required=true;if(directTapsGroup)directTapsGroup.style.display='none';}
+  else if(type==='unreleased'){document.getElementById('card-unreleased').className='type-card selected-unreleased';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
+  else if(type==='insta_viral'){document.getElementById('card-viral').className='type-card selected-viral';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
+  else if(type==='already_uploaded'){document.getElementById('card-uploaded').className='type-card selected-uploaded';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
+  else if(type==='direct'){document.getElementById('card-direct').className='type-card selected-direct';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
 }
+
+function onTapChange(val){
+  document.querySelectorAll('.tap-card').forEach(c=>c.classList.remove('sel-tap'));
+  const el = document.getElementById('tap-'+val);
+  if(el) el.classList.add('sel-tap');
+}
+
 onTypeChange('secret');
 
 function renderTags(){
@@ -539,5 +584,7 @@ function openDrawer(){document.getElementById('sideDrawer').classList.add('open'
 function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
 </script>
 </html>
+
+
 
 

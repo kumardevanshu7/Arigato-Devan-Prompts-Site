@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 // Guard: if logged in but onboarding not done, force setup
@@ -116,6 +116,11 @@ function sessionAvatar()
         .tag-scroll-inner::-webkit-scrollbar{width:5px;}
         .tag-scroll-inner::-webkit-scrollbar-track{background:transparent;}
         .tag-scroll-inner::-webkit-scrollbar-thumb{background:var(--primary-color);border-radius:99px;}
+        .gallery-tag-btn{background:var(--card-bg);padding:6px 14px;border-radius:12px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.8rem;transition:all 0.15s;text-transform:capitalize;text-decoration:none;color:var(--text-color);display:inline-flex;align-items:center;gap:6px;box-shadow:2px 2px 0 var(--text-color);}
+        .gallery-tag-btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--text-color);background:var(--bg-color);}
+        .gallery-tag-btn.active{background:var(--primary-color);color:var(--text-color);}
+        .gallery-tag-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;background:var(--text-color);color:var(--card-bg);border-radius:99px;font-size:0.65rem;font-weight:900;line-height:1;}
+        .gallery-tag-btn.active .gallery-tag-badge{background:var(--text-color);color:var(--primary-color);}
         .gallery-header {
             display: flex;
             align-items: center;
@@ -216,7 +221,8 @@ function sessionAvatar()
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-gallery">
-    <header>
+    <div class="nav-sticky-wrap" id="navStickyWrap">
+<header>
         <div class="logo-area" id="logo-container"  style="cursor:pointer;">
             <div class="logo-flipper">
                 <div class="logo-front">
@@ -317,6 +323,7 @@ function sessionAvatar()
             <?php endif; ?>
         </div>
     </header>
+</div><!-- /nav-sticky-wrap -->
 
     <div class="container" style="padding-top:40px;">
         <div class="gallery-header">
@@ -354,14 +361,17 @@ function sessionAvatar()
 
             <div class="tag-filter-container" id="tag-filter-container">
                 <div class="tag-scroll-inner" id="tag-scroll-inner">
-                <a href="gallery.php" class="tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" data-label="All" data-count="9999" style="background:<?= !$tag_filter || $tag_filter === 'all' ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-decoration:none;color:var(--text-color);">All</a>
+                <a href="gallery.php" class="gallery-tag-btn tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>" data-label="All" data-count="9999">All</a>
                 <?php
                 $badge_colors = ['#c084fc','#f43f5e','#fb923c','#22c55e','#0ea5e9','#f59e0b','#8b5cf6','#ec4899','#14b8a6','#ef4444'];
                 $ci = 0;
                 foreach ($all_tags as $t):
                     $bc = $badge_colors[$ci % count($badge_colors)]; $ci++;
                 ?>
-                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" data-label="<?= htmlspecialchars(ucfirst($t)) ?>" data-count="<?= $tag_counts[$t] ?? 0 ?>" style="background:<?= $tag_filter === $t ? 'var(--primary-color)' : 'var(--bg-color)' ?>;padding:8px 14px 8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;text-decoration:none;color:var(--text-color);display:inline-flex;align-items:center;gap:7px;"><?= htmlspecialchars(ucfirst($t)) ?><span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;background:<?= $bc ?>;color:#fff;border-radius:99px;font-size:.65rem;font-weight:900;line-height:1;box-shadow:1px 1px 0 rgba(0,0,0,0.25);"><?= $tag_counts[$t] ?? 0 ?></span></a>
+                    <a href="gallery.php?tag=<?= urlencode($t) ?>" class="gallery-tag-btn tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>" data-label="<?= htmlspecialchars(ucfirst($t)) ?>" data-count="<?= $tag_counts[$t] ?? 0 ?>">
+                        <?= htmlspecialchars(ucfirst($t)) ?>
+                        <span class="gallery-tag-badge" style="background:<?= $bc ?>; color:#fff;"><?= $tag_counts[$t] ?? 0 ?></span>
+                    </a>
                 <?php endforeach; ?>
 
                 </div>
@@ -790,6 +800,8 @@ function sessionAvatar()
         <button class="wrong-code-close" onclick="document.getElementById('wrong-code-popup').classList.remove('show')">TRY AGAIN <i class="fa-solid fa-rotate"></i></button>
     </div>
 </div>
+<script>(function(){var nav=document.getElementById("navStickyWrap");if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener("scroll",function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add("nav-hidden");else nav.classList.remove("nav-hidden");lastY=y;ticking=false;});ticking=true;}},{passive:true});})();</script>
 </body>
 </html>
+
 
