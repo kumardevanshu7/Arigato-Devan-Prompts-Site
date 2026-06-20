@@ -212,7 +212,7 @@ if (isset($_SESSION['user_id'])) {
             <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
         </div>
         <nav class="nav-links">
-            <a href="digital_store/index.php">SHOP</a>
+            <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
             <a href="gallery.php">GALLERY</a>
             <a href="blogs.php">BLOGS</a>
             <a href="faq.php" title="FAQ" class="active" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
@@ -372,7 +372,7 @@ if (isset($_SESSION['user_id'])) {
                 <a href="about.php">About</a>
                 <a href="contact.php">Contact</a>
                 <a href="blogs.php">Blogs</a>
-                <a href="digital_store/index.php">SHOP</a>
+                <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
             </div>
             <div class="footer-col">
                 <h3>Legal</h3>

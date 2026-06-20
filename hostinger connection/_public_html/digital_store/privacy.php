@@ -94,16 +94,7 @@
   </div>
 </main>
 
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php" class="nav-active">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 <script src="js/store.js"></script>
 <?php include 'store_firebase_js.php'; ?>
 </body>

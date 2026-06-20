@@ -233,7 +233,7 @@
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="digital_store/index.php">SHOP</a>
+        <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
         <a href="gallery.php">GALLERY</a>
         <a href="about.php">ABOUT</a>
     </nav>
@@ -326,17 +326,7 @@
     </div>
 </div>
 
-<footer style="color:#fff; border-top:1px solid rgba(255,255,255,0.1); background:transparent;">
-    <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links">
-        <a href="about.php" style="color:rgba(255,255,255,0.7);">ABOUT</a>
-        <a href="contact.php" style="color:rgba(255,255,255,0.7);">CONTACT</a>
-        <a href="faq.php" style="color:rgba(255,255,255,0.7);">FAQ</a>
-        <a href="privacy.php" style="color:rgba(255,255,255,0.7);">PRIVACY POLICY</a>
-        <a href="disclaimer.php" style="color:rgba(255,255,255,0.7);">DISCLAIMER</a>
-        <a href="terms.php" style="color:rgba(255,255,255,0.7);">TERMS OF SERVICE</a>
-    </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script>
 document.getElementById('contact-form').addEventListener('submit', function(e) {

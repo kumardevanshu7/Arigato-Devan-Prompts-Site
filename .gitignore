@@ -17,3 +17,5 @@ firebase_auth.php
 Thumbs.db
 
 seo_report.html
+sync_report.html
+generate_sync_report.php
