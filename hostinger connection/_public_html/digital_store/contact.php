@@ -11,6 +11,7 @@ $error_msg   = '';
 
 // ---- HANDLE FORM SUBMISSION ----
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
+    verify_csrf();
     $name       = trim($_POST['name']       ?? '');
     $email      = trim($_POST['email']      ?? '');
     $order_id   = trim($_POST['order_id']   ?? '');
@@ -30,13 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
         // Handle screenshot upload (only for payment issues)
         if ($issue_type === 'Payment Issue' && !empty($_FILES['screenshot']['tmp_name'])) {
             $sc = $_FILES['screenshot'];
-            $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            if (in_array($sc['type'], $allowed_types) && $sc['size'] <= 5 * 1024 * 1024) {
-                $sc_dir = __DIR__ . '/assets/tickets/';
-                if (!is_dir($sc_dir)) mkdir($sc_dir, 0755, true);
-                $ext = pathinfo($sc['name'], PATHINFO_EXTENSION);
-                $screenshot_filename = 'ticket_' . time() . '_' . random_int(100, 999) . '.' . $ext;
-                move_uploaded_file($sc['tmp_name'], $sc_dir . $screenshot_filename);
+            if ($sc['size'] <= 5 * 1024 * 1024) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $sc['tmp_name']);
+                finfo_close($finfo);
+
+                $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                if (in_array($mime, $allowed_types)) {
+                    $sc_dir = __DIR__ . '/assets/tickets/';
+                    if (!is_dir($sc_dir)) mkdir($sc_dir, 0755, true);
+                    $ext = pathinfo($sc['name'], PATHINFO_EXTENSION);
+                    $screenshot_filename = 'ticket_' . time() . '_' . random_int(100, 999) . '.' . $ext;
+                    move_uploaded_file($sc['tmp_name'], $sc_dir . $screenshot_filename);
+                }
             }
         }
 
@@ -339,7 +346,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
   <!-- Ticket Form -->
   <?php if (!$success_msg): ?>
   <div class="ticket-card">
-    <form method="POST" enctype="multipart/form-data" id="ticketForm">
+    <form id="contact-form" method="POST" action="contact.php" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
 
       <!-- Name + Email -->
       <div class="form-row">
@@ -411,16 +419,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
 </main>
 
 <!-- Footer -->
-<footer class="store-footer">
-  <div class="store-footer-inner">
-    <p class="footer-copy">© <?= date('Y') ?> Arigato Store. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms</a>
-      <a href="contact.php" class="nav-active">Contact</a>
-    </div>
-  </div>
-</footer>
+<?php include '../footer.php'; ?>
 
 <script>
   function handleIssueType(val) {

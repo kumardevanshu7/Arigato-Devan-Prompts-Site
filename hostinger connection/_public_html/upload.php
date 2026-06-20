@@ -58,6 +58,7 @@ if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf();
     $title = trim($_POST["title"] ?? "");
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text = trim($_POST["prompt_text"] ?? "");
@@ -70,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $asset_images_json = null;
 
     // Validate prompt_type
-    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded"];
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
@@ -102,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
     } else if ($prompt_type === "direct") {
-        $unlock_code = trim($_POST["direct_taps"] ?? "9");
+        $unlock_code = trim($_POST["direct_taps"] ?? "09");
         if (empty($title) || empty($tag) || empty($prompt_text)) {
             $_SESSION["error_msg"] = "All fields are required!";
             header("Location: upload_prompt.php");
@@ -139,6 +140,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $file_info = pathinfo($_FILES["image"]["name"]);
     $ext = strtolower($file_info["extension"]);
+
+    // Security Checks: File Size and MIME type
+    if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+        $_SESSION["error_msg"] = "Image too large! Maximum allowed size is 5MB.";
+        header("Location: upload_prompt.php");
+        exit();
+    }
+    
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+    if (!str_starts_with($mime, 'image/')) {
+        $_SESSION["error_msg"] = "Invalid file type. Only actual images are allowed.";
+        finfo_close($finfo);
+        header("Location: upload_prompt.php");
+        exit();
+    }
+    finfo_close($finfo);
 
     $allowed_ext = ["jpg", "jpeg", "png", "gif", "webp"];
     if (!in_array($ext, $allowed_ext)) {

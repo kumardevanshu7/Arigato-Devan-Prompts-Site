@@ -474,6 +474,7 @@ body::before, body::after { display: none !important; background-image: none !im
       <div class="action-btns">
         <a href="blog_edit.php?id=<?= $bl["id"] ?>" class="act-btn act-edit" title="Edit"><i class="fa-solid fa-pencil"></i></a>
         <form action="blog_toggle.php" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
           <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">
           <input type="hidden" name="status" value="<?= $isPub ? 0 : 1 ?>">
           <button type="submit" class="act-btn <?= $isPub ? "act-unpub" : "act-pub" ?>" title="<?= $isPub ? "Unpublish" : "Publish" ?>">
@@ -520,6 +521,7 @@ body::before, body::after { display: none !important; background-image: none !im
               <i class="fa-solid fa-pencil"></i> Edit Post
             </a>
             <form action="blog_toggle.php" method="POST" style="margin:0;">
+              <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
               <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">
               <input type="hidden" name="status" value="<?= $isPub ? 0 : 1 ?>">
               <button type="submit" class="mob-dd-item <?= $isPub ? "dd-unpub" : "dd-pub" ?>" style="width:100%;background:none;border:none;font-family:var(--font);text-align:left;border-bottom:1px solid var(--border2);">
@@ -565,6 +567,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="del-btns">
       <button class="del-cancel" onclick="document.getElementById('del-modal').style.display='none'">Cancel</button>
       <form id="del-form" action="blog_delete.php" method="POST" style="flex:1;margin:0;">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
         <input type="hidden" id="del-blog-id" name="blog_id" value="">
         <button type="submit" class="del-confirm">Delete</button>
       </form>

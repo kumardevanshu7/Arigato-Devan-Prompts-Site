@@ -217,7 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
       <thead><tr><th>#</th><th>Cover</th><th>Title</th><th>Type</th><th>Likes</th><th>Copy Link</th></tr></thead>
       <tbody>
       <?php
-      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP']];
+      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP']];
       foreach($prompts as $idx=>$p):
         $ptype=$p['prompt_type']??'secret';
         $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];

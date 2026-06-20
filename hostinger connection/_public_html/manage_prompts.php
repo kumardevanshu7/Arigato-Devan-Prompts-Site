@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_trial_id'], $_
 
 // -- Bulk toggle (checkbox + publish/unpublish) --
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'], $_POST['selected_ids'])) {
+    verify_csrf();
     $ids = array_map('intval', (array)$_POST['selected_ids']);
     if (!empty($ids)) {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
@@ -344,7 +345,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     </div>
     <div id="prompts-list">
     <?php
-    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DIR']];
+    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP']];
     foreach($prompts as $p):
       $ptype=$p['prompt_type']??'secret';
       $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];
@@ -440,6 +441,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <div class="card">
     <div class="card-head"><div class="card-title"><i class="fa-solid fa-sliders"></i> Bulk Type Change</div></div>
     <form id="bulk-form" method="POST" action="manage_prompts.php">
+      <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
       <input type="hidden" id="bulk-action-val" name="bulk_action" value="">
       <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px"><i class="fa-solid fa-circle-info" style="color:var(--accent2)"></i> Select an action type, then tick prompts to change them all at once.</p>
       <div class="bulk-type-btns">
@@ -484,6 +486,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="del-btns">
       <button onclick="closeDeleteModal()" class="del-cancel">Cancel</button>
       <form id="delete-form" action="delete_prompt.php" method="POST" style="flex:1;margin:0">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
         <input type="hidden" id="delete-prompt-id" name="prompt_id" value="">
         <button type="submit" class="del-confirm">Delete</button>
       </form>

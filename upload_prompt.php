@@ -241,8 +241,18 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="dashboard.php" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:.75rem;font-weight:800;border:1px solid rgba(139,92,246,0.22);background:rgba(139,92,246,0.07);color:var(--accent2);text-decoration:none"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
   </div>
 
+  <?php if (!empty($_SESSION["error_msg"])): ?>
+    <div class="flash flash-err" style="background:rgba(248,113,113,0.1); border:1px solid var(--red); color:var(--red); padding:10px 15px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars($_SESSION["error_msg"]) ?></div>
+    <?php unset($_SESSION["error_msg"]); ?>
+  <?php endif; ?>
+  <?php if (!empty($_SESSION["success_msg"])): ?>
+    <div class="flash flash-ok" style="background:rgba(74,222,128,0.1); border:1px solid var(--green); color:var(--green); padding:10px 15px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; font-weight:700;"><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($_SESSION["success_msg"]) ?></div>
+    <?php unset($_SESSION["success_msg"]); ?>
+  <?php endif; ?>
+
   <div class="form-wrap">
-  <form method="POST" action="upload.php" enctype="multipart/form-data">
+  <form method="POST" action="upload.php" enctype="multipart/form-data" class="needs-validation" novalidate>
+    <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
 
     <!-- PROMPT TYPE -->
     <div class="card">
@@ -383,9 +393,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <div id="direct-taps-group" style="display:none;border:1px solid rgba(244,63,94,0.15);border-radius:12px;padding:14px;margin-bottom:18px;background:rgba(244,63,94,0.03)">
       <label class="form-label" style="color:#f43f5e;margin-bottom:10px;display:block;"><i class="fa-solid fa-heart"></i> Heart Taps Required</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label class="tap-card sel-tap" id="tap-9">
-          <input type="radio" name="direct_taps" value="9" checked onchange="onTapChange('9')">
-          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>9
+        <label class="tap-card sel-tap" id="tap-09">
+          <input type="radio" name="direct_taps" value="09" checked onchange="onTapChange('09')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>09
         </label>
         <label class="tap-card" id="tap-11">
           <input type="radio" name="direct_taps" value="11" onchange="onTapChange('11')">

@@ -728,6 +728,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="del-btns">
       <button onclick="closeDeleteModal()" class="del-cancel">Cancel</button>
       <form id="delete-form" action="delete_prompt.php" method="POST" style="flex:1;margin:0">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
         <input type="hidden" id="delete-prompt-id" name="prompt_id" value="">
         <button type="submit" class="del-confirm">Delete</button>
       </form>

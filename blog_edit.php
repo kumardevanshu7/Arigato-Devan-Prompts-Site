@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -10,8 +10,9 @@ if (!$id) {
     header("Location: blog_admin.php");
     exit();
 }
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $title = $_POST["title"] ?? "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+    $title = trim($_POST['title'] ?? '');
     $description = $_POST["description"] ?? "";
     $content = $_POST["content"] ?? "";
     $meta_title = $_POST["meta_title"] ?? "";
@@ -63,9 +64,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_FILES["image"]["error"] === UPLOAD_ERR_OK
     ) {
         $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-        $fn = "uploads/blog_" . uniqid() . "." . $ext;
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
-            $image_path = $fn;
+        
+        if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+            $error = "Image too large! Maximum allowed size is 5MB.";
+        } else {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+            if (!str_starts_with($mime, 'image/')) {
+                $error = "Invalid file type. Only actual images are allowed.";
+            } else {
+                $fn = "uploads/blog_" . uniqid() . "." . $ext;
+                if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
+                    $image_path = $fn;
+                }
+            }
+            finfo_close($finfo);
         }
     }
     $pdo->prepare(
@@ -1386,6 +1399,7 @@ body {
 <?php endif; ?>
 
 <form method="POST" action="blog_edit.php?id=<?= $id ?>" enctype="multipart/form-data" class="scribe-container">
+    <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
   <input type="hidden" name="current_image" value="<?= htmlspecialchars($bl["image_path"]) ?>">
 
   <!-- LEFT SIDEBAR -->

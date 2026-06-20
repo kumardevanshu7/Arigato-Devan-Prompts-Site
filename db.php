@@ -220,4 +220,18 @@ function renderAvatar(
         return "<img src=\"$src_clean\" class=\"$class\" alt=\"$alt\" referrerpolicy=\"no-referrer\" onerror=\"$onerror\" loading=\"lazy\" $extra_attrs>";
     }
 }
+// CSRF Protection Functions
+function generate_csrf() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf() {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        header('HTTP/1.1 403 Forbidden');
+        die('Invalid CSRF token. Please refresh the page and try again.');
+    }
+}
 ?>

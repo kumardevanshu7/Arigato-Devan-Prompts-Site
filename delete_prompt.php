@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prompt_id'])) {
+    verify_csrf();
     $prompt_id = (int)$_POST['prompt_id'];
 
     // First fetch the image path so we can delete the file

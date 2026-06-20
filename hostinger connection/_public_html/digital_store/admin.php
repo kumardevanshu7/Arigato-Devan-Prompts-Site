@@ -29,7 +29,19 @@ if (!$is_admin) {
 require_once '../db.php';
 
 // ---- HANDLE ACTIONS (Add / Edit / Delete) ----
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+}
+
 $action  = $_POST['action'] ?? $_GET['action'] ?? '';
+
+// ---- GET ACTION CSRF CHECK ----
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['delete', 'toggle', 'update_ticket', 'del_img'])) {
+    if (empty($_GET['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_GET['csrf_token'])) {
+        die("Invalid CSRF token for this action.");
+    }
+}
+
 $msg     = '';
 $msg_type = 'success';
 
@@ -130,10 +142,13 @@ function uploadImages(array $files, int $product_id, PDO $pdo): void {
 
     $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
     $order   = 0;
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
     foreach ($files['tmp_name'] as $i => $tmp) {
         if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
-        if (!in_array($files['type'][$i], $allowed))  continue;
-        if ($files['size'][$i] > 5 * 1024 * 1024)    continue; // 5MB max
+        if ($files['size'][$i] > 5 * 1024 * 1024) continue; // 5MB max
+        
+        $mime = finfo_file($finfo, $tmp);
+        if (!in_array($mime, $allowed)) continue;
 
         $ext      = pathinfo($files['name'][$i], PATHINFO_EXTENSION);
         $filename = 'prod_' . $product_id . '_' . time() . '_' . $order . '.' . $ext;
@@ -143,6 +158,7 @@ function uploadImages(array $files, int $product_id, PDO $pdo): void {
             ->execute([$product_id, $filename, $order]);
         $order++;
     }
+    finfo_close($finfo);
 }
 
 // ---- UPLOAD HELPER (PDFs) ----
@@ -151,8 +167,13 @@ function uploadPdf(array $file, int $product_id): string {
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
     if ($file['error'] !== UPLOAD_ERR_OK) return '';
-    if ($file['type'] !== 'application/pdf') return '';
     if ($file['size'] > 10 * 1024 * 1024) return ''; // 10MB max
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+
+    if ($mime !== 'application/pdf') return '';
 
     $filename = 'guide_' . $product_id . '_' . time() . '.pdf';
     move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
@@ -932,7 +953,7 @@ if (isset($_GET['edit'])) {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   Edit
                 </a>
-                <a href="?action=toggle&id=<?= $prod['id'] ?>" onclick="return confirm('Toggle visibility?')">
+                <a href="?action=toggle&id=<?= $prod['id'] ?>&csrf_token=<?= generate_csrf() ?>" onclick="return confirm('Toggle visibility?')">
                   <?php if ($prod['active']): ?>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                     Hide
@@ -941,7 +962,7 @@ if (isset($_GET['edit'])) {
                     Show
                   <?php endif; ?>
                 </a>
-                <a href="?action=delete&id=<?= $prod['id'] ?>" class="btn-delete" onclick="return confirm('Delete \'<?= addslashes($prod['title']) ?>\' permanently?')">
+                <a href="?action=delete&id=<?= $prod['id'] ?>&csrf_token=<?= generate_csrf() ?>" class="btn-delete" onclick="return confirm('Delete \'<?= addslashes($prod['title']) ?>\' permanently?')">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
                   Delete
                 </a>
@@ -1042,6 +1063,7 @@ if (isset($_GET['edit'])) {
     </div>
 
     <form class="admin-form" method="POST" action="admin.php" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
       <input type="hidden" name="action"  value="<?= $edit_product ? 'edit' : 'add' ?>"/>
       <?php if ($edit_product): ?>
         <input type="hidden" name="edit_id" value="<?= $edit_product['id'] ?>"/>
@@ -1151,7 +1173,7 @@ if (isset($_GET['edit'])) {
             <?php foreach ($edit_images as $img): ?>
               <div class="existing-img-wrap">
                 <img src="assets/images/<?= htmlspecialchars($img['filename']) ?>" alt="Preview"/>
-                <a href="?action=del_img&img_id=<?= $img['id'] ?>&edit=<?= $edit_product['id'] ?>"
+                <a href="?action=del_img&img_id=<?= $img['id'] ?>&edit=<?= $edit_product['id'] ?>&csrf_token=<?= generate_csrf() ?>"
                    class="del-img-btn"
                    onclick="return confirm('Delete this image?')"></a>
               </div>
@@ -1256,7 +1278,7 @@ if (isset($_GET['edit'])) {
   // Update Ticket Status via AJAX
   function updateStatus(id, status) {
     document.getElementById('st-menu-'+id).style.display = 'none';
-    fetch(`admin.php?action=update_ticket&id=${id}&status=${status}`)
+    fetch(`admin.php?action=update_ticket&id=${id}&status=${status}&csrf_token=<?= generate_csrf() ?>`)
       .then(() => {
         const btn = document.getElementById(`st-btn-${id}`);
         const text = document.getElementById(`st-text-${id}`);

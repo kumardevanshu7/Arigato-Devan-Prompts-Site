@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -9,6 +9,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 $error = $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf();
     $title = trim($_POST["title"] ?? "");
     $description = trim($_POST["description"] ?? "");
     $content = $_POST["content"] ?? ""; // HTML from editor
@@ -63,14 +64,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
             if (in_array($_FILES["image"]["type"], $allowed)) {
                 $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-                $filename = "uploads/blog_" . uniqid() . "." . $ext;
-                if (
-                    move_uploaded_file($_FILES["image"]["tmp_name"], $filename)
-                ) {
-                    $image_path = $filename;
+                
+                if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+                    $error = "Image too large! Maximum allowed size is 5MB.";
+                } else {
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+                    if (!str_starts_with($mime, 'image/')) {
+                        $error = "Invalid file type. Only actual images are allowed.";
+                    } else {
+                        $filename = "uploads/blog_" . uniqid() . "." . $ext;
+                        if (move_uploaded_file($_FILES["image"]["tmp_name"], $filename)) {
+                            $image_path = $filename;
+                        }
+                    }
+                    finfo_close($finfo);
                 }
             }
         }
+
+        if (empty($error)) {
 
         $pdo->prepare(
             "INSERT INTO blogs (title,slug,description,content,content_hindi,image_path,image_ratio,meta_title,meta_description,tags,is_published,author_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -95,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: blog_admin.php");
         exit();
     }
+}
 }
 ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1365,6 +1379,7 @@ body {
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data" class="scribe-container">
+    <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
   <!-- LEFT SIDEBAR -->
   <aside class="scribe-sidebar">
     <div>

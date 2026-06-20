@@ -13,6 +13,7 @@ if (!$id) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf();
     $title = trim($_POST["title"] ?? "");
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text  = trim($_POST["prompt_text"] ?? "");
@@ -59,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
     } else if ($is_direct) {
-        $unlock_code = $_POST["direct_taps"] ?? "9";
+        $unlock_code = $_POST["direct_taps"] ?? "09";
         if (!$title || !$tag || !$prompt_text) {
             $_SESSION["edit_error"] =
                 "Title, tags and prompt text are required.";
@@ -82,6 +83,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_FILES["image"]["error"] === UPLOAD_ERR_OK
     ) {
         $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+
+        // Security Checks: File Size and MIME type
+        if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+            $_SESSION["edit_error"] = "Image too large! Maximum allowed size is 5MB.";
+            header("Location: edit_prompt.php?id=$id");
+            exit();
+        }
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+        if (!str_starts_with($mime, 'image/')) {
+            $_SESSION["edit_error"] = "Invalid file type. Only actual images are allowed.";
+            finfo_close($finfo);
+            header("Location: edit_prompt.php?id=$id");
+            exit();
+        }
+        finfo_close($finfo);
         $fn = "uploads/" . uniqid("prompt_") . "." . $ext;
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
             $image_path = $fn;
@@ -410,7 +428,8 @@ body::before, body::after { display: none !important; background-image: none !im
 ) ?></div><?php endif; ?>
   <div class="edit-card">
     <h2>Prompt Details</h2>
-    <form method="POST" action="edit_prompt.php?id=<?= $id ?>" enctype="multipart/form-data">
+    <form method="POST" action="edit_prompt.php?id=<?= $id ?>" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
       <input type="hidden" name="current_image" value="<?= htmlspecialchars(
           $p["image_path"],
       ) ?>">
@@ -649,9 +668,9 @@ body::before, body::after { display: none !important; background-image: none !im
         <label class="form-label" style="color:#f43f5e;margin-bottom:10px;display:block;"><i class="fa-solid fa-heart"></i> Heart Taps Required</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <?php $taps = $p['unlock_code'] ?? '9'; ?>
-          <label class="tap-card <?= $taps == '9' ? 'sel-tap' : '' ?>" id="tap-9">
-            <input type="radio" name="direct_taps" value="9" <?= $taps == '9' ? 'checked' : '' ?> onchange="onTapChange('9')">
-            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>9
+          <label class="tap-card <?= $taps == '09' || $taps == '9' ? 'sel-tap' : '' ?>" id="tap-09">
+            <input type="radio" name="direct_taps" value="09" <?= ($taps == '09' || $taps == '9') ? 'checked' : '' ?> onchange="onTapChange('09')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>09
           </label>
           <label class="tap-card <?= $taps == '11' ? 'sel-tap' : '' ?>" id="tap-11">
             <input type="radio" name="direct_taps" value="11" <?= $taps == '11' ? 'checked' : '' ?> onchange="onTapChange('11')">

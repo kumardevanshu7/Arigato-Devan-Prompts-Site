@@ -1823,3 +1823,150 @@ function checkFirstUnlock() {
     });
   }, { passive: true });
 })();
+
+
+/* =========================================
+   UX IMPROVEMENTS: TOASTS & VALIDATION
+   ========================================= */
+
+// 1. Toast Notification System
+function showToast(message, type = "success") {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    
+    // Icon based on type
+    let icon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+    if (type === "error") {
+        icon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+    } else if (type === "info") {
+        icon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+    }
+    
+    toast.innerHTML = `${icon} <span>${message}</span>`;
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => { toast.classList.add("show"); }, 10);
+    
+    // Animate out and remove after 3s
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+// 2. Client-Side Form Validation
+document.addEventListener("DOMContentLoaded", () => {
+    const forms = document.querySelectorAll(".needs-validation");
+    forms.forEach(form => {
+        form.addEventListener("submit", function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                showToast("Please fill in all required fields correctly.", "error");
+            }
+            form.classList.add("was-validated"); // Optional: for bootstrap-like css styling if needed
+        }, false);
+    });
+});
+
+/* =========================================
+   UX IMPROVEMENTS: AJAX PAGINATION
+   ========================================= */
+document.addEventListener("DOMContentLoaded", () => {
+    // Intercept pagination clicks in gallery
+    document.body.addEventListener("click", function(e) {
+        const pageLink = e.target.closest(".pagination a");
+        if (pageLink && !pageLink.closest(".no-ajax")) {
+            e.preventDefault();
+            const url = new URL(pageLink.href);
+            url.searchParams.set("ajax", "1");
+            
+            // Show skeletons in the grid
+            const grid = document.querySelector(".gallery-grid");
+            if (grid) {
+                // Keep the same number of items, just turn them to skeletons
+                const cards = grid.querySelectorAll(".prompt-card");
+                cards.forEach(card => {
+                    const img = card.querySelector(".prompt-image");
+                    if (img) {
+                        img.innerHTML = "<div class=\"skeleton\" style=\"width:100%;height:100%;min-height:200px;\"></div>";
+                    }
+                    card.style.pointerEvents = "none";
+                    card.style.opacity = "0.7";
+                });
+                
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                
+                fetch(url.toString(), {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(res => res.text())
+                .then(html => {
+                    // Expecting HTML fragment containing the new cards and new pagination
+                    // Parse the HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    
+                    const newGrid = doc.querySelector(".gallery-grid");
+                    const newPagination = doc.querySelector(".pagination");
+                    
+                    if (newGrid) {
+                        grid.innerHTML = newGrid.innerHTML;
+                    }
+                    const currentPagination = document.querySelector(".pagination");
+                    if (currentPagination && newPagination) {
+                        currentPagination.innerHTML = newPagination.innerHTML;
+                    }
+                    
+                    // Update URL without reload
+                    url.searchParams.delete("ajax");
+                    window.history.pushState({path: url.href}, "", url.href);
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast("Failed to load next page.", "error");
+                    // Fallback to hard load
+                    window.location.href = pageLink.href;
+                });
+            }
+        }
+    });
+});
+
+
+
+/* =========================================
+   CONVERT EXISTING FLASH MESSAGES TO TOASTS
+   ========================================= */
+document.addEventListener("DOMContentLoaded", () => {
+    const flashMessages = document.querySelectorAll(".flash, .alert");
+    flashMessages.forEach(msg => {
+        // Determine type
+        let type = "info";
+        if (msg.classList.contains("flash-ok") || msg.classList.contains("alert-success")) {
+            type = "success";
+        } else if (msg.classList.contains("flash-err") || msg.classList.contains("flash-error") || msg.classList.contains("alert-error") || msg.classList.contains("alert-danger")) {
+            type = "error";
+        }
+        
+        // Get text content and strip HTML tags if any (like <i>)
+        const text = msg.textContent.trim();
+        
+        if (text) {
+            showToast(text, type);
+        }
+        
+        // Hide original element
+        msg.style.display = "none";
+    });
+});
+

@@ -395,7 +395,7 @@ function sessionAvatar() {
                         <div class="pp-code-header">
                             <div class="pp-code-header-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
                             <span>PROMPT.txt</span>
-                            <span style="opacity:.6;font-size:.7rem;"><?= $is_unlocked ? strlen($p['prompt_text']) : 0 ?> chars</span>
+                            <span style="opacity:.6;font-size:.7rem;" id="pp-word-count"><?= $is_unlocked ? str_word_count($p['prompt_text']) : 0 ?> words</span>
                         </div>
                         <div class="pp-prompt-text" id="pp-prompt-text"><?= $is_unlocked ? htmlspecialchars($p['prompt_text']) : '' ?></div>
                     </div>
@@ -494,7 +494,12 @@ function sessionAvatar() {
         const content = document.getElementById('pp-content');
         const imgCol = document.getElementById('pp-img-col');
         if (task) task.style.display = 'none';
-        if (content) { content.style.display = 'flex'; document.getElementById('pp-prompt-text').textContent = text; }
+        if (content) { 
+            content.style.display = 'flex'; 
+            document.getElementById('pp-prompt-text').textContent = text; 
+            const wcEl = document.getElementById('pp-word-count');
+            if (wcEl) wcEl.textContent = text.trim().split(/\s+/).filter(w => w.length > 0).length + ' words';
+        }
         if (imgCol) imgCol.classList.remove('blurred');
         const mainImg = document.getElementById('pp-main-img');
         if (mainImg) mainImg.style.filter = '';

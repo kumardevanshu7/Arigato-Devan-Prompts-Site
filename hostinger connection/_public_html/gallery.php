@@ -11,7 +11,7 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
 $page       = max(1, (int)($_GET['page'] ?? 1));
 $per_page   = 20;
 $tag_filter = trim(strtolower($_GET['tag'] ?? ''));
-$tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . $tag_filter . '%' : null;
+$tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . addcslashes($tag_filter, '%_') . '%' : null;
 $_page_canonical = 'https://arigatodevan.com/gallery.php' . (($tag_filter && $tag_filter !== 'all') ? '?tag=' . urlencode($tag_filter) : '');
 $offset     = ($page - 1) * $per_page;
 
@@ -408,7 +408,7 @@ function sessionAvatar()
                 ];
                 $tinfo = $type_labels[$ptype] ?? $type_labels["secret_code"];
                 ?>
-                    <div class="card"
+                    <div class="card skeleton"
                          data-id="<?= $p["id"] ?>"
                          data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
                          data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
@@ -442,9 +442,9 @@ function sessionAvatar()
                                 : ""; ?>
                         <img loading="lazy" src="<?= htmlspecialchars(
                             $p["image_path"],
-                        ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
+                        ) ?>" class="card-bg-image skeleton-img" alt="<?= htmlspecialchars(
     $p["title"],
-) ?>" style="<?= $blur_style ?>" loading="lazy">
+) ?>" style="<?= $blur_style ?>" onload="this.classList.add('loaded'); this.parentElement.classList.remove('skeleton')">
 
                         <!-- Type Label Ribbon -->
                         <div class="card-type-badge <?= $tinfo[
