@@ -1,14 +1,11 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
 }
-// Guests allowed &mdash; they need 90 taps; logged-in users need only 20
-$tap_threshold = isset($_SESSION["user_id"]) ? 20 : 90;
-
-// Fetch unreleased prompts by prompt_type
+// Fetch already uploaded prompts by prompt_type
 if (isset($_SESSION["user_id"])) {
     $stmt = $pdo->prepare("
         SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
@@ -18,15 +15,15 @@ if (isset($_SESSION["user_id"])) {
         LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
         LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
         LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        WHERE p.prompt_type = 'unreleased' AND (p.is_trial = 0 OR p.is_trial IS NULL) AND (p.is_trial = 0 OR p.is_trial IS NULL)
+        WHERE p.prompt_type = 'direct' AND (p.is_trial = 0 OR p.is_trial IS NULL) AND (p.is_trial = 0 OR p.is_trial IS NULL)
         ORDER BY p.created_at DESC
     ");
     $stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]]);
-    $unreleased = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $uploaded_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $unreleased = $pdo
+    $uploaded_prompts = $pdo
         ->query(
-            "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='unreleased' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
+            "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE prompt_type='direct' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
         )
         ->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -37,19 +34,19 @@ if (isset($_SESSION["user_id"])) {
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unreleased Reels &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
-    <link rel="canonical" href="https://arigatodevan.com/unreleased.php">
+<title>Direct Prompts &mdash; Arigato Devan Prompts</title>
+<meta name="description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! 📱">
+    <link rel="canonical" href="https://arigatodevan.com/direct_prompts.php">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Unreleased Prompts â€” Arigato Devan">
-<meta property="og:description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
+<meta property="og:title" content="Already Uploaded Prompts — Arigato Devan">
+<meta property="og:description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! 📱">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-<meta property="og:url" content="https://arigatodevan.com/unreleased.php">
+<meta property="og:url" content="https://arigatodevan.com/direct_prompts.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Unreleased Prompts â€” Arigato Devan">
-<meta name="twitter:description" content="Exclusive unreleased AI couple prompts â€” unlock before anyone else! Show love &amp; get early access. ðŸŒŸ">
+<meta name="twitter:title" content="Already Uploaded Prompts — Arigato Devan">
+<meta name="twitter:description" content="Prompts already shared on Instagram by Arigato Devan — unlock with just 9 taps! 📱">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -58,7 +55,7 @@ if (isset($_SESSION["user_id"])) {
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Unreleased Prompts","item":"https://arigatodevan.com/unreleased.php"}]}
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Already Uploaded Prompts","item":"https://arigatodevan.com/already_uploaded.php"}]}
     </script>
     <?php include_once "gtag.php"; ?>
     <style>
@@ -171,64 +168,60 @@ if (isset($_SESSION["user_id"])) {
 
 <div class="container" style="padding-top:40px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-        <div class="badge" style="margin:0;transform:rotate(-1deg);"><i class="fa-solid fa-lock"></i> UNRELEASED</div>
-        <h1 style="font-size:2rem;font-weight:900;">Secret <span class="highlight">Drops</span></h1>
+        <div class="badge" style="margin:0;transform:rotate(-1deg);background:#e6f2ff;color:#00509e;"><i class="fa-solid fa-hand-pointer"></i> DIRECT PROMPTS</div>
+        <h1 style="font-size:2rem;font-weight:900;">Direct <span class="highlight">Prompts</span></h1>
     </div>
     <p style="color:#666;font-weight:600;margin-bottom:16px;">
-        Show some love to unlock &mdash; tap the Love Bar
-        <strong><?= isset($_SESSION["user_id"]) ? "20" : "90" ?></strong> times!
-        <i class="fa-solid fa-heart"></i>
-        <?php if (!isset($_SESSION["user_id"])): ?>
-            <span style="font-size:.85rem;color:#999;"> (Login to unlock faster with just 20 taps!)</span>
-        <?php endif; ?>
+        Explore the collection of direct prompts. <br>Tap just <strong>9 times</strong> to unlock them!
+        <i class="bx bxs-pointer"></i>
     </p>
-    <?php $_steps_page = 'unreleased'; include_once 'steps_guide.php'; ?>
+    <?php $_steps_page = 'already_uploaded'; include_once 'steps_guide.php'; ?>
 
-    <?php if (empty($unreleased)): ?>
+    <?php if (empty($uploaded_prompts)): ?>
         <div style="text-align:center;padding:80px 20px;">
-            <div style="font-size:3rem;margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
+            <div style="font-size:3rem;margin-bottom:16px;color:#00509e;"><i class="fa-solid fa-hand-pointer"></i></div>
             <h2 style="font-size:1.6rem;font-weight:900;margin-bottom:8px;">Nothing here yet...</h2>
-            <p style="color:#888;font-weight:600;">Unreleased reels will appear here when the admin drops them!</p>
+            <p style="color:#888;font-weight:600;">Direct prompts will appear here when the admin adds them!</p>
         </div>
     <?php
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
-        // Collect sub-tags (excluding 'unreleased' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
+        // Collect sub-tags (excluding 'already_uploaded' itself)
         else: ?>
         <?php
-        $ur_sub_tags = [];
-        foreach ($unreleased as $ur_item) {
+        $aup_sub_tags = [];
+        foreach ($uploaded_prompts as $aup_item) {
             $tarr = array_map(
                 "trim",
-                explode(",", strtolower($ur_item["tag"])),
+                explode(",", strtolower($aup_item["tag"])),
             );
             foreach ($tarr as $t) {
-                if (!empty($t) && $t !== "unreleased") {
-                    $ur_sub_tags[] = $t;
+                if (!empty($t) && $t !== "direct") {
+                    $aup_sub_tags[] = $t;
                 }
             }
         }
-        $ur_sub_tags = array_unique($ur_sub_tags);
-        sort($ur_sub_tags);
+        $aup_sub_tags = array_unique($aup_sub_tags);
+        sort($aup_sub_tags);
         ?>
-        <?php if (!empty($ur_sub_tags)): ?>
+        <?php if (!empty($aup_sub_tags)): ?>
         <div class="tag-filter-container" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 28px;">
-            <button class="ur-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
-            <?php foreach ($ur_sub_tags as $t): ?>
-                <button class="ur-filter-btn" data-tag="<?= htmlspecialchars(
+            <button class="aup-filter-btn active" data-tag="all" style="background:var(--primary-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;">All</button>
+            <?php foreach ($aup_sub_tags as $t): ?>
+                <button class="aup-filter-btn" data-tag="<?= htmlspecialchars(
                     $t,
                 ) ?>" style="background:var(--bg-color);padding:8px 18px;border-radius:20px;font-weight:800;border:2px solid var(--text-color);cursor:pointer;font-family:var(--font-main);font-size:0.85rem;transition:all 0.2s;text-transform:capitalize;"><?= htmlspecialchars(
     ucfirst($t),
@@ -237,42 +230,40 @@ if (isset($_SESSION["user_id"])) {
         </div>
         <?php endif; ?>
         <div class="gallery-grid" id="card-stack">
-            <?php foreach ($unreleased as $ur):
+            <?php foreach ($uploaded_prompts as $aup):
 
                 $tags_arr = array_map(
                     "trim",
-                    explode(",", strtolower($ur["tag"])),
+                    explode(",", strtolower($aup["tag"])),
                 );
-                $is_unlocked = $ur["is_unlocked"];
-                $blur_style = $is_unlocked
-                    ? ""
-                    : "filter: blur(5px); transform: scale(1.1);";
+                $is_unlocked = $aup["is_unlocked"];
+                $blur_style = "";
                 ?>
             <div class="card"
-                 data-id="<?= $ur["id"] ?>"
-                 data-slug="<?= htmlspecialchars($ur["slug"] ?? "") ?>"
-                 data-created="<?= htmlspecialchars($ur["created_at"] ?? "") ?>"
-                 data-image="<?= htmlspecialchars($ur["image_path"]) ?>"
-                 data-title="<?= htmlspecialchars($ur["title"]) ?>"
-                 data-prompt-type="unreleased"
+                 data-id="<?= $aup["id"] ?>"
+                 data-slug="<?= htmlspecialchars($aup["slug"] ?? "") ?>"
+                 data-created="<?= htmlspecialchars($aup["created_at"] ?? "") ?>"
+                 data-image="<?= htmlspecialchars($aup["image_path"]) ?>"
+                 data-title="<?= htmlspecialchars($aup["title"]) ?>"
+                 data-prompt-type="direct"
                  data-unlocked="<?= $is_unlocked ? "true" : "false" ?>"
-                 data-saved="<?= !empty($ur["is_saved"]) ? "true" : "false" ?>"
+                 data-saved="<?= !empty($aup["is_saved"]) ? "true" : "false" ?>"
                  data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
-                 data-best-works-in="<?= htmlspecialchars($ur['best_works_in'] ?? '') ?>"
-                 data-asset-title="<?= htmlspecialchars($ur['asset_title'] ?? '') ?>"
-                 data-asset-images="<?= htmlspecialchars($ur['asset_images'] ?? '[]') ?>"
+                 data-best-works-in="<?= htmlspecialchars($aup['best_works_in'] ?? '') ?>"
+                 data-asset-title="<?= htmlspecialchars($aup['asset_title'] ?? '') ?>"
+                 data-asset-images="<?= htmlspecialchars($aup['asset_images'] ?? '[]') ?>"
                  <?= $is_unlocked
                      ? 'data-prompt-text="' .
-                         htmlspecialchars($ur["prompt_text"]) .
+                         htmlspecialchars($aup["prompt_text"]) .
                          '"'
                      : "" ?>>
 
                 <img loading="lazy" src="<?= htmlspecialchars(
-                    $ur["image_path"],
+                    $aup["image_path"],
                 ) ?>" class="card-bg-image" alt="<?= htmlspecialchars(
-    $ur["title"],
+    $aup["title"],
 ) ?>" style="<?= $blur_style ?>" loading="lazy">
-                <div class="card-type-badge urp">UNRELEASED</div>
+                <div class="card-type-badge aup" style="background:var(--primary-color);">DIRECT</div>
 
                 <?php if (!$is_unlocked): ?>
                     <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
@@ -283,11 +274,11 @@ if (isset($_SESSION["user_id"])) {
                 <div class="card-click-trigger"></div>
                 <div class="card-content-overlay">
                     <div class="card-title"><?= htmlspecialchars(
-                        $ur["title"],
+                        $aup["title"],
                     ) ?></div>
-                    <div class="like-btn" data-prompt-id="<?= $ur["id"] ?>">
+                    <div class="like-btn" data-prompt-id="<?= $aup["id"] ?>">
                         <i class="fa-solid fa-heart"></i>
-                        <span class="like-count"><?= (int) $ur[
+                        <span class="like-count"><?= (int) $aup[
                             "likes_count"
                         ] ?></span>
                     </div>
@@ -387,10 +378,10 @@ if (bgLayers.length > 0) {
 </script>
 
 <script>
-// Unreleased filter
-document.querySelectorAll('.ur-filter-btn').forEach(btn => {
+// Already Uploaded filter
+document.querySelectorAll('.aup-filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.ur-filter-btn').forEach(b => {
+        document.querySelectorAll('.aup-filter-btn').forEach(b => {
             b.classList.remove('active');
             b.style.background = 'var(--bg-color)';
             b.style.color = 'var(--text-color)';
@@ -398,14 +389,14 @@ document.querySelectorAll('.ur-filter-btn').forEach(btn => {
         btn.classList.add('active');
         btn.style.background = 'var(--primary-color)';
         const tag = btn.dataset.tag;
-        document.querySelectorAll('#unreleased-grid .unreleased-card').forEach(card => {
+        document.querySelectorAll('#card-stack .card').forEach(card => {
             const tags = (card.dataset.tags || '').split(',').map(t => t.trim());
             card.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
         });
     });
 });
 
-// Card click â†’ navigate to prompt page
+// Card click → navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {
@@ -428,5 +419,8 @@ document.querySelectorAll('.card').forEach(function(card) {
 });
 </script><script>(function(){var nav=document.getElementById("navStickyWrap");if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener("scroll",function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add("nav-hidden");else nav.classList.remove("nav-hidden");lastY=y;ticking=false;});ticking=true;}},{passive:true});})();</script>
 </body></html>
+
+
+
 
 

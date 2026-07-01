@@ -131,7 +131,8 @@ if (empty($_SESSION["oauth_state"])) {
     : ($curPage == "already_uploaded.php"
         ? '<span class="dd-tag">ACTIVE</span>'
         : "") ?></a>
-            </div>
+                    <a href="direct_prompts.php" <?= $curPage == "direct_prompts.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-hand-pointer"></i> Direct Prompts <?= empty($nav_counts["direct"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "direct_prompts.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
+                </div>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
             <i class="fa-brands fa-instagram" style="font-size:18px;"></i>

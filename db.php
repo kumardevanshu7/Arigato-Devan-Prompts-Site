@@ -165,7 +165,7 @@ try {
 }
 
 // Navigation counts using prompt_type column (accurate)
-$nav_counts = ["secret_code" => 0, "unreleased" => 0, "insta_viral" => 0, "already_uploaded" => 0];
+$nav_counts = ["secret_code" => 0, "unreleased" => 0, "insta_viral" => 0, "already_uploaded" => 0, "direct" => 0];
 try {
     $stmt = $pdo->query(
         "SELECT prompt_type, COUNT(*) as cnt FROM prompts GROUP BY prompt_type",
@@ -182,6 +182,9 @@ try {
         }
         if ($row["prompt_type"] === "already_uploaded") {
             $nav_counts["already_uploaded"] += $row["cnt"];
+        }
+        if ($row["prompt_type"] === "direct") {
+            $nav_counts["direct"] += $row["cnt"];
         }
     }
 } catch (PDOException $e) {
