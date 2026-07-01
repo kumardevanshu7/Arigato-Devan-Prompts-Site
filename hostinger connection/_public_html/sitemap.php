@@ -52,18 +52,6 @@ $static_pages = [
         "lastmod"    => "2026-06-01",
     ],
     [
-        "url"        => "/how_to_use.php",
-        "priority"   => "0.7",
-        "changefreq" => "monthly",
-        "lastmod"    => "2026-06-01",
-    ],
-    [
-        "url"        => "/steps_guide.php",
-        "priority"   => "0.7",
-        "changefreq" => "monthly",
-        "lastmod"    => "2026-06-01",
-    ],
-    [
         "url"        => "/faq.php",
         "priority"   => "0.7",
         "changefreq" => "monthly",

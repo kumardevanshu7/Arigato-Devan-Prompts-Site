@@ -42,7 +42,7 @@ $cat_empty_text  = 'When we share prompts on Instagram, they will appear here.';
 
 $cat_instruction = [
     'icon'  => 'fa-heart',
-    'title' => '9 baar heart tap karo — tabhi prompt unlock hoga',
+    'title' => '9 Baar heart tap karo — tabhi prompt unlock hoga',
 ];
 $cat_hide_hero = true;
 

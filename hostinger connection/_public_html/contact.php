@@ -9,7 +9,7 @@
     <meta name="description" content="Get in touch with Arigato Devan. We'd love to hear your feedback, suggestions, or answer any questions you have about our AI prompts.">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/info-pages.css?v=20260701">
+    <link rel="stylesheet" href="css/info-pages.css?v=20260703">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info page-contact theme-nogoda">
@@ -18,69 +18,60 @@
 <div class="nogoda-mesh" aria-hidden="true"></div>
 
 <main class="info-page-main info-page-main--wide">
-    <div class="info-page-hero">
+    <div class="info-page-hero contact-hero">
         <p class="hero-label">Get in Touch</p>
         <h1>Contact <em>Me</em></h1>
         <p>Questions, collabs, or feedback — drop a message and we'll reply within 24 hours.</p>
     </div>
 
+    <div class="contact-chips">
+        <a href="about.php">About</a>
+        <a href="faq.php">FAQ</a>
+        <a href="feedback.php">Feedback</a>
+        <a href="gallery.php">Gallery</a>
+    </div>
+
     <div class="contact-layout">
-
-        <!-- Left Info Block -->
-        <div class="contact-info-block">
-            <div class="ci-item">
-                <span class="ci-label">Email (required)</span>
-                <a href="mailto:devansh.grow@gmail.com" class="ci-value">devansh.grow@gmail.com</a>
-            </div>
-            
-            <div class="ci-divider"></div>
-
-            <div class="ci-item">
-                <span class="ci-label">Instagram</span>
-                <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="ci-value">@arigato.devan</a>
-            </div>
-
-            <div class="ci-divider"></div>
-
-            <div class="ci-item">
-                <span class="ci-label">Response Time</span>
-                <span class="ci-value">Usually within 24 hours</span>
-            </div>
-
-            <div class="ci-footer-links">
-                <a href="about.php">About</a>
-                <a href="faq.php">FAQ</a>
-                <a href="feedback.php">Feedback</a>
-                <a href="gallery.php">Gallery</a>
+        <div class="contact-info-grid">
+            <a href="mailto:devansh.grow@gmail.com" class="contact-info-card">
+                <span class="ci-card-icon ci-card-icon--email"><i class="fa-solid fa-envelope"></i></span>
+                <span class="ci-card-label">Email</span>
+                <span class="ci-card-value">devansh.grow@gmail.com</span>
+            </a>
+            <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="contact-info-card">
+                <span class="ci-card-icon ci-card-icon--insta"><i class="fa-brands fa-instagram"></i></span>
+                <span class="ci-card-label">Instagram</span>
+                <span class="ci-card-value">@arigato.devan</span>
+            </a>
+            <div class="contact-info-card contact-info-card--static">
+                <span class="ci-card-icon ci-card-icon--time"><i class="fa-solid fa-clock"></i></span>
+                <span class="ci-card-label">Response Time</span>
+                <span class="ci-card-value">Usually within 24 hours</span>
             </div>
         </div>
 
         <div class="contact-form-card">
+            <h2 class="contact-form-title">Send a message</h2>
             <form id="contact-form" novalidate>
                 <div class="cf-group">
                     <label for="cf-name">Name</label>
                     <input type="text" id="cf-name" name="name" placeholder="Your name" required maxlength="100">
                 </div>
-                
                 <div class="cf-group">
                     <label for="cf-email">Email</label>
-                    <input type="email" id="cf-email" name="email" placeholder="Your email" required maxlength="200">
+                    <input type="email" id="cf-email" name="email" placeholder="your@email.com" required maxlength="200">
                 </div>
-                
                 <div class="cf-group">
                     <label for="cf-query">Message</label>
                     <textarea id="cf-query" name="query" placeholder="How can we help?" required maxlength="2000"></textarea>
                 </div>
-                
                 <button type="submit" class="cf-submit">Submit Message</button>
                 <div id="form-error"></div>
             </form>
         </div>
-
     </div>
 </main>
 
-<!-- Sending Popup -->
 <div id="sending-popup">
     <div class="sp-box">
         <div class="sp-spinner"></div>
@@ -89,7 +80,6 @@
     </div>
 </div>
 
-<!-- Success Popup -->
 <div id="success-popup">
     <div class="suc-box">
         <div class="suc-icon"><i class="fa-solid fa-check"></i></div>
@@ -120,7 +110,6 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
         errEl.style.display = 'block'; return;
     }
 
-    // Show sending popup
     document.getElementById('sending-popup').style.display = 'flex';
 
     var fd = new FormData();

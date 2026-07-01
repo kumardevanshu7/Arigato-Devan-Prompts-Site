@@ -147,7 +147,6 @@
         <a href="login.php" class="home-btn-primary" id="hero-login-btn">
             <i class="fa-brands fa-google"></i> Login with Google
         </a>
-        <a href="gallery.php" class="home-btn-outline" id="hero-gallery-btn">Explore Prompts &rarr;</a>
     </div>
 
     <div class="home-stats">

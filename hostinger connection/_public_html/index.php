@@ -203,7 +203,7 @@ try {
     }
     </script>
         <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/home-page.css?v=20260708">
+    <link rel="stylesheet" href="css/home-page.css?v=20260716">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->

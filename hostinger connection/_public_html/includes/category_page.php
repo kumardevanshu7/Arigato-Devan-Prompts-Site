@@ -42,7 +42,7 @@ $breadcrumb_name = $breadcrumb_name ?? ($cat_title . ' ' . $cat_title_em);
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
     </script>
     <?php include_once __DIR__ . '/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/category-pages.css?v=20260714">
+    <link rel="stylesheet" href="css/category-pages.css?v=20260715">
     <?php include_once __DIR__ . '/../gtag.php'; ?>
 </head>
 <body class="page-store theme-nogoda page-category<?= !empty($cat_instruction) ? ' has-cat-instruction' : '' ?>">

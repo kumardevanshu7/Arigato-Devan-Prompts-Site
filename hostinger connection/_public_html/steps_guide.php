@@ -86,10 +86,3 @@ $_last  = count($_steps) - 1;
     <?php endforeach; ?>
   </div>
 </div>
-<?php if ($_sp !== 'generic'): ?>
-<div style="text-align:center;margin-top:-10px;margin-bottom:28px;">
-  <a href="how_to_use.php?cat=<?= $_sp ?>" class="sg-detail-btn">
-    <i class="fa-solid fa-book-open"></i> Check Steps in Detail
-  </a>
-</div>
-<?php endif; ?>

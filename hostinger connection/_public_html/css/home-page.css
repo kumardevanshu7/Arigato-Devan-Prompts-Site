@@ -55,6 +55,28 @@ body.page-home {
 .home-testi-carousel {
   position: relative;
   max-width: 100%;
+  overflow: hidden;
+}
+
+.home-testi-carousel::before,
+.home-testi-carousel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 16px;
+  width: 28px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.home-testi-carousel::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--pal-beige, #F5EFEB) 0%, transparent 100%);
+}
+
+.home-testi-carousel::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--pal-beige, #F5EFEB) 0%, transparent 100%);
 }
 
 .home-testi-track {
@@ -64,7 +86,7 @@ body.page-home {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 8px clamp(4px, 2vw, 12px) 16px;
+  padding: 8px clamp(20px, 5vw, 32px) 16px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -81,8 +103,8 @@ body.page-home {
 .home-testi-card {
   position: relative;
   flex: 0 0 auto;
-  min-width: 280px;
-  max-width: 300px;
+  min-width: min(300px, calc(100vw - 56px));
+  max-width: min(300px, calc(100vw - 56px));
   scroll-snap-align: center;
   background: #fff;
   border: 1px solid var(--pal-sky, #C8D9E6);
@@ -838,18 +860,25 @@ body.page-home {
 
   .page-home .home-testi-wrap {
     margin: 0 auto 24px;
-    padding: 0 16px;
+    padding: 0;
     overflow: hidden;
   }
 
+  .page-home .home-testi-carousel::before,
+  .page-home .home-testi-carousel::after {
+    width: 36px;
+  }
+
   .page-home .home-testi-track {
-    padding: 4px 0 12px;
+    padding: 4px 20px 12px;
+    gap: 12px;
+    scroll-padding: 0 20px;
     -webkit-overflow-scrolling: touch;
   }
 
   .page-home .home-testi-card {
-    min-width: min(280px, 86vw);
-    max-width: min(280px, 86vw);
+    min-width: calc(100vw - 72px);
+    max-width: calc(100vw - 72px);
   }
 
   .page-home .home-testi-nav {
@@ -919,6 +948,10 @@ body.page-home {
     width: 100%;
   }
 
+  .page-home .sg-wrap .sg-arr {
+    display: none !important;
+  }
+
   .page-home .sg-arr {
     display: none !important;
   }
@@ -944,8 +977,14 @@ body.page-home {
   }
 
   .page-home .home-compare {
-    padding: 0;
+    padding: 0 4px;
     margin-top: 32px;
+    margin-bottom: 8px;
+  }
+
+  .page-home .home-compare-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .page-home .home-compare h2 {

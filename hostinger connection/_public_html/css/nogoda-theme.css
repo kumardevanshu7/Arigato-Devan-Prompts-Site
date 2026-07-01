@@ -470,25 +470,44 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 }
 
 .theme-nogoda .prompt-card .card-info {
-  padding: 14px 16px 16px;
+  padding: 12px 14px 14px;
   background: var(--pal-white);
   border-top: 1px solid var(--pal-sky);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .theme-nogoda .prompt-card .card-title {
   font-family: 'Inter', sans-serif !important;
-  font-size: 0.86rem !important;
+  font-size: 0.84rem !important;
   font-weight: 600 !important;
   color: var(--pal-navy) !important;
   letter-spacing: -0.01em;
-  margin-bottom: 8px !important;
+  margin-bottom: 0 !important;
+  line-height: 1.35 !important;
 }
 
 .theme-nogoda .prompt-card .card-like-display {
-  color: var(--pal-teal);
-  font-size: 0.74rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(245, 112, 157, 0.1);
+  border: 1px solid rgba(245, 112, 157, 0.2);
+  color: var(--pal-navy);
+  font-size: 0.72rem;
+  font-weight: 700;
 }
-.theme-nogoda .prompt-card .card-like-display .liked-heart { color: var(--nogoda-pink); }
+
+.theme-nogoda .prompt-card .card-like-display i {
+  color: var(--nogoda-pink);
+  font-size: 0.68rem;
+}
+
+.theme-nogoda .prompt-card .card-like-display .liked-heart { color: #e11d48; }
 
 .theme-nogoda .card-badge.scp { background: linear-gradient(135deg, #6D2D52, #2F4156); color: #fff; }
 .theme-nogoda .card-badge.urp { background: linear-gradient(135deg, #F5709D, #6D2D52); color: #fff; }
