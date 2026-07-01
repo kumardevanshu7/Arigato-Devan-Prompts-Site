@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
@@ -41,20 +41,20 @@ arsort($all_tags);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs — Arigato Devan Prompts">
-<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta property="og:title" content="Blogs � Arigato Devan Prompts">
+<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs — Arigato Devan Prompts">
-<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. 💡">
+<meta name="twitter:title" content="Blogs � Arigato Devan Prompts">
+<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
@@ -1036,7 +1036,7 @@ footer .footer-links a:hover {
                 <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
             </div>
             <div class="splash-arrow-wrap">
-                <span class="splash-arrow" id="splash-arrow">➔</span>
+                <span class="splash-arrow" id="splash-arrow">?</span>
                 <div class="splash-ring-loader" id="splash-ring-loader"></div>
             </div>
             <div class="splash-word blog-word" id="splash-blog-word">
@@ -1221,7 +1221,7 @@ footer .footer-links a:hover {
           <div class="title">Creative Prompter</div>
         </div>
       </div>
-      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> — a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> � a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
       <div class="author-location">
         <i class="fa-solid fa-location-dot"></i> Mumbai, India
       </div>
@@ -1364,7 +1364,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Intercept Outbound Clicks for BLOG ➔ PROMPT 2-second Reverse Transition
+// Intercept Outbound Clicks for BLOG ? PROMPT 2-second Reverse Transition
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
     if (!link) return;
@@ -1380,7 +1380,7 @@ document.addEventListener('click', (e) => {
         if (splash) {
             e.preventDefault(); // Intercept redirect
             
-            // Swap text positions to BLOG ➔ PROMPT
+            // Swap text positions to BLOG ? PROMPT
             const blogWordHTML = `<span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">B</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">L</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">O</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">G</span>`;
             const promptWordHTML = `<span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">R</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">O</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">M</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">T</span>`;
             

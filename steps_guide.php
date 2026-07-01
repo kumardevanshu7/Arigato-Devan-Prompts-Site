@@ -46,7 +46,7 @@ $_steps = $_all_steps[$_sp] ?? $_all_steps['generic'];
 $_last  = count($_steps) - 1;
 ?>
 <style>
-.sg-outer{overflow-x:auto;margin-bottom:28px;padding:14px 14px 6px;scrollbar-width:none;text-align:center;width:100%;box-sizing:border-box;max-width:100%;}
+.sg-outer{overflow-x:auto;margin-bottom:28px;padding:14px 14px 6px;scrollbar-width:none;text-align:center;width:100%;box-sizing:border-box;max-width:100%;overscroll-behavior-x:contain;}
 .sg-outer::-webkit-scrollbar{display:none;}
 .sg-wrap{display:inline-flex;align-items:center;gap:0;padding:0 2px 8px;}
 .sg-box{flex-shrink:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--card-bg);border:var(--border-width) solid var(--text-color);border-radius:18px;padding:14px 16px 12px;width:110px;text-align:center;box-shadow:4px 4px 0 var(--text-color);transition:transform .18s,box-shadow .18s;}

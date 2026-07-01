@@ -1,4 +1,4 @@
-﻿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,19 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse � a platform crafting beautiful AI prompts for couples and creative souls.">
+    <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse ? a platform crafting beautiful AI prompts for couples and creative souls.">
     <link rel="canonical" href="https://arigatodevan.com/about.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="About Us � Arigato Devan PromptVerse">
-    <meta property="og:description" content="Meet the creator of Arigato Devan � crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
+    <meta property="og:title" content="About Us ? Arigato Devan PromptVerse">
+    <meta property="og:description" content="Meet the creator of Arigato Devan ? crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/about.php">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="About Us � Arigato Devan PromptVerse">
-    <meta name="twitter:description" content="Meet the creator of Arigato Devan � crafting premium AI couple prompts for Instagram Reels.">
+    <meta name="twitter:title" content="About Us ? Arigato Devan PromptVerse">
+    <meta name="twitter:description" content="Meet the creator of Arigato Devan ? crafting premium AI couple prompts for Instagram Reels.">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <link rel="stylesheet" href="style.min.css?v=20260601">
     <style>
@@ -99,7 +99,7 @@
         <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
     </div>
     <nav class="nav-links">
-        <a href="digital_store/index.php">SHOP</a>
+        <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
         <a href="gallery.php">GALLERY</a>
         <a href="contact.php">CONTACT</a>
     </nav>
@@ -121,10 +121,10 @@
             <div class="profile-flipper" id="profileFlipper" onclick="toggleFlip()" title="Click to flip">
                 <div class="profile-inner" id="profileInner">
                     <div class="pf-front">
-                        <img loading="lazy" src="aboutmepics/new.webp" alt="Arigato Devan � Now">
+                        <img loading="lazy" src="aboutmepics/new.webp" alt="Arigato Devan ? Now">
                     </div>
                     <div class="pf-back">
-                        <img loading="lazy" src="aboutmepics/old.webp" alt="Arigato Devan � Then">
+                        <img loading="lazy" src="aboutmepics/old.webp" alt="Arigato Devan ? Then">
                     </div>
                 </div>
             </div>
@@ -134,8 +134,8 @@
         <div class="about-bio">
             <h1>Arigato Devan</h1>
             <div class="handle"><i class="fa-brands fa-instagram"></i> @arigato.devan</div>
-            <p>Hello! I'm the creator behind <strong>Arigato Devan PromptVerse</strong> � a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
-            <p>Every prompt here is carefully designed to produce stunning visuals � from cinematic couple portraits to viral-worthy aesthetic shots. Just copy, paste into your favourite AI tool, and create magic.</p>
+            <p>Hello! I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ? a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+            <p>Every prompt here is carefully designed to produce stunning visuals ? from cinematic couple portraits to viral-worthy aesthetic shots. Just copy, paste into your favourite AI tool, and create magic.</p>
             <div class="about-badge-row">
                 <span class="about-badge"><i class="fa-solid fa-heart"></i> Couple Prompts</span>
                 <span class="about-badge"><i class="fa-solid fa-sparkles"></i> Lovely Prompts</span>
@@ -150,12 +150,12 @@
         <div class="about-info-card">
             <div class="aic-icon"><i class="fa-solid fa-robot"></i></div>
             <h3>AI Tools Used</h3>
-            <p>All prompts are primarily crafted and tested with <strong>ChatGPT (DALL�E)</strong> and <strong>Google Gemini</strong>. However, they work beautifully on any AI image platform � Midjourney, Adobe Firefly, Stable Diffusion, and more.</p>
+            <p>All prompts are primarily crafted and tested with <strong>ChatGPT (DALL?E)</strong> and <strong>Google Gemini</strong>. However, they work beautifully on any AI image platform ? Midjourney, Adobe Firefly, Stable Diffusion, and more.</p>
         </div>
         <div class="about-info-card">
             <div class="aic-icon" style="background:var(--secondary-color);"><i class="fa-solid fa-lock"></i></div>
             <h3>Your Privacy</h3>
-            <p>We use <strong>Google OAuth</strong> for secure login � we only access your name and email. No passwords are stored. Your data is protected and never sold to third parties.</p>
+            <p>We use <strong>Google OAuth</strong> for secure login ? we only access your name and email. No passwords are stored. Your data is protected and never sold to third parties.</p>
         </div>
         <div class="about-info-card">
             <div class="aic-icon" style="background:#d1fae5;"><i class="fa-solid fa-globe"></i></div>
@@ -182,10 +182,7 @@
 
 </div>
 
-<footer>
-    <div>&copy; <?= date("Y") ?> ARIGATO DEVAN. KEEP CREATING.</div>
-    <div class="footer-links"><a href="about.php">ABOUT</a><a href="contact.php">CONTACT</a><a href="faq.php">FAQ</a><a href="privacy.php">PRIVACY POLICY</a><a href="disclaimer.php">DISCLAIMER</a><a href="terms.php">TERMS OF SERVICE</a></div>
-</footer>
+<?php include 'footer.php'; ?>
 
 <script>
 var isFlipped = false;

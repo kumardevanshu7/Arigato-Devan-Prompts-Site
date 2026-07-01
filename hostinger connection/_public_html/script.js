@@ -330,15 +330,18 @@ document.addEventListener("DOMContentLoaded", () => {
       // Prevent opening modal when clicking like button or category pill
       if (
         e.target.closest(".like-btn") ||
+        e.target.closest(".card-like-display") ||
         e.target.closest(".card-category-pill")
       ) {
         e.stopPropagation();
         return;
       }
 
-      // Navigate to prompt page
+      // Navigate to prompt page (live site only — gallery handles its own clicks)
       const _slug = card.dataset.slug;
-      if (_slug) {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isGalleryPage = document.body.classList.contains('page-gallery');
+      if (_slug && !isLocal && !isGalleryPage) {
         window.location.href = '/prompts/' + _slug;
         return;
       }
@@ -376,7 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (bwiBadge) {
         const bwi = card.dataset.bestWorksIn || '';
         if (bwi === 'nano_banana') {
-          bwiBadge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;background:#ffe066;border:2px solid #2d2a35;border-radius:20px;padding:4px 14px;font-size:.78rem;font-weight:900;box-shadow:2px 2px 0 #2d2a35;">🍌 Best in Nano Banana</span>';
+          bwiBadge.innerHTML = '<span class="pp-bwi-badge pp-bwi-nano" style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:.74rem;font-weight:700;background:#ffe066;color:#2d2a35;border:1px solid rgba(47,65,86,.12);"><i class="fa-solid fa-banana" style="color:#c47a00"></i> Best in Nano Banana</span>';
         } else if (bwi === 'chatgpt') {
           bwiBadge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;background:#10a37f;color:#fff;border:2px solid #2d2a35;border-radius:20px;padding:4px 14px;font-size:.78rem;font-weight:900;box-shadow:2px 2px 0 #2d2a35;">✦ Best in ChatGPT</span>';
         } else {
@@ -816,13 +819,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle Copy buttons using event delegation
   document.addEventListener("click", (e) => {
     // Copy Button Logic
-    if (e.target.closest(".copy-btn")) {
-      const btn = e.target.closest(".copy-btn");
-      // Try modal first, then closest unlocked-state
+    if (e.target.closest(".copy-btn") || e.target.closest(".pp-copy-btn")) {
+      const btn = e.target.closest(".copy-btn") || e.target.closest(".pp-copy-btn");
+      // Try modal first, then closest unlocked-state, then prompt page
       let textToCopy = "";
       const modalText = document.getElementById("modal-unlocked-text");
+      const ppText = document.getElementById("pp-prompt-text");
       if (modalText && modalText.textContent) {
         textToCopy = modalText.textContent;
+      } else if (ppText && ppText.textContent) {
+        textToCopy = ppText.textContent;
       } else {
         const unlockedState = btn.closest(".unlocked-state");
         if (unlockedState)
@@ -1560,10 +1566,12 @@ document.addEventListener("DOMContentLoaded", () => {
    BACK TO TOP BUTTON
    ========================================================= */
 (function () {
+  if (document.getElementById("back-to-top")) return;
   var btn = document.createElement("button");
+  btn.type = "button";
   btn.id = "back-to-top";
+  btn.setAttribute("aria-label", "Back to top");
   btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-  btn.title = "Back to top";
   document.body.appendChild(btn);
 
   window.addEventListener(

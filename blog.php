@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $slug = $_GET["slug"] ?? "";
@@ -72,7 +72,7 @@ $read_time = max(1, (int)ceil($word_count / 200));
                     ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/')
                     : 'https://arigatodevan.com/landingpics/lan9.webp';
     $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
-    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' – Arigato Devan');
+    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' � Arigato Devan');
 ?>
 <!-- Canonical -->
 <link rel="canonical" href="<?= $blog_url ?>">
@@ -1366,7 +1366,7 @@ footer .footer-links a:hover {
           : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>� All Blogs</a>
   </div>
 
   <!-- Comments -->
@@ -1653,7 +1653,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Intercept Outbound Clicks for BLOG ➔ PROMPT 2-second Reverse Transition
+// Intercept Outbound Clicks for BLOG ? PROMPT 2-second Reverse Transition
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
     if (!link) return;
@@ -1669,7 +1669,7 @@ document.addEventListener('click', (e) => {
         if (splash) {
             e.preventDefault(); // Intercept redirect
             
-            // Swap text positions to BLOG ➔ PROMPT
+            // Swap text positions to BLOG ? PROMPT
             const blogWordHTML = `<span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">B</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">L</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">O</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">G</span>`;
             const promptWordHTML = `<span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">R</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">O</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">M</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">T</span>`;
             

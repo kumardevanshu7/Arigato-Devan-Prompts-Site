@@ -1,82 +1,29 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <meta name="theme-color" content="#c084fc">
+    <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy &ndash; Arigato Devan Prompts</title>
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Arigato Devan Prompts">
-    <meta property="og:description" content="Discover the best AI prompts for Instagram Reels.">
-    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <meta property="og:url" content="https://arigatodevan.com/privacy.php">
-    <meta name="twitter:card" content="summary_large_image">
     <meta name="description" content="Privacy Policy for Arigato Devan PromptVerse — how we collect, use and protect your data.">
     <link rel="canonical" href="https://arigatodevan.com/privacy.php">
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <style>
-        .legal-wrap { max-width: 800px; margin: 0 auto; padding: 60px 24px 100px; position: relative; z-index: 2; }
-        .legal-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 48px; box-shadow: var(--shadow-comic); }
-        .legal-title { font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
-        .legal-date { font-size: .85rem; color: #888; font-weight: 600; margin-bottom: 32px; }
-        .legal-card h2 { font-size: 1.15rem; font-weight: 900; margin: 28px 0 10px; color: var(--primary-dark); }
-        .legal-card p, .legal-card li { font-size: .95rem; line-height: 1.8; color: #555; font-weight: 500; }
-        .legal-card ul { padding-left: 20px; margin: 8px 0; }
-        .legal-card a { color: var(--primary-dark); font-weight: 700; }
-        @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-title { font-size: 1.5rem; } }
-    </style>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <?php include_once 'includes/theme_head.php'; ?>
+    <link rel="stylesheet" href="css/info-pages.css?v=20260701">
     <?php include_once "gtag.php"; ?>
-    <style>
-        html, body { background: transparent !important; height: 100%; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
-    </style>
 </head>
-<body>
-    <!-- Aurora Background -->
-    <div class="aurora-bg" aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:transparent;">
-        <div style="position:absolute;width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);border-radius:50%;filter:blur(90px);opacity:.55;top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);border-radius:50%;filter:blur(90px);opacity:.55;bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);border-radius:50%;filter:blur(90px);opacity:.55;top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);border-radius:50%;filter:blur(90px);opacity:.55;bottom:10%;left:10%;animation:auroraFloat4 13s ease-in-out infinite;"></div>
-    </div>
-    <style>
-    .aurora-bg~*{position:relative;z-index:1;}
-    @keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
-    @keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
-    @keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
-    @keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-10%) scale(1.05);}}
-    </style>
-<header>
-    <div class="logo-area" style="cursor:pointer;" onclick="window.location='index.php'">
-        <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-    </div>
-    <nav class="nav-links">
-        <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-        <a href="blogs.php">BLOG</a>
-    </nav>
-    <div class="header-right">
-        <div class="header-divider"></div>
-        <?php if (isset($_SESSION["user_id"])): ?>
-            <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
-        <?php else: ?>
-            <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;">LOGIN</a>
-        <?php endif; ?>
-    </div>
-</header>
+<body class="page-store page-info theme-nogoda">
 
-<div class="legal-wrap">
+<?php $nav_active = ''; include 'includes/site_nav.php'; ?>
+<div class="nogoda-mesh" aria-hidden="true"></div>
+
+<main class="info-page-main">
     <div class="legal-card">
-        <div class="legal-title"><i class="fa-solid fa-lock" style="color:var(--primary-dark);"></i> Privacy Policy</div>
+        <h1><i class="fa-solid fa-lock"></i> Privacy Policy</h1>
         <div class="legal-date">Effective Date: May 24, 2026 &nbsp;&middot;&nbsp; arigatodevan.com</div>
 
         <p>Welcome to <strong>Arigato Devan PromptVerse</strong> ("we", "us", or "our"). We are committed to protecting your personal information and your right to privacy. This policy explains what information we collect, how we use it, and your rights regarding it.</p>
@@ -158,7 +105,7 @@ require_once "db.php";
         <p>For privacy-related questions or requests, contact us via our <a href="contact.php">Contact page</a> or email us directly at: <a href="mailto:devansh.grow@gmail.com">devansh.grow@gmail.com</a></p>
         <p>Instagram: <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener">@arigato.devan</a></p>
     </div>
-</div>
+</main>
 
 <?php include 'footer.php'; ?>
 

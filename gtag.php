@@ -148,7 +148,7 @@ if (!isset($_page_canonical)) {
   });
 })();
 </script>
-<!-- ── Custom cursor + Sound effects ── -->
+<!-- Custom cursor -->
 <style>
 #cc-dot,#cc-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s,opacity .15s;}
 #cc-dot{width:10px;height:10px;background:var(--primary-color,#c084fc);border:2.5px solid #2d2a35;}
@@ -159,8 +159,7 @@ if (!isset($_page_canonical)) {
 .cc-active #cc-ring{transform:translate(-50%,-50%) scale(.85);}
 html:has(#cc-dot){cursor:none!important;}
 html:has(#cc-dot) a,html:has(#cc-dot) button,html:has(#cc-dot) input,html:has(#cc-dot) textarea,html:has(#cc-dot) select,html:has(#cc-dot) [onclick],html:has(#cc-dot) [tabindex]{cursor:none!important;}
-#sound-toggle-btn{position:fixed;bottom:76px;right:20px;z-index:9998;width:40px;height:40px;border-radius:50%;background:var(--card-bg,#fff);border:2px solid #2d2a35;box-shadow:3px 3px 0 #2d2a35;font-size:1rem;line-height:1;cursor:none;display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;padding:0;}
-#sound-toggle-btn:hover{transform:translateY(-2px) scale(1.08);box-shadow:3px 5px 0 #2d2a35;}
+#sound-toggle-btn{display:none!important;}
 </style>
 <script>
 (function(){
@@ -187,19 +186,6 @@ html:has(#cc-dot) a,html:has(#cc-dot) button,html:has(#cc-dot) input,html:has(#c
     ring.style.left=rx+'px'; ring.style.top=ry+'px';
     requestAnimationFrame(anim);
   })();
-
-  /* ── Sound toggle button ── */
-  document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.createElement('button');
-    btn.id='sound-toggle-btn'; btn.title='Toggle sound effects';
-    var on=localStorage.getItem('arigatoSound')!=='off';
-    btn.innerHTML=on?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
-    btn.addEventListener('click',function(){
-      on=!on; localStorage.setItem('arigatoSound',on?'on':'off');
-      btn.innerHTML=on?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>';
-    });
-    document.body.appendChild(btn);
-  });
 })();
 
 /* ── Unlock sound (callable globally) ── */

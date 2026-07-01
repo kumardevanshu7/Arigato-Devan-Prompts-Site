@@ -13,6 +13,33 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION["user_id"]]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Fetch user statistics
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM unlocked_prompts WHERE user_id = ?");
+$stmt->execute([$_SESSION["user_id"]]);
+$unlocked_count = (int)$stmt->fetchColumn();
+
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM saved_prompts WHERE user_id = ?");
+$stmt->execute([$_SESSION["user_id"]]);
+$saved_count = (int)$stmt->fetchColumn();
+
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
+$stmt->execute([$_SESSION["user_id"]]);
+$likes_count = (int)$stmt->fetchColumn();
+
+// Fetch nav counts for header
+$nav_counts = [];
+try {
+    $stmt = $pdo->prepare("SELECT
+        SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
+        SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
+        SUM(CASE WHEN prompt_type = 'insta_viral' THEN 1 ELSE 0 END) as insta_viral,
+        SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
+        SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct
+    FROM prompts");
+    $stmt->execute();
+    $nav_counts = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $nav_counts = []; }
+
 // --- Avatar Pool ---
 $male_avatars = [
     "profiledp/b1.webp",
@@ -77,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (empty($errors)) {
         $pdo->prepare(
-            "UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?",
+            "UPDATE users SET username = ?, avatar = ?, gender = ?, onboarding_complete = 1 WHERE id = ?"
         )->execute([$username, $avatar, $gender, $_SESSION["user_id"]]);
 
         $_SESSION["username"] = $username;
@@ -100,284 +127,79 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile &ndash; Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <style>
-        body { min-height: 100vh; padding: 40px 16px 80px; background: var(--bg-color); }
-
-        .prof-wrap { max-width: 660px; margin: 0 auto; }
-
-        .prof-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: var(--text-color);
-            text-decoration: none;
-            margin-bottom: 24px;
-            padding: 8px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            transition: all 0.2s;
-        }
-        .prof-back:hover { border-color: var(--text-color); transform: translateX(-3px); }
-
-        .prof-card {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 28px;
-            padding: 44px;
-            box-shadow: var(--shadow-comic);
-        }
-
-        .prof-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 2px dashed var(--border-color);
-        }
-
-        .prof-current-avatar {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            border: var(--border-width) solid var(--text-color);
-            object-fit: cover;
-            box-shadow: var(--shadow-comic);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .prof-header-info h2 {
-            font-size: 1.6rem;
-            font-weight: 900;
-            margin-bottom: 4px;
-        }
-
-        .prof-header-info p {
-            font-size: 0.9rem;
-            color: #888;
-            font-weight: 600;
-        }
-
-        .ob-section { margin-bottom: 32px; }
-        .ob-section-title {
-            font-size: 0.95rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Avatar Grid */
-        .avatar-divider {
-            display: flex; align-items: center; gap: 12px;
-            margin: 14px 0 10px;
-            font-size: 0.75rem; font-weight: 700; color: #bbb;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .avatar-divider::before, .avatar-divider::after {
-            content: ''; flex: 1; height: 1px; background: var(--border-color);
-        }
-
-        .avatar-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
-
-        .avatar-option { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .avatar-option input[type="radio"] { display: none; }
-
-        .avatar-img-wrap {
-            width: 66px; height: 66px;
-            border-radius: 50%;
-            border: 3px solid var(--border-color);
-            overflow: hidden;
-            transition: all 0.2s ease-out;
-            background: var(--bg-color);
-        }
-        .avatar-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-
-        .avatar-option input[type="radio"]:checked + .avatar-img-wrap {
-            border-color: var(--text-color);
-            box-shadow: 3px 3px 0px var(--text-color);
-            transform: scale(1.1);
-        }
-        .avatar-option:hover .avatar-img-wrap { border-color: var(--primary-dark); transform: scale(1.05); }
-
-        /* Username */
-        .ob-input {
-            width: 100%;
-            padding: 13px 18px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 14px;
-            font-family: var(--font-main);
-            font-size: 1rem;
-            font-weight: 700;
-            background: var(--bg-color);
-            color: var(--text-color);
-            box-shadow: var(--shadow-comic);
-            outline: none;
-            transition: all 0.2s;
-            box-sizing: border-box;
-        }
-        .ob-input:focus { border-color: var(--primary-dark); box-shadow: var(--shadow-comic-hover); transform: translateY(-1px); }
-        .ob-input-hint { font-size: 0.8rem; color: #999; font-weight: 600; margin-top: 7px; }
-
-        /* Gender */
-        .gender-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .gender-option { cursor: pointer; display: block; }
-        .gender-option input[type="radio"] { display: none; }
-        .gender-box {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 8px; padding: 16px 10px;
-            border: var(--border-width) solid var(--border-color);
-            border-radius: 16px; font-weight: 800; font-size: 0.9rem;
-            transition: all 0.2s; background: var(--bg-color);
-            box-shadow: 2px 2px 0px transparent;
-        }
-        .gender-emoji { font-size: 1.6rem; line-height: 1; }
-        .gender-option:hover .gender-box { border-color: var(--text-color); transform: translateY(-2px); }
-        .gender-option input[type="radio"]:checked + .gender-box {
-            border-color: var(--text-color);
-            background: var(--primary-color);
-            box-shadow: 4px 4px 0px var(--text-color);
-            transform: translateY(-2px);
-        }
-
-        /* Success / Error */
-        .flash-success {
-            background: #d9f5e5; color: #1e5c36;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 14px; padding: 14px 18px;
-            font-weight: 700; margin-bottom: 24px;
-            box-shadow: 3px 3px 0px var(--text-color);
-            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .flash-error {
-            background: #ffe6e6; color: #a70000;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 14px; padding: 14px 18px;
-            font-weight: 700; margin-bottom: 24px;
-            box-shadow: 3px 3px 0px var(--text-color);
-        }
-        .flash-error ul { margin: 6px 0 0 18px; padding: 0; }
-        .flash-error li { margin-bottom: 4px; font-size: 0.95rem; }
-
-        /* Submit */
-        .prof-submit {
-            width: 100%; padding: 15px;
-            font-size: 1rem; font-weight: 900;
-            font-family: var(--font-main);
-            text-transform: uppercase; letter-spacing: 1px;
-            background: var(--secondary-color); color: var(--text-color);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 16px; cursor: pointer;
-            box-shadow: var(--shadow-comic);
-            transition: all 0.2s ease-out; margin-top: 6px;
-        }
-        .prof-submit:hover { transform: translateY(-3px); box-shadow: var(--shadow-comic-hover); background: var(--primary-color); }
-        .prof-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--text-color); }
-
-        @media (max-width: 500px) {
-            .prof-card { padding: 28px 18px 36px; }
-            .avatar-img-wrap { width: 52px; height: 52px; }
-        }
-    </style>
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <meta name="theme-color" content="#2F4156">
+    <title>Edit Profile — Arigato Devan Prompts</title>
+    <?php include_once 'includes/theme_head.php'; ?>
+    <link rel="stylesheet" href="css/profile-pages.css">
     <?php include_once "gtag.php"; ?>
-    <style>
-        html, body { background: transparent !important; height: 100%; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
-    </style>
 </head>
-<body>
-    <div class="prof-wrap">
+<body class="page-store theme-nogoda page-profile">
 
-        <a href="index.php" class="prof-back"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+<?php $nav_active = 'profile'; include 'includes/site_nav.php'; ?>
 
+<main class="prof-main">
+    <div class="profile-container-grid">
+        
+        <!-- Left: Form -->
         <div class="prof-card">
-
-            <!-- Current Avatar Preview Header -->
             <div class="prof-header">
-                <img loading="lazy" src="<?= htmlspecialchars(
-                    $user["avatar"] ?:
-                    "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
-                ) ?>"
+                <img loading="lazy" src="<?= htmlspecialchars(sessionAvatar()) ?>"
                      alt="Your Avatar" class="prof-current-avatar" id="live-avatar-preview" referrerpolicy="no-referrer">
                 <div class="prof-header-info">
-                    <h2><?= htmlspecialchars(
-                        $user["username"] ?? "Your Profile",
-                    ) ?></h2>
-                    <p>Update your profile anytime &mdash; no restrictions!</p>
+                    <h2>Edit Profile</h2>
+                    <p>Customize your profile & representation on Arigato Devan!</p>
                 </div>
             </div>
 
             <?php if ($success): ?>
-                <div class="flash-success"><i class="fa-solid fa-check"></i> Profile updated successfully!</div>
+                <div class="flash-success"><i class="fa-solid fa-circle-check"></i> Profile updated successfully!</div>
             <?php endif; ?>
             <?php if (!empty($errors)): ?>
                 <div class="flash-error">
                     <i class="fa-solid fa-triangle-exclamation"></i> Fix the following:
-                    <ul><?php foreach (
-                        $errors
-                        as $e
-                    ): ?><li><?= htmlspecialchars(
-    $e,
-) ?></li><?php endforeach; ?></ul>
+                    <ul>
+                        <?php foreach ($errors as $e): ?>
+                            <li><?= htmlspecialchars($e) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
             <?php endif; ?>
 
             <form method="POST">
-
                 <!-- Avatar Selection -->
                 <div class="ob-section">
-                    <div class="ob-section-title"><i class="fa-solid fa-user"></i> Avatar</div>
+                    <div class="prof-section-title"><i class="fa-solid fa-user-tag"></i> Choose Avatar</div>
+                    
+                    <div class="avatar-section">
+                        <div class="avatar-divider">Male Avatars</div>
+                        <div class="avatar-grid">
+                            <?php foreach ($male_avatars as $av): ?>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
+                                <div class="avatar-img-wrap">
+                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Avatar">
+                                </div>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
 
-                    <div class="avatar-divider">Male</div>
-                    <div class="avatar-grid">
-                        <?php foreach ($male_avatars as $av): ?>
-                        <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
-                                $av,
-                            ) ?>"
-                                <?= $cur_avatar === $av ? "checked" : "" ?>>
-                            <div class="avatar-img-wrap">
-                                <img loading="lazy" src="<?= htmlspecialchars(
-                                    $av,
-                                ) ?>" alt="Avatar" loading="lazy">
-                            </div>
-                        </label>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <div class="avatar-divider">Female</div>
-                    <div class="avatar-grid">
-                        <?php foreach ($female_avatars as $av): ?>
-                        <label class="avatar-option">
-                            <input type="radio" name="avatar" value="<?= htmlspecialchars(
-                                $av,
-                            ) ?>"
-                                <?= $cur_avatar === $av ? "checked" : "" ?>>
-                            <div class="avatar-img-wrap">
-                                <img loading="lazy" src="<?= htmlspecialchars(
-                                    $av,
-                                ) ?>" alt="Avatar" loading="lazy">
-                            </div>
-                        </label>
-                        <?php endforeach; ?>
+                        <div class="avatar-divider" style="margin-top:20px;">Female Avatars</div>
+                        <div class="avatar-grid">
+                            <?php foreach ($female_avatars as $av): ?>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
+                                <div class="avatar-img-wrap">
+                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Avatar">
+                                </div>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Username -->
                 <div class="ob-section">
-                    <div class="ob-section-title"><i class="fa-solid fa-pen-nib"></i> Username</div>
+                    <div class="prof-section-title"><i class="fa-solid fa-pen-nib"></i> Username</div>
                     <input type="text" name="username" class="ob-input"
                            id="username-input"
                            placeholder="3-15 characters"
@@ -391,28 +213,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <!-- Gender -->
                 <div class="ob-section">
-                    <div class="ob-section-title"><i class="fa-solid fa-venus-mars"></i> Gender</div>
+                    <div class="prof-section-title"><i class="fa-solid fa-venus-mars"></i> Gender / Identity</div>
                     <div class="gender-grid">
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="male" <?= $cur_gender ===
-                            "male"
-                                ? "checked"
-                                : "" ?>>
-                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-mars"></i></span> Male</div>
+                            <input type="radio" name="gender" value="male" <?= $cur_gender === "male" ? "checked" : "" ?>>
+                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-mars" style="color:#3b82f6;"></i></span> Male</div>
                         </label>
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="female" <?= $cur_gender ===
-                            "female"
-                                ? "checked"
-                                : "" ?>>
-                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-venus"></i></span> Female</div>
+                            <input type="radio" name="gender" value="female" <?= $cur_gender === "female" ? "checked" : "" ?>>
+                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-venus" style="color:#ec4899;"></i></span> Female</div>
                         </label>
                         <label class="gender-option">
-                            <input type="radio" name="gender" value="nonbinary" <?= $cur_gender ===
-                            "nonbinary"
-                                ? "checked"
-                                : "" ?>>
-                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-genderless"></i></span> Non-binary</div>
+                            <input type="radio" name="gender" value="nonbinary" <?= $cur_gender === "nonbinary" ? "checked" : "" ?>>
+                            <div class="gender-box"><span class="gender-emoji"><i class="fa-solid fa-genderless" style="color:#8b5cf6;"></i></span> Other</div>
                         </label>
                     </div>
                 </div>
@@ -420,32 +233,101 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <button type="submit" class="prof-submit">Save Changes <i class="fa-solid fa-wand-magic-sparkles"></i></button>
             </form>
         </div>
+        
+        <!-- Right: Stats & Info -->
+        <div class="prof-stats-card">
+            <h3>Your Statistics</h3>
+            <p class="prof-stats-sub">Track your interaction metrics and account details.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-pill">
+                    <span class="stat-val"><?= $unlocked_count ?></span>
+                    <span class="stat-lbl">Unlocked</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-val"><?= $saved_count ?></span>
+                    <span class="stat-lbl">Saved</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-val"><?= $likes_count ?></span>
+                    <span class="stat-lbl">Liked</span>
+                </div>
+            </div>
+            
+            <hr class="prof-divider">
+            
+            <h3>Account Details</h3>
+            
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-solid fa-envelope" style="color:#f59e0b;"></i></div>
+                    <div class="info-content">
+                        <div class="info-lbl">Email Address</div>
+                        <div class="info-val" title="<?= htmlspecialchars($user["email"] ?? "") ?>"><?= htmlspecialchars($user["email"] ?? "Linked Account") ?></div>
+                    </div>
+                    <div style="font-size:0.8rem; color:#10b981;" title="Verified Google Account"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-solid fa-calendar-days" style="color:#ec4899;"></i></div>
+                    <div class="info-content">
+                        <div class="info-lbl">Member Since</div>
+                        <div class="info-val"><?= date("d M Y", strtotime($user["created_at"] ?? "now")) ?></div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-solid fa-shield-halved" style="color:#6366f1;"></i></div>
+                    <div class="info-content">
+                        <div class="info-lbl">Account Status</div>
+                        <div class="info-val" style="text-transform: capitalize; color:<?= ($user["role"] ?? "member") === "admin" ? "#8b5cf6" : "inherit" ?>;"><?= htmlspecialchars($user["role"] ?? "Member") ?></div>
+                    </div>
+                </div>
+            </div>
+            
+            <?php if (isset($user["role"]) && $user["role"] === "admin"): ?>
+                <a href="dashboard.php" class="prof-admin-btn">
+                    <i class="fa-solid fa-toolbox"></i> Admin Control Panel
+                </a>
+            <?php endif; ?>
+        </div>
+
     </div>
+</main>
 
-    <script>
-        // Live char counter
-        const input   = document.getElementById('username-input');
-        const hint    = document.getElementById('char-counter');
-        input.addEventListener('input', () => {
-            const len = input.value.length;
-            if (len < 3)       { hint.textContent = `${len}/15 "Ã¢â‚¬Â Need at least 3`; hint.style.color = '#FF6B6B'; }
-            else if (len > 15) { hint.textContent = `${len}/15 "Ã¢â‚¬Â Too long!`;        hint.style.color = '#FF6B6B'; }
-            else               { hint.textContent = `${len}/15 ?`;                  hint.style.color = '#2ecc71'; }
-        });
+<?php include_once "footer.php"; ?>
 
-        // Live avatar preview in header
-        const preview = document.getElementById('live-avatar-preview');
-        document.querySelectorAll('input[name="avatar"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (preview) {
-                    preview.style.transform = 'scale(0.85)';
-                    setTimeout(() => {
-                        preview.src = radio.value;
-                        preview.style.transform = 'scale(1)';
-                    }, 150);
-                }
-            });
+<script>
+    // Live char counter
+    const input = document.getElementById('username-input');
+    const hint = document.getElementById('char-counter');
+    input.addEventListener('input', () => {
+        const len = input.value.length;
+        if (len < 3) {
+            hint.textContent = `${len}/15 - Need at least 3`;
+            hint.style.color = '#FF6B6B';
+        } else if (len > 15) {
+            hint.textContent = `${len}/15 - Too long!`;
+            hint.style.color = '#FF6B6B';
+        } else {
+            hint.textContent = `${len}/15 - Perfect!`;
+            hint.style.color = '#2ecc71';
+        }
+    });
+
+    // Live avatar preview
+    const preview = document.getElementById('live-avatar-preview');
+    document.querySelectorAll('input[name="avatar"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (preview) {
+                preview.style.transform = 'scale(0.85)';
+                setTimeout(() => {
+                    preview.src = radio.value;
+                    preview.style.transform = 'scale(1)';
+                }, 150);
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>

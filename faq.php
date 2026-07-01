@@ -20,224 +20,26 @@ if (isset($_SESSION['user_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ - Arigato Devan Prompts</title>
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* === Vintar Theme Clean Override === */
-        html, body {
-            background: #f9fafb !important; /* light grey/white background */
-            color: #111827 !important;
-            margin: 0; padding: 0;
-            font-family: var(--font-main, 'Outfit', sans-serif);
-        }
-        body::before { display: none !important; }
-        body::after { display: none !important; }
-        .aurora-bg, .scroll-bg-container { display: none !important; }
-
-        /* Remove header overrides to keep the site's global pill-shaped comic header */
-
-        .faq-wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 80px 24px;
-        }
-
-        .faq-hero {
-            text-align: center;
-            margin-bottom: 64px;
-        }
-        .faq-hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
-            color: #111827;
-        }
-        .faq-hero h1 span { color: #007bff; }
-        .faq-hero p {
-            font-size: 1.15rem;
-            color: #4b5563;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .faq-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        @media (max-width: 800px) {
-            .faq-grid { grid-template-columns: 1fr; gap: 60px; }
-        }
-
-        .faq-column h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: #111827;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 12px;
-        }
-
-        .faq-card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .faq-card:hover {
-            border-color: #d1d5db;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-
-        .faq-question {
-            width: 100%;
-            background: none;
-            border: none;
-            text-align: left;
-            padding: 20px 24px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #111827;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: inherit;
-        }
-        .faq-icon {
-            color: #007bff;
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-            flex-shrink: 0;
-            margin-left: 16px;
-        }
-        .faq-card.open .faq-icon {
-            transform: rotate(45deg);
-            color: #ef4444; /* changes to red 'x' visually, or keep blue */
-        }
-        
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .faq-answer-inner {
-            padding: 0 24px 24px;
-            color: #4b5563;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-        .faq-answer-inner a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .faq-answer-inner a:hover { text-decoration: underline; }
-
-        /* Vintar style Footer */
-        .vintar-footer {
-            background: #fff;
-            border-top: 1px solid #e5e7eb;
-            padding: 80px 24px 40px;
-            margin-top: 60px;
-        }
-        .vintar-footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-        }
-        .footer-col h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 20px;
-        }
-        .footer-col a {
-            display: block;
-            color: #4b5563;
-            text-decoration: none;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-        .footer-col a:hover { color: #007bff; }
-        .footer-col.newsletter p {
-            color: #4b5563;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-        .insta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #111827;
-            color: #fff !important;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .insta-btn:hover { background: #1f2937; }
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 40px auto 0;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 0.9rem;
-        }
-    </style>
+    <title>FAQ &ndash; Arigato Devan Prompts</title>
+    <meta name="description" content="Frequently asked questions about Arigato Devan Prompts — unlocking, login, viral reels, and more.">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <?php include_once 'includes/theme_head.php'; ?>
+    <link rel="stylesheet" href="css/info-pages.css?v=20260701">
+    <?php include_once "gtag.php"; ?>
 </head>
-<body>
+<body class="page-store page-info theme-nogoda">
 
-    <header>
-        <div class="logo-area" id="logo-container" style="cursor:pointer;" onclick="window.location='index.php'">
-            <div class="logo-flipper">
-                <div class="logo-front"><img src="toplogo/logo01.webp" alt="Arigato Devan Logo" id="profile-logo"></div>
-                <div class="logo-back"><img src="toplogo/logo02.webp" alt="Logo Alt" loading="lazy"></div>
-            </div>
-            <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-        </div>
-        <nav class="nav-links">
-            <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-            <a href="gallery.php">GALLERY</a>
-            <a href="blogs.php">BLOGS</a>
-            <a href="faq.php" title="FAQ" class="active" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
-        </nav>
-        <div class="header-right">
-            <div class="header-divider"></div>
-            <?php if (isset($_SESSION["user_id"])): ?>
-                <a href="profile.php" title="Profile" style="display:flex;align-items:center;">
-                    <?php if (!empty($_SESSION["profile_image"])): ?>
-                        <img loading="lazy" src="<?= htmlspecialchars($_SESSION["profile_image"]) ?>" referrerpolicy="no-referrer" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--primary-color);">
-                    <?php else: ?>
-                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-color);border:2px solid var(--text-color);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;"><?= strtoupper(substr($_SESSION["username"] ?? "U", 0, 1)) ?></div>
-                    <?php endif; ?>
-                </a>
-            <?php else: ?>
-                <a href="login.php" class="btn-primary" style="font-size:.82rem;padding:8px 16px;">Sign In</a>
-            <?php endif; ?>
-        </div>
-    </header>
+<?php $nav_active = ''; include 'includes/site_nav.php'; ?>
+<div class="nogoda-mesh" aria-hidden="true"></div>
 
-    <div class="faq-wrapper">
-        <div class="faq-hero">
-            <h1>Frequently Asked <span>Question</span></h1>
-            <p>We provide a secure, powerful platform to get the absolute best AI prompts directly from viral Instagram reels.</p>
+<main class="info-page-main info-page-main--wide">
+        <div class="info-page-hero">
+            <p class="hero-label">Help Center</p>
+            <h1>Frequently Asked <em>Questions</em></h1>
+            <p>Everything you need to know about unlocking prompts, logging in, and getting the best AI couple results.</p>
         </div>
 
         <div class="faq-grid">
@@ -363,34 +165,9 @@ if (isset($_SESSION['user_id'])) {
                 </div>
             </div>
         </div>
-    </div>
+</main>
 
-    <!-- Vintar Footer -->
-    <div class="vintar-footer">
-        <div class="vintar-footer-inner">
-            <div class="footer-col">
-                <h3>Company</h3>
-                <a href="about.php">About</a>
-                <a href="contact.php">Contact</a>
-                <a href="blogs.php">Blogs</a>
-                <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-            </div>
-            <div class="footer-col">
-                <h3>Legal</h3>
-                <a href="privacy.php">Privacy Policy</a>
-                <a href="terms.php">Terms of Service</a>
-                <a href="disclaimer.php">Disclaimer</a>
-            </div>
-            <div class="footer-col newsletter">
-                <h3>Subscribe to our Updates</h3>
-                <p>Follow us on Instagram to get notified whenever new prompts drop, exclusive behind-the-scenes, and much more.</p>
-                <a href="https://www.instagram.com/arigato.devan/" target="_blank" class="insta-btn"><i class="fa-brands fa-instagram"></i> Follow @arigato.devan</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; <?= date("Y") ?> ARIGATO DEVAN. ALL RIGHTS RESERVED.
-        </div>
-    </div>
+<?php include 'footer.php'; ?>
 
     <script>
     document.querySelectorAll('.faq-question').forEach(button => {

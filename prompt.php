@@ -75,17 +75,12 @@ $type_page    = match($ptype) {
     'direct'           => 'gallery.php', // Assuming there's no direct.php list page yet
     default            => 'gallery.php',
 };
-
-function sessionAvatar() {
-    return !empty($_SESSION["profile_image"])
-        ? $_SESSION["profile_image"]
-        : "https://api.dicebear.com/7.x/avataaars/svg?seed=" . urlencode($_SESSION["username"] ?? "user");
-}
+$is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="theme-color" content="#c084fc">
+    <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
@@ -129,180 +124,35 @@ function sessionAvatar() {
         'inLanguage'      => 'en',
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
     </script>
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <style>
-        .pp-wrap { max-width: 1100px; margin: 0 auto; padding: 20px 20px 80px; }
-        .pp-back { margin-bottom: 20px; }
-        .pp-back a { font-weight: 800; color: var(--text-color); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; padding: 8px 16px; background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 20px; box-shadow: 2px 2px 0 var(--text-color); transition: all .15s; }
-        .pp-back a:hover { box-shadow: 4px 4px 0 var(--text-color); transform: translateY(-1px); }
-        .pp-layout { display: flex; gap: 32px; align-items: flex-start; }
-        .pp-img-col { width: 300px; flex-shrink: 0; position: sticky; top: 100px; }
-        .pp-prompt-img { width: 100%; aspect-ratio: 9/16; object-fit: cover; border-radius: 20px; border: var(--border-width) solid var(--text-color); box-shadow: var(--shadow-comic); display: block; }
-        .pp-img-col.blurred .pp-prompt-img { filter: blur(8px); transform: scale(1.04); }
-        .pp-badge { display: inline-flex; align-items: center; font-size: 0.75rem; font-weight: 900; padding: 6px 14px; border-radius: 20px; border: 2px solid var(--text-color); box-shadow: 2px 2px 0 var(--text-color); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em; }
-        .pp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-        .pp-tag { font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--bg-color); border: 2px solid var(--text-color); text-transform: capitalize; }
-        .pp-like-mini { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-weight: 800; font-size: 0.9rem; color: #888; }
-        .pp-multi-badge { display:inline-flex; align-items:center; gap:8px; background:#fff1b8; color:#7a5c00; border:2.5px solid #e6a800; border-radius:14px; padding:8px 18px; font-weight:900; font-size:.88rem; margin-bottom:14px; box-shadow:3px 3px 0 #e6a800; letter-spacing:.03em; }
-        .pp-extra-section { margin-top:32px; border-top:2px dashed var(--border-color); padding-top:28px; }
-        .pp-extra-num { font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.12em; color:#888; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
-        .pp-extra-num::after { content:''; flex:1; height:2px; background:var(--border-color); }
-        .pp-extra-layout { display:flex; gap:32px; align-items:flex-start; }
-        .pp-extra-img-col { width:300px; flex-shrink:0; }
-        .pp-extra-img { width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:20px; border:var(--border-width) solid var(--text-color); box-shadow:var(--shadow-comic); display:block; }
-        .pp-extra-info { flex:1; min-width:0; }
-        .pp-extra-title { font-size:clamp(1.2rem,3vw,1.6rem); font-weight:900; margin-bottom:16px; line-height:1.2; }
-        @media(max-width:700px){.pp-extra-layout{flex-direction:column;} .pp-extra-img-col{width:100%;max-width:300px;}}
-        .pp-info-col { flex: 1; min-width: 0; }
-        .pp-title { color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.5); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; text-align: left; }
-        /* -- Task Card -- */
-        .pp-task-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 32px 28px; box-shadow: var(--shadow-comic); text-align: center; }
-        .pp-task-icon { font-size: 3rem; margin-bottom: 12px; }
-        .pp-task-card h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; }
-        .pp-task-card p { font-weight: 600; color: #555; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; }
-        .pp-reel-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--secondary-color); border: var(--border-width) solid var(--text-color); border-radius: 12px; padding: 10px 20px; font-weight: 800; font-family: var(--font-main); cursor: pointer; box-shadow: var(--shadow-comic); text-decoration: none; color: var(--text-color); margin-bottom: 20px; transition: all .15s; }
-        .pp-reel-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-2px); }
-        .pp-input-group { display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 0 auto; }
-        .pp-input-group input { padding: 14px 18px; border: var(--border-width) solid var(--text-color); border-radius: 14px; font-family: var(--font-main); font-size: 1rem; font-weight: 700; background: var(--card-bg); box-shadow: var(--shadow-comic); text-align: center; text-transform: uppercase; outline: none; }
-        .pp-input-group input:focus { border-color: var(--primary-dark); }
-        .pp-unlock-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; background: var(--primary-color); border: var(--border-width) solid var(--text-color); border-radius: 14px; font-weight: 900; font-size: 1rem; font-family: var(--font-main); cursor: pointer; box-shadow: var(--shadow-comic); transition: all .15s; color: var(--text-color); width: 100%; }
-        .pp-unlock-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-2px); }
-        .pp-unlock-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-        .pp-unlock-big { background: var(--secondary-color); font-size: 1.1rem; padding: 18px 32px; margin-top: 8px; }
-        /* -- Love Tap -- */
-        .pp-love-area { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 8px 0 20px; }
-        .pp-love-btn { font-size: 3.5rem; background: none; border: none; cursor: pointer; transition: transform .1s; line-height: 1; padding: 0; color: #e11d48; }
-        .pp-love-btn:active { transform: scale(0.85); }
-        .pp-love-btn:hover { color: #be123c; }
-        .pp-love-progress { font-size: 1.4rem; font-weight: 900; }
-        .pp-progress-bar { width: 200px; height: 10px; background: #eee; border-radius: 20px; border: 2px solid var(--text-color); overflow: hidden; }
-        .pp-progress-fill { height: 100%; background: var(--primary-dark); border-radius: 20px; transition: width .2s; }
-        /* -- Math -- */
-        .pp-math-q { font-size: 1.8rem; font-weight: 900; background: var(--secondary-color); border: var(--border-width) solid var(--text-color); border-radius: 14px; padding: 16px 24px; margin: 0 auto 20px; display: inline-block; box-shadow: var(--shadow-comic); }
-        /* -- Error -- */
-        .pp-error { background: #fff0f0; border: 2px solid #ff6b6b; color: #c00; border-radius: 12px; padding: 10px 16px; font-weight: 700; margin-top: 14px; font-size: 0.9rem; }
-        /* -- Content Section -- */
-        .pp-content-section { display: flex; flex-direction: column; gap: 16px; }
-        .pp-prompt-label { font-weight: 900; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
-        .pp-bwi-badge { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--text-color); border-radius: 20px; padding: 4px 14px; font-size: .78rem; font-weight: 900; box-shadow: 2px 2px 0 var(--text-color); }
-        .pp-code-block { border: var(--border-width) solid var(--text-color); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-comic); }
-        .pp-code-header { background: var(--text-color); color: #fff; padding: 8px 14px; font-size: 0.75rem; font-weight: 800; font-family: var(--font-main); display: flex; align-items: center; justify-content: space-between; letter-spacing: .08em; }
-        .pp-code-header-dots { display: flex; gap: 5px; }
-        .pp-code-header-dots span { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .pp-prompt-text { font-family: monospace; font-size: 0.9rem; font-weight: 500; background: #1e1e2e; color: #cdd6f4; padding: 16px; white-space: pre-wrap; word-break: break-word; line-height: 1.7; max-height: 220px; overflow-y: auto; display: block; }
-        .pp-prompt-text::-webkit-scrollbar { width: 6px; }
-        .pp-prompt-text::-webkit-scrollbar-track { background: #2a2a3e; }
-        .pp-prompt-text::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 4px; }
-        .pp-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .pp-btn { flex: 1; min-width: 110px; padding: 12px; border: var(--border-width) solid var(--text-color); border-radius: 12px; font-weight: 800; font-family: var(--font-main); cursor: pointer; box-shadow: var(--shadow-comic); transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; text-transform: uppercase; }
-        .pp-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-1px); }
-        .pp-copy-btn { background: var(--primary-color); color: var(--text-color); }
-        .pp-save-btn { background: var(--secondary-color); color: var(--text-color); }
-        .pp-like-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 12px; font-weight: 800; font-family: var(--font-main); font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-comic); transition: all .15s; color: var(--text-color); }
-        .pp-like-btn:hover { box-shadow: var(--shadow-comic-hover); transform: translateY(-1px); }
-        .pp-like-btn .liked-heart { color: #ff6b6b; }
-        .pp-like-btn.is-liked { background: rgba(255,107,107,.15); border-color: #ff6b6b; }
-        /* -- Assets -- */
-        .pp-assets { border-top: var(--border-width) solid var(--text-color); padding-top: 16px; margin-top: 4px; }
-        .pp-assets-title { font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-        .pp-assets-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-        .pp-assets-grid img { width: 100px; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; border: var(--border-width) solid var(--text-color); }
-        /* -- Related -- */
-        .pp-related { margin-top: 48px; }
-        .pp-related h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; }
-        .pp-rel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .pp-rel-card { display: block; text-decoration: none; color: #fff; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 6px 15px rgba(0,0,0,0.3); transition: all .2s; background: rgba(30, 30, 35, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .pp-rel-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateY(-3px); border-color: rgba(255,255,255,0.4); }
-        .pp-rel-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .pp-rel-card-title { padding: 12px 14px; font-weight: 800; font-size: 0.85rem; line-height: 1.3; color: #fff; }
-        /* -- Mobile -- */
-        @media (max-width: 768px) {
-            .pp-layout { flex-direction: column; }
-            .pp-img-col { width: 100%; position: static; max-width: 320px; margin: 0 auto; }
-            .pp-rel-grid { grid-template-columns: repeat(2, 1fr); }
-            .pp-task-card { padding: 24px 18px; }
-            .pp-math-q { font-size: 1.4rem; }
-        }
-        @media (max-width: 480px) {
-            .pp-wrap { padding: 16px 14px 60px; }
-            .pp-rel-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        }
-    </style>
+    <?php include_once 'includes/theme_head.php'; ?>
     <?php include_once "gtag.php"; ?>
-    <style>
-        html, body { background: transparent !important; min-height: 100vh; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
-    </style>
 </head>
-<body>
-      <div class="prompt-custom-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; margin: 15px auto 25px; max-width: 1100px; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--text-color); box-shadow: 4px 4px 0 var(--text-color); width: calc(100% - 40px); position: relative; z-index: 999;">
-          <div class="logo-area" onclick="location.href='index.php'" style="cursor:pointer; margin:0;">
-              <div class="logo-flipper">
-                  <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo"></div>
-                  <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt="Logo"></div>
-              </div>
-              <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-          </div>
-          
-          <div class="prompt-dots-menu" style="position:relative;">
-              <button id="prompt-nav-toggle" style="background:var(--bg-color); border:2px solid var(--text-color); border-radius:12px; padding:6px 14px; cursor:pointer; font-size:1.3rem; color:var(--text-color); box-shadow:2px 2px 0 var(--text-color); transition:all 0.15s; display:flex; align-items:center; justify-content:center;">
-                  <i class="fa-solid fa-ellipsis-vertical"></i>
-              </button>
-              <div id="prompt-nav-dropdown" style="display:none; position:absolute; top:calc(100% + 10px); right:0; background:var(--card-bg); border:2px solid var(--text-color); border-radius:14px; box-shadow:4px 4px 0 var(--text-color); min-width:180px; z-index:1000; flex-direction:column; overflow:hidden;">
-                  <a href="index.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Home</a>
-                  <a href="gallery.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-images"></i> Gallery</a>
-                  <a href="digital_store/index.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-shop"></i> Shop</a>
-                  <a href="blogs.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
-                  <?php if(isset($_SESSION['user_id'])): ?>
-                  <a href="profile.php" style="padding:12px 16px; text-decoration:none; color:var(--text-color); font-family:var(--font-main); font-weight:800; display:flex; align-items:center; gap:10px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-user"></i> Profile</a>
-                  <?php endif; ?>
-              </div>
-          </div>
-      </div>
-      <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          var toggle = document.getElementById('prompt-nav-toggle');
-          var dropdown = document.getElementById('prompt-nav-dropdown');
-          if(toggle && dropdown) {
-              toggle.addEventListener('click', function(e) {
-                  e.stopPropagation();
-                  dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
-              });
-              document.addEventListener('click', function() {
-                  dropdown.style.display = 'none';
-              });
-              dropdown.addEventListener('click', function(e) {
-                  e.stopPropagation();
-              });
-          }
-      });
-      </script>
+<body class="page-store theme-nogoda page-prompt">
 
-
+<?php $nav_active = 'gallery'; include 'includes/site_nav.php'; ?>
+<div class="nogoda-mesh" aria-hidden="true"></div>
     <div class="pp-wrap">
   
         <div class="pp-layout">
             <!-- Image Column -->
             <div class="pp-img-col <?= ($ptype === 'unreleased' && !$is_unlocked) ? 'blurred' : '' ?>" id="pp-img-col">
-                <div class="pp-badge" style="background:<?= $tinfo['bg'] ?>;color:<?= $tinfo['color'] ?>;">
-                    <?= $tinfo['label'] ?>
+                <div class="pp-img-frame">
+                    <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
+                    <span class="pp-badge"><?= $tinfo['label'] ?></span>
                 </div>
-                <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
-                <div class="pp-like-mini">
-                    <i class="fa-solid fa-heart" style="color:#ff6b6b;"></i>
-                    <span id="pp-like-count-mini"><?= (int)$p['likes_count'] ?></span> likes
+                <div class="pp-img-meta">
+                    <div class="pp-like-mini">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="pp-like-count-mini"><?= (int)$p['likes_count'] ?></span> likes
+                    </div>
+                    <?php if (!empty($tags_arr)): ?>
+                    <div class="pp-tags">
+                        <?php foreach ($tags_arr as $t): ?>
+                            <span class="pp-tag"><?= htmlspecialchars(ucfirst($t)) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php if (!empty($tags_arr)): ?>
-                <div class="pp-tags">
-                    <?php foreach ($tags_arr as $t): ?>
-                        <span class="pp-tag"><?= htmlspecialchars(ucfirst($t)) ?></span>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
             </div>
 
             <!-- Info Column -->
@@ -382,11 +232,15 @@ function sessionAvatar() {
 
                 <!-- -- CONTENT SECTION (shown when unlocked) -- -->
                 <div id="pp-content" class="pp-content-section" <?= !$is_unlocked ? 'style="display:none;"' : '' ?>>
-                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <div class="pp-prompt-head">
                         <span class="pp-prompt-label"><i class="fa-solid fa-scroll"></i> THE PROMPT:</span>
                         <?php if (!empty($p['best_works_in'])): ?>
-                        <span class="pp-bwi-badge" style="background:<?= $p['best_works_in'] === 'nano_banana' ? '#ffe066' : '#10a37f' ?>;color:<?= $p['best_works_in'] === 'nano_banana' ? '#2d2a35' : '#fff' ?>;">
-                            <?= $p['best_works_in'] === 'nano_banana' ? '<i class="fa-solid fa-star"></i> Best in Nano Banana' : '<i class="fa-solid fa-robot"></i> Best in ChatGPT' ?>
+                        <span class="pp-bwi-badge <?= $p['best_works_in'] === 'nano_banana' ? 'pp-bwi-nano' : 'pp-bwi-chatgpt' ?>">
+                            <?php if ($p['best_works_in'] === 'nano_banana'): ?>
+                                <i class="fa-solid fa-banana"></i> Best in Nano Banana
+                            <?php else: ?>
+                                <i class="fa-solid fa-robot"></i> Best in ChatGPT
+                            <?php endif; ?>
                         </span>
                         <?php endif; ?>
                     </div>
@@ -401,15 +255,15 @@ function sessionAvatar() {
                     </div>
 
                     <div class="pp-actions">
-                        <button class="pp-btn pp-copy-btn" id="pp-copy-btn"><i class="fa-solid fa-copy"></i> COPY</button>
-                        <button class="pp-btn pp-save-btn" id="pp-save-btn" data-prompt-id="<?= $id ?>" data-saved="<?= $p['is_saved'] ? 'true' : 'false' ?>">
+                        <button type="button" class="pp-btn pp-copy-btn" id="pp-copy-btn"><i class="fa-solid fa-copy"></i> COPY</button>
+                        <button type="button" class="pp-btn pp-save-btn" id="pp-save-btn" data-prompt-id="<?= $id ?>" data-saved="<?= $p['is_saved'] ? 'true' : 'false' ?>">
                             <i class="fa-solid fa-bookmark"></i> <span id="pp-save-label"><?= $p['is_saved'] ? 'SAVED' : 'SAVE' ?></span>
                         </button>
                         <button class="pp-like-btn <?= $p['is_liked'] ? 'is-liked' : '' ?>" id="pp-like-btn" data-prompt-id="<?= $id ?>">
                             <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>" id="pp-like-icon"></i>
                             <span id="pp-like-count"><?= (int)$p['likes_count'] ?></span>
                         </button>
-                        <button class="pp-btn" id="pp-share-btn" style="background:var(--card-bg);flex:0;padding:12px 16px;"><i class="fa-solid fa-share-nodes"></i> SHARE</button>
+                        <button type="button" class="pp-btn pp-share-btn" id="pp-share-btn"><i class="fa-solid fa-share-nodes"></i> SHARE</button>
                     </div>
 
                     <?php if (!empty($asset_images) || !empty($p['asset_title'])): ?>
@@ -463,7 +317,7 @@ function sessionAvatar() {
             <h2>More <?= htmlspecialchars($tinfo['label']) ?> Prompts</h2>
             <div class="pp-rel-grid">
                 <?php foreach ($related as $r): ?>
-                <a href="<?= !empty($r['slug']) ? '/prompts/' . htmlspecialchars($r['slug']) : 'prompt.php?id=' . $r['id'] ?>" class="pp-rel-card">
+                <a href="<?= (!$is_local && !empty($r['slug'])) ? '/prompts/' . htmlspecialchars($r['slug']) : 'prompt.php?id=' . $r['id'] ?>" class="pp-rel-card">
                     <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy">
                     <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
                 </a>
@@ -476,6 +330,7 @@ function sessionAvatar() {
     <?php include 'footer.php'; ?>
 
     <script>
+    const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
     const promptId = <?= $id ?>;
     const ptype    = '<?= $ptype ?>';
 
@@ -512,10 +367,32 @@ function sessionAvatar() {
         content.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function copyToClipboard(text) {
+        if (!text || !text.trim()) return Promise.reject(new Error('empty'));
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text).catch(function() {
+                return copyToClipboardFallback(text);
+            });
+        }
+        return copyToClipboardFallback(text);
+    }
+    function copyToClipboardFallback(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        return Promise.resolve();
+    }
+
     function copyExtra(idx, btn) {
         const el = document.getElementById('pp-extra-text-' + idx);
         if (!el || !el.textContent.trim()) return;
-        navigator.clipboard.writeText(el.textContent.trim()).then(function() {
+        copyToClipboard(el.textContent.trim()).then(function() {
             btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
             setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-copy"></i> COPY', 2000);
         });
@@ -625,17 +502,17 @@ function sessionAvatar() {
     }
 
 
-    // -- COPY --
+    // -- COPY (with fallback for non-HTTPS / arigato.local) --
     const copyBtn = document.getElementById('pp-copy-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
             const text = document.getElementById('pp-prompt-text').textContent;
-            navigator.clipboard.writeText(text).then(() => {
+            copyToClipboard(text).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
                 setTimeout(() => this.innerHTML = '<i class="fa-solid fa-copy"></i> COPY', 2000);
                 const fd = new FormData(); fd.append('action','copy'); fd.append('prompt_id', promptId);
                 fetch('track.php', {method:'POST', body:fd});
-            });
+            }).catch(function() { showError('Could not copy — try selecting the text manually.'); });
         });
     }
 

@@ -153,12 +153,23 @@ try {
             "ALTER TABLE prompts ADD COLUMN asset_title VARCHAR(255) DEFAULT NULL",
             "ALTER TABLE prompts ADD COLUMN asset_images TEXT DEFAULT NULL",
             "ALTER TABLE prompts ADD COLUMN slug VARCHAR(255) DEFAULT NULL",
+            "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
+            "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
         ];
         foreach ($prompt_alters as $sql) {
             try { $pdo->exec($sql); } catch (PDOException $e) {}
         }
 
         $_SESSION['_db_migrations_done'] = true;
+    }
+
+    // Newer columns — always try (idempotent); session flag may skip older batch
+    $prompt_alters_late = [
+        "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
+        "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
+    ];
+    foreach ($prompt_alters_late as $sql) {
+        try { $pdo->exec($sql); } catch (PDOException $e) {}
     }
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());

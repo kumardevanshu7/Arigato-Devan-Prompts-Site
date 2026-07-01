@@ -1,80 +1,26 @@
-﻿<?php session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <meta name="theme-color" content="#c084fc">
+    <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service &ndash; Arigato Devan Prompts</title>
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Arigato Devan Prompts">
-    <meta property="og:description" content="Discover the best AI prompts for Instagram Reels.">
-    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <meta property="og:url" content="https://arigatodevan.com/terms.php">
-    <meta name="twitter:card" content="summary_large_image">
     <meta name="description" content="Terms of Service for Arigato Devan PromptVerse. Usage rules, ownership, and platform guidelines.">
     <link rel="canonical" href="https://arigatodevan.com/terms.php">
-    <link rel="stylesheet" href="style.min.css?v=20260601">
-    <style>
-        .legal-wrap { max-width: 780px; margin: 40px auto; padding: 0 24px 100px; }
-        .legal-card { background: var(--card-bg); border: var(--border-width) solid var(--text-color); border-radius: 24px; padding: 48px 48px; box-shadow: var(--shadow-comic); }
-        .legal-card h1 { font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; }
-        .legal-date { font-size: 0.85rem; font-weight: 600; color: #888; margin-bottom: 32px; }
-        .legal-card h2 { font-size: 1.3rem; font-weight: 900; margin-top: 36px; margin-bottom: 10px; padding-left: 12px; border-left: 4px solid var(--primary-dark); }
-        .legal-card p, .legal-card li { font-size: 1.05rem; line-height: 1.7; color: #444; margin-bottom: 14px; font-weight: 500; }
-        .legal-card ul { padding-left: 24px; }
-        .legal-card li { margin-bottom: 10px; }
-        .legal-highlight { background: var(--secondary-color); border: var(--border-width) solid var(--text-color); border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-weight: 700; color: var(--text-color); box-shadow: 3px 3px 0px var(--text-color); }
-        @media (max-width: 600px) { .legal-card { padding: 28px 20px; } .legal-card h1 { font-size: 1.8rem; } }
-    </style>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <?php include_once 'includes/theme_head.php'; ?>
+    <link rel="stylesheet" href="css/info-pages.css?v=20260701">
     <?php include_once "gtag.php"; ?>
-    <style>
-        html, body { background: transparent !important; height: 100%; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
-    </style>
 </head>
-<body>
-    <!-- Aurora Background -->
-    <div class="aurora-bg" aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:transparent;">
-        <div style="position:absolute;width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);border-radius:50%;filter:blur(90px);opacity:.55;top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);border-radius:50%;filter:blur(90px);opacity:.55;bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);border-radius:50%;filter:blur(90px);opacity:.55;top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);border-radius:50%;filter:blur(90px);opacity:.55;bottom:10%;left:10%;animation:auroraFloat4 13s ease-in-out infinite;"></div>
-    </div>
-    <style>
-    .aurora-bg~*{position:relative;z-index:1;}
-    @keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
-    @keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
-    @keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
-    @keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-10%) scale(1.05);}}
-    </style>
-    <header>
-        <div class="logo-area"  style="cursor:pointer;">
-            <div class="logo-flipper">
-                <div class="logo-front">
-                    <img src="toplogo/logo01.webp" alt="Logo">
-                </div>
-                <div class="logo-back">
-                    <img loading="lazy" src="toplogo/logo02.webp" alt="Logo Alt">
-                </div>
-            </div>
-            <div class="logo-text">ARIGATO<br>DEVAN</div>
-        </div>
-        <nav class="nav-links">
-            <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-            <a href="gallery.php">GALLERY</a>
-        </nav>
-    </header>
+<body class="page-store page-info theme-nogoda">
 
-    <div class="legal-wrap">
-        <div class="legal-card">
-            <h1>Terms of Service</h1>
+<?php $nav_active = ''; include 'includes/site_nav.php'; ?>
+<div class="nogoda-mesh" aria-hidden="true"></div>
+
+<main class="info-page-main">
+    <div class="legal-card">
+        <h1>Terms of Service</h1>
             <div class="legal-date">Effective Date: <?= date("F d, Y") ?></div>
 
             <div class="legal-highlight">
@@ -126,11 +72,11 @@
             <h2>8. Contact</h2>
             <p>For any questions regarding these Terms, reach out via Instagram: <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="color:var(--primary-dark); font-weight:700;">@arigato.devan</a></p>
 
-            <div style="text-align:center; margin-top:40px;">
-                <a href="index.php" class="comic-btn-small"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+            <div style="text-align:center; margin-top:32px;">
+                <a href="index.php" class="cta-btn cta-btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
             </div>
         </div>
-    </div>
+</main>
 
     <?php include 'footer.php'; ?>
 </body>

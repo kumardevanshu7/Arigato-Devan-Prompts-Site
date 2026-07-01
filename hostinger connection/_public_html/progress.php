@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 $curPage = basename($_SERVER["PHP_SELF"]);
@@ -111,177 +111,35 @@ $milestones = [
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Growth Journey &mdash; Arigato Devan Prompts</title>
-<meta name="description" content="The story of growing from 693 followers to 10,000+ &mdash; a visual journey.">
-    <link rel="canonical" href="https://arigatodevan.com/progress.php">
-<link rel="stylesheet" href="style.min.css?v=20260601">
-    <link rel='preload' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' as='style' onload='this.onload=null;this.rel="stylesheet"'>
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
-.pg-bg{position:fixed;inset:0;background:linear-gradient(135deg,#fdf6ec 0%,#f0e8ff 50%,#fce8f3 100%);z-index:-2}
-.pg-bg::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");z-index:-1}
-
-/* NAV override for progress page */
-.progress-hero{text-align:center;padding:100px 20px 60px;position:relative;z-index:2}
-.progress-hero h1{font-size:clamp(2rem,5vw,4rem);font-weight:900;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,#2d2a35,#7c3aed,#2d2a35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.progress-hero p{font-size:1.15rem;color:#666;font-weight:600;max-width:500px;margin:0 auto 24px}
-.hero-stat{display:inline-flex;align-items:center;gap:10px;background:#fff;border:2.5px solid #2d2a35;border-radius:40px;padding:12px 28px;font-weight:900;font-size:1.1rem;box-shadow:4px 4px 0 #2d2a35}
-
-/* ROPE TIMELINE */
-.timeline-wrap{position:relative;max-width:900px;margin:0 auto;padding:0 20px 120px}
-.rope{position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:6px;background:linear-gradient(to bottom,#c9a87c 0%,#a0784a 30%,#c9a87c 60%,#a0784a 100%);border-radius:3px;box-shadow:2px 0 8px rgba(0,0,0,0.15),-1px 0 0 rgba(255,255,255,0.3);z-index:1}
-.rope::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:20px;background:#a0784a;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-
-/* TIMELINE ITEMS */
-.tl-item{display:flex;align-items:flex-start;margin-bottom:70px;position:relative;z-index:2}
-.tl-item.side-left{flex-direction:row;justify-content:flex-start;padding-right:calc(50% + 40px)}
-.tl-item.side-right{flex-direction:row-reverse;justify-content:flex-start;padding-left:calc(50% + 40px)}
-.tl-item.side-center{justify-content:center;padding:0}
-
-/* CONNECTOR DOT */
-.tl-dot{position:absolute;left:50%;transform:translateX(-50%);width:18px;height:18px;background:#fff;border:3px solid #2d2a35;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:3;top:30px}
-.tl-item.side-center .tl-dot{display:none}
-
-/* POLAROID CARDS */
-.polaroid{background:#fff;padding:14px 14px 40px;box-shadow:4px 6px 20px rgba(0,0,0,0.18);border:1px solid #e0d8cc;display:inline-block;cursor:pointer;transition:transform 0.3s ease,box-shadow 0.3s ease}
-.polaroid img{width:100%;height:auto;display:block;border:1px solid #f0ece6}
-.polaroid .caption{margin-top:10px;text-align:center}
-.polaroid .caption .count{font-size:1.1rem;font-weight:900;color:#2d2a35;display:block;line-height:1.2}
-.polaroid .caption .label{font-size:0.78rem;color:#888;font-weight:600;display:block;margin-top:3px}
-
-/* PIN */
-.pin{position:absolute;top:-16px;left:50%;transform:translateX(-50%);z-index:10}
-.pin svg{drop-shadow:0 2px 4px rgba(0,0,0,0.3)}
-
-/* Rope connector line from dot to card */
-.tl-connector{position:absolute;top:39px;height:2px;background:repeating-linear-gradient(90deg,#a0784a 0 6px,transparent 6px 12px);z-index:0}
-.side-left .tl-connector{right:calc(50% + 9px);width:40px}
-.side-right .tl-connector{left:calc(50% + 9px);width:40px}
-
-/* SIZES &mdash; increased for visual impact */
-.size-sm .polaroid{width:260px;transform:rotate(-2deg)}
-.size-sm .polaroid:hover{transform:rotate(0deg) scale(1.05)}
-.size-md .polaroid{width:300px;transform:rotate(1.5deg)}
-.size-md .polaroid:hover{transform:rotate(0deg) scale(1.05)}
-.size-lg .polaroid{width:330px;transform:rotate(-1.5deg)}
-.size-lg .polaroid:hover{transform:rotate(0deg) scale(1.05)}
-.side-right .polaroid{transform:rotate(-2.5deg)}
-.side-right .size-md .polaroid{transform:rotate(1.8deg)}
-.side-right .size-lg .polaroid{transform:rotate(2deg)}
-
-/* HERO &mdash; 1M Views */
-.size-hero{display:flex;flex-direction:column;align-items:center;width:100%}
-.size-hero .polaroid{width:min(360px,90vw);transform:rotate(0deg);border:3px solid #7c3aed;box-shadow:0 0 40px rgba(124,58,237,0.4),0 0 0 6px rgba(124,58,237,0.1),4px 8px 24px rgba(0,0,0,0.2);animation:heroGlow 3s ease-in-out infinite}
-.size-hero .polaroid:hover{transform:scale(1.03)}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;padding:8px 22px;border-radius:40px;font-weight:900;font-size:0.9rem;margin-bottom:16px;box-shadow:0 4px 16px rgba(124,58,237,0.4)}
-@keyframes heroGlow{0%,100%{box-shadow:0 0 30px rgba(124,58,237,0.3),4px 8px 24px rgba(0,0,0,0.2)}50%{box-shadow:0 0 60px rgba(124,58,237,0.6),0 0 0 8px rgba(124,58,237,0.12),4px 8px 24px rgba(0,0,0,0.2)}}
-
-/* FINALE &mdash; 10K */
-.size-finale{display:flex;flex-direction:column;align-items:center;width:100%}
-.size-finale .polaroid{width:min(400px,92vw);transform:rotate(0deg);border:3px solid #f59e0b;box-shadow:0 0 50px rgba(245,158,11,0.5),0 0 0 8px rgba(245,158,11,0.1),4px 10px 30px rgba(0,0,0,0.25);animation:finaleShine 4s ease-in-out infinite}
-.size-finale .polaroid:hover{transform:scale(1.02)}
-.finale-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:10px 28px;border-radius:40px;font-weight:900;font-size:1rem;margin-bottom:16px;box-shadow:0 4px 20px rgba(245,158,11,0.5)}
-@keyframes finaleShine{0%,100%{box-shadow:0 0 40px rgba(245,158,11,0.4),4px 10px 30px rgba(0,0,0,0.2)}50%{box-shadow:0 0 80px rgba(245,158,11,0.7),0 0 0 12px rgba(245,158,11,0.1),4px 10px 30px rgba(0,0,0,0.2)}}
-
-/* SCROLL ANIMATIONS */
-.tl-item{opacity:0;transform:translateY(40px)}
-.tl-item.side-left{transform:translateX(-50px) translateY(20px)}
-.tl-item.side-right{transform:translateX(50px) translateY(20px)}
-.tl-item.visible{opacity:1;transform:translate(0,0);transition:opacity 0.6s ease,transform 0.6s cubic-bezier(0.34,1.56,0.64,1)}
-
-/* END MARKER */
-.rope-end{text-align:center;padding:40px 20px;position:relative;z-index:2}
-.rope-end-badge{display:inline-flex;align-items:center;gap:10px;background:#2d2a35;color:#fff;padding:14px 32px;border-radius:40px;font-weight:900;font-size:1rem;box-shadow:4px 4px 0 #7c3aed}
-
-/* MOBILE */
-@media(max-width:640px){
-.tl-item.side-left,.tl-item.side-right{flex-direction:column;align-items:center;padding:0;justify-content:center}
-.tl-connector{display:none}
-.rope{left:20px;transform:none;width:4px}
-.tl-dot{left:20px}
-.tl-item.side-left,.tl-item.side-right,.tl-item.side-center{padding-left:50px;justify-content:flex-start}
-.size-sm .polaroid,.size-md .polaroid,.size-lg .polaroid{width:240px}
-}
-</style>
-    <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Our Journey","item":"https://arigatodevan.com/progress.php"}]}
-    </script>
-    <?php include_once "gtag.php"; ?>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2F4156">
+<title>Growth Journey — Arigato Devan Prompts</title>
+<meta name="description" content="The story of growing from 693 followers to 10,000+ — a visual journey.">
+<link rel="canonical" href="https://arigatodevan.com/progress.php">
+<?php include_once 'includes/theme_head.php'; ?>
+<link rel="stylesheet" href="css/progress-page.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Our Journey","item":"https://arigatodevan.com/progress.php"}]}
+</script>
+<?php include_once "gtag.php"; ?>
 </head>
-<body>
-<div class="pg-bg"></div>
+<body class="page-store theme-nogoda page-progress">
 
-<header>
-    <div class="logo-area"  style="cursor:pointer">
-        <div class="logo-flipper">
-            <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-            <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
-        </div>
-        <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
-    </div>
-    <nav class="nav-links">
-        <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-        <a href="gallery.php">GALLERY</a>
-        <a href="blogs.php">BLOGS</a>
-        <a href="progress.php" title="Growth Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-            <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
-        <div class="nav-dropdown">
-            <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-            <div class="nav-dropdown-menu">
-                <a href="secret_code.php" <?= $curPage == "secret_code.php"
-                    ? 'style="background:var(--primary-color)"'
-                    : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty(
-    $nav_counts["secret_code"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "secret_code.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                <a href="unreleased.php" <?= $curPage == "unreleased.php"
-                    ? 'style="background:var(--primary-color)"'
-                    : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty(
-    $nav_counts["unreleased"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "unreleased.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-                <a href="insta_viral.php" <?= $curPage == "insta_viral.php"
-                    ? 'style="background:var(--primary-color)"'
-                    : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty(
-    $nav_counts["insta_viral"]
-)
-    ? '<span class="dd-tag soon">SOON</span>'
-    : ($curPage == "insta_viral.php"
-        ? '<span class="dd-tag">ACTIVE</span>'
-        : "") ?></a>
-            </div>
-        </div>
-        <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
-            <i class="fa-brands fa-instagram" style="font-size:18px;"></i>
-            <span style="font-weight:600;">@arigato.devan</span><span class="pulse-dot"></span><span style="font-weight:800;font-size:1.1rem;">15K+</span>
-        </a>
-    </nav>
-    <div class="header-right">
-        <div class="header-divider"></div>
-        <?php if (isset($_SESSION["user_id"])): ?>
-            <a href="login.php?logout=1" class="logout"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
-        <?php else: ?>
-            <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
-        <?php endif; ?>
-    </div>
-</header>
+<?php $nav_active = 'progress'; include 'includes/site_nav.php'; ?>
 
 <!-- HERO -->
 <div class="progress-hero">
-    <p style="font-size:0.9rem;font-weight:700;letter-spacing:3px;color:#7c3aed;text-transform:uppercase;margin-bottom:12px;"><i class="fa-solid fa-chart-line"></i> Growth Story</p>
-    <h1>From 0 to<br>10,000+</h1>
-    <p>A real, raw, emotional journey of building an Instagram community from scratch &mdash; one prompt at a time.</p>
-    <div class="hero-stat"><i class="fa-brands fa-instagram" style="color:#dc2743;"></i> 13 Milestones &nbsp;&middot;&nbsp; <i class="fa-solid fa-eye" style="color:#7c3aed;"></i> 1M+ Views &nbsp;&middot;&nbsp; <i class="fa-solid fa-users" style="color:#f59e0b;"></i> 10K+ Family</div>
+    <p class="hero-eyebrow"><i class="fa-solid fa-chart-line"></i> Growth Story</p>
+    <h1>From 0 to<br><em>10,000+</em></h1>
+    <p>A real, raw, emotional journey of building an Instagram community from scratch — one prompt at a time.</p>
+    <div class="hero-stat">
+        <span><i class="fa-brands fa-instagram" style="color:#dc2743;"></i> 13 Milestones</span>
+        <span style="opacity:0.4;">·</span>
+        <span><i class="fa-solid fa-eye" style="color:#7c3aed;"></i> 1M+ Views</span>
+        <span style="opacity:0.4;">·</span>
+        <span><i class="fa-solid fa-users" style="color:#f59e0b;"></i> 10K+ Family</span>
+    </div>
 </div>
 
 <!-- TIMELINE -->
@@ -289,13 +147,13 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
     <div class="rope"></div>
 
     <!-- ORIGIN MARKER: Started from 0 -->
-    <div style="text-align:center;position:relative;z-index:3;margin-bottom:48px;padding-top:24px;">
+    <div class="origin-marker">
         <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;">
-            <div style="width:2px;height:40px;background:linear-gradient(to bottom,transparent,#a0784a);margin:0 auto;"></div>
-            <div style="background:#fff;border:2px dashed #a0784a;border-radius:40px;padding:10px 24px;font-size:0.82rem;font-weight:800;letter-spacing:2px;color:#a0784a;text-transform:uppercase;box-shadow:2px 2px 0 rgba(160,120,74,0.2);">
-                <i class="fa-solid fa-seedling" style="margin-right:6px;color:#7c3aed;"></i>Started from 0
+            <div style="width:2px;height:32px;background:linear-gradient(to bottom,transparent,#a0784a);"></div>
+            <div class="origin-badge">
+                <i class="fa-solid fa-seedling" style="color:#7c3aed;"></i> Started from 0
             </div>
-            <div style="width:2px;height:32px;background:linear-gradient(to bottom,#a0784a,transparent);margin:0 auto;"></div>
+            <div style="width:2px;height:24px;background:linear-gradient(to bottom,#a0784a,transparent);"></div>
         </div>
     </div>
 
@@ -377,7 +235,7 @@ body{background:#faf6f0;font-family:'Outfit',sans-serif;overflow-x:hidden}
     <div class="rope-end-badge"><i class="fa-solid fa-flag-checkered"></i> Journey Continues... Stay Tuned</div>
 </div>
 
-<?php include '../footer.php'; ?>
+<?php include_once 'footer.php'; ?>
 
 <script>
 // Intersection Observer for scroll animations
@@ -389,24 +247,8 @@ const obs = new IntersectionObserver((entries) => {
             obs.unobserve(entry.target);
         }
     });
-}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 items.forEach(el => obs.observe(el));
-
-// Mobile tap zoom feedback
-document.querySelectorAll('.polaroid').forEach(card => {
-    card.addEventListener('touchstart', () => {
-        card.style.transform = 'scale(0.97)';
-        setTimeout(() => { card.style.transform = ''; }, 200);
-    }, { passive: true });
-});
-
-// Nav dropdown
-const ddBtn = document.querySelector('.nav-dropdown-btn');
-const ddMenu = document.querySelector('.nav-dropdown-menu');
-if(ddBtn && ddMenu) {
-    ddBtn.addEventListener('click', e => { e.stopPropagation(); ddMenu.classList.toggle('open'); });
-    document.addEventListener('click', () => ddMenu.classList.remove('open'));
-}
 </script>
 </body>
 </html>

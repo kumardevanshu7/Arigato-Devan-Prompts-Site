@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once "db.php";
 
@@ -340,7 +340,7 @@ $type_map = [
                 </div>
                 Saved Prompts
             </div>
-            <div class="sp-sub">All prompts you've unlocked â€” <span id="sp-counter"><?= $total ?></span> saved so far</div>
+            <div class="sp-sub">All prompts you've unlocked — <span id="sp-counter"><?= $total ?></span> saved so far</div>
             <div class="sp-filters">
                 <?php if($stats['secret'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-lock"></i> Secret <?= $stats['secret'] ?></span><?php endif; ?>
                 <?php if($stats['insta_viral'] > 0): ?><span class="sp-pill"><i class="fa-solid fa-fire"></i> Viral <?= $stats['insta_viral'] ?></span><?php endif; ?>
@@ -608,7 +608,7 @@ $type_map = [
     });
 })();
 
-// Card click â†’ navigate to prompt page
+// Card click → navigate to prompt page
 document.querySelectorAll('.card').forEach(function(card) {
     var trigger = card.querySelector('.card-click-trigger');
     if (trigger) {

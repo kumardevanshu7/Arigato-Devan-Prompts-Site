@@ -24,63 +24,45 @@ unset($_SESSION["error_msg"]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
-    <link rel="stylesheet" href="style.min.css?v=20260601">
+    <link rel="stylesheet" href="digital_store/css/store.css">
     <style>
-        /* ─── Force transparent body so wallpaper shows ─── */
+        /* ─── Nogoda Palette Styles ─── */
+        :root {
+            --nogoda-plum: #6D2D52;
+            --nogoda-rose: #F5709D;
+            --nogoda-mint: #11FFC9;
+            --nogoda-sky: #2FA6C6;
+            --nogoda-indigo: #204162;
+        }
+
         html, body {
-            margin: 0;
-            height: 100%;
-            background: transparent !important;
+            background: #F8F6F2 !important;
+            background-image: none !important;
+            background-color: #F8F6F2 !important;
+            font-family: 'Inter', sans-serif !important;
+            color: var(--nogoda-indigo) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+            -webkit-font-smoothing: antialiased;
         }
-        /* ─── Anime Wallpaper Background (same as homepage) ─── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background-image: url('backgroundwally/only-homepage-pic.webp');
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: rgba(0,0,0,0.52);
-            pointer-events: none;
-        }
-        @media (max-width: 640px) {
-            body::before {
-                background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp');
-                background-position: center center;
-            }
-        }
+        body::before, body::after { display: none !important; }
 
         .login-root {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
-            background: transparent;
+            background: #F8F6F2;
         }
 
-        /* Filmstrip bg — hidden, replaced by wallpaper */
-        .login-filmstrip {
+        .login-filmstrip, .login-filmstrip-overlay {
             display: none;
         }
 
-        .login-filmstrip .filmstrip-row {
-            height: 50%;
-        }
-
-        .login-filmstrip-overlay {
-            display: none;
-        }
-
-        /* &mdash; Minimal Login Header &mdash; */
+        /* ─── Header ─── */
         .login-header {
             position: relative;
             z-index: 10;
@@ -91,11 +73,10 @@ unset($_SESSION["error_msg"]);
             margin: 24px auto;
             max-width: 800px;
             width: 90%;
-            border: var(--border-width) solid var(--border-color);
+            border: 1.5px solid rgba(32, 65, 98, 0.15);
             border-radius: 40px;
-            background: rgba(253, 251, 247, 0.9);
-            backdrop-filter: blur(12px);
-            box-shadow: 6px 6px 0px var(--text-color);
+            background: var(--bg-card);
+            box-shadow: 0 4px 15px rgba(32, 65, 98, 0.04);
         }
 
         .login-header-logo {
@@ -103,40 +84,46 @@ unset($_SESSION["error_msg"]);
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            color: var(--text-color);
         }
 
         .login-header-logo img {
-            width: 46px;
-            height: 46px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: var(--border-width) solid var(--text-color);
+            border: 1px solid rgba(32, 65, 98, 0.2);
             object-fit: cover;
         }
 
         .login-header-logo-text {
-            font-size: 1.3rem;
-            font-weight: 900;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--nogoda-indigo);
+            letter-spacing: -0.02em;
         }
 
         .login-header-nav a {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--nogoda-indigo);
             text-decoration: none;
-            padding: 8px 16px;
-            border: 2px solid transparent;
+            padding: 8px 18px;
+            border: 1.5px solid rgba(32, 65, 98, 0.2);
             border-radius: 20px;
-            transition: all 0.2s;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
 
         .login-header-nav a:hover {
-            border-color: var(--border-color);
-            background: var(--primary-color);
+            border-color: var(--nogoda-sky);
+            color: var(--nogoda-plum);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        /* &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; Center Content &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; */
+        /* ─── Center Content ─── */
         .login-body {
             position: relative;
             z-index: 5;
@@ -147,46 +134,35 @@ unset($_SESSION["error_msg"]);
             padding: 40px 20px;
         }
 
-        /* &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; Login Card &mdash;&ndash;�&mdash;&ndash;�&mdash;&ndash;�&mdash; */
+        /* ─── Login Card ─── */
         .login-card {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--text-color);
+            background: var(--bg-card);
+            border: 1.5px solid rgba(32, 65, 98, 0.12);
             border-radius: 28px;
-            padding: 52px 48px 48px;
-            box-shadow: 8px 8px 0px var(--text-color);
+            padding: 48px 40px;
+            box-shadow: 0 10px 30px rgba(32, 65, 98, 0.06);
             max-width: 440px;
             width: 100%;
             text-align: center;
-            animation: loginCardIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-            transform-origin: center bottom;
+            animation: loginCardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         @keyframes loginCardIn {
-            from {
-                opacity: 0;
-                transform: scale(0.82) translateY(30px) rotate(-2deg);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0) rotate(0deg);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Logo inside card */
         .card-logo {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            border: var(--border-width) solid var(--text-color);
+            border: 1.5px solid rgba(32, 65, 98, 0.15);
             object-fit: cover;
-            box-shadow: var(--shadow-comic);
+            box-shadow: var(--shadow-sm);
             margin: 0 auto 20px;
             display: block;
-            animation: loginCardIn 0.65s 0.08s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
 
-        /* Sticker pair */
         .card-stickers {
             display: flex;
             justify-content: center;
@@ -195,178 +171,169 @@ unset($_SESSION["error_msg"]);
         }
 
         .card-sticker {
-            font-size: 0.72rem;
-            font-weight: 900;
-            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            padding: 5px 14px;
-            border: 2px solid var(--text-color);
-            border-radius: 30px;
-            box-shadow: 2px 2px 0px var(--text-color);
+            padding: 5px 12px;
+            border-radius: 99px;
+            border: 1px solid transparent;
         }
 
         .card-sticker-1 {
-            background: #FFF1B8;
-            transform: rotate(-3deg);
+            background: rgba(245, 112, 157, 0.15);
+            color: var(--nogoda-plum);
+            border-color: rgba(245, 112, 157, 0.25);
         }
 
         .card-sticker-2 {
-            background: #D6EDFF;
-            transform: rotate(2deg);
+            background: rgba(47, 166, 198, 0.12);
+            color: var(--nogoda-indigo);
+            border-color: rgba(47, 166, 198, 0.22);
         }
 
-        /* Title */
         .login-card-title {
-            font-size: 1.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.85rem;
             font-weight: 900;
-            margin-bottom: 8px;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            line-height: 1.25;
+            color: var(--nogoda-indigo);
         }
 
         .login-card-sub {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #777;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #5a6e85;
             margin-bottom: 32px;
             line-height: 1.5;
         }
 
-        /* Error */
         .login-error {
-            background: #ffe6e6;
-            color: #a70000;
-            border: var(--border-width) solid var(--text-color);
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
             border-radius: 12px;
             padding: 12px 16px;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 20px;
-            font-size: 0.9rem;
-            box-shadow: 3px 3px 0px var(--text-color);
+            font-size: 0.88rem;
         }
 
-        /* Google Button */
+        /* Google Button — Nogoda light gradient, beautiful and colorful */
         .google-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            padding: 16px 24px;
-            background: #fff;
-            color: var(--text-color);
-            border: 3px solid var(--text-color);
-            border-radius: 16px;
-            font-family: var(--font-main);
-            font-weight: 900;
-            font-size: 1.05rem;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, rgba(245, 112, 157, 0.08) 0%, rgba(47, 166, 198, 0.08) 100%);
+            color: var(--nogoda-indigo);
+            border: 1.5px solid rgba(47, 166, 198, 0.4);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
             text-decoration: none;
-            box-shadow: 5px 5px 0px var(--text-color);
-            transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(47, 166, 198, 0.06);
+            transition: var(--transition);
             cursor: pointer;
             margin-bottom: 16px;
         }
 
-        .google-btn img {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
         .google-btn:hover {
-            transform: translateY(-4px) rotate(-1deg);
-            box-shadow: 7px 7px 0px var(--text-color);
-            background: #f8f8ff;
+            background: linear-gradient(135deg, rgba(245, 112, 157, 0.15) 0%, rgba(47, 166, 198, 0.15) 100%);
+            border-color: var(--nogoda-sky);
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 15px rgba(47, 166, 198, 0.12);
         }
 
-        .google-btn:active {
-            transform: translate(4px, 4px);
-            box-shadow: 1px 1px 0px var(--text-color);
-        }
-
-        /* Explore link */
         .login-explore {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #888;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #5a6e85;
             text-decoration: none;
-            display: block;
-            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
             padding: 4px 0;
         }
 
         .login-explore:hover {
-            color: var(--primary-dark);
+            color: var(--nogoda-rose);
         }
 
-        /* Divider */
         .card-divider {
             display: flex;
             align-items: center;
             gap: 12px;
             margin: 20px 0;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #ccc;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #a0aec0;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.05em;
         }
 
         .card-divider::before,
         .card-divider::after {
             content: '';
             flex: 1;
-            height: 1.5px;
-            background: var(--border-color);
-            border-radius: 2px;
+            height: 1px;
+            background: rgba(32, 65, 98, 0.1);
         }
 
-        /* Promise badges row */
         .login-promises {
             display: flex;
             gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 24px;
+            margin-top: 28px;
             padding-top: 20px;
-            border-top: 2px dashed var(--border-color);
+            border-top: 1px dashed rgba(32, 65, 98, 0.12);
         }
 
         .login-promise-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #666;
-            background: var(--bg-color);
-            border: 1.5px solid var(--border-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #5a6e85;
+            background: rgba(32, 65, 98, 0.03);
+            border: 1px solid rgba(32, 65, 98, 0.1);
             border-radius: 20px;
             padding: 4px 12px;
         }
 
-        /* --- Comparison Cards --- */
+        /* --- Comparison Section --- */
         .login-compare-section {
             position: relative;
             z-index: 5;
-            padding: 0 20px 48px;
+            padding: 0 20px 64px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
 
         .login-compare-heading {
-            font-size: 0.8rem;
-            font-weight: 900;
-            letter-spacing: 3px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: #aaa;
+            color: #a0aec0;
             text-align: center;
             margin-bottom: 4px;
         }
 
         .login-compare-row {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             width: 100%;
             max-width: 760px;
             justify-content: center;
@@ -375,64 +342,59 @@ unset($_SESSION["error_msg"]);
         .cmp-card {
             flex: 1;
             max-width: 360px;
-            background: var(--card-bg);
-            border: 3px solid var(--text-color);
+            background: var(--bg-card);
+            border: 1.5px solid rgba(32, 65, 98, 0.1);
             border-radius: 20px;
-            padding: 28px 24px 24px;
-            box-shadow: 6px 6px 0px var(--text-color);
-            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
-            cursor: default;
+            padding: 32px 28px;
+            box-shadow: 0 4px 12px rgba(32, 65, 98, 0.02);
+            transition: var(--transition);
+            text-align: left;
         }
 
         .cmp-card:hover {
-            transform: translateY(-5px) rotate(-0.5deg);
-            box-shadow: 8px 10px 0px var(--text-color);
-        }
-
-        .cmp-card:active {
-            transform: translate(3px, 3px);
-            box-shadow: 3px 3px 0px var(--text-color);
+            box-shadow: 0 8px 24px rgba(32, 65, 98, 0.06);
+            transform: translateY(-2px);
         }
 
         .cmp-card-with {
-            background: #fffbe8;
-            border-color: var(--text-color);
+            background: #fffdf9;
+            border-color: rgba(245, 112, 157, 0.2);
         }
 
         .cmp-card-without {
-            background: #fff0f0;
-            border-color: var(--text-color);
+            background: #fafafc;
         }
 
         .cmp-card-badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            font-size: 0.72rem;
-            font-weight: 900;
-            letter-spacing: 1.5px;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            padding: 5px 14px;
-            border: 2.5px solid var(--text-color);
-            border-radius: 30px;
-            margin-bottom: 16px;
+            padding: 4px 12px;
+            border-radius: 99px;
+            margin-bottom: 18px;
+            white-space: nowrap;
         }
 
         .cmp-card-with .cmp-card-badge {
-            background: #ffe066;
-            color: var(--text-color);
+            background: rgba(17, 255, 201, 0.15);
+            color: #0f766e;
         }
 
         .cmp-card-without .cmp-card-badge {
-            background: #ffb3b3;
-            color: var(--text-color);
+            background: rgba(245, 112, 157, 0.12);
+            color: #be123c;
         }
 
         .cmp-card-title {
-            font-size: 1.15rem;
-            font-weight: 900;
-            margin-bottom: 16px;
-            letter-spacing: -0.3px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: var(--nogoda-indigo);
         }
 
         .cmp-list {
@@ -441,55 +403,126 @@ unset($_SESSION["error_msg"]);
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .cmp-list li {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            line-height: 1.4;
-            color: #333;
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.45;
+            color: #5a6e85;
         }
 
         .cmp-icon {
             flex-shrink: 0;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            border: 2px solid var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
-            margin-top: 1px;
+            font-size: 0.6rem;
+            margin-top: 2px;
         }
 
         .cmp-card-with .cmp-icon {
-            background: #2ecc71;
-            color: #fff;
+            background: var(--nogoda-mint);
+            color: var(--nogoda-indigo);
+            font-weight: bold;
         }
 
         .cmp-card-without .cmp-icon {
-            background: #e74c3c;
+            background: var(--nogoda-rose);
             color: #fff;
         }
 
-        /* &mdash;&ndash; &mdash;&ndash; &mdash;&ndash; &mdash; Ticker at bottom &mdash;&ndash; &mdash;&ndash; &mdash;&ndash; &mdash; */
+        /* ─── Ticker / Footer ─── */
         .login-ticker {
             position: relative;
             z-index: 10;
-            background: var(--text-color);
-            height: 42px;
+            background: var(--nogoda-indigo) !important;
+            height: 48px;
             display: flex;
             align-items: center;
             overflow: hidden;
-            border-top: 3px solid var(--primary-dark);
+            width: 100%;
+            margin-top: auto;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* &mdash; RESPONSIVE &mdash; */
+        .ticker-label {
+            flex-shrink: 0;
+            background: var(--nogoda-rose);
+            color: #fff !important;
+            font-weight: 800;
+            font-size: 0.72rem;
+            padding: 0 16px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            letter-spacing: 2px;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            animation: pulseTicker 1.2s ease-in-out infinite;
+        }
+
+        .ticker-track-wrap {
+            overflow: hidden;
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-track {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            width: max-content;
+            animation: tickerScroll 45s linear infinite;
+            will-change: transform;
+        }
+
+        .ticker-item {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0 6px;
+            color: rgba(255, 255, 255, 0.9) !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ticker-sep {
+            margin: 0 16px;
+            color: var(--nogoda-mint);
+            font-size: 0.7rem;
+        }
+
+        @keyframes pulseTicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 700px) {
+            .login-compare-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            .cmp-card {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
         @media (max-width: 600px) {
             .login-header {
                 padding: 12px 20px;
@@ -504,43 +537,11 @@ unset($_SESSION["error_msg"]);
             }
 
             .login-card-title {
-                font-size: 1.4rem;
-            }
-
-            .google-btn {
-                font-size: 0.95rem;
-                padding: 14px 20px;
-            }
-
-            .card-logo {
-                width: 68px;
-                height: 68px;
-            }
-
-            .login-compare-row {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .cmp-card {
-                max-width: 100%;
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .login-header-logo-text {
-                font-size: 1.1rem;
-            }
-
-            .login-card-title {
-                font-size: 1.25rem;
+                font-size: 1.5rem;
             }
         }
     </style>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,600&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <?php include_once "gtag.php"; ?>
 </head>
 
@@ -562,9 +563,8 @@ unset($_SESSION["error_msg"]);
         <!-- Header -->
         <header class="login-header">
             <a href="index.php" class="login-header-logo">
-                <img src="toplogo/logo01.webp"
-                    alt="Logo">
-                <div class="login-header-logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+                <img src="toplogo/logo01.webp" alt="Logo">
+                <div class="login-header-logo-text">arigatoPrompt</div>
             </a>
             <nav class="login-header-nav">
                 <a href="index.php"><i class="fa-solid fa-arrow-left"></i> HOME</a>
@@ -576,8 +576,7 @@ unset($_SESSION["error_msg"]);
             <div class="login-card">
 
                 <!-- Avatar -->
-                <img src="toplogo/logo01.webp"
-                    alt="Arigato Devan" class="card-logo">
+                <img src="toplogo/logo01.webp" alt="Arigato Devan" class="card-logo">
 
                 <!-- Sticker tags -->
                 <div class="card-stickers">
@@ -586,7 +585,7 @@ unset($_SESSION["error_msg"]);
                 </div>
 
                 <!-- Title -->
-                <h1 class="login-card-title">Welcome to<br>Arigato Devan Prompts</h1>
+                <h1 class="login-card-title">Welcome to<br>arigatoPrompt</h1>
                 <p class="login-card-sub">Login to unlock premium AI prompts<br>and save your progress forever.</p>
 
                 <!-- Error -->

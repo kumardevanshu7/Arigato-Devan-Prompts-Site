@@ -329,6 +329,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="manage_prompts.php" class="d-link"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
     <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <a href="trending_settings.php" class="d-link"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <div class="d-sec">Blog</div>
     <a href="blog_admin.php" class="d-link active"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
@@ -368,6 +369,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
+    <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link active"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>

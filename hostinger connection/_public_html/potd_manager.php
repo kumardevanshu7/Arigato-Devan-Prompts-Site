@@ -52,7 +52,7 @@ $type_map = [
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POTD Manager — Arigato Admin</title>
+<title>POTD Manager â€” Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php include_once "gtag.php"; ?>
@@ -180,6 +180,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <a href="manage_prompts.php" class="d-link2 "><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link2 "><i class="fa-solid fa-link"></i> Prompt Links</a>
     <a href="potd_manager.php" class="d-link2 active"><i class="fa-solid fa-sun"></i> POTD Manager</a>
+    <a href="trending_settings.php" class="d-link2 "><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <div class="d-sec2">Blog</div>
     <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus"></i> New Post</a>
@@ -225,6 +226,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
     <a href="potd_manager.php" class="sb-link active"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
+    <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
