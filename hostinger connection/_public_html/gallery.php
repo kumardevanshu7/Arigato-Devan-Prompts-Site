@@ -66,10 +66,10 @@ $gal_banner_slides = gallery_banner_slides();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery &mdash; Arigato Devan Prompts</title>
-    <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites â€” only on Arigato Devan! âœ¨">
+    <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites &mdash; only on Arigato Devan!">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Gallery â€” All AI Couple Prompts | Arigato Devan">
-    <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites â€” only on Arigato Devan! âœ¨">
+    <meta property="og:title" content="Gallery &mdash; All AI Couple Prompts | Arigato Devan">
+    <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites &mdash; only on Arigato Devan!">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/gallery.php">
     <meta name="twitter:card" content="summary_large_image">
@@ -272,9 +272,9 @@ $gal_banner_slides = gallery_banner_slides();
         <div class="modal-right">
             <h2 id="modal-title">Prompt Locked</h2>
             <div class="want-code-section" id="modal-want-code" style="display:none;">
-                <p class="want-code-text">Want the Code?</p>
-                <a href="#" id="modal-reel-link" target="_blank" class="comic-btn-small">
-                    <i class="fa-solid fa-play"></i> Watch Reel to Get It
+                <p class="want-code-text">Need Secret Code?</p>
+                <a href="all_codes.php" id="modal-reel-link" class="comic-btn-small">
+                    <i class="fa-solid fa-code"></i> All Codes Here - Click to Know
                 </a>
             </div>
             <div class="modal-unlock-area" id="modal-unlock-area">
@@ -388,7 +388,7 @@ $gal_banner_slides = gallery_banner_slides();
 })();
 </script>
 
-<script defer src="script.min.js?v=20260616"></script>
+<script defer src="script.js?v=20260702"></script>
 
 <script>
 function promptPageUrl(card) {

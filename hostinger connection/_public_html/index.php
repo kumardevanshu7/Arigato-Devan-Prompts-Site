@@ -18,7 +18,19 @@ try {
         WHERE f.show_on_homepage = 1
         ORDER BY f.submitted_at DESC
     ");
-    $testimonials = $tStmt->fetchAll(PDO::FETCH_ASSOC);
+    $raw_testimonials = $tStmt->fetchAll(PDO::FETCH_ASSOC);
+    $seen_testimonial_text = [];
+    foreach ($raw_testimonials as $tRow) {
+        $normalized = strtolower(trim(preg_replace('/\s+/', ' ', (string)($tRow['feedback_text'] ?? ''))));
+        if ($normalized === '' || isset($seen_testimonial_text[$normalized])) {
+            continue;
+        }
+        $seen_testimonial_text[$normalized] = true;
+        $testimonials[] = $tRow;
+        if (count($testimonials) >= 8) {
+            break;
+        }
+    }
 } catch (Exception $e) { $testimonials = []; }
 
 // Fetch ONLY secret prompts for Home page
@@ -150,18 +162,18 @@ try {
     <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arigato Devan ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â AI Couple Prompts for Instagram Reels</title>
-    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â use instantly on ChatGPT. Only on Arigato Devan.">
+    <title>Arigato Devan &mdash; AI Couple Prompts for Instagram Reels</title>
+    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts &mdash; use instantly on ChatGPT. Only on Arigato Devan.">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="Arigato Devan Prompts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Premium AI Couple Prompts">
-    <meta property="og:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â only on Arigato Devan! ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…â€œ">
+    <meta property="og:title" content="Arigato Devan Prompts &mdash; Premium AI Couple Prompts">
+    <meta property="og:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts &mdash; only on Arigato Devan!">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Arigato Devan Prompts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Premium AI Couple Prompts">
-    <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â only on Arigato Devan! ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…â€œ">
+    <meta name="twitter:title" content="Arigato Devan Prompts &mdash; Premium AI Couple Prompts">
+    <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts &mdash; only on Arigato Devan!">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <!-- Canonical -->
     <link rel="canonical" href="<?= htmlspecialchars($_page_canonical) ?>">
@@ -245,8 +257,8 @@ try {
                 <h2 id="modal-title">PROMPT LOCKED</h2>
 
                 <div class="want-code-section" id="modal-want-code" style="display:none;">
-                    <p class="want-code-text">Want Code?</p>
-                    <a href="#" id="modal-reel-link" target="_blank" class="comic-btn-small"><i class="fa-solid fa-play"></i> WATCH REEL TO GET IT</a>
+                    <p class="want-code-text">Need Secret Code?</p>
+                    <a href="all_codes.php" id="modal-reel-link" class="comic-btn-small"><i class="fa-solid fa-code"></i> ALL CODES HERE - CLICK TO KNOW</a>
                 </div>
 
                 <div class="modal-unlock-area" id="modal-unlock-area">

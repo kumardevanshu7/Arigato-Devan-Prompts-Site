@@ -659,10 +659,8 @@ document.addEventListener("DOMContentLoaded", () => {
           // SCP — Secret Code: Code input
           // ══════════════════════════════════════════
         } else {
-          if (card.dataset.reel) {
-            if (modalReelLink) modalReelLink.href = card.dataset.reel;
-            if (wantCodeSection) wantCodeSection.style.display = "block";
-          }
+          if (modalReelLink) modalReelLink.href = `all_codes.php#code-${currentPromptId}`;
+          if (wantCodeSection) wantCodeSection.style.display = "block";
           if (unlockArea) {
             unlockArea.innerHTML = `
                             <p style="font-weight:700;margin-bottom:16px;color:#555;">Enter the secret code to reveal this prompt.</p>

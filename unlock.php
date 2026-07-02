@@ -11,6 +11,22 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_POST["action"])) {
 $action = $_POST["action"];
 $prompt_id = (int) ($_POST["prompt_id"] ?? 0);
 
+function auto_like_prompt(PDO $pdo, int $user_id, int $prompt_id): void
+{
+    try {
+        $stmtLike = $pdo->prepare(
+            "INSERT IGNORE INTO likes (user_id, prompt_id) VALUES (?, ?)",
+        );
+        $stmtLike->execute([$user_id, $prompt_id]);
+        if ($stmtLike->rowCount() > 0) {
+            $pdo->prepare(
+                "UPDATE prompts SET likes_count = likes_count + 1 WHERE id = ?",
+            )->execute([$prompt_id]);
+        }
+    } catch (PDOException $e) {
+    }
+}
+
 // ─── RATE LIMITER — max 5 wrong attempts per prompt per 10 min ───────────────
 function checkRateLimit($prompt_id)
 {
@@ -94,6 +110,7 @@ if ($action === "verify") {
                 $pdo->prepare(
                     "INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)",
                 )->execute([$_SESSION["user_id"], $prompt_id]);
+                auto_like_prompt($pdo, (int) $_SESSION["user_id"], $prompt_id);
             } catch (PDOException $e) {
             }
         }
@@ -151,11 +168,7 @@ if ($action === "insta_viral") {
         if (isset($_SESSION["user_id"])) {
             try {
                 $pdo->prepare("INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)")->execute([$_SESSION["user_id"], $prompt_id]);
-                $stmtLike = $pdo->prepare("INSERT IGNORE INTO likes (user_id, prompt_id) VALUES (?, ?)");
-                $stmtLike->execute([$_SESSION["user_id"], $prompt_id]);
-                if ($stmtLike->rowCount() > 0) {
-                    $pdo->prepare("UPDATE prompts SET likes_count = likes_count + 1 WHERE id = ?")->execute([$prompt_id]);
-                }
+                auto_like_prompt($pdo, (int) $_SESSION["user_id"], $prompt_id);
             } catch (PDOException $e) {
             }
         }
@@ -203,11 +216,7 @@ if ($action === "unreleased") {
         if (isset($_SESSION["user_id"])) {
             try {
                 $pdo->prepare("INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)")->execute([$_SESSION["user_id"], $prompt_id]);
-                $stmtLike = $pdo->prepare("INSERT IGNORE INTO likes (user_id, prompt_id) VALUES (?, ?)");
-                $stmtLike->execute([$_SESSION["user_id"], $prompt_id]);
-                if ($stmtLike->rowCount() > 0) {
-                    $pdo->prepare("UPDATE prompts SET likes_count = likes_count + 1 WHERE id = ?")->execute([$prompt_id]);
-                }
+                auto_like_prompt($pdo, (int) $_SESSION["user_id"], $prompt_id);
             } catch (PDOException $e) {
             }
         }
@@ -237,11 +246,7 @@ if ($action === "already_uploaded") {
         if (isset($_SESSION["user_id"])) {
             try {
                 $pdo->prepare("INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)")->execute([$_SESSION["user_id"], $prompt_id]);
-                $stmtLike = $pdo->prepare("INSERT IGNORE INTO likes (user_id, prompt_id) VALUES (?, ?)");
-                $stmtLike->execute([$_SESSION["user_id"], $prompt_id]);
-                if ($stmtLike->rowCount() > 0) {
-                    $pdo->prepare("UPDATE prompts SET likes_count = likes_count + 1 WHERE id = ?")->execute([$prompt_id]);
-                }
+                auto_like_prompt($pdo, (int) $_SESSION["user_id"], $prompt_id);
             } catch (PDOException $e) {
             }
         }
@@ -272,6 +277,7 @@ if ($action === "direct") {
                 $pdo->prepare(
                     "INSERT IGNORE INTO unlocked_prompts (user_id, prompt_id) VALUES (?, ?)",
                 )->execute([$_SESSION["user_id"], $prompt_id]);
+                auto_like_prompt($pdo, (int) $_SESSION["user_id"], $prompt_id);
             } catch (PDOException $e) {
             }
         }

@@ -428,7 +428,7 @@ $type_map = [
         </div>
         <div class="modal-right">
             <h2 id="modal-title">PROMPT</h2>
-            <div id="modal-want-code" style="display:none;"><p>Get the code from our Instagram reel!</p><a id="modal-reel-link" href="#" target="_blank"><i class="fa-brands fa-instagram"></i> View Reel</a></div>
+            <div id="modal-want-code" style="display:none;"><p>Need secret code?</p><a id="modal-reel-link" href="all_codes.php"><i class="fa-solid fa-code"></i> All Codes Here - Click to Know</a></div>
             <div id="modal-unlock-area" style="display:none;"></div>
             <div id="modal-unlocked-area" style="display:none;flex-direction:column;text-align:left;height:100%;">
                 <h3 style="margin-bottom:10px;color:var(--text-color);font-size:1rem;"><i class="fa-solid fa-scroll"></i> THE PROMPT:</h3>
@@ -466,7 +466,7 @@ $type_map = [
 <script>const isLoggedIn = <?= isset($_SESSION["user_id"])
     ? "true"
     : "false" ?>;</script>
-<script defer src="script.min.js?v=20260616"></script>
+<script defer src="script.js?v=20260702"></script>
 <script>
 (function () {
     const popup = document.getElementById('sp-confirm-remove');

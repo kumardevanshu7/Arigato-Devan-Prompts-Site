@@ -2,6 +2,16 @@
 session_start();
 // Handle logout
 if (isset($_GET["logout"])) {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION = [];
+        setcookie(session_name(), "", [
+            "expires" => time() - 3600,
+            "path" => "/",
+            "secure" => (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off"),
+            "httponly" => true,
+            "samesite" => "Lax",
+        ]);
+    }
     session_destroy();
     header("Location: login.php");
     exit();

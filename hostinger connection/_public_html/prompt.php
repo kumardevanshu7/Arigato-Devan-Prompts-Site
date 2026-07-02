@@ -168,12 +168,10 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                     <?php if ($ptype === 'secret_code'): ?>
                         <div class="pp-task-icon"><i class="fa-solid fa-lock"></i></div>
                         <h3>Enter Secret Code</h3>
-                        <p>Watch our Instagram Reel to get the 6-letter secret code, then enter it below to reveal this prompt.</p>
-                        <?php if (!empty($p['reel_link'])): ?>
-                        <a href="<?= htmlspecialchars($p['reel_link']) ?>" target="_blank" class="pp-reel-btn">
-                            <i class="fa-solid fa-play"></i> Watch Reel to Get Code
+                        <p>All secret codes are listed in one place. Open the code hub and copy your 6-letter code.</p>
+                        <a href="all_codes.php#code-<?= (int)$p['id'] ?>" class="pp-reel-btn">
+                            <i class="fa-solid fa-code"></i> All Codes Here - Click to Know
                         </a>
-                        <?php endif; ?>
                         <div class="pp-input-group">
                             <input type="text" id="pp-code-input" placeholder="6-LETTER CODE" maxlength="6" autocomplete="off" style="letter-spacing:.2em;">
                             <button id="pp-submit-code" class="pp-unlock-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt</button>

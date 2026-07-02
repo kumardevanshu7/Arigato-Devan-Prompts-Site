@@ -4,6 +4,19 @@ $dbname = "prompt_app";
 $username = "root";
 $password = "";
 
+// Keep authenticated users logged in for long sessions.
+ini_set("session.gc_maxlifetime", (string) (60 * 60 * 24 * 30));
+if (session_status() === PHP_SESSION_ACTIVE && session_id() !== "") {
+    $is_https = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off";
+    setcookie(session_name(), session_id(), [
+        "expires" => time() + (60 * 60 * 24 * 30),
+        "path" => "/",
+        "secure" => $is_https,
+        "httponly" => true,
+        "samesite" => "Lax",
+    ]);
+}
+
 try {
     $pdo = new PDO(
         "mysql:host=$host;dbname=$dbname;charset=utf8mb4",

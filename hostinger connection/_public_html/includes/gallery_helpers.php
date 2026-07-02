@@ -8,7 +8,9 @@ function gallery_banner_slides(): array {
     $slides = [];
     $exts = ['webp', 'jpg', 'jpeg', 'png'];
     if (is_dir($dir)) {
-        foreach (scandir($dir) as $file) {
+        $files = scandir($dir) ?: [];
+        natsort($files);
+        foreach ($files as $file) {
             if ($file === '.' || $file === '..' || $file === '.gitkeep') {
                 continue;
             }

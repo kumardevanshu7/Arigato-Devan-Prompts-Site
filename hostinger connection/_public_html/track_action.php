@@ -20,6 +20,17 @@ $col = $action . '_count';
 try {
     $pdo->prepare("UPDATE prompts SET `{$col}` = COALESCE(`{$col}`, 0) + 1 WHERE id = ?")
         ->execute([$prompt_id]);
+    if ($action === "copy") {
+        $stmt = $pdo->prepare(
+            "INSERT IGNORE INTO likes (user_id, prompt_id) VALUES (?, ?)",
+        );
+        $stmt->execute([(int) $_SESSION["user_id"], $prompt_id]);
+        if ($stmt->rowCount() > 0) {
+            $pdo->prepare(
+                "UPDATE prompts SET likes_count = likes_count + 1 WHERE id = ?",
+            )->execute([$prompt_id]);
+        }
+    }
     echo json_encode(['ok' => true]);
 } catch (Exception $e) {
     echo json_encode(['ok' => false, 'msg' => 'db_error']);

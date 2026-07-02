@@ -125,354 +125,238 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome &ndash; Set Up Your Profile | Arigato Devan Prompts</title>
     <meta name="description" content="Set up your PromptVerse profile before exploring exclusive AI prompts.">
-    <link rel="stylesheet" href="style.min.css?v=20260601">
+    <?php include_once 'includes/theme_head.php'; ?>
+    <?php include_once "gtag.php"; ?>
     <style>
-        body {
+        body.page-onboarding {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 40px 16px 80px;
-            background: var(--bg-color);
+            background: var(--pal-beige, #F5EFEB);
+            color: var(--pal-navy, #2F4156);
         }
-
         .ob-wrap {
             width: 100%;
-            max-width: 680px;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 36px 16px 72px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
         }
-
-        .ob-logo {
+        .ob-head {
             display: flex;
             align-items: center;
-            gap: 12px;
             justify-content: center;
-            margin-bottom: 36px;
+            gap: 12px;
+            margin-bottom: 26px;
+            text-align: center;
         }
-
-        .ob-logo img {
-            width: 52px;
-            height: 52px;
+        .ob-head img {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            border: var(--border-width) solid var(--text-color);
+            border: 2px solid var(--pal-sky, #C8D9E6);
             object-fit: cover;
         }
-
-        .ob-logo-text {
-            font-size: 1.4rem;
+        .ob-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.32rem;
             font-weight: 900;
-            line-height: 1.1;
+            line-height: 1.05;
         }
-
         .ob-card {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 28px;
-            padding: 44px 44px 50px;
-            box-shadow: var(--shadow-comic);
+            background: #fff;
+            border: 1px solid var(--pal-sky, #C8D9E6);
+            border-radius: 24px;
+            box-shadow: 0 12px 38px rgba(47,65,86,.08);
+            padding: clamp(22px, 3.5vw, 36px);
         }
-
         .ob-step-label {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: var(--primary-color);
-            border: 2px solid var(--text-color);
-            border-radius: 40px;
-            padding: 6px 18px;
+            gap: 7px;
+            font-size: .74rem;
             font-weight: 800;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 2px 2px 0px var(--text-color);
-            margin-bottom: 16px;
+            letter-spacing: .08em;
+            color: var(--pal-teal, #567C8D);
+            margin-bottom: 10px;
         }
-
         .ob-title {
-            font-size: 2rem;
+            margin: 0 0 8px;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 4.8vw, 2.2rem);
             font-weight: 900;
-            margin-bottom: 6px;
-            line-height: 1.2;
+            color: var(--pal-navy, #2F4156);
+            line-height: 1.15;
         }
-
+        .ob-title em {
+            font-style: italic;
+            background: var(--nogoda-gradient-h);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         .ob-sub {
-            font-size: 1rem;
-            color: #777;
-            font-weight: 600;
-            margin-bottom: 36px;
+            margin: 0 0 24px;
+            color: var(--pal-teal, #567C8D);
+            font-weight: 500;
+            font-size: .92rem;
         }
-
-        .ob-section {
-            margin-bottom: 36px;
+        .ob-errors {
+            background: #fff1f1;
+            border: 1px solid #f1b4b4;
+            color: #b42318;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: .86rem;
         }
-
+        .ob-errors ul { margin: 8px 0 0 18px; padding: 0; }
+        .ob-section { margin-bottom: 24px; }
         .ob-section-title {
-            font-size: 1rem;
-            font-weight: 900;
+            font-size: .82rem;
+            font-weight: 800;
+            letter-spacing: .06em;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
+            color: var(--pal-teal, #567C8D);
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 12px;
         }
-
-        /* Avatar Grid */
+        .avatar-divider {
+            margin: 12px 0 8px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #8b9aaa;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
         .avatar-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 10px;
         }
-
-        .avatar-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .avatar-option input[type="radio"] {
-            display: none;
-        }
-
+        .avatar-option input[type="radio"],
+        .gender-option input[type="radio"] { display: none; }
         .avatar-img-wrap {
-            width: 70px;
-            height: 70px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
-            border: 3px solid var(--border-color);
+            border: 2px solid var(--pal-sky, #C8D9E6);
             overflow: hidden;
-            transition: all 0.2s ease-out;
-            box-shadow: 2px 2px 0px transparent;
-            background: var(--bg-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #fff;
+            transition: transform .16s, border-color .16s, box-shadow .16s;
+            box-shadow: 0 4px 12px rgba(47,65,86,.06);
         }
-
         .avatar-img-wrap img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .avatar-gender-tag {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .avatar-option input[type="radio"]:checked + .avatar-img-wrap {
-            border-color: var(--text-color);
-            box-shadow: 3px 3px 0px var(--text-color);
-            transform: scale(1.08);
-        }
-
-        .avatar-option:hover .avatar-img-wrap {
-            border-color: var(--primary-dark);
-            transform: scale(1.05);
-        }
-
-        /* Avatar separator */
-        .avatar-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 16px 0 12px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #bbb;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .avatar-divider::before,
-        .avatar-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-color);
-        }
-
-        /* Username Input */
-        .ob-input {
-            width: 100%;
-            padding: 14px 18px;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 14px;
-            font-family: var(--font-main);
-            font-size: 1rem;
-            font-weight: 700;
-            background: var(--bg-color);
-            color: var(--text-color);
-            box-shadow: var(--shadow-comic);
-            outline: none;
-            transition: all 0.2s ease-out;
-            box-sizing: border-box;
-        }
-
-        .ob-input:focus {
-            border-color: var(--primary-dark);
-            box-shadow: var(--shadow-comic-hover);
-            transform: translateY(-1px);
-        }
-
-        .ob-input-hint {
-            font-size: 0.8rem;
-            color: #999;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        /* Gender Selector */
-        .gender-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .gender-option {
-            cursor: pointer;
             display: block;
         }
-
-        .gender-option input[type="radio"] {
-            display: none;
+        .avatar-option { cursor: pointer; display: block; }
+        .avatar-option:hover .avatar-img-wrap {
+            transform: translateY(-2px);
+            border-color: var(--pal-teal, #567C8D);
         }
-
+        .avatar-option input[type="radio"]:checked + .avatar-img-wrap {
+            border-color: var(--nogoda-pink, #F5709D);
+            box-shadow: 0 0 0 3px rgba(245,112,157,.2), 0 8px 18px rgba(47,65,86,.12);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .ob-input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1.5px solid var(--pal-sky, #C8D9E6);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            font-weight: 600;
+            color: var(--pal-navy, #2F4156);
+            box-sizing: border-box;
+            background: #fff;
+            outline: none;
+            transition: border-color .16s, box-shadow .16s;
+        }
+        .ob-input:focus {
+            border-color: var(--pal-teal, #567C8D);
+            box-shadow: 0 0 0 3px rgba(86,124,141,.15);
+        }
+        .ob-input-hint {
+            margin-top: 8px;
+            font-size: .76rem;
+            font-weight: 600;
+            color: #7d8da0;
+        }
+        .gender-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
         .gender-box {
+            border: 1.5px solid var(--pal-sky, #C8D9E6);
+            border-radius: 14px;
+            background: #fff;
+            padding: 14px 8px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--pal-navy, #2F4156);
+            transition: transform .16s, border-color .16s, box-shadow .16s;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             gap: 8px;
-            padding: 18px 10px;
-            border: var(--border-width) solid var(--border-color);
-            border-radius: 16px;
-            font-weight: 800;
-            font-size: 0.9rem;
-            transition: all 0.2s ease-out;
-            background: var(--bg-color);
-            box-shadow: 2px 2px 0px transparent;
+            align-items: center;
         }
-
-        .gender-emoji {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
-
+        .gender-emoji { font-size: 1.2rem; }
+        .gender-option { cursor: pointer; }
         .gender-option:hover .gender-box {
-            border-color: var(--text-color);
             transform: translateY(-2px);
-            box-shadow: 3px 3px 0px var(--border-color);
+            border-color: var(--pal-teal, #567C8D);
         }
-
         .gender-option input[type="radio"]:checked + .gender-box {
-            border-color: var(--text-color);
-            background: var(--primary-color);
-            box-shadow: 4px 4px 0px var(--text-color);
-            transform: translateY(-2px);
+            border-color: var(--nogoda-pink, #F5709D);
+            background: rgba(245,112,157,.08);
+            box-shadow: 0 0 0 3px rgba(245,112,157,.12);
         }
-
-        /* Errors */
-        .ob-errors {
-            background: #ffe6e6;
-            color: #a70000;
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 14px;
-            padding: 14px 18px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            box-shadow: 3px 3px 0px var(--text-color);
-        }
-
-        .ob-errors ul {
-            margin: 6px 0 0 18px;
-            padding: 0;
-        }
-
-        .ob-errors li {
-            margin-bottom: 4px;
-            font-size: 0.95rem;
-        }
-
-        /* Submit Button */
         .ob-submit {
             width: 100%;
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: 900;
-            font-family: var(--font-main);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--secondary-color);
-            color: var(--text-color);
-            border: var(--border-width) solid var(--text-color);
-            border-radius: 16px;
+            margin-top: 6px;
+            border: none;
+            border-radius: 999px;
+            padding: 13px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: .92rem;
+            font-weight: 800;
+            background: var(--nogoda-gradient-h);
+            color: var(--pal-navy, #2F4156);
             cursor: pointer;
-            box-shadow: var(--shadow-comic);
-            transition: all 0.2s ease-out;
-            margin-top: 8px;
+            box-shadow: 0 8px 24px rgba(47,65,86,.16);
+            transition: transform .16s, box-shadow .16s;
         }
-
         .ob-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-comic-hover);
-            background: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(47,65,86,.2);
         }
-
-        .ob-submit:active {
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px var(--text-color);
+        @media (max-width: 760px) {
+            .ob-wrap { padding-top: 24px; }
+            .avatar-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+            .gender-grid { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 500px) {
-            .ob-card { padding: 28px 20px 36px; }
-            .ob-title { font-size: 1.6rem; }
-            .avatar-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
-            .avatar-img-wrap { width: 52px; height: 52px; }
-            .gender-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-    </style>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <?php include_once "gtag.php"; ?>
-    <style>
-        html, body { background: transparent !important; height: 100%; margin: 0; }
-        body::before { content: ''; position: fixed; inset: 0; z-index: -2; background-image: url('backgroundwally/only-homepage-pic.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        body::after { content: ''; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,0.52); pointer-events: none; }
-        @media (max-width: 640px) { body::before { background-image: url('backgroundwally/only-homepage-pic-for-mobile.webp'); background-position: center center; } }
-        .aurora-bg { display: none !important; }
     </style>
 </head>
-<body>
-    <div class="ob-wrap" style="background:transparent;">
-        <div class="aurora-bg" aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#fdf6ff;">
-            <div style="position:absolute;width:65%;height:65%;background:radial-gradient(circle,#c8b4f8,#e9d8fd);border-radius:50%;filter:blur(90px);opacity:.55;top:-15%;left:-10%;animation:auroraFloat1 12s ease-in-out infinite;"></div>
-            <div style="position:absolute;width:55%;height:55%;background:radial-gradient(circle,#ffb3c6,#ffd6e7);border-radius:50%;filter:blur(90px);opacity:.55;bottom:-20%;right:-10%;animation:auroraFloat2 15s ease-in-out infinite;"></div>
-            <div style="position:absolute;width:45%;height:45%;background:radial-gradient(circle,#a5f3fc,#e0f2fe);border-radius:50%;filter:blur(90px);opacity:.55;top:30%;right:5%;animation:auroraFloat3 10s ease-in-out infinite;"></div>
-            <div style="position:absolute;width:40%;height:40%;background:radial-gradient(circle,#fde68a,#fef9c3);border-radius:50%;filter:blur(90px);opacity:.55;bottom:10%;left:10%;animation:auroraFloat4 13s ease-in-out infinite;"></div>
+<body class="page-store theme-nogoda page-onboarding">
+    <div class="nogoda-mesh" aria-hidden="true"></div>
+    <div class="ob-wrap">
+        <div class="ob-head">
+            <img src="toplogo/logo01.webp" alt="Arigato Devan">
+            <div class="ob-brand">arigato.<span style="color:#F5709D;">prompt</span></div>
         </div>
-        <style>
-        @keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(6%,8%) scale(1.08);}66%{transform:translate(-4%,5%) scale(0.95);}}
-        @keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-8%,-6%) scale(1.06);}66%{transform:translate(5%,-3%) scale(0.97);}}
-        @keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,8%) scale(1.1);}}
-        @keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-10%) scale(1.05);}}
-        .ob-wrap>*:not([aria-hidden]){position:relative;z-index:1;}
-        </style>
-
-        <!-- Logo -->
-        <div class="ob-logo">
-            <img src="toplogo/logo01.webp" alt="Logo">
-            <div class="ob-logo-text">ARIGATO<br>DEVAN</div>
-        </div>
-
-        <!-- Card -->
         <div class="ob-card">
             <div class="ob-step-label"><i class="fa-solid fa-sparkles"></i> Profile Setup</div>
-            <h1 class="ob-title">Welcome to <span class="highlight">PromptVerse!</span></h1>
-            <p class="ob-sub">Quick setup before you unlock the magic &mdash; takes 10 seconds!</p>
+            <h1 class="ob-title">Welcome to <em>PromptVerse</em></h1>
+            <p class="ob-sub">Quick setup before you unlock prompts — takes less than 20 seconds.</p>
 
             <!-- Errors -->
             <?php if (!empty($errors)): ?>
@@ -492,7 +376,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="ob-section">
                     <div class="ob-section-title"><i class="fa-solid fa-user"></i> Choose Your Avatar</div>
 
-                    <div class="avatar-divider">Male</div>
+                    <div class="avatar-divider">Male Avatars</div>
                     <div class="avatar-grid">
                         <?php foreach ($male_avatars as $i => $av): ?>
                         <label class="avatar-option">
@@ -517,7 +401,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="avatar-divider">Female</div>
+                    <div class="avatar-divider">Female Avatars</div>
                     <div class="avatar-grid">
                         <?php foreach ($female_avatars as $i => $av): ?>
                         <label class="avatar-option">
@@ -600,7 +484,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
 
                 <button type="submit" class="ob-submit" id="ob-submit-btn">
-                    Enter PromptVerse <i class="fa-solid fa-rocket"></i>
+                    Continue <i class="fa-solid fa-arrow-right"></i>
                 </button>
 
             </form>
@@ -625,18 +509,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         });
 
-        // Avatar selection visual feedback
-        document.querySelectorAll('input[name="avatar"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                document.querySelectorAll('.avatar-img-wrap').forEach(w => w.classList.remove('selected'));
-                radio.nextElementSibling.classList.add('selected');
-            });
-        });
-
         // Submit button pulse on validate
         document.getElementById('onboarding-form').addEventListener('submit', (e) => {
             const btn = document.getElementById('ob-submit-btn');
-            btn.innerHTML = 'Setting up... <i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.innerHTML = 'Saving... <i class="fa-solid fa-spinner fa-spin"></i>';
             btn.style.opacity = '0.8';
         });
     </script>

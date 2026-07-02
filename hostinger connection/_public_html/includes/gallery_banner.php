@@ -15,16 +15,6 @@ if (empty($gal_banner_slides)) {
                 <?php else: ?>
                     <div class="gal-banner-ph" style="background:<?= htmlspecialchars($slide['gradient'] ?? 'linear-gradient(135deg,#2F4156,#567C8D)') ?>;"></div>
                 <?php endif; ?>
-                <div class="gal-banner-overlay">
-                    <div class="gal-banner-content">
-                        <div class="gal-banner-meta">Featured</div>
-                        <h2 class="gal-banner-title"><?= htmlspecialchars($slide['title'] ?? '') ?></h2>
-                        <p class="gal-banner-sub"><?= htmlspecialchars($slide['subtitle'] ?? '') ?></p>
-                        <a href="<?= htmlspecialchars($slide['href'] ?? '#card-stack') ?>" class="gal-banner-cta">
-                            <?= htmlspecialchars($slide['cta'] ?? 'Explore') ?> <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -37,5 +27,10 @@ if (empty($gal_banner_slides)) {
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
+    </div>
+    <div class="gal-banner-actions">
+        <a href="#card-stack" class="gal-banner-cta">
+            Browse Gallery <i class="fa-solid fa-arrow-right"></i>
+        </a>
     </div>
 </section>
