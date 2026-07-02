@@ -3,7 +3,7 @@ session_start();
 require_once "db.php";
 
 $stmt = $pdo->query("
-    SELECT id, title, image_path, reel_link, unlock_code
+    SELECT id, title, image_path, unlock_code
     FROM prompts
     WHERE prompt_type = 'secret'
       AND unlock_code IS NOT NULL
@@ -38,10 +38,17 @@ $code_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .code-title{margin:0;font-size:.82rem;line-height:1.35;font-weight:700;color:var(--pal-navy,#2F4156);min-height:2.2em}
         .code-row{display:flex;align-items:center;gap:8px}
         .code-pill{flex:1;border:1px dashed rgba(47,65,86,.35);border-radius:10px;padding:8px 10px;font-size:.84rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#f9fbfc}
-        .copy-code-btn,.open-reel-btn{border:none;border-radius:10px;padding:9px 12px;font-size:.78rem;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+        .copy-code-btn{border:none;border-radius:10px;padding:9px 12px;font-size:.78rem;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
         .copy-code-btn{background:var(--nogoda-gradient-h);color:var(--pal-navy,#2F4156)}
-        .open-reel-btn{background:#fff;color:var(--pal-navy,#2F4156);border:1px solid var(--pal-sky,#C8D9E6)}
         .codes-empty{text-align:center;padding:48px 20px;background:#fff;border-radius:18px;border:1px solid var(--pal-sky,#C8D9E6)}
+        @media (max-width: 640px){
+            .codes-wrap{padding:20px 12px 52px}
+            .codes-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+            .code-body{padding:10px}
+            .code-title{font-size:.76rem;min-height:2.1em}
+            .code-pill{padding:7px 8px;font-size:.72rem}
+            .copy-code-btn{padding:8px 9px;font-size:.7rem}
+        }
     </style>
 </head>
 <body class="page-store theme-nogoda page-all-codes">
@@ -71,11 +78,6 @@ $code_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <i class="fa-regular fa-copy"></i> Copy
                             </button>
                         </div>
-                        <?php if (!empty($cp["reel_link"])): ?>
-                            <a class="open-reel-btn" href="<?= htmlspecialchars($cp["reel_link"]) ?>" target="_blank" rel="noopener">
-                                <i class="fa-solid fa-play"></i> Open Reel
-                            </a>
-                        <?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>
