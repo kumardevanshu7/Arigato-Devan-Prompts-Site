@@ -17,7 +17,17 @@ Disallow: /blog_toggle.php
 Disallow: /blog_comment.php
 Disallow: /prompt_links.php
 Disallow: /potd_manager.php
+Disallow: /potd_toggle.php
+Disallow: /potd_delete_custom.php
+Disallow: /trending_settings.php
 Disallow: /user_management.php
+Disallow: /feedback.php
+Disallow: /feedback_admin.php
+Disallow: /digital_store/admin.php
+Disallow: /digital_store/webhook.php
+Disallow: /digital_store/init_purchase.php
+Disallow: /digital_store/store_auth.php
+Disallow: /digital_store/test_webhook.php
 Disallow: /onboarding.php
 Disallow: /saved_prompts.php
 Disallow: /profile.php

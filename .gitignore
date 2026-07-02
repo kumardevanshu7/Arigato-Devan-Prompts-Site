@@ -6,7 +6,7 @@ firebase_auth.php
 .htaccess
 
 # ===== LOCAL ONLY — NEVER UPLOAD =====
-/dev_dashboard/
+/Arigato Hidden/
 
 # ===== PRIVATE FOLDER =====
 /private/
