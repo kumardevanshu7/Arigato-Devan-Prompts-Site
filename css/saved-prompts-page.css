@@ -1,0 +1,305 @@
+/* Saved Prompts — Nogoda theme */
+body.page-saved {
+  overflow-x: hidden;
+  --sp-pad-x: clamp(16px, 4vw, 48px);
+  --sp-gap: clamp(14px, 2vw, 24px);
+}
+
+.page-saved .hero-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pal-teal, #567C8D);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+}
+
+.page-saved .page-main {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 40px) var(--sp-pad-x) 72px;
+  box-sizing: border-box;
+}
+
+.sp-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.sp-page-head h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+  font-weight: 700;
+  color: var(--pal-navy, #2F4156);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.sp-page-head h1 em {
+  font-style: italic;
+  color: var(--nogoda-pink, #F5709D);
+}
+
+.sp-page-sub {
+  font-size: 0.92rem;
+  color: var(--pal-teal, #567C8D);
+  font-weight: 500;
+  margin: 0;
+}
+
+.sp-page-stat {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.sp-page-stat .page-hero-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--pal-navy, #2F4156);
+  line-height: 1;
+}
+
+.sp-page-stat .page-hero-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pal-teal, #567C8D);
+  margin-top: 4px;
+}
+
+.sp-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.sp-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--pal-navy, #2F4156);
+  background: var(--pal-white, #fff);
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  box-shadow: 0 2px 8px rgba(47, 65, 86, 0.05);
+}
+
+.sp-type-chip i {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.sp-empty {
+  text-align: center;
+  padding: 64px 24px;
+  background: var(--pal-white, #fff);
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm, 0 4px 20px rgba(47, 65, 86, 0.06));
+}
+
+.sp-empty-icon {
+  font-size: 2.5rem;
+  color: var(--nogoda-pink, #F5709D);
+  margin-bottom: 14px;
+}
+
+.sp-empty h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--pal-navy, #2F4156);
+  margin: 0 0 8px;
+}
+
+.sp-empty p {
+  color: var(--pal-teal, #567C8D);
+  font-size: 0.9rem;
+  margin: 0 0 20px;
+}
+
+.sp-empty .home-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.sp-confirm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 65, 86, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 3500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sp-confirm-overlay.open {
+  display: flex;
+}
+
+.sp-confirm-card {
+  background: var(--pal-white, #fff);
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  border-radius: 20px;
+  padding: 28px 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(47, 65, 86, 0.18);
+  text-align: center;
+}
+
+.sp-confirm-card .sp-confirm-icon {
+  font-size: 2rem;
+  color: #e11d48;
+  margin-bottom: 10px;
+}
+
+.sp-confirm-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--pal-navy, #2F4156);
+  margin: 0 0 8px;
+}
+
+.sp-confirm-card p {
+  font-size: 0.88rem;
+  color: var(--pal-teal, #567C8D);
+  margin: 0 0 20px;
+}
+
+.sp-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sp-confirm-actions button {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  transition: all 0.2s;
+}
+
+.sp-confirm-cancel {
+  background: var(--pal-beige, #F5EFEB);
+  color: var(--pal-navy, #2F4156);
+}
+
+.sp-confirm-yes {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.sp-confirm-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.page-saved .prompt-grid {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 0 48px !important;
+  box-sizing: border-box;
+}
+
+.page-saved .prompt-card,
+.page-saved .product-card {
+  min-width: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.page-saved .card-image-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 177.78%;
+  overflow: hidden;
+}
+
+.page-saved .card-image-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-saved .prompt-card .card-info {
+  padding: 12px 14px 14px;
+}
+
+.page-saved .prompt-card .card-title {
+  text-align: left;
+}
+
+.page-saved .prompt-card .card-like-display {
+  align-self: flex-start;
+}
+
+@media (max-width: 768px) {
+  .page-saved .prompt-grid {
+    padding-bottom: 40px !important;
+  }
+
+  .page-saved .prompt-card .card-info {
+    padding: 10px 10px 12px !important;
+  }
+
+  .page-saved .prompt-card .card-title {
+    font-size: 0.74rem !important;
+    white-space: normal !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.25;
+  }
+
+  .page-saved .prompt-card .card-badge {
+    top: 8px;
+    left: 8px;
+    font-size: 0.5rem;
+    padding: 3px 7px;
+  }
+
+  .page-saved .prompt-card .card-lock-icon {
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .page-saved .prompt-card .card-like-display {
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-saved .page-main { padding: 20px 14px 64px; }
+  .sp-page-head { flex-direction: column; align-items: flex-start; }
+  .sp-page-stat { text-align: left; }
+}

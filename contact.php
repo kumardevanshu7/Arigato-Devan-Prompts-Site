@@ -9,7 +9,7 @@
     <meta name="description" content="Get in touch with Arigato Devan. We'd love to hear your feedback, suggestions, or answer any questions you have about our AI prompts.">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/info-pages.css?v=20260703">
+    <link rel="stylesheet" href="css/info-pages.css?v=20260721">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info page-contact theme-nogoda">
@@ -35,18 +35,24 @@
         <div class="contact-info-grid">
             <a href="mailto:devansh.grow@gmail.com" class="contact-info-card">
                 <span class="ci-card-icon ci-card-icon--email"><i class="fa-solid fa-envelope"></i></span>
-                <span class="ci-card-label">Email</span>
-                <span class="ci-card-value">devansh.grow@gmail.com</span>
+                <span class="ci-card-body">
+                    <span class="ci-card-label">Email</span>
+                    <span class="ci-card-value">devansh.grow@gmail.com</span>
+                </span>
             </a>
             <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="contact-info-card">
                 <span class="ci-card-icon ci-card-icon--insta"><i class="fa-brands fa-instagram"></i></span>
-                <span class="ci-card-label">Instagram</span>
-                <span class="ci-card-value">@arigato.devan</span>
+                <span class="ci-card-body">
+                    <span class="ci-card-label">Instagram</span>
+                    <span class="ci-card-value">@arigato.devan</span>
+                </span>
             </a>
             <div class="contact-info-card contact-info-card--static">
                 <span class="ci-card-icon ci-card-icon--time"><i class="fa-solid fa-clock"></i></span>
-                <span class="ci-card-label">Response Time</span>
-                <span class="ci-card-value">Usually within 24 hours</span>
+                <span class="ci-card-body">
+                    <span class="ci-card-label">Response Time</span>
+                    <span class="ci-card-value">Within 24 hours</span>
+                </span>
             </div>
         </div>
 

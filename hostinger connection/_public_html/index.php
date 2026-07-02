@@ -215,7 +215,8 @@ try {
     }
     </script>
         <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/home-page.css?v=20260716">
+        <?php include_once 'includes/card_skeleton_assets.php'; ?>
+    <link rel="stylesheet" href="css/home-page.css?v=20260740">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->
@@ -316,9 +317,6 @@ const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") 
             if (btn && e.detail && e.detail.promptId) btn.dataset.promptId = e.detail.promptId;
         });
     </script>
-<script>
-(function(){var nav=document.getElementById('navStickyWrap');if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add('nav-hidden');else nav.classList.remove('nav-hidden');lastY=y;ticking=false;});ticking=true;}},{passive:true});})();
-</script>
 </body>
 </html>
 

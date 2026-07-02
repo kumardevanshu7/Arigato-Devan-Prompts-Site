@@ -1,0 +1,117 @@
+/* Surprise Me — full-screen loading */
+
+.page-surprise-loading {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #F5EFEB 0%, #fff 45%, rgba(245, 112, 157, 0.08) 100%);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.surprise-loading {
+  width: min(420px, 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.surprise-loading-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pal-teal, #567C8D);
+}
+
+.surprise-dice-stage {
+  position: relative;
+  width: 140px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.surprise-die {
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--pal-navy, #2F4156);
+  filter: drop-shadow(0 8px 18px rgba(245, 112, 157, 0.28));
+  animation: surprise-die-bounce 0.55s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.surprise-die--b {
+  animation-delay: 0.18s;
+  color: #F5709D;
+}
+
+@keyframes surprise-die-bounce {
+  0% {
+    transform: translateY(0) rotate(-12deg) scale(1);
+  }
+  100% {
+    transform: translateY(-14px) rotate(18deg) scale(1.06);
+  }
+}
+
+.surprise-loading-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.35rem, 4vw, 1.65rem);
+  font-weight: 700;
+  color: var(--pal-navy, #2F4156);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.surprise-loading-msg {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--pal-teal, #567C8D);
+  margin: 0;
+  min-height: 1.4em;
+  transition: opacity 0.35s ease;
+}
+
+.surprise-loading-msg.is-fading {
+  opacity: 0;
+}
+
+.surprise-loading-bar {
+  width: 100%;
+  max-width: 280px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(200, 217, 230, 0.55);
+  overflow: hidden;
+  border: 1px solid var(--pal-sky, #C8D9E6);
+}
+
+.surprise-loading-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #F5709D, #11FFC9, #2FA6C6);
+  animation: surprise-progress 2.5s linear forwards;
+}
+
+@keyframes surprise-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.surprise-loading-hint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--pal-teal, #567C8D);
+  opacity: 0.75;
+  margin: 0;
+}

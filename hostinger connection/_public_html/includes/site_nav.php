@@ -80,6 +80,10 @@ $nav_counts = $nav_counts ?? [];
                             <i class="fa-solid fa-hand-pointer"></i> Direct Prompts
                             <?= empty($nav_counts['direct']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'direct_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
+                        <a href="all_codes.php" class="dd-all-codes">
+                            <i class="fa-solid fa-code"></i> All Secret Codes
+                            <?= $curPage === 'all_codes.php' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
+                        </a>
                     </div>
                 </div>
 
@@ -139,6 +143,7 @@ $nav_counts = $nav_counts ?? [];
             <a href="insta_viral.php">Insta Viral Reels</a>
             <a href="already_uploaded.php">Already Uploaded</a>
             <a href="direct_prompts.php">Direct Prompts</a>
+            <a href="all_codes.php">All Secret Codes</a>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">
             <i class="fa-brands fa-instagram"></i> @arigato.devan

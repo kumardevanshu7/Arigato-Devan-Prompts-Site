@@ -8,11 +8,23 @@ body.page-category {
   max-width: 100%;
 }
 
+body.page-category #navStickyWrap {
+  padding-bottom: clamp(18px, 3vw, 28px);
+}
+
 .page-category .cat-hero,
 .page-category .cat-main {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.page-category .cat-main {
+  padding-top: clamp(8px, 2vw, 16px);
+}
+
+.page-category .cat-main--with-instruction {
+  padding-top: clamp(20px, 3.5vw, 32px) !important;
 }
 
 .page-category .cat-hero h1 {
@@ -53,8 +65,12 @@ body.page-category {
   }
 
   .page-category .cat-main {
-    padding: 0 16px 72px !important;
+    padding: 20px 16px 80px !important;
     overflow-x: hidden;
+  }
+
+  .page-category .cat-main--with-instruction {
+    padding-top: 20px !important;
   }
 
   /* Steps — 2-column grid instead of horizontal overflow */
@@ -122,8 +138,9 @@ body.page-category {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin-bottom: 18px !important;
-    padding: 0 16px 4px 16px;
+    gap: 10px;
+    margin-bottom: 22px !important;
+    padding: 2px 16px 6px 16px;
     margin-left: -16px;
     margin-right: -16px;
     width: calc(100% + 32px);
@@ -138,14 +155,12 @@ body.page-category {
   .page-category .filter-pill {
     flex-shrink: 0;
     font-size: 0.72rem;
-    padding: 7px 14px;
+    padding: 8px 15px;
   }
 
-  /* Card grid — 2 columns full width */
+  /* Card grid — inherits shared .prompt-grid breakpoints */
   .page-category .cat-main .prompt-grid {
-    padding: 0 0 48px !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
+    padding: 0 0 56px !important;
     margin: 0;
   }
 
@@ -157,7 +172,8 @@ body.page-category {
   }
 
   .page-category .prompt-card .card-info {
-    padding: 10px 10px 12px !important;
+    padding: 12px 12px 14px !important;
+    gap: 10px !important;
   }
 
   .page-category .prompt-card .card-title {
@@ -171,15 +187,15 @@ body.page-category {
   }
 
   .page-category .prompt-card .card-badge {
-    top: 8px;
-    left: 8px;
+    top: 10px;
+    left: 10px;
     font-size: 0.5rem;
-    padding: 3px 7px;
+    padding: 4px 8px;
   }
 
   .page-category .prompt-card .card-lock-icon {
-    top: 8px;
-    right: 8px;
+    top: 10px;
+    right: 10px;
     width: 24px;
     height: 24px;
     font-size: 10px;
@@ -192,7 +208,7 @@ body.page-category {
 
 @media (max-width: 380px) {
   .page-category .cat-main .prompt-grid {
-    gap: 8px !important;
+    gap: 14px !important;
   }
 
   .page-category .sg-box {
@@ -210,18 +226,19 @@ body.page-category {
 
 .cat-instruction-wrap--above-grid {
   padding: 0;
-  margin: 0 0 12px;
+  margin: 0 0 22px;
   width: 100%;
 }
 
 .page-category .cat-main--with-instruction {
-  padding-top: 10px !important;
+  padding-top: clamp(20px, 3.5vw, 32px) !important;
 }
 
 .page-category .cat-tag-filters {
-  margin-bottom: 20px !important;
+  margin-bottom: 24px !important;
   padding-left: 2px;
   padding-right: 2px;
+  gap: 10px;
   scroll-padding-left: 16px;
 }
 
@@ -230,6 +247,7 @@ body.page-category {
   margin-right: 0;
   padding-left: 4px;
   padding-right: 16px;
+  padding-bottom: 4px;
 }
 
 .page-category .cat-tag-filters .filter-pill:first-child {
@@ -240,8 +258,12 @@ body.page-category {
 .page-category .prompt-card .card-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px 12px !important;
+  gap: 10px;
+  padding: 12px 14px 14px !important;
+}
+
+.page-category .cat-main .prompt-grid {
+  gap: var(--pg-gap, clamp(18px, 2.2vw, 26px));
 }
 
 .page-category .prompt-card .card-title {
@@ -275,34 +297,40 @@ body.page-category {
 .cat-instruction-banner--compact {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 14px;
+  padding: 14px 18px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(245, 112, 157, 0.14) 0%, rgba(17, 255, 201, 0.1) 100%);
   border: 1px solid rgba(245, 112, 157, 0.38);
   box-shadow: 0 4px 16px rgba(245, 112, 157, 0.12);
 }
 
-.cat-instruction-banner--compact .cat-instruction-heart {
+.cat-instruction-banner--compact .cat-instruction-icon {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.78rem;
   color: #fff;
   background: linear-gradient(135deg, #F5709D, #6D2D52);
   box-shadow: 0 2px 8px rgba(245, 112, 157, 0.35);
 }
 
+.cat-instruction-banner--compact .cat-instruction-icon i {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
 .cat-instruction-banner--compact .cat-instruction-line {
   margin: 0;
+  flex: 1;
+  min-width: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1.45;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.5;
   color: var(--pal-navy, #2F4156);
   letter-spacing: -0.01em;
 }
@@ -323,26 +351,27 @@ body.page-category {
 
 @media (max-width: 768px) {
   .cat-instruction-wrap--above-grid {
-    margin-bottom: 10px;
+    margin-bottom: 18px;
   }
 
   .page-category .cat-main--with-instruction {
-    padding-top: 8px !important;
+    padding-top: 20px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
 
   .cat-instruction-banner--compact {
-    padding: 8px 12px;
-    gap: 8px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    gap: 12px;
+    border-radius: 12px;
   }
 
   .cat-instruction-banner--compact .cat-instruction-line {
-    font-size: 0.74rem;
+    font-size: 0.78rem;
+    line-height: 1.55;
   }
 
   .page-category .cat-tag-filters {
-    margin-bottom: 16px !important;
+    margin-bottom: 20px !important;
   }
 }

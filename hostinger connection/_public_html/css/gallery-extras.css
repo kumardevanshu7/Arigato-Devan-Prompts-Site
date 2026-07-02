@@ -597,7 +597,6 @@ body.page-gallery {
 
 .page-gallery .prompt-grid {
   padding-bottom: var(--gal-gap-lg) !important;
-  gap: clamp(16px, 2.5vw, 28px) !important;
 }
 
 .page-gallery .gal-pagination {
@@ -827,8 +826,6 @@ body.page-gallery {
     max-width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px !important;
     margin: 0 auto;
   }
 
@@ -887,9 +884,5 @@ body.page-gallery {
 
   .trending-card {
     flex: 0 0 118px;
-  }
-
-  .page-gallery .prompt-grid {
-    gap: 8px !important;
   }
 }

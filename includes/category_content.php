@@ -16,11 +16,14 @@ $cat_hide_hero   = !empty($cat_hide_hero);
 function render_cat_instruction_banner(array $instruction): void {
     $compact = !isset($instruction['compact']) || $instruction['compact'] !== false;
     $icon    = htmlspecialchars($instruction['icon'] ?? 'fa-heart');
+    $title   = $instruction['title'] ?? '';
     ?>
     <div class="cat-instruction-wrap cat-instruction-wrap--above-grid">
         <div class="cat-instruction-banner<?= $compact ? ' cat-instruction-banner--compact' : '' ?>" role="note">
-            <i class="fa-solid <?= $icon ?> cat-instruction-heart" aria-hidden="true"></i>
-            <p class="cat-instruction-line"><?= htmlspecialchars($instruction['title'] ?? '') ?></p>
+            <span class="cat-instruction-icon" aria-hidden="true">
+                <i class="fa-solid <?= $icon ?>"></i>
+            </span>
+            <p class="cat-instruction-line"><?= htmlspecialchars($title) ?></p>
         </div>
     </div>
     <?php

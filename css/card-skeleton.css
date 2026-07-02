@@ -1,0 +1,119 @@
+/* Fast visible card shimmer */
+@keyframes skel-fast {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.prompt-card.skeleton .card-image-wrap,
+.sp-card.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #d2cbc2 !important;
+}
+
+.prompt-card.skeleton .card-image-wrap::before,
+.sp-card.skeleton::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.25) 30%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0.25) 70%,
+        transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: skel-fast 0.75s linear infinite;
+    pointer-events: none;
+}
+
+.prompt-card.skeleton .card-image-wrap img.skeleton-img,
+.sp-card.skeleton .card-bg-image.skeleton-img {
+    opacity: 0;
+    transition: opacity 0.28s ease-out;
+}
+
+.prompt-card.skeleton .card-image-wrap img.skeleton-img.loaded,
+.sp-card.skeleton .card-bg-image.skeleton-img.loaded {
+    opacity: 1;
+}
+
+.prompt-card.skeleton .card-badge,
+.prompt-card.skeleton .card-lock-icon,
+.sp-card.skeleton .card-type-badge,
+.sp-card.skeleton .card-lock-icon {
+    opacity: 0.65;
+    z-index: 4;
+    position: relative;
+}
+
+.prompt-card.skeleton .card-overlay {
+    display: none;
+}
+
+.prompt-card.skeleton .card-title {
+    position: relative;
+    color: transparent !important;
+    background: #d8d1c8;
+    border-radius: 5px;
+    height: 12px;
+    width: 68%;
+    overflow: hidden;
+}
+
+.prompt-card.skeleton .card-title::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 35%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.3) 65%,
+        transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: skel-fast 0.75s linear infinite;
+    animation-delay: 0.1s;
+}
+
+.prompt-card.skeleton .card-like-display {
+    opacity: 0.5;
+}
+
+.sp-card.skeleton .card-content-overlay .card-title {
+    color: transparent !important;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    height: 11px;
+    width: 65%;
+    position: relative;
+    overflow: hidden;
+}
+
+.sp-card.skeleton .card-content-overlay .card-title::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.55),
+        transparent
+    );
+    transform: translateX(-100%);
+    animation: skel-fast 0.75s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .prompt-card.skeleton .card-image-wrap::before,
+    .sp-card.skeleton::before,
+    .prompt-card.skeleton .card-title::before,
+    .sp-card.skeleton .card-content-overlay .card-title::before {
+        animation: none;
+    }
+}

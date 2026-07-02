@@ -26,40 +26,49 @@ foreach ($prompts as $sp) {
 $secret_sub_tags = array_unique($secret_sub_tags);
 sort($secret_sub_tags);
 ?>
-<section class="page-hero" style="flex-direction:column;align-items:center;text-align:center;padding-bottom:36px;">
-    <div class="home-welcome">
-        <span class="home-welcome-icon<?= $welcome_icon === 'fa-fire' ? ' is-fire' : '' ?>"><i class="fa-solid <?= $welcome_icon ?>"></i></span>
-        <div>
-            <div class="pw-hi"><?= $welcome_hi ?></div>
-            <div class="pw-sub"><?= $welcome_sub ?></div>
+<section class="page-hero page-hero--logged">
+    <div class="home-logged-shell">
+        <div class="home-welcome">
+            <span class="home-welcome-icon<?= $welcome_icon === 'fa-fire' ? ' is-fire' : '' ?>"><i class="fa-solid <?= $welcome_icon ?>"></i></span>
+            <div>
+                <div class="pw-hi"><?= $welcome_hi ?></div>
+                <div class="pw-sub"><?= $welcome_sub ?></div>
+            </div>
+        </div>
+
+        <?php if ($new_drop_count > 0): ?>
+        <a href="gallery.php" class="home-drop-banner">
+            <i class="fa-solid fa-fire"></i>
+            <?= $new_drop_count ?> NEW <?= $new_drop_count === 1 ? 'PROMPT' : 'PROMPTS' ?> DROPPED!
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <?php endif; ?>
+
+        <div class="home-logged-head">
+            <span class="home-logged-eyebrow">Fresh Drops</span>
+            <h1 class="home-logged-title">Unlock <em>the Magic</em></h1>
+            <p class="home-logged-sub">Secret, viral &amp; unreleased AI prompts — pick one and go viral</p>
+        </div>
+
+        <div class="home-logged-actions">
+            <a href="gallery.php" class="home-gallery-cta">
+                <span class="home-gallery-cta-icon" aria-hidden="true"><i class="fa-solid fa-images"></i></span>
+                <span class="home-gallery-cta-body">
+                    <span class="home-gallery-cta-title">Browse Prompt Gallery</span>
+                    <span class="home-gallery-cta-desc">Complete collection — filter by vibe</span>
+                </span>
+                <span class="home-gallery-cta-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="surprise_me.php" class="home-surprise-btn">
+                <span class="home-surprise-dice-pair" aria-hidden="true">
+                    <i class="fa-solid fa-dice-three home-surprise-die home-surprise-die--red"></i>
+                    <i class="fa-solid fa-dice-five home-surprise-die home-surprise-die--pink"></i>
+                </span>
+                Surprise Me
+            </a>
         </div>
     </div>
-
-    <?php if ($new_drop_count > 0): ?>
-    <a href="gallery.php" class="home-drop-banner">
-        <i class="fa-solid fa-fire"></i>
-        <?= $new_drop_count ?> NEW <?= $new_drop_count === 1 ? 'PROMPT' : 'PROMPTS' ?> DROPPED!
-        <i class="fa-solid fa-arrow-right"></i>
-    </a>
-    <?php endif; ?>
-
-    <p class="hero-label" style="justify-content:center;">Fresh Drops</p>
-    <h1 style="text-align:center;">Unlock <em>the Magic</em></h1>
-
-    <a href="gallery.php" class="home-browse-card">
-        <div class="home-browse-inner">
-            <div class="hbc-icon"><i class="fa-solid fa-images"></i></div>
-            <div>
-                <h3>Browse the Complete Prompt Gallery</h3>
-                <p>Explore all secret, viral &amp; unreleased AI prompts</p>
-            </div>
-            <i class="fa-solid fa-arrow-right"></i>
-        </div>
-    </a>
-
-    <a href="surprise_me.php" class="home-btn-outline" style="margin-top:8px;">
-        <i class="fa-solid fa-dice"></i> Surprise Me
-    </a>
 </section>
 
 <main class="page-main">
@@ -71,8 +80,7 @@ sort($secret_sub_tags);
         else { $fptype = 'secret_code'; }
     ?>
     <div class="potd-section">
-        <div class="potd-label"><i class="fa-solid fa-star"></i> Prompt of the Day</div>
-        <article class="potd-featured card"
+        <article class="potd-featured"
              data-id="<?= $featuredPrompt['id'] ?>"
              data-slug="<?= htmlspecialchars($featuredPrompt['slug'] ?? '') ?>"
              data-image="<?= htmlspecialchars($featuredPrompt['image_path']) ?>"
@@ -88,25 +96,32 @@ sort($secret_sub_tags);
              <?= $featuredPrompt['is_unlocked'] ? 'data-prompt-text="' . htmlspecialchars($featuredPrompt['prompt_text']) . '"' : '' ?>>
             <div class="potd-featured-img">
                 <img loading="lazy" src="<?= htmlspecialchars($featuredPrompt['image_path']) ?>" alt="<?= htmlspecialchars($featuredPrompt['title']) ?>">
-                <div class="potd-img-shade" aria-hidden="true"></div>
                 <?php if (!$featuredPrompt['is_unlocked']): ?>
-                <span class="potd-status-tag is-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+                <span class="potd-status-tag is-locked"><i class="fa-solid fa-lock"></i></span>
                 <?php else: ?>
-                <span class="potd-status-tag is-open"><i class="fa-solid fa-check"></i> Unlocked</span>
+                <span class="potd-status-tag is-open"><i class="fa-solid fa-check"></i></span>
                 <?php endif; ?>
             </div>
             <div class="potd-featured-body">
-                <h3><?= htmlspecialchars($featuredPrompt['title']) ?></h3>
-                <div class="potd-meta-row">
-                    <span class="potd-likes-pill">
+                <div class="potd-title-row">
+                    <h3><?= htmlspecialchars($featuredPrompt['title']) ?></h3>
+                    <span class="potd-star-badge" title="Prompt of the Day"><i class="fa-solid fa-star"></i></span>
+                </div>
+                <p class="potd-sub">
+                    <?= $featuredPrompt['is_unlocked']
+                        ? 'Prompt of the Day — ready to copy &amp; create.'
+                        : 'Prompt of the Day — unlock and go viral today.' ?>
+                </p>
+                <div class="potd-foot">
+                    <span class="potd-stat">
                         <i class="fa-solid fa-heart"></i>
-                        <?= (int)$featuredPrompt['likes_count'] ?> likes
+                        <?= (int)$featuredPrompt['likes_count'] ?>
+                    </span>
+                    <span class="potd-cta-link">
+                        <?= $featuredPrompt['is_unlocked'] ? 'View' : 'Unlock' ?>
+                        <i class="fa-solid fa-plus"></i>
                     </span>
                 </div>
-                <span class="potd-cta-link">
-                    <?= $featuredPrompt['is_unlocked'] ? 'View Prompt' : 'Tap to Unlock' ?>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </span>
             </div>
         </article>
     </div>
@@ -138,7 +153,7 @@ sort($secret_sub_tags);
             $tinfo = $type_labels[$ptype] ?? $type_labels['secret_code'];
             $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter:blur(5px);transform:scale(1.05);' : '';
         ?>
-        <div class="product-card prompt-card card"
+        <div class="product-card prompt-card card skeleton"
              data-index="<?= $index ?>"
              data-id="<?= $p['id'] ?>"
              data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
@@ -155,7 +170,7 @@ sort($secret_sub_tags);
              data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
              <?= $p['is_unlocked'] ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
             <div class="card-image-wrap">
-                <img src="<?= htmlspecialchars($p['image_path']) ?>" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
+                <img src="<?= htmlspecialchars($p['image_path']) ?>" class="skeleton-img" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
                 <span class="card-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></span>
                 <?php if (!$p['is_unlocked']): ?>
                     <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>

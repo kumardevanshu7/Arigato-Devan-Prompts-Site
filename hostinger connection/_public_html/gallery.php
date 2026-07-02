@@ -77,7 +77,8 @@ $gal_banner_slides = gallery_banner_slides();
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260706">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20260729">
+    <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -208,8 +209,7 @@ $gal_banner_slides = gallery_banner_slides();
                          src="<?= htmlspecialchars($p["image_path"]) ?>"
                          class="skeleton-img"
                          alt="<?= htmlspecialchars($p["title"]) ?>"
-                         style="<?= $blur_style ?>"
-                         onload="this.classList.add('loaded');this.closest('.prompt-card').classList.remove('skeleton')">
+                         style="<?= $blur_style ?>">
                     <span class="card-badge <?= $tinfo["cls"] ?>"><?= $tinfo["label"] ?></span>
                     <?php if (!$p["is_unlocked"]): ?>
                         <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
@@ -545,7 +545,5 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<!-- Nav scroll-hide -->
-<script>(function(){var nav=document.getElementById("navStickyWrap");if(!nav)return;var lastY=window.scrollY,ticking=false;window.addEventListener("scroll",function(){if(!ticking){window.requestAnimationFrame(function(){var y=window.scrollY;if(y>lastY&&y>80)nav.classList.add("nav-hidden");else nav.classList.remove("nav-hidden");lastY=y;ticking=false;});ticking=true;}},{passive:true});})();</script>
 </body>
 </html>

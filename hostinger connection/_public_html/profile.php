@@ -121,6 +121,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $cur_gender = $gender;
     }
 }
+
+// Streak (same logic as user_data.php)
+$streak = 0;
+$today = date('Y-m-d');
+$yesterday = date('Y-m-d', strtotime('-1 day'));
+try {
+    $last_visit = $user['last_visit_date'] ?? null;
+    $streak = (int)($user['streak_count'] ?? 0);
+    if ($last_visit === $today) {
+        // already counted today
+    } elseif ($last_visit === $yesterday) {
+        $streak++;
+        $pdo->prepare("UPDATE users SET last_visit_date = ?, streak_count = ? WHERE id = ?")
+            ->execute([$today, $streak, $_SESSION["user_id"]]);
+        $user['streak_count'] = $streak;
+        $user['last_visit_date'] = $today;
+    } else {
+        $streak = 1;
+        $pdo->prepare("UPDATE users SET last_visit_date = ?, streak_count = 1 WHERE id = ?")
+            ->execute([$today, $_SESSION["user_id"]]);
+        $user['streak_count'] = 1;
+        $user['last_visit_date'] = $today;
+    }
+    $_SESSION['streak'] = $streak;
+} catch (PDOException $e) {
+    $streak = (int)($_SESSION['streak'] ?? 0);
+}
+
+// Profile completion
+$has_avatar = !empty($user['avatar']) && in_array($user['avatar'], $all_avatars, true);
+$has_username = strlen(trim($user['username'] ?? '')) >= 3;
+$has_gender = in_array($user['gender'] ?? '', ['male', 'female', 'nonbinary'], true);
+$completion_steps = [
+    ['label' => 'Avatar', 'done' => $has_avatar],
+    ['label' => 'Username', 'done' => $has_username],
+    ['label' => 'Gender', 'done' => $has_gender],
+];
+$completion_done = count(array_filter($completion_steps, static fn($s) => $s['done']));
+$completion_pct = (int) round($completion_done / 3 * 100);
+
+if ($streak <= 0) {
+    $streak_sub = 'Visit daily to build your streak!';
+} elseif ($streak === 1) {
+    $streak_sub = 'Great start — come back tomorrow!';
+} else {
+    $streak_sub = 'Keep it up — don\'t break the chain!';
+}
+
+// Small milestones
+$badges = [
+    ['icon' => 'fa-lock-open', 'label' => 'First Unlock', 'earned' => $unlocked_count >= 1],
+    ['icon' => 'fa-key',         'label' => '5 Unlocks',    'earned' => $unlocked_count >= 5],
+    ['icon' => 'fa-bookmark',    'label' => 'First Save',   'earned' => $saved_count >= 1],
+    ['icon' => 'fa-heart',       'label' => 'First Like',   'earned' => $likes_count >= 1],
+    ['icon' => 'fa-fire',        'label' => '3 Day Streak', 'earned' => $streak >= 3],
+    ['icon' => 'fa-star',        'label' => 'All Set',      'earned' => $completion_pct === 100],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -130,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="theme-color" content="#2F4156">
     <title>Edit Profile — Arigato Devan Prompts</title>
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/profile-pages.css">
+    <link rel="stylesheet" href="css/profile-pages.css?v=20260732">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store theme-nogoda page-profile">
@@ -236,7 +293,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         
         <!-- Right: Stats & Info -->
         <div class="prof-stats-card">
-            <h3>Your Statistics</h3>
+            <h3>Your Profile</h3>
+
+            <div class="prof-completion">
+                <div class="prof-completion-head">
+                    <span class="prof-completion-title">Profile Completion</span>
+                    <span class="prof-completion-pct"><?= $completion_pct ?>%</span>
+                </div>
+                <div class="prof-completion-bar" role="progressbar" aria-valuenow="<?= $completion_pct ?>" aria-valuemin="0" aria-valuemax="100">
+                    <div class="prof-completion-fill" style="width: <?= $completion_pct ?>%"></div>
+                </div>
+                <div class="prof-completion-steps">
+                    <?php foreach ($completion_steps as $step): ?>
+                    <span class="prof-completion-step<?= $step['done'] ? ' is-done' : '' ?>">
+                        <i class="fa-solid <?= $step['done'] ? 'fa-circle-check' : 'fa-circle' ?>"></i>
+                        <?= htmlspecialchars($step['label']) ?>
+                    </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <div class="prof-streak-card">
+                <div class="prof-streak-icon" aria-hidden="true">🔥</div>
+                <div class="prof-streak-body">
+                    <div class="prof-streak-top">
+                        <span class="prof-streak-val"><?= $streak ?></span>
+                        <span class="prof-streak-lbl">Day<?= $streak === 1 ? '' : 's' ?> Streak</span>
+                    </div>
+                    <p class="prof-streak-sub"><?= htmlspecialchars($streak_sub) ?></p>
+                </div>
+            </div>
+
             <p class="prof-stats-sub">Track your interaction metrics and account details.</p>
             
             <div class="stats-grid">
@@ -253,6 +340,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <span class="stat-lbl">Liked</span>
                 </div>
             </div>
+
+            <div class="prof-badges-section">
+                <h4 class="prof-badges-title">Milestones</h4>
+                <div class="prof-badges-grid">
+                    <?php foreach ($badges as $badge): ?>
+                    <div class="prof-badge<?= $badge['earned'] ? ' is-earned' : ' is-locked' ?>" title="<?= htmlspecialchars($badge['label']) ?>">
+                        <span class="prof-badge-icon"><i class="fa-solid <?= $badge['icon'] ?>"></i></span>
+                        <span class="prof-badge-lbl"><?= htmlspecialchars($badge['label']) ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <a href="saved_prompts.php" class="prof-saved-card">
+                <div class="prof-saved-icon" aria-hidden="true">
+                    <i class="fa-solid fa-bookmark"></i>
+                </div>
+                <div class="prof-saved-body">
+                    <span class="prof-saved-lbl">Saved Prompts</span>
+                    <span class="prof-saved-val"><?= $saved_count ?> prompt<?= $saved_count === 1 ? '' : 's' ?> saved</span>
+                </div>
+                <span class="prof-saved-action">
+                    View All <i class="fa-solid fa-arrow-right"></i>
+                </span>
+            </a>
             
             <hr class="prof-divider">
             

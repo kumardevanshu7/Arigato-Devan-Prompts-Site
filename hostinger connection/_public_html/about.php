@@ -26,7 +26,7 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
     <meta property="og:url" content="https://arigatodevan.com/about.php">
     <meta name="twitter:card" content="summary_large_image">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/info-pages.css?v=20260701">
+    <link rel="stylesheet" href="css/info-pages.css?v=20260719">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info theme-nogoda">
@@ -41,7 +41,8 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
         <p>Premium AI couple prompts for Instagram Reels — crafted with care, tested on Gemini &amp; ChatGPT.</p>
     </div>
 
-    <div class="about-profile-section">
+    <div class="about-creator-card">
+        <div class="about-profile-section">
         <div class="about-avatar-wrap">
             <div class="profile-flipper" id="profileFlipper" onclick="toggleFlip()" title="Click to flip">
                 <div class="profile-inner" id="profileInner">
@@ -68,14 +69,15 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
             <span class="about-tag">#PromptVerse</span>
             <span class="about-tag">#DigitalCreator</span>
         </div>
-    </div>
+        </div>
 
-    <div class="about-stats-row">
-        <div class="about-stat"><div class="stat-num"><?= $total_prompts ?>+</div><div class="stat-label">Prompts</div></div>
-        <div class="about-stat"><div class="stat-num"><?= $total_unlocks ?>+</div><div class="stat-label">Unlocks</div></div>
-        <div class="about-stat"><div class="stat-num"><?= $total_followers ?>+</div><div class="stat-label">Followers</div></div>
-        <div class="about-stat"><div class="stat-num"><?= $total_copies ?>+</div><div class="stat-label">Copies</div></div>
-        <div class="about-stat"><div class="stat-num"><?= $total_views ?>+</div><div class="stat-label">Views</div></div>
+        <div class="about-stats-row">
+            <div class="about-stat"><div class="stat-num"><?= $total_prompts ?>+</div><div class="stat-label">Prompts</div></div>
+            <div class="about-stat"><div class="stat-num"><?= $total_unlocks ?>+</div><div class="stat-label">Unlocks</div></div>
+            <div class="about-stat"><div class="stat-num"><?= $total_followers ?>+</div><div class="stat-label">Followers</div></div>
+            <div class="about-stat"><div class="stat-num"><?= $total_copies ?>+</div><div class="stat-label">Copies</div></div>
+            <div class="about-stat"><div class="stat-num"><?= $total_views ?>+</div><div class="stat-label">Views</div></div>
+        </div>
     </div>
 
     <div class="info-card">

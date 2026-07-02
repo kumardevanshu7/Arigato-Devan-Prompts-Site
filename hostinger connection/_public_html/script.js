@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const cards = document.querySelectorAll(".card");
+  const cards = document.querySelectorAll("#card-stack .card, .potd-featured");
 
   // ── ✨ NEW Sparkle Badge — for prompts created in last 48 hours ──
   (function markNewCards() {
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const prevBtn = document.getElementById("swipe-left-btn");
   const nextBtn = document.getElementById("swipe-right-btn");
 
-  let allCards = document.querySelectorAll(".card");
+  let allCards = document.querySelectorAll("#card-stack .card");
   let currentIndex = 0;
   window.isSwiping = false;
 

@@ -5,7 +5,11 @@ $username = "root";
 $password = "";
 
 // Keep authenticated users logged in for long sessions.
-ini_set("session.gc_maxlifetime", (string) (60 * 60 * 24 * 30));
+// ini_set only works before session_start(); pages call session_start() before db.php.
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set("session.gc_maxlifetime", (string) (60 * 60 * 24 * 30));
+    ini_set("session.cookie_lifetime", (string) (60 * 60 * 24 * 30));
+}
 if (session_status() === PHP_SESSION_ACTIVE && session_id() !== "") {
     $is_https = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off";
     setcookie(session_name(), session_id(), [
@@ -24,10 +28,7 @@ try {
         $password,
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Create database if it doesn't exist
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
-    $pdo->exec("USE `$dbname`");
+    $pdo->setAttribute(PDO::ATTR_TIMEOUT, 5);
 
     // Create users table
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
@@ -128,61 +129,70 @@ try {
         UNIQUE KEY unique_user_feedback (user_id)
     )");
 
-    // ─── Run ALTER TABLE migrations only once per session (not every page load) ─
-    if (empty($_SESSION['_db_migrations_done'])) {
-        $blog_alters = [
-            "ALTER TABLE blogs ADD COLUMN image_ratio VARCHAR(10) DEFAULT '16:9'",
-            "ALTER TABLE blogs ADD COLUMN views_count INT DEFAULT 0",
-        ];
-        foreach ($blog_alters as $sql) {
-            try { $pdo->exec($sql); } catch (PDOException $e) {}
+    // ─── Schema migrations: run once, never block every page load ─────────────
+    $schema_flag = __DIR__ . '/cache/.schema_ready_v4';
+    if (!is_file($schema_flag)) {
+        $cache_dir = __DIR__ . '/cache';
+        if (!is_dir($cache_dir)) {
+            @mkdir($cache_dir, 0775, true);
+        }
+        $lock_fp = @fopen($cache_dir . '/.schema.lock', 'c');
+        $got_lock = $lock_fp && flock($lock_fp, LOCK_EX);
+
+        if ($got_lock && !is_file($schema_flag)) {
+            $blog_alters = [
+                "ALTER TABLE blogs ADD COLUMN image_ratio VARCHAR(10) DEFAULT '16:9'",
+                "ALTER TABLE blogs ADD COLUMN views_count INT DEFAULT 0",
+            ];
+            foreach ($blog_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+
+            $user_alters = [
+                "ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE",
+                "ALTER TABLE users ADD COLUMN google_id VARCHAR(100) UNIQUE",
+                "ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'",
+                "ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) NULL",
+                "ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL",
+                "ALTER TABLE users ADD COLUMN gender VARCHAR(20) DEFAULT NULL",
+                "ALTER TABLE users ADD COLUMN onboarding_complete TINYINT(1) DEFAULT 0",
+                "ALTER TABLE users MODIFY password_hash VARCHAR(255) NULL",
+                "ALTER TABLE users MODIFY username VARCHAR(50) NULL",
+                "ALTER TABLE users ADD UNIQUE KEY username (username)",
+                "ALTER TABLE users ADD COLUMN last_visit_date DATE DEFAULT NULL",
+                "ALTER TABLE users ADD COLUMN streak_count INT DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN last_active DATETIME DEFAULT NULL",
+            ];
+            foreach ($user_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+
+            $prompt_alters = [
+                "ALTER TABLE prompts ADD COLUMN reel_link VARCHAR(255) DEFAULT ''",
+                "ALTER TABLE prompts ADD COLUMN likes_count INT DEFAULT 0",
+                "ALTER TABLE prompts CHANGE description tag TEXT NOT NULL",
+                "ALTER TABLE prompts ADD COLUMN prompt_type VARCHAR(20) DEFAULT 'secret'",
+                "ALTER TABLE prompts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0",
+                "ALTER TABLE prompts ADD COLUMN best_works_in VARCHAR(50) DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN asset_title VARCHAR(255) DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN asset_images TEXT DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN slug VARCHAR(255) DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
+                "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
+            ];
+            foreach ($prompt_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+
+            @file_put_contents($schema_flag, date('c'));
         }
 
-        $user_alters = [
-            "ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE",
-            "ALTER TABLE users ADD COLUMN google_id VARCHAR(100) UNIQUE",
-            "ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'",
-            "ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) NULL",
-            "ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL",
-            "ALTER TABLE users ADD COLUMN gender VARCHAR(20) DEFAULT NULL",
-            "ALTER TABLE users ADD COLUMN onboarding_complete TINYINT(1) DEFAULT 0",
-            "ALTER TABLE users MODIFY password_hash VARCHAR(255) NULL",
-            "ALTER TABLE users MODIFY username VARCHAR(50) NULL",
-            "ALTER TABLE users ADD UNIQUE KEY username (username)",
-            "ALTER TABLE users ADD COLUMN last_visit_date DATE DEFAULT NULL",
-            "ALTER TABLE users ADD COLUMN streak_count INT DEFAULT 0",
-        ];
-        foreach ($user_alters as $sql) {
-            try { $pdo->exec($sql); } catch (PDOException $e) {}
+        if ($got_lock) {
+            flock($lock_fp, LOCK_UN);
         }
-
-        $prompt_alters = [
-            "ALTER TABLE prompts ADD COLUMN reel_link VARCHAR(255) DEFAULT ''",
-            "ALTER TABLE prompts ADD COLUMN likes_count INT DEFAULT 0",
-            "ALTER TABLE prompts CHANGE description tag TEXT NOT NULL",
-            "ALTER TABLE prompts ADD COLUMN prompt_type VARCHAR(20) DEFAULT 'secret'",
-            "ALTER TABLE prompts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0",
-            "ALTER TABLE prompts ADD COLUMN best_works_in VARCHAR(50) DEFAULT NULL",
-            "ALTER TABLE prompts ADD COLUMN asset_title VARCHAR(255) DEFAULT NULL",
-            "ALTER TABLE prompts ADD COLUMN asset_images TEXT DEFAULT NULL",
-            "ALTER TABLE prompts ADD COLUMN slug VARCHAR(255) DEFAULT NULL",
-            "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
-            "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
-        ];
-        foreach ($prompt_alters as $sql) {
-            try { $pdo->exec($sql); } catch (PDOException $e) {}
+        if ($lock_fp) {
+            fclose($lock_fp);
         }
-
-        $_SESSION['_db_migrations_done'] = true;
-    }
-
-    // Newer columns — always try (idempotent); session flag may skip older batch
-    $prompt_alters_late = [
-        "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
-        "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
-    ];
-    foreach ($prompt_alters_late as $sql) {
-        try { $pdo->exec($sql); } catch (PDOException $e) {}
     }
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());

@@ -43,7 +43,7 @@ function render_prompt_grid(array $prompts, array $opts = []): void {
         $is_unlocked = !empty($p['is_unlocked']);
         $is_liked    = !empty($p['is_liked']);
     ?>
-        <div class="<?= $card_class ?>"
+        <div class="<?= $card_class ?> skeleton"
              data-index="<?= (int)$index ?>"
              data-id="<?= (int)$p['id'] ?>"
              data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
@@ -61,6 +61,7 @@ function render_prompt_grid(array $prompts, array $opts = []): void {
              <?= $is_unlocked ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
             <div class="card-image-wrap">
                 <img src="<?= htmlspecialchars($p['image_path']) ?>"
+                     class="skeleton-img"
                      alt="<?= htmlspecialchars($p['title']) ?>"
                      style="<?= $blur_style ?>"
                      <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
