@@ -215,6 +215,42 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   height: 2px;
 }
 
+/* My Heroines — pink + beating heart (all main pages) */
+.theme-nogoda .store-nav a.nav-heroines-link,
+.theme-nogoda .gal-mobile-nav a.nav-heroines-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e85d8a !important;
+  font-weight: 700;
+}
+
+.theme-nogoda .store-nav a.nav-heroines-link:hover,
+.theme-nogoda .gal-mobile-nav a.nav-heroines-link:hover {
+  color: #c2185b !important;
+}
+
+.theme-nogoda .store-nav a.nav-heroines-link.gal-nav-active,
+.theme-nogoda .gal-mobile-nav a.nav-heroines-link.gal-nav-active {
+  color: #c2185b !important;
+}
+
+.theme-nogoda .nav-heroines-heart {
+  color: #F5709D;
+  font-size: 0.72rem;
+  line-height: 1;
+  transform-origin: center;
+  animation: nav-heroines-heart-beat 1.15s ease-in-out infinite;
+}
+
+@keyframes nav-heroines-heart-beat {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.22); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.14); }
+  80% { transform: scale(1); }
+}
+
 .theme-nogoda .gal-dropdown-menu a { color: var(--pal-navy); }
 
 /* ---- Back to top (floating) ---- */

@@ -337,13 +337,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Navigate to prompt page (live site only — gallery handles its own clicks)
-      const _slug = card.dataset.slug;
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      // Navigate to prompt page (gallery has its own click handler)
       const isGalleryPage = document.body.classList.contains('page-gallery');
-      if (_slug && !isLocal && !isGalleryPage) {
-        window.location.href = '/prompts/' + _slug;
-        return;
+      const isSavedPage = document.body.classList.contains('page-saved');
+      if (isGalleryPage) {
+        /* gallery.php binds its own navigation */
+      } else {
+        const isLocal =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1';
+        const goToPage = isSavedPage || !isLocal;
+        if (goToPage) {
+          const url = card.dataset.slug
+            ? 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug)
+            : 'prompt.php?id=' + card.dataset.id;
+          window.location.href = url;
+          return;
+        }
       }
 
       currentPromptId = card.dataset.id;

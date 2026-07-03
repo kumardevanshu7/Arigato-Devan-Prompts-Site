@@ -392,8 +392,9 @@ $gal_banner_slides = gallery_banner_slides();
 
 <script>
 function promptPageUrl(card) {
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (!isLocal && card.dataset.slug) return '/prompts/' + card.dataset.slug;
+    if (card.dataset.slug) {
+        return 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug);
+    }
     return 'prompt.php?id=' + card.dataset.id;
 }
 

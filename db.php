@@ -129,6 +129,29 @@ try {
         UNIQUE KEY unique_user_feedback (user_id)
     )");
 
+    // My Heroines — profiles featured in prompts/content
+    $pdo->exec("CREATE TABLE IF NOT EXISTS heroines (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(120) NOT NULL,
+        heroine_type ENUM('real', 'ai') NOT NULL DEFAULT 'ai',
+        circle_image VARCHAR(255) NOT NULL,
+        card_image VARCHAR(255) NOT NULL,
+        times_used INT NOT NULL DEFAULT 0,
+        country VARCHAR(80) DEFAULT NULL,
+        instagram_username VARCHAR(80) DEFAULT NULL,
+        instagram_url VARCHAR(255) DEFAULT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS heroine_settings (
+        setting_key VARCHAR(64) PRIMARY KEY,
+        setting_value TEXT NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+
     // ─── Schema migrations: run once, never block every page load ─────────────
     $schema_flag = __DIR__ . '/cache/.schema_ready_v4';
     if (!is_file($schema_flag)) {

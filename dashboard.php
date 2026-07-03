@@ -510,6 +510,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
+    <a href="heroine_admin.php" class="sb-link"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
@@ -526,6 +527,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="tb-title"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</div>
     <div class="tb-time"><i class="fa-regular fa-clock"></i> <?= date('D, d M Y | h:i A') ?> IST</div>
     <a href="404.php" target="_blank" class="tb-btn tb-red"><i class="fa-solid fa-triangle-exclamation"></i> Preview 404</a>
+    <a href="500.php" target="_blank" class="tb-btn tb-red"><i class="fa-solid fa-server"></i> Preview 500</a>
   </div>
 
   <?php if ($success): ?><div class="flash flash-ok"><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($success) ?></div><?php endif; ?>

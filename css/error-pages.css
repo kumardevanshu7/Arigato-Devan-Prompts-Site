@@ -1,0 +1,240 @@
+/* 404 / 500 — Nogoda theme */
+
+body.page-error {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  position: relative;
+  padding: 24px 16px 48px;
+}
+
+body.page-error::before,
+body.page-error::after {
+  display: none !important;
+}
+
+.err-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(193, 232, 255, 0.85) 0%, transparent 42%),
+    radial-gradient(circle at 88% 14%, rgba(224, 218, 254, 0.75) 0%, transparent 40%),
+    radial-gradient(circle at 50% 92%, rgba(245, 238, 253, 0.9) 0%, transparent 48%),
+    linear-gradient(160deg, #F5EFEB 0%, #fff 52%, rgba(245, 112, 157, 0.1) 100%);
+}
+
+.err-page {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: min(560px, 100%);
+  padding: clamp(28px, 5vw, 44px) clamp(20px, 4vw, 32px);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  border-radius: 28px;
+  box-shadow: 0 16px 48px rgba(47, 65, 86, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.err-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff4cc 100%);
+  border: 1px solid rgba(245, 112, 157, 0.22);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--pal-navy, #2F4156);
+  box-shadow: 0 4px 16px rgba(47, 65, 86, 0.06);
+}
+
+.err-char {
+  display: block;
+  font-size: clamp(3rem, 10vw, 4.2rem);
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--pal-teal, #567C8D);
+  animation: err-char-bob 2.8s ease-in-out infinite;
+}
+
+@keyframes err-char-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-12px) rotate(4deg); }
+}
+
+.err-num {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(5rem, 22vw, 9.5rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  position: relative;
+  display: inline-block;
+  margin: 12px 0 14px;
+  background: linear-gradient(180deg, var(--pal-navy, #2F4156) 0%, var(--pal-navy, #2F4156) 48%, transparent 48%),
+    var(--nogoda-gradient-h, linear-gradient(90deg, #6D2D52, #F5709D, #11FFC9, #2FA6C6));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.err-num::before,
+.err-num::after {
+  content: attr(data-code);
+  position: absolute;
+  inset: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  -webkit-text-fill-color: transparent;
+}
+
+.err-num::before {
+  background: linear-gradient(90deg, #F5709D, #e8b4d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  clip-path: polygon(0 0, 100% 0, 100% 46%, 0 46%);
+  animation: err-glitch-a 4s infinite;
+}
+
+.err-num::after {
+  background: linear-gradient(90deg, #11FFC9, #2FA6C6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  clip-path: polygon(0 54%, 100% 54%, 100% 100%, 0 100%);
+  animation: err-glitch-b 4s infinite;
+}
+
+@keyframes err-glitch-a {
+  0%, 80%, 100% { transform: translate(0); }
+  82% { transform: translate(-4px, -2px); }
+  84% { transform: translate(4px, 1px); }
+  86% { transform: translate(0); }
+}
+
+@keyframes err-glitch-b {
+  0%, 80%, 100% { transform: translate(0); }
+  82% { transform: translate(4px, 2px); }
+  84% { transform: translate(-4px, -1px); }
+  86% { transform: translate(0); }
+}
+
+.err-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #e85d8a, #F5709D);
+  border: 1px solid rgba(109, 45, 82, 0.2);
+  box-shadow: 0 4px 14px rgba(245, 112, 157, 0.28);
+  margin-bottom: 16px;
+}
+
+.err-badge--500 {
+  background: linear-gradient(135deg, #567C8D, #2F4156);
+  box-shadow: 0 4px 14px rgba(47, 65, 86, 0.2);
+}
+
+.err-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.45rem, 4.5vw, 2rem);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--pal-navy, #2F4156);
+  margin: 0 0 10px;
+}
+
+.err-desc {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--pal-teal, #567C8D);
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+
+.err-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.err-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 148px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.err-btn:hover {
+  transform: translateY(-2px);
+}
+
+.err-btn-home {
+  color: var(--pal-navy, #2F4156);
+  background: linear-gradient(135deg, rgba(245, 112, 157, 0.18), rgba(200, 217, 230, 0.5));
+  border-color: var(--pal-sky, #C8D9E6);
+  box-shadow: 0 6px 20px rgba(47, 65, 86, 0.08);
+}
+
+.err-btn-home:hover {
+  box-shadow: 0 10px 28px rgba(245, 112, 157, 0.18);
+}
+
+.err-btn-surprise {
+  color: var(--pal-navy, #2F4156);
+  background: linear-gradient(135deg, #fff9e6, #fff4cc);
+  border-color: rgba(245, 112, 157, 0.25);
+  box-shadow: 0 6px 20px rgba(47, 65, 86, 0.06);
+}
+
+.err-btn-surprise:hover {
+  box-shadow: 0 10px 28px rgba(245, 112, 157, 0.14);
+}
+
+.err-particle {
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  opacity: 0;
+  animation: err-particle-rise linear infinite;
+}
+
+@keyframes err-particle-rise {
+  0% { transform: translateY(105vh) rotate(0deg) scale(0.5); opacity: 0; }
+  10% { opacity: 0.55; }
+  90% { opacity: 0.55; }
+  100% { transform: translateY(-10vh) rotate(360deg) scale(1); opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .err-page { border-radius: 22px; padding: 24px 16px; }
+  .err-btns { flex-direction: column; }
+  .err-btn { width: 100%; min-width: 0; }
+}

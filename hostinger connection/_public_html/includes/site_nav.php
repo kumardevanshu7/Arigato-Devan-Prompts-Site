@@ -28,6 +28,7 @@ if (!isset($nav_counts) && isset($pdo)) {
     }
 }
 $nav_counts = $nav_counts ?? [];
+$nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
 ?>
 <div id="navStickyWrap">
     <header class="store-header">
@@ -47,11 +48,12 @@ $nav_counts = $nav_counts ?? [];
                 </a>
                 <a href="gallery.php" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
                 <a href="blogs.php" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
+                <a href="my_heroines.php" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
+                    <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
+                    My Heroines
+                </a>
                 <a href="progress.php" class="gal-icon-link" title="Our Journey">
                     <i class="fa-solid fa-chart-line"></i>
-                </a>
-                <a href="faq.php" class="gal-icon-link" title="FAQ">
-                    <i class="fa-solid fa-circle-question"></i>
                 </a>
 
                 <div class="gal-dropdown">
@@ -132,8 +134,11 @@ $nav_counts = $nav_counts ?? [];
         <a href="digital_store/index.php"><i class="fa-solid fa-shop"></i> Shop</a>
         <a href="gallery.php"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="blogs.php"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
+        <a href="my_heroines.php" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
+            <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
+            My Heroines
+        </a>
         <a href="progress.php"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
-        <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
         <button type="button" class="gal-mobile-section-btn" id="galMobileReelsBtn">
             <i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down" style="margin-left:auto;font-size:0.7rem;"></i>
         </button>
@@ -212,11 +217,11 @@ $nav_counts = $nav_counts ?? [];
         reelsBtn.addEventListener('click', function() { reelsSub.classList.toggle('open'); });
     }
 
-    /* Brand title typewriter: arigato.prompt ↔ arigato.devan */
+    /* Brand title typewriter: arigato.prompt ↔ arigato.devan (↔ heroines on some pages) */
     var suffixEl = document.getElementById('brandSuffix');
     var brandWrap = document.getElementById('brandTypewriter');
     if (suffixEl && brandWrap) {
-        var words = ['prompt', 'devan'];
+        var words = <?= json_encode(array_values($nav_brand_words), JSON_UNESCAPED_UNICODE) ?>;
         var wordIdx = 0;
         var typing = false;
 

@@ -1,0 +1,138 @@
+/* Blog portal splash — Nogoda theme + surprise-me loading bar */
+
+.blog-splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5EFEB;
+  background-image: linear-gradient(160deg, #F5EFEB 0%, #fff 48%, rgba(245, 112, 157, 0.12) 100%);
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow: hidden;
+  isolation: isolate;
+  will-change: transform;
+}
+
+.splash-content {
+  width: min(420px, 92vw);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.splash-typewriter {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.65rem, 5.5vw, 2.45rem);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  min-height: 1.3em;
+}
+
+.splash-prefix {
+  color: var(--pal-navy, #2F4156);
+}
+
+.splash-suffix--prompt {
+  color: var(--pal-navy, #2F4156);
+}
+
+.splash-suffix--blog {
+  background: var(--nogoda-gradient-h, linear-gradient(90deg, #6D2D52, #F5709D, #11FFC9, #2FA6C6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.splash-cursor {
+  display: inline-block;
+  color: var(--pal-teal, #567C8D);
+  font-weight: 400;
+  font-style: normal;
+  margin-left: 1px;
+  animation: splash-cursor-blink 0.9s step-end infinite;
+}
+
+@keyframes splash-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Same bar as surprise-loading.css */
+.splash-loading-bar {
+  width: 100%;
+  max-width: 280px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(200, 217, 230, 0.55);
+  overflow: hidden;
+  border: 1px solid var(--pal-sky, #C8D9E6);
+}
+
+.splash-loading-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #F5709D, #11FFC9, #2FA6C6);
+}
+
+.splash-loading-bar-fill.is-running {
+  animation: blog-splash-progress 2.5s linear forwards;
+}
+
+.splash-loading-bar-fill.is-reverse {
+  width: 100%;
+  animation: blog-splash-progress-reverse 2.5s linear forwards;
+}
+
+@keyframes blog-splash-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes blog-splash-progress-reverse {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.splash-loading-label {
+  margin: 0;
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--pal-teal, #567C8D);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
+}
+
+html.no-scroll,
+body.no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+/* Hide blog page behind splash — no ghost bleed-through */
+body.blog-splash-active > *:not(#blog-splash-screen) {
+  visibility: hidden !important;
+}
+
+@media (max-width: 480px) {
+  .splash-typewriter {
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  }
+
+  .splash-loading-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+  }
+}

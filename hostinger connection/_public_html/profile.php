@@ -187,7 +187,7 @@ $badges = [
     <meta name="theme-color" content="#2F4156">
     <title>Edit Profile — Arigato Devan Prompts</title>
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/profile-pages.css?v=20260732">
+    <link rel="stylesheet" href="css/profile-pages.css?v=20260759">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store theme-nogoda page-profile">

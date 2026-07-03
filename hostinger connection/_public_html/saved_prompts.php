@@ -66,7 +66,7 @@ require_once "includes/prompt_cards.php";
 
     <?php include_once "includes/theme_head.php"; ?>
     <link rel="stylesheet" href="css/gallery-extras.css?v=20260706">
-    <link rel="stylesheet" href="css/saved-prompts-page.css?v=20260729">
+    <link rel="stylesheet" href="css/saved-prompts-page.css?v=20260757">
     <?php include_once "includes/card_skeleton_assets.php"; ?>
     <?php include_once "gtag.php"; ?>
 </head>
@@ -175,7 +175,7 @@ require_once "includes/prompt_cards.php";
 <?php include "footer.php"; ?>
 
 <script>const isLoggedIn = true;</script>
-<script defer src="script.js?v=20260707"></script>
+<script defer src="script.js?v=20260757"></script>
 <script>
 (function () {
     const popup     = document.getElementById("sp-confirm-remove");

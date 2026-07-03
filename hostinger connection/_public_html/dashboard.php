@@ -468,6 +468,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
     <div class="d-sec">Community</div>
+    <a href="heroine_admin.php" class="d-link"><i class="fa-solid fa-venus"></i> My Heroine</a>
     <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
@@ -510,6 +511,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
+    <a href="heroine_admin.php" class="sb-link"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
