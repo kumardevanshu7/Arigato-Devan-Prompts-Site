@@ -1,0 +1,124 @@
+/* Happy Users — Pinterest-style masonry (nogoda theme) */
+.page-happy-users .hu-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-happy-users .hu-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-happy-users .hu-hero .hero-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e85d8a;
+  margin-bottom: 10px;
+}
+
+.page-happy-users .hu-hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  font-weight: 900;
+  font-style: italic;
+  color: var(--pal-navy, #2f4156);
+  margin: 0 0 12px;
+  line-height: 1.1;
+}
+
+.page-happy-users .hu-hero h1 em {
+  font-style: italic;
+  background: linear-gradient(105deg, #6d2d52 0%, #f5709d 45%, #e85d8a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-happy-users .hu-hero p {
+  margin: 0 auto;
+  max-width: 520px;
+  font-size: 1rem;
+  color: var(--pal-teal, #567c8d);
+  line-height: 1.55;
+}
+
+.page-happy-users .hu-masonry {
+  column-count: 4;
+  column-gap: 18px;
+}
+
+.page-happy-users .hu-pin {
+  break-inside: avoid;
+  margin: 0 0 18px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(245, 112, 157, 0.18);
+  box-shadow:
+    0 8px 28px rgba(47, 65, 86, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: zoom-in;
+}
+
+.page-happy-users .hu-pin:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 14px 36px rgba(245, 112, 157, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+}
+
+.page-happy-users .hu-pin img {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+.page-happy-users .hu-empty {
+  text-align: center;
+  padding: 64px 24px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px dashed rgba(245, 112, 157, 0.35);
+  border-radius: 22px;
+  color: var(--pal-teal, #567c8d);
+}
+
+.page-happy-users .hu-empty i {
+  font-size: 2.4rem;
+  color: #f5709d;
+  margin-bottom: 14px;
+  opacity: 0.75;
+}
+
+@media (max-width: 1100px) {
+  .page-happy-users .hu-masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-happy-users .hu-masonry {
+    column-count: 2;
+    column-gap: 12px;
+  }
+
+  .page-happy-users .hu-pin {
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-happy-users .hu-masonry {
+    column-count: 1;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}

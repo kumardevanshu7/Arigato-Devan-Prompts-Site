@@ -4,7 +4,7 @@
 //  Security: Only accessible to the Firebase Admin UID
 //  Session must be active + google_uid must match ADMIN_UID
 // ============================================================
-session_start();
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 
 define('ADMIN_UID', '5RDnMAipOwZTA21JJCnkH2V4E492');
 define('ADMIN_EMAIL', 'devansh.grow@gmail.com');

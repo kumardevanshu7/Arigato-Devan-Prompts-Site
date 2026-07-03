@@ -80,3 +80,36 @@ function heroine_upload_image(array $file, string $prefix, int $maxW = 600, int 
     $saved = resizeToWebP($target, $maxW, $maxH);
     return 'uploads/heroines/' . basename($saved);
 }
+
+/**
+ * @return array{path: string, width: int, height: int}|null
+ */
+function happy_users_upload_image(array $file): ?array
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return null;
+    }
+    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    $mime    = mime_content_type($file['tmp_name']) ?: ($file['type'] ?? '');
+    if (!in_array($mime, $allowed, true)) {
+        return null;
+    }
+    $ext_map = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif'];
+    $ext     = $ext_map[$mime] ?? 'jpg';
+    $dir     = __DIR__ . '/../uploads/happy_users/';
+    if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+        return null;
+    }
+    $target = $dir . 'hu_' . uniqid('', true) . '.' . $ext;
+    if (!move_uploaded_file($file['tmp_name'], $target)) {
+        return null;
+    }
+    $saved = resizeToWebP($target, 1400, 2400, 86);
+    $rel   = 'uploads/happy_users/' . basename($saved);
+    $info  = @getimagesize(__DIR__ . '/../' . $rel);
+    return [
+        'path'   => $rel,
+        'width'  => $info ? (int) $info[0] : 0,
+        'height' => $info ? (int) $info[1] : 0,
+    ];
+}

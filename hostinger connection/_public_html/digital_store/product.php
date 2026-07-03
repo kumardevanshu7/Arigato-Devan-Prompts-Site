@@ -1,14 +1,12 @@
-﻿<?php 
-session_start();
-
-
+<?php 
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Product Details — Arigato Store</title>
+  <title>Product Details � Arigato Store</title>
   <meta name="description" content="View prompt details, sample images, and unlock this premium AI prompt."/>
   <link rel="stylesheet" href="css/store.css"/>
 </head>
@@ -118,8 +116,8 @@ if ($user_email) {
 
       <!-- Pricing -->
       <div class="product-pricing-row">
-        <span class="product-price-new">₹<?= $p['discount'] ?></span>
-        <span class="product-price-original">₹<?= $p['price'] ?></span>
+        <span class="product-price-new">?<?= $p['discount'] ?></span>
+        <span class="product-price-original">?<?= $p['price'] ?></span>
         <span class="product-discount-badge"><?= $disc_pct ?>% off</span>
       </div>
 
@@ -192,12 +190,12 @@ if ($user_email) {
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
             <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Enter your email</h3>
-            <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:20px; line-height:1.6;">After payment, your prompt will also be sent to this email — so you can always access it later.</p>
+            <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:20px; line-height:1.6;">After payment, your prompt will also be sent to this email � so you can always access it later.</p>
             <input type="email" id="guestEmail" placeholder="you@email.com"
               style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;background:var(--bg);color:var(--text-primary);outline:none;margin-bottom:16px;box-sizing:border-box;"/>
             <button id="guestProceedBtn" onclick="proceedWithEmail()"
               style="width:100%;padding:13px;background:var(--text-primary);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;">
-              Continue to Payment →
+              Continue to Payment ?
             </button>
             <button onclick="document.getElementById('emailPopup').style.display='none'"
               style="margin-top:12px;background:none;border:none;color:var(--text-muted);font-size:0.83rem;cursor:pointer;">Cancel</button>
@@ -235,7 +233,7 @@ if ($user_email) {
             const txt = document.getElementById('theActualPrompt').innerText;
             navigator.clipboard.writeText(txt).then(() => {
               const orig = btn.innerHTML;
-              btn.innerHTML = '<span style="color:var(--success)">Copied! ✓</span>';
+              btn.innerHTML = '<span style="color:var(--success)">Copied! ?</span>';
               setTimeout(() => btn.innerHTML = orig, 2000);
             });
           }
@@ -320,9 +318,9 @@ if ($user_email) {
 
       <!-- Trust Badges -->
       <div class="trust-badges">
-        <span class="trust-item">🔒 Secure Payment</span>
-        <span class="trust-item">⚡ Instant Access</span>
-        <span class="trust-item">♾️ Lifetime Use</span>
+        <span class="trust-item">?? Secure Payment</span>
+        <span class="trust-item">? Instant Access</span>
+        <span class="trust-item">?? Lifetime Use</span>
       </div>
 
     </div>

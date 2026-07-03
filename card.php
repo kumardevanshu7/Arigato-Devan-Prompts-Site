@@ -10,7 +10,7 @@
  *   the correct category page with ?open=ID so the modal opens.
  * - Social-media crawlers don't run JS, so they only read the meta tags.
  */
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once 'db.php';
 
 $id = (int) ($_GET['id'] ?? 0);

@@ -4,7 +4,7 @@
  * Returns: { streak: N, new_prompts: M }
  * Used by: script.js (profile dropdown, streak badge, NEW dot)
  */
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once 'db.php';
 
 header('Content-Type: application/json');

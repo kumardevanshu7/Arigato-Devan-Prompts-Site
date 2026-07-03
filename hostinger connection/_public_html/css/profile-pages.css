@@ -12,6 +12,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  align-items: start;
 }
 
 @media (min-width: 820px) {
@@ -29,6 +30,16 @@
   padding: clamp(24px, 4vw, 36px);
   box-shadow: 0 8px 28px rgba(47, 65, 86, 0.08);
   box-sizing: border-box;
+}
+
+.page-profile .prof-card {
+  align-self: start;
+  height: auto;
+}
+
+.page-profile .prof-card form {
+  display: flex;
+  flex-direction: column;
 }
 
 .page-profile .prof-stats-card {
@@ -84,6 +95,7 @@
 }
 
 .page-profile .ob-section { margin-bottom: 24px; }
+.page-profile form > .ob-section:last-of-type { margin-bottom: 16px; }
 
 .page-profile .avatar-section {
   background: var(--pal-beige, #F5EFEB);
@@ -109,6 +121,35 @@
   flex: 1;
   height: 1px;
   background: var(--pal-sky, #C8D9E6);
+}
+
+.page-profile .avatar-divider--real {
+  margin-top: 22px;
+  margin-bottom: 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--pal-navy, #2F4156);
+  letter-spacing: 0.08em;
+}
+
+.page-profile .avatar-divider--real::before,
+.page-profile .avatar-divider--real::after {
+  background: rgba(47, 65, 86, 0.22);
+}
+
+.page-profile .avatar-grid--real {
+  gap: 8px;
+}
+
+.page-profile .avatar-img-wrap--real {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(47, 65, 86, 0.18);
+}
+
+.page-profile .avatar-option input[type="radio"]:checked + .avatar-img-wrap--real {
+  border-color: var(--pal-navy, #2F4156);
+  box-shadow: 0 0 0 3px rgba(47, 65, 86, 0.18);
 }
 
 .page-profile .avatar-grid {
@@ -167,8 +208,23 @@
   .page-profile .gender-grid { grid-template-columns: 1fr; }
 }
 
-.page-profile .gender-option { cursor: pointer; display: block; }
-.page-profile .gender-option input[type="radio"] { display: none; }
+.page-profile .gender-option {
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+
+.page-profile .gender-option input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .page-profile .gender-box {
   display: flex;
   flex-direction: column;
@@ -200,7 +256,9 @@
   border: none;
   border-radius: 14px;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 0;
+  margin-bottom: 0;
+  flex-shrink: 0;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .page-profile .prof-submit:hover {

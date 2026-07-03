@@ -3,7 +3,7 @@
  * contact.php — Support / Contact Page
  * Handles ticket submission with dynamic form + email notifications
  */
-session_start();
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once '../db.php';
 
 $success_msg = '';

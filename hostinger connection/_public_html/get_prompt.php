@@ -4,7 +4,7 @@
  * Called by insta_viral.php after the math challenge is solved.
  * Returns JSON: { prompt_text: "..." } or { error: "..." }
  */
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 
 header("Content-Type: application/json");

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 $slug = $_GET["slug"] ?? "";
 if (!$slug) {

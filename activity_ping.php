@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 if (!isset($_SESSION['user_id'])) { http_response_code(204); exit; }
 // Throttle: only update if last_active is NULL or older than 2 minutes

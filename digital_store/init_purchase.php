@@ -5,7 +5,7 @@
  * Sets a one-time session token to validate the purchase on success.php
  * Also accepts guest email for non-logged-in users.
  */
-session_start();
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 
 header('Content-Type: application/json');
 

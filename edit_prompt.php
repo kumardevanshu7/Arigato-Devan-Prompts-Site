@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 require_once "slug_helper.php";
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
@@ -360,6 +360,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
     <div class="d-sec">Community</div>
     <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
+    <div class="d-sec">Happy Users</div>
+    <a href="happy_users_admin.php?tab=upload" class="d-link"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
+    <a href="happy_users_admin.php?tab=manage" class="d-link"><i class="fa-solid fa-images"></i> Manage Pics</a>
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
@@ -402,6 +405,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
+    <div class="sb-sec">Happy Users</div>
+    <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
+    <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>

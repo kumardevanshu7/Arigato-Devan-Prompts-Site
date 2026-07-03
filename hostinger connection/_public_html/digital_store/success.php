@@ -8,7 +8,7 @@
  * 4. Generates a one-time view token
  * 5. Redirects to view_prompt.php?token=XYZ
  */
-session_start();
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once '../db.php';
 
 $product_id = isset($_GET['product_id']) ? (int)$_GET['product_id'] : 0;

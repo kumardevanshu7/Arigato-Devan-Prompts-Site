@@ -1,6 +1,6 @@
 <?php
 // Blog Comment Submit "&ndash; AJAX/POST endpoint
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 header("Content-Type: application/json");
 

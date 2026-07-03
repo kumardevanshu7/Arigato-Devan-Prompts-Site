@@ -1,0 +1,199 @@
+/* Happy Users lightbox — fullscreen preview */
+.hu-pin {
+  cursor: zoom-in;
+}
+
+.hu-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 10, 22, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+  touch-action: pan-y pinch-zoom;
+}
+
+.hu-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hu-lightbox.is-open .hu-lb-img {
+  animation: huLbIn 0.32s ease;
+}
+
+@keyframes huLbIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.hu-lb-backdrop {
+  position: absolute;
+  inset: 0;
+  cursor: zoom-out;
+}
+
+.hu-lb-stage {
+  position: relative;
+  z-index: 2;
+  max-width: min(96vw, 1100px);
+  max-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+  pointer-events: none;
+}
+
+.hu-lb-img {
+  max-width: 100%;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
+
+.hu-lb-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.hu-lb-close:hover {
+  background: rgba(245, 112, 157, 0.35);
+  transform: scale(1.05);
+}
+
+.hu-lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.hu-lb-nav:hover:not(:disabled) {
+  background: rgba(245, 112, 157, 0.4);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.hu-lb-nav:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.hu-lb-prev { left: 18px; }
+.hu-lb-next { right: 18px; }
+
+.hu-lb-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.hu-lb-swipe-hint {
+  display: none;
+  position: absolute;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.04em;
+}
+
+body.hu-lightbox-open {
+  overflow: hidden;
+}
+
+body.hu-lightbox-open #navStickyWrap,
+body.hu-lightbox-open .nogoda-mesh,
+body.hu-lightbox-open .store-footer,
+body.hu-lightbox-open #back-to-top,
+body.hu-lightbox-open .gal-mobile-overlay,
+body.hu-lightbox-open .gal-mobile-drawer,
+body.hu-lightbox-open .gal-mobile-nav {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+  .hu-lb-stage {
+    padding: 40px 12px;
+    max-width: 100vw;
+  }
+
+  .hu-lb-img {
+    max-height: 82vh;
+    border-radius: 8px;
+  }
+
+  .hu-lb-nav {
+    display: none;
+  }
+
+  .hu-lb-swipe-hint {
+    display: block;
+  }
+
+  .hu-lb-close {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (min-width: 769px) {
+  .hu-lb-swipe-hint {
+    display: none !important;
+  }
+}

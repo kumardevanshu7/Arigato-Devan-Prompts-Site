@@ -4,20 +4,16 @@ $dbname = "prompt_app";
 $username = "root";
 $password = "";
 
-// Keep authenticated users logged in for long sessions.
-// ini_set only works before session_start(); pages call session_start() before db.php.
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    ini_set("session.gc_maxlifetime", (string) (60 * 60 * 24 * 30));
-    ini_set("session.cookie_lifetime", (string) (60 * 60 * 24 * 30));
-}
-if (session_status() === PHP_SESSION_ACTIVE && session_id() !== "") {
-    $is_https = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off";
+// Refresh session cookie on each authenticated request (rolling 365-day expiry).
+require_once __DIR__ . '/includes/session_config.php';
+if (session_status() === PHP_SESSION_ACTIVE && session_id() !== '' && !empty($_SESSION['user_id'])) {
+    $lifetime = session_lifetime_seconds();
     setcookie(session_name(), session_id(), [
-        "expires" => time() + (60 * 60 * 24 * 30),
-        "path" => "/",
-        "secure" => $is_https,
-        "httponly" => true,
-        "samesite" => "Lax",
+        'expires'  => time() + $lifetime,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
     ]);
 }
 
@@ -150,6 +146,16 @@ try {
         setting_key VARCHAR(64) PRIMARY KEY,
         setting_value TEXT NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS happy_users_screenshots (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        image_path VARCHAR(255) NOT NULL,
+        img_width INT UNSIGNED DEFAULT NULL,
+        img_height INT UNSIGNED DEFAULT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        is_visible TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
     // ─── Schema migrations: run once, never block every page load ─────────────

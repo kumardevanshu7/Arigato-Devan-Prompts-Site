@@ -1,6 +1,7 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+require_once __DIR__ . '/includes/prompt_cards.php';
 // Guard: if logged in but onboarding not done, force setup
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
@@ -173,19 +174,11 @@ $gal_banner_slides = gallery_banner_slides();
         <div class="prompt-grid" id="card-stack">
         <?php foreach ($prompts as $p):
             $db_type = $p["prompt_type"] ?? "secret";
-            if ($db_type === "insta_viral") { $ptype = "insta_viral"; }
-            elseif ($db_type === "unreleased") { $ptype = "unreleased"; }
-            elseif ($db_type === "already_uploaded") { $ptype = "already_uploaded"; }
-            else { $ptype = "secret_code"; }
+            $type    = prompt_resolve_type($db_type);
+            $ptype   = $type['ptype'];
+            $tinfo   = ['label' => $type['label'], 'cls' => $type['cls']];
 
             $tags_arr = array_map("trim", explode(",", strtolower($p["tag"])));
-            $type_labels = [
-                "secret_code"      => ["label" => "SECRET",    "cls" => "scp"],
-                "unreleased"       => ["label" => "UNRELEASED","cls" => "urp"],
-                "insta_viral"      => ["label" => "VIRAL",     "cls" => "ivp"],
-                "already_uploaded" => ["label" => "UPLOADED",  "cls" => "aup"],
-            ];
-            $tinfo = $type_labels[$ptype] ?? $type_labels["secret_code"];
             $blur_style = ($ptype === "unreleased" && !$p["is_unlocked"]) ? "filter:blur(5px);transform:scale(1.05);" : "";
         ?>
             <div class="product-card prompt-card skeleton"
@@ -432,8 +425,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeIdx = -1, acMatches = [];
 
     function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    var typeLabels = {secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED'};
-    var typeColors = {secret_code:'#111111',unreleased:'#f97316',insta_viral:'#e11d48',already_uploaded:'#16a34a'};
+    var typeLabels = {secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED',direct:'DIRECT'};
+    var typeColors = {secret_code:'#111111',unreleased:'#f97316',insta_viral:'#e11d48',already_uploaded:'#16a34a',direct:'#567C8D'};
 
     function filterGallery(q) {
         var visible = 0;

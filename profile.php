@@ -1,6 +1,7 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+require_once __DIR__ . "/includes/profile_avatars.php";
 
 // Must be logged in
 if (!isset($_SESSION["user_id"])) {
@@ -41,39 +42,11 @@ try {
 } catch (Exception $e) { $nav_counts = []; }
 
 // --- Avatar Pool ---
-$male_avatars = [
-    "profiledp/b1.webp",
-    "profiledp/b2.webp",
-    "profiledp/b3.webp",
-    "profiledp/b4.webp",
-    "profiledp/b5.webp",
-    "profiledp/b6.webp",
-    "profiledp/b7.webp",
-    "profiledp/b8.webp",
-    "profiledp/b9.webp",
-    "profiledp/b10.webp",
-    "profiledp/b11.webp",
-    "profiledp/b12.webp",
-    "profiledp/b13.webp",
-    "profiledp/b14.webp",
-];
-$female_avatars = [
-    "profiledp/g1.webp",
-    "profiledp/g2.webp",
-    "profiledp/g3.webp",
-    "profiledp/g4.webp",
-    "profiledp/g5.webp",
-    "profiledp/g6.webp",
-    "profiledp/g7.webp",
-    "profiledp/g8.webp",
-    "profiledp/g9.webp",
-    "profiledp/g10.webp",
-    "profiledp/g11.webp",
-    "profiledp/g12.webp",
-    "profiledp/g13.webp",
-    "profiledp/g14.webp",
-];
-$all_avatars = array_merge($male_avatars, $female_avatars);
+$male_avatars        = profile_avatars_anime_male();
+$female_avatars      = profile_avatars_anime_female();
+$real_male_avatars   = profile_avatars_real_male();
+$real_female_avatars = profile_avatars_real_female();
+$all_avatars         = profile_avatars_all();
 
 $errors = [];
 $success = false;
@@ -95,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!preg_match('/^[a-zA-Z0-9_. ]+$/', $username)) {
         $errors[] = "Username: letters, numbers, spaces, _ or . only.";
     }
-    if (!in_array($avatar, $all_avatars)) {
+    if (!profile_avatar_is_valid($avatar)) {
         $errors[] = "Please select an avatar.";
     }
     if (!in_array($gender, ["male", "female", "nonbinary"])) {
@@ -150,7 +123,7 @@ try {
 }
 
 // Profile completion
-$has_avatar = !empty($user['avatar']) && in_array($user['avatar'], $all_avatars, true);
+$has_avatar = !empty($user['avatar']) && profile_avatar_is_valid($user['avatar']);
 $has_username = strlen(trim($user['username'] ?? '')) >= 3;
 $has_gender = in_array($user['gender'] ?? '', ['male', 'female', 'nonbinary'], true);
 $completion_steps = [
@@ -187,7 +160,7 @@ $badges = [
     <meta name="theme-color" content="#2F4156">
     <title>Edit Profile — Arigato Devan Prompts</title>
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/profile-pages.css?v=20260759">
+    <link rel="stylesheet" href="css/profile-pages.css?v=20260780">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store theme-nogoda page-profile">
@@ -247,6 +220,32 @@ $badges = [
                                 <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
                                 <div class="avatar-img-wrap">
                                     <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Avatar">
+                                </div>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="avatar-divider avatar-divider--real">Real Avatars</div>
+
+                        <div class="avatar-divider">Male</div>
+                        <div class="avatar-grid avatar-grid--real">
+                            <?php foreach ($real_male_avatars as $av): ?>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
+                                <div class="avatar-img-wrap avatar-img-wrap--real">
+                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Real avatar">
+                                </div>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="avatar-divider" style="margin-top:16px;">Female</div>
+                        <div class="avatar-grid avatar-grid--real">
+                            <?php foreach ($real_female_avatars as $av): ?>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
+                                <div class="avatar-img-wrap avatar-img-wrap--real">
+                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Real avatar">
                                 </div>
                             </label>
                             <?php endforeach; ?>

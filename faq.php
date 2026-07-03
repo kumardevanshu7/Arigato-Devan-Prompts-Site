@@ -1,6 +1,5 @@
 <?php
-session_start();
-
+require_once __DIR__ . '/includes/session_bootstrap.php';
 $curPage = 'faq.php';
 if (isset($_SESSION['user_id'])) {
     require_once "db.php";

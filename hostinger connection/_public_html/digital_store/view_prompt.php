@@ -7,7 +7,7 @@
  * - Shows full prompt + PDF download + Drive link
  * - If token already used or invalid → shows expired page
  */
-session_start();
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once '../db.php';
 
 $token = isset($_GET['token']) ? trim($_GET['token']) : '';

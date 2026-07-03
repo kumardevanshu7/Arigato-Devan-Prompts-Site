@@ -1,8 +1,5 @@
-ï»¿<?php 
-session_start();
-
-
-
+<?php 
+require_once __DIR__ . '/../includes/session_bootstrap.php';
 // Use site's existing DB connection
 require_once '../db.php';
 
@@ -38,7 +35,7 @@ $total = count($products);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prompt Store â€” Arigato</title>
+  <title>Prompt Store — Arigato</title>
   <meta name="description" content="Premium AI prompt packs, curated and handcrafted for stunning results."/>
   <link rel="stylesheet" href="css/store.css"/>
 </head>
@@ -61,7 +58,7 @@ $total = count($products);
       $items = ['Hot CloseUp Couple Prompt', 'Cinematic Portrait Prompt', 'Aesthetic Outfit Prompt', 'Golden Hour Glow Prompt', 'Dark Moody Boudoir Prompt', 'Viral Reel Thumbnail Prompt', 'Fashion Editorial Prompt', 'Street Style Candid Prompt', 'Soft Glam Studio Prompt', 'Bold Colour Pop Prompt', 'Neon Night Out Prompt'];
       $html = '';
       foreach($items as $item) {
-        $html .= '<span class="marquee-item">' . $item . ' <span class="marquee-dot">âœ¦</span></span>';
+        $html .= '<span class="marquee-item">' . $item . ' <span class="marquee-dot">?</span></span>';
       }
       // Duplicate for seamless loop
       echo $html . $html;
@@ -134,7 +131,7 @@ $total = count($products);
     <div class="how-header">
       <span class="how-label">Simple Process</span>
       <h2 class="how-title">How It Works</h2>
-      <p class="how-subtitle">From discovery to delivery â€” in four steps</p>
+      <p class="how-subtitle">From discovery to delivery — in four steps</p>
     </div>
     <div class="how-steps">
 
@@ -166,7 +163,7 @@ $total = count($products);
         </div>
         <div class="step-num">03</div>
         <h3 class="step-title">Purchase</h3>
-        <p class="step-desc">Complete secure payment via Super Profile â€” trusted, instant checkout.</p>
+        <p class="step-desc">Complete secure payment via Super Profile — trusted, instant checkout.</p>
       </div>
 
       <div class="how-connector"></div>

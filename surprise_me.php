@@ -3,7 +3,7 @@
  * surprise_me.php — Random prompt picker with loading screen.
  * Shows dice animation for 4s, then opens prompt.php directly.
  */
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 
 $redirect = "gallery.php";

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 $_page_canonical = 'https://arigatodevan.com/';
 // Guard: if logged in but onboarding not done, force setup

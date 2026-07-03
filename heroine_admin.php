@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once 'db.php';
 require_once 'includes/image_helpers.php';
 require_once 'includes/heroines_orbit.php';
@@ -311,6 +311,9 @@ $form = $editing ?: [
     <div class="d-sec2">Community</div>
     <a href="heroine_admin.php" class="d-link2 active"><i class="fa-solid fa-venus"></i> My Heroine</a>
     <a href="feedback_admin.php" class="d-link2"><i class="fa-solid fa-comments"></i> Feedbacks</a>
+    <div class="d-sec2">Happy Users</div>
+    <a href="happy_users_admin.php?tab=upload" class="d-link2"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
+    <a href="happy_users_admin.php?tab=manage" class="d-link2"><i class="fa-solid fa-images"></i> Manage Pics</a>
     <div class="d-sec2">Users</div>
     <a href="user_management.php" class="d-link2"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec2">Tools</div>
@@ -348,6 +351,9 @@ $form = $editing ?: [
     <div class="sb-sec">Community</div>
     <a href="heroine_admin.php" class="sb-link active"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
+    <div class="sb-sec">Happy Users</div>
+    <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
+    <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
