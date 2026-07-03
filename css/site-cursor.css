@@ -1,0 +1,93 @@
+/* Arigato site cursor — Nagao arrow pointer (desktop only) */
+
+#cc-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2147483000;
+}
+
+#cc-arrow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  transform: translate(0, 0);
+  transform-origin: 5px 4px;
+  will-change: left, top, transform;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  filter: drop-shadow(2px 3px 2px rgba(47, 65, 86, 0.28));
+}
+
+#cc-arrow .cc-fill {
+  fill: var(--pal-navy, #2F4156);
+  transition: fill 0.2s ease;
+}
+
+#cc-arrow .cc-stroke {
+  fill: none;
+  stroke: var(--pal-white, #fff);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.cc-hover #cc-arrow {
+  transform: scale(1.1);
+  filter: drop-shadow(2px 4px 6px rgba(245, 112, 157, 0.35));
+}
+
+.cc-hover #cc-arrow .cc-fill {
+  fill: var(--nogoda-pink, #F5709D);
+}
+
+.cc-active #cc-arrow {
+  transform: scale(0.88);
+}
+
+.cc-hidden #cc-cursor {
+  opacity: 0 !important;
+}
+
+html.cc-cursor-on,
+html.cc-cursor-on * {
+  cursor: none !important;
+}
+
+body.no-site-cursor #cc-cursor,
+body.preel-feed-page #cc-cursor {
+  display: none !important;
+}
+
+html:has(body.no-site-cursor),
+html:has(body.no-site-cursor) *,
+html:has(body.preel-feed-page),
+html:has(body.preel-feed-page) * {
+  cursor: auto !important;
+}
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  #cc-cursor {
+    display: none !important;
+  }
+
+  html.cc-cursor-on,
+  html.cc-cursor-on * {
+    cursor: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cc-cursor {
+    display: none !important;
+  }
+
+  html.cc-cursor-on,
+  html.cc-cursor-on * {
+    cursor: auto !important;
+  }
+}

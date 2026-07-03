@@ -83,6 +83,7 @@ sort($secret_sub_tags);
         <article class="potd-featured"
              data-id="<?= $featuredPrompt['id'] ?>"
              data-slug="<?= htmlspecialchars($featuredPrompt['slug'] ?? '') ?>"
+             <?= !empty($featuredIsCustom) ? 'data-custom-potd="1"' : '' ?>
              data-image="<?= htmlspecialchars($featuredPrompt['image_path']) ?>"
              data-title="<?= htmlspecialchars($featuredPrompt['title']) ?>"
              data-reel="<?= htmlspecialchars($featuredPrompt['reel_link'] ?? '') ?>"

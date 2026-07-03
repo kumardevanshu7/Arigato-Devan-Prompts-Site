@@ -31,7 +31,7 @@ $blob_colors = ['#FFE4EC', '#F5D0E0', '#FFD6E8', '#F0E6F5', '#FFF0F5', '#FAD4E4'
     <title>My Heroines — Arigato Devan Prompts</title>
     <meta name="description" content="Meet the heroines featured in Arigato Devan prompts and creative content — AI girls and real profiles.">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/heroines-page.css?v=20260779">
+    <link rel="stylesheet" href="css/heroines-page.css?v=20260792">
     <link rel="stylesheet" href="css/info-pages.css?v=20260719">
     <?php include_once 'gtag.php'; ?>
 </head>

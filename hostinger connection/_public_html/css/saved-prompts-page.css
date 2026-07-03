@@ -303,3 +303,53 @@ body.page-saved {
   .sp-page-head { flex-direction: column; align-items: flex-start; }
   .sp-page-stat { text-align: left; }
 }
+
+/* Footer — Nogoda layout on saved page (no comic overlap) */
+.page-saved .store-footer {
+  margin-top: clamp(32px, 6vw, 56px);
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  position: relative;
+  z-index: 2;
+}
+
+.page-saved .store-footer-inner {
+  gap: 18px;
+}
+
+.page-saved .footer-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.page-saved .footer-links a {
+  font-size: 0.72rem;
+  padding: 6px 4px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.page-saved #back-to-top {
+  border: 1px solid var(--pal-sky, #C8D9E6) !important;
+  background: var(--pal-white, #fff) !important;
+  box-shadow: 0 8px 28px rgba(47, 65, 86, 0.2) !important;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (min-width: 640px) {
+  .page-saved .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: none;
+    gap: 10px 18px;
+  }
+
+  .page-saved .footer-links a {
+    font-size: 0.78rem;
+    padding: 0;
+    text-align: left;
+  }
+}

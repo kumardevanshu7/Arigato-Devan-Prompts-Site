@@ -56,22 +56,67 @@
 .page-happy-users .hu-pin {
   break-inside: avoid;
   margin: 0 0 18px;
+  position: relative;
+  cursor: zoom-in;
+}
+
+.page-happy-users .hu-pin-media {
+  position: relative;
   border-radius: 18px;
-  overflow: hidden;
+  overflow: visible;
   background: #fff;
   border: 1px solid rgba(245, 112, 157, 0.18);
   box-shadow:
     0 8px 28px rgba(47, 65, 86, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.6) inset;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  cursor: zoom-in;
 }
 
-.page-happy-users .hu-pin:hover {
+.page-happy-users .hu-pin-img-wrap {
+  border-radius: 18px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.page-happy-users .hu-chat-badge {
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  z-index: 5;
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #fff;
+  white-space: nowrap;
+  background: linear-gradient(145deg, #ff9ec4 0%, #f5709d 42%, #e85d8a 100%);
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  transform: rotate(-10deg);
+  transform-origin: left center;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.28),
+    0 4px 14px rgba(232, 93, 138, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  user-select: none;
+  transition: transform 0.28s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.28s ease;
+}
+
+.page-happy-users .hu-pin:hover .hu-pin-media {
   transform: translateY(-4px);
   box-shadow:
     0 14px 36px rgba(245, 112, 157, 0.16),
     0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+}
+
+.page-happy-users .hu-pin:hover .hu-chat-badge {
+  transform: rotate(-6deg) translateY(-2px) scale(1.03);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.32),
+    0 6px 18px rgba(232, 93, 138, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .page-happy-users .hu-pin img {
@@ -111,7 +156,19 @@
 
   .page-happy-users .hu-pin {
     margin-bottom: 12px;
+  }
+
+  .page-happy-users .hu-pin-media,
+  .page-happy-users .hu-pin-img-wrap {
     border-radius: 14px;
+  }
+
+  .page-happy-users .hu-chat-badge {
+    top: 10px;
+    left: 8px;
+    font-size: 0.62rem;
+    padding: 7px 11px;
+    transform: rotate(-9deg);
   }
 }
 

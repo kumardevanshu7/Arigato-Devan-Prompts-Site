@@ -1,28 +1,44 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
-require_once "db.php";
+require_once 'db.php';
 require_once __DIR__ . '/includes/prompt_cards.php';
-// Guard: if logged in but onboarding not done, force setup
+require_once 'includes/gallery_helpers.php';
+
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
 }
 
-// Pagination + tag filter
-$page       = max(1, (int)($_GET['page'] ?? 1));
-$per_page   = 20;
-$tag_filter = trim(strtolower($_GET['tag'] ?? ''));
-$tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . addcslashes($tag_filter, '%_') . '%' : null;
+$is_ajax_cards = isset($_GET['ajax']) && $_GET['ajax'] === 'cards';
+$tag_filter    = trim(strtolower($_GET['tag'] ?? ''));
+$per_page      = 20;
+if ($is_ajax_cards) {
+    $per_page = ($tag_filter && $tag_filter !== 'all') ? 120 : 20;
+}
+$page          = max(1, (int) ($_GET['page'] ?? 1));
 $_page_canonical = 'https://arigatodevan.com/gallery.php' . (($tag_filter && $tag_filter !== 'all') ? '?tag=' . urlencode($tag_filter) : '');
-$offset     = ($page - 1) * $per_page;
 
-// Count total for pagination
-$count_sql  = $tag_param ? "SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) AND LOWER(tag) LIKE ?" : "SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)";
-$count_stmt = $pdo->prepare($count_sql);
-$count_stmt->execute($tag_param ? [$tag_param] : []);
-$total       = (int)$count_stmt->fetchColumn();
-$total_pages = max(1, (int)ceil($total / $per_page));
+$gal_data      = gallery_fetch_prompts($pdo, $_SESSION['user_id'] ?? null, [
+    'page'     => $page,
+    'per_page' => $per_page,
+    'tag'      => $tag_filter,
+]);
+$prompts       = $gal_data['prompts'];
+$total         = $gal_data['total'];
+$total_pages   = $gal_data['total_pages'];
+$tag_filter    = $gal_data['tag_filter'];
 
+if ($is_ajax_cards) {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'ok'    => true,
+        'html'  => render_gallery_prompt_cards($prompts),
+        'total' => $total,
+        'tag'   => $tag_filter ?: 'all',
+        'empty' => count($prompts) === 0,
+    ]);
+    exit;
+}
 // All unique tags for filter buttons (separate query, not paginated)
 $all_tags_raw = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != '' AND (is_trial = 0 OR is_trial IS NULL)")->fetchAll(PDO::FETCH_COLUMN);
 $all_tags = [];
@@ -31,31 +47,6 @@ $tag_counts = [];
 foreach ($all_tags_raw as $ts) { foreach (explode(',', strtolower($ts)) as $t) { $t = trim($t); if ($t) $tag_counts[$t] = ($tag_counts[$t] ?? 0) + 1; } }
 $all_tags = array_unique($all_tags); sort($all_tags);
 
-// Fetch prompts with unlocked / liked / saved status
-$tag_where = $tag_param ? " AND LOWER(tag) LIKE ?" : "";
-if (isset($_SESSION["user_id"])) {
-    $sql = "SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
-               IF(l.id IS NOT NULL, 1, 0) as is_liked,
-               IF(sv.id IS NOT NULL, 1, 0) as is_saved
-        FROM prompts p
-        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
-        LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
-        LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-        WHERE (p.is_trial = 0 OR p.is_trial IS NULL){$tag_where}
-        ORDER BY p.created_at DESC LIMIT {$per_page} OFFSET {$offset}";
-    $params = [$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"]];
-    if ($tag_param) $params[] = $tag_param;
-    $stmt = $pdo->prepare($sql); $stmt->execute($params);
-    $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    $sql = "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL){$tag_where} ORDER BY created_at DESC LIMIT {$per_page} OFFSET {$offset}";
-    $params = []; if ($tag_param) $params[] = $tag_param;
-    $stmt = $pdo->prepare($sql); $stmt->execute($params);
-    $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-require_once 'includes/gallery_helpers.php';
-require_once 'includes/prompt_cards.php';
 $trending_prompts = fetch_trending_prompts($pdo, $_SESSION['user_id'] ?? null);
 $gal_banner_slides = gallery_banner_slides();
 
@@ -78,7 +69,7 @@ $gal_banner_slides = gallery_banner_slides();
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260729">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20260793">
     <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
@@ -136,22 +127,24 @@ $gal_banner_slides = gallery_banner_slides();
         <!-- Tag Pills -->
         <div class="gal-tag-wrap" id="tag-filter-container">
             <div class="gal-tag-inner" id="tag-scroll-inner">
-                <a href="gallery.php"
+                <button type="button"
                    class="gallery-tag-btn tag-filter-btn <?= !$tag_filter || $tag_filter === 'all' ? 'active' : '' ?>"
-                   data-label="All" data-count="9999">All</a>
+                   data-tag="all"
+                   data-label="All" data-count="9999">All</button>
                 <?php
                 $badge_colors = ['#c084fc','#f43f5e','#fb923c','#22c55e','#0ea5e9','#f59e0b','#8b5cf6','#ec4899','#14b8a6','#ef4444'];
                 $ci = 0;
                 foreach ($all_tags as $t):
                     $bc = $badge_colors[$ci % count($badge_colors)]; $ci++;
                 ?>
-                    <a href="gallery.php?tag=<?= urlencode($t) ?>"
+                    <button type="button"
                        class="gallery-tag-btn tag-filter-btn <?= $tag_filter === $t ? 'active' : '' ?>"
+                       data-tag="<?= htmlspecialchars($t) ?>"
                        data-label="<?= htmlspecialchars(ucfirst($t)) ?>"
                        data-count="<?= $tag_counts[$t] ?? 0 ?>">
                         <?= htmlspecialchars(ucfirst($t)) ?>
                         <span class="gal-tag-count" style="background:<?= $bc ?>"><?= $tag_counts[$t] ?? 0 ?></span>
-                    </a>
+                    </button>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -172,58 +165,7 @@ $gal_banner_slides = gallery_banner_slides();
 
         <!-- Card Grid -->
         <div class="prompt-grid" id="card-stack">
-        <?php foreach ($prompts as $p):
-            $db_type = $p["prompt_type"] ?? "secret";
-            $type    = prompt_resolve_type($db_type);
-            $ptype   = $type['ptype'];
-            $tinfo   = ['label' => $type['label'], 'cls' => $type['cls']];
-
-            $tags_arr = array_map("trim", explode(",", strtolower($p["tag"])));
-            $blur_style = ($ptype === "unreleased" && !$p["is_unlocked"]) ? "filter:blur(5px);transform:scale(1.05);" : "";
-        ?>
-            <div class="product-card prompt-card skeleton"
-                 data-id="<?= $p["id"] ?>"
-                 data-slug="<?= htmlspecialchars($p["slug"] ?? "") ?>"
-                 data-created="<?= htmlspecialchars($p["created_at"] ?? "") ?>"
-                 data-image="<?= htmlspecialchars($p["image_path"]) ?>"
-                 data-title="<?= htmlspecialchars($p["title"]) ?>"
-                 data-reel="<?= htmlspecialchars($p["reel_link"] ?? "") ?>"
-                 data-unlocked="<?= $p["is_unlocked"] ? "true" : "false" ?>"
-                 data-saved="<?= !empty($p["is_saved"]) ? "true" : "false" ?>"
-                 data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-                 data-tags="<?= htmlspecialchars(implode(",", $tags_arr)) ?>"
-                 data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
-                 data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
-                 data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
-                 <?= $p["is_unlocked"] ? 'data-prompt-text="' . htmlspecialchars($p["prompt_text"]) . '"' : "" ?>>
-
-                <div class="card-image-wrap">
-                    <img loading="lazy"
-                         src="<?= htmlspecialchars($p["image_path"]) ?>"
-                         class="skeleton-img"
-                         alt="<?= htmlspecialchars($p["title"]) ?>"
-                         style="<?= $blur_style ?>">
-                    <span class="card-badge <?= $tinfo["cls"] ?>"><?= $tinfo["label"] ?></span>
-                    <?php if (!$p["is_unlocked"]): ?>
-                        <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
-                    <?php else: ?>
-                        <div class="card-lock-icon unlocked"><i class="fa-solid fa-check"></i></div>
-                    <?php endif; ?>
-                    <div class="card-overlay">
-                        <span class="quick-view-btn">View Prompt &rarr;</span>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <p class="card-title"><?= htmlspecialchars($p["title"]) ?></p>
-                    <div class="card-like-display"
-                         data-liked="<?= $p["is_liked"] ? "true" : "false" ?>"
-                         data-prompt-id="<?= $p["id"] ?>">
-                        <i class="fa-solid fa-heart <?= $p["is_liked"] ? "liked-heart" : "" ?>"></i>
-                        <span class="like-count"><?= (int)$p["likes_count"] ?></span>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
+        <?= render_gallery_prompt_cards($prompts) ?>
         </div>
 
         <!-- Pagination -->
@@ -382,6 +324,7 @@ $gal_banner_slides = gallery_banner_slides();
 </script>
 
 <script defer src="script.js?v=20260702"></script>
+<script src="js/gallery-tag-filter.js?v=20260793" defer></script>
 
 <script>
 function promptPageUrl(card) {
@@ -390,28 +333,6 @@ function promptPageUrl(card) {
     }
     return 'prompt.php?id=' + card.dataset.id;
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.prompt-grid .prompt-card').forEach(function(card) {
-        card.addEventListener('click', function(e) {
-            if (e.target.closest('.card-like-display')) return;
-            e.preventDefault();
-            var url = promptPageUrl(card);
-            document.body.style.transition = 'opacity 0.15s ease';
-            document.body.style.opacity = '0';
-            setTimeout(function() { window.location.href = url; }, 150);
-        });
-        card.addEventListener('mouseenter', function() {
-            var url = promptPageUrl(card);
-            if (!document.querySelector('link[rel="prefetch"][href="' + url + '"]')) {
-                var l = document.createElement('link');
-                l.rel = 'prefetch';
-                l.href = url;
-                document.head.appendChild(l);
-            }
-        }, { once: true });
-    });
-});
 
 (function() {
     var inp       = document.getElementById('gallery-search');
@@ -423,6 +344,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var cards = Array.from(document.querySelectorAll('.prompt-grid .prompt-card'));
     var activeIdx = -1, acMatches = [];
+
+    window.gallerySearchRefresh = function () {
+        cards = window.galleryGetCards ? window.galleryGetCards() : cards;
+        filterGallery(inp.value.trim().toLowerCase());
+    };
 
     function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     var typeLabels = {secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED',direct:'DIRECT'};

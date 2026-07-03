@@ -895,6 +895,9 @@ footer .footer-links a:hover {
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"}]}
 </script>
 <?php include_once "gtag.php"; ?>
+<?php if (!empty($_SESSION['user_id'])): ?>
+<link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
+<?php endif; ?>
 </head>
 <body class="blog-splash-active">
 <!-- Blog portal splash loader -->

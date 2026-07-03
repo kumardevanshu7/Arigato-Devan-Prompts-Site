@@ -310,7 +310,7 @@ try {
 
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"]) ? "true" : "false" ?>;
 const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") ? "true" : "false" ?>;</script>
-    <script defer src="script.js?v=20260617"></script>
+    <script defer src="script.js?v=20260796"></script>
     <script>
         document.addEventListener('modalOpened', function(e) {
             const btn = document.getElementById('modal-save-btn');

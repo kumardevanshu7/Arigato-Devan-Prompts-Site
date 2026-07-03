@@ -340,17 +340,26 @@ document.addEventListener("DOMContentLoaded", () => {
       // Navigate to prompt page (gallery has its own click handler)
       const isGalleryPage = document.body.classList.contains('page-gallery');
       const isSavedPage = document.body.classList.contains('page-saved');
-      if (isGalleryPage) {
-        /* gallery.php binds its own navigation */
-      } else {
-        const isLocal =
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1';
-        const goToPage = isSavedPage || !isLocal;
-        if (goToPage) {
-          const url = card.dataset.slug
-            ? 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug)
-            : 'prompt.php?id=' + card.dataset.id;
+      const isDevHost =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === 'arigato.local';
+
+      if (!isGalleryPage && (isSavedPage || !isDevHost)) {
+        const slug = (card.dataset.slug || '').trim();
+        const id = (card.dataset.id || '').trim();
+        const isCustomPotd = card.dataset.customPotd === '1';
+        let url = '';
+        if (!isCustomPotd) {
+          if (slug && !isDevHost) {
+            url = '/prompts/' + encodeURIComponent(slug);
+          } else if (slug) {
+            url = 'prompt.php?slug=' + encodeURIComponent(slug);
+          } else if (id && id !== '0') {
+            url = 'prompt.php?id=' + encodeURIComponent(id);
+          }
+        }
+        if (url) {
           window.location.href = url;
           return;
         }

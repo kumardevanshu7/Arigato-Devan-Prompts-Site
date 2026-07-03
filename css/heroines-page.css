@@ -755,8 +755,61 @@ body.heroes-revealed .heroines-cards-panel {
   }
 
   .heroines-grid {
-    grid-template-columns: 1fr;
-    max-width: 340px;
-    margin: 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-width: none;
+    margin: 0;
+  }
+
+  .heroine-card {
+    padding: 14px 10px 12px;
+    border-radius: 16px;
+  }
+
+  .heroine-card-photo-wrap {
+    width: min(100%, 104px);
+    height: 118px;
+    margin-bottom: 10px;
+  }
+
+  .heroine-card-name {
+    font-size: 0.8rem;
+    gap: 4px;
+    line-height: 1.25;
+  }
+
+  .heroine-card-name i {
+    font-size: 0.75rem;
+  }
+
+  .heroine-card-type {
+    font-size: 0.55rem;
+    padding: 3px 8px;
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  .heroine-card-meta {
+    font-size: 0.68rem;
+    gap: 4px;
+  }
+
+  .heroine-card-used span {
+    font-size: 0.88rem;
+  }
+
+  .heroine-card-insta {
+    width: 100%;
+    max-width: 100%;
+    padding: 6px 8px;
+    font-size: 0.62rem;
+    gap: 4px;
+    margin-top: 2px;
+    word-break: break-all;
+  }
+
+  .heroines-main {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }

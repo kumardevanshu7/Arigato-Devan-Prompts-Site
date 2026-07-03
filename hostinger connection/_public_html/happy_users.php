@@ -21,7 +21,7 @@ try {
     <meta name="description" content="Real screenshots and kind words from happy Arigato Devan users — see what the community loves about our prompts.">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260721">
-    <link rel="stylesheet" href="css/happy-users-page.css?v=20260786">
+    <link rel="stylesheet" href="css/happy-users-page.css?v=20260791">
     <link rel="stylesheet" href="css/happy-users-lightbox.css?v=20260787">
     <?php include_once 'gtag.php'; ?>
 </head>
@@ -44,15 +44,22 @@ try {
         </div>
     <?php else: ?>
         <div class="hu-masonry" aria-label="Happy user screenshots">
-            <?php foreach ($shots as $shot): ?>
+            <?php foreach ($shots as $i => $shot):
+                $comment_num = str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT);
+            ?>
             <figure class="hu-pin">
-                <img src="<?= htmlspecialchars($shot['image_path']) ?>"
-                     alt="Happy user screenshot"
-                     loading="lazy"
-                     <?php if (!empty($shot['img_width']) && !empty($shot['img_height'])): ?>
-                     width="<?= (int) $shot['img_width'] ?>"
-                     height="<?= (int) $shot['img_height'] ?>"
-                     <?php endif; ?>>
+                <div class="hu-pin-media">
+                    <span class="hu-chat-badge">#User_Chat_<?= $comment_num ?></span>
+                    <div class="hu-pin-img-wrap">
+                    <img src="<?= htmlspecialchars($shot['image_path']) ?>"
+                         alt="User chat <?= $comment_num ?>"
+                         loading="lazy"
+                         <?php if (!empty($shot['img_width']) && !empty($shot['img_height'])): ?>
+                         width="<?= (int) $shot['img_width'] ?>"
+                         height="<?= (int) $shot['img_height'] ?>"
+                         <?php endif; ?>>
+                    </div>
+                </div>
             </figure>
             <?php endforeach; ?>
         </div>

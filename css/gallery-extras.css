@@ -886,3 +886,14 @@ body.page-gallery {
     flex: 0 0 118px;
   }
 }
+
+.page-gallery .prompt-grid.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  min-height: 120px;
+}
+
+button.gallery-tag-btn {
+  font-family: inherit;
+}

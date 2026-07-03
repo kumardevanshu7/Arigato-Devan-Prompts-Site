@@ -41,6 +41,8 @@ arsort($all_tags);
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+<link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
+<link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
     <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -48,18 +50,18 @@ arsort($all_tags);
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs ó Arigato Devan Prompts">
+<meta property="og:title" content="Blogs ù Arigato Devan Prompts">
 <meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs ó Arigato Devan Prompts">
+<meta name="twitter:title" content="Blogs ù Arigato Devan Prompts">
 <meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
 /* Global Modern Reset for Blog Section */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 body {
     background-color: #f1f5f9 !important; /* Neutral light-gray base */
@@ -68,148 +70,6 @@ body {
     margin: 0;
     padding: 0;
     position: relative !important;
-}
-
-/* Luxury GSAP Splash Screen Loader Styles */
-.blog-splash-screen {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    background: #090c15 !important; /* Premium dark background */
-    z-index: 9999999 !important;
-    display: flex;
-    align-items: center !important;
-    justify-content: center !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    overflow: hidden !important;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* Initial curtain down */
-}
-.splash-content {
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 32px !important;
-    perspective: 1000px !important;
-}
-.splash-logo-container {
-    display: flex !important;
-    align-items: center !important;
-    gap: 20px !important;
-    font-size: 2.8rem !important;
-    font-weight: 900 !important;
-    letter-spacing: -2px !important;
-}
-/* Word & Letter staggers */
-.splash-word {
-    display: flex !important;
-    gap: 4px !important;
-}
-.splash-word span {
-    display: inline-block !important;
-    opacity: 0;
-    transform: translateY(30px) scale(0.6);
-    filter: blur(10px);
-}
-.prompt-word span {
-    color: #e2e8f0 !important;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;
-}
-.blog-word span {
-    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;
-}
-/* Spinning Neon Ring Loader & Arrow */
-.splash-arrow-wrap {
-    position: relative !important;
-    width: 80px !important;
-    height: 80px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-.splash-arrow {
-    font-size: 1.8rem !important;
-    color: #6366f1 !important;
-    opacity: 0;
-    transform: scale(0.3) rotate(-180deg);
-    text-shadow: 0 0 25px rgba(99,102,241,0.8) !important;
-    position: absolute !important;
-    z-index: 10 !important;
-}
-/* Neon Ring Spinning Loader */
-.splash-ring-loader {
-    width: 68px !important;
-    height: 68px !important;
-    border: 3px solid rgba(99, 102, 241, 0.08) !important;
-    border-top: 3px solid #6366f1 !important;
-    border-right: 3px solid #a855f7 !important;
-    border-radius: 50% !important;
-    position: absolute !important;
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.25) !important;
-    opacity: 0;
-    transform: scale(0.5);
-}
-.splash-loading-label {
-    font-size: 0.8rem !important;
-    font-weight: 800 !important;
-    color: #475569 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 3px !important;
-    opacity: 0;
-    transform: translateY(15px);
-}
-
-/* Responsive adjustments for Splash Screen */
-@media (max-width: 768px) {
-    .splash-logo-container {
-        font-size: 2rem !important; /* Scale down on tablets */
-        gap: 12px !important;
-    }
-    .splash-arrow-wrap {
-        width: 60px !important;
-        height: 60px !important;
-    }
-    .splash-ring-loader {
-        width: 50px !important;
-        height: 50px !important;
-        border-width: 2px !important;
-    }
-    .splash-arrow {
-        font-size: 1.4rem !important;
-    }
-}
-@media (max-width: 480px) {
-    .splash-logo-container {
-        font-size: 1.4rem !important; /* Snug fit on mobile screens under 480px */
-        gap: 8px !important;
-    }
-    .splash-arrow-wrap {
-        width: 44px !important;
-        height: 44px !important;
-    }
-    .splash-ring-loader {
-        width: 36px !important;
-        height: 36px !important;
-        border-width: 2px !important;
-    }
-    .splash-arrow {
-        font-size: 1rem !important;
-    }
-    .splash-loading-label {
-        font-size: 0.65rem !important;
-        letter-spacing: 2px !important;
-    }
-}
-@media (max-width: 360px) {
-    .splash-logo-container {
-        font-size: 1.2rem !important; /* Perfect fit on ultra-small mobile screens */
-        gap: 6px !important;
-    }
 }
 
 /* Force hide all scrollbars of HTML and Body elements during splash transitions */
@@ -315,42 +175,32 @@ header .logo-area {
     flex-shrink: 0 !important;
 }
 header .logo-text {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 800 !important;
-    font-size: 0.95rem !important;
-    letter-spacing: -0.5px !important;
-    color: #0f172a !important;
-    line-height: 1.1 !important;
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-style: italic !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    letter-spacing: -0.02em !important;
+    color: #2F4156 !important;
+    line-height: 1.15 !important;
+    text-transform: lowercase !important;
+    white-space: nowrap !important;
 }
-header .logo-flipper {
+header .logo-text .blog-brand-suffix {
+    background: linear-gradient(90deg, #6D2D52, #F5709D, #11FFC9, #2FA6C6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+/* Override style.min.css ù keep arigato.blog visible on all mobile widths */
+header .logo-area .logo-text {
     display: block !important;
-    width: 44px !important;
-    height: 44px !important;
-    position: relative !important;
-    transform-style: preserve-3d !important;
-    transition: transform 0.6s !important;
-    flex-shrink: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: visible !important;
 }
-header .logo-front, header .logo-back {
-    position: absolute !important;
-    width: 100% !important;
-    height: 100% !important;
-    backface-visibility: hidden !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-}
-header .logo-back {
-    transform: rotateY(180deg) !important;
-}
-header .logo-front img, header .logo-back img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-}
-header .logo-area:hover .logo-flipper {
-    transform: rotateY(180deg) !important;
-}
+/* logo circle avatar ù css/blog-header-logo.css */
 header nav.nav-links {
     gap: 16px !important; /* Perfect spacious layout */
     border: none !important;
@@ -422,8 +272,8 @@ header .admin-avatar {
         display: none !important; /* Force hide desktop-only items with absolute authority */
     }
     header {
-        padding: 0 24px !important; /* Center elements vertically inside a 64px capsule */
-        margin: 15px 16px 0 !important;
+        padding: 0 16px !important; /* Center elements vertically inside a 64px capsule */
+        margin: 15px 12px 0 !important;
         border-radius: 20px !important;
         height: 64px !important; /* Exact mathematical height to match desktop perfectly */
         min-height: 64px !important;
@@ -431,7 +281,21 @@ header .admin-avatar {
         flex-direction: column !important;
         justify-content: center !important;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow: visible !important;
+    }
+    header .header-top-row {
+        min-width: 0 !important;
+    }
+    header .logo-area {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: calc(100% - 64px) !important;
+    }
+    header .logo-area .logo-text {
+        display: block !important;
+        font-size: 0.92rem !important;
         overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     header.menu-open {
         border-radius: 20px 20px 16px 16px !important;
@@ -717,11 +581,8 @@ footer .footer-links a:hover {
         justify-content: space-between !important;
     }
     header .logo-text {
-        font-size: 0.8rem !important;
-    }
-    header .logo-flipper {
-        width: 32px !important;
-        height: 32px !important;
+        display: block !important;
+        font-size: 0.86rem !important;
     }
     header nav.nav-links {
         order: 3 !important;
@@ -743,6 +604,13 @@ footer .footer-links a:hover {
     header .header-right .logout {
         padding: 6px 12px !important;
         font-size: 0.72rem !important;
+    }
+}
+
+@media (max-width: 380px) {
+    header .logo-area .logo-text {
+        display: block !important;
+        font-size: 0.78rem !important;
     }
 }
 
@@ -1016,6 +884,7 @@ footer .footer-links a:hover {
     font-size: 1.1rem;
 }
 </style>
+<link rel="stylesheet" href="css/blog-header-logo.css?v=20260758">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -1026,24 +895,21 @@ footer .footer-links a:hover {
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"}]}
 </script>
 <?php include_once "gtag.php"; ?>
+<?php if (!empty($_SESSION['user_id'])): ?>
+<link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
+<?php endif; ?>
 </head>
-<body>
-<!-- High-End GSAP Splash Screen Loader -->
-<div id="blog-splash-screen" class="blog-splash-screen">
+<body class="blog-splash-active">
+<!-- Blog portal splash loader -->
+<div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
-        <div class="splash-logo-container" id="splash-logo-container">
-            <div class="splash-word prompt-word" id="splash-prompt-word">
-                <span>P</span><span>R</span><span>O</span><span>M</span><span>P</span><span>T</span>
-            </div>
-            <div class="splash-arrow-wrap">
-                <span class="splash-arrow" id="splash-arrow">?</span>
-                <div class="splash-ring-loader" id="splash-ring-loader"></div>
-            </div>
-            <div class="splash-word blog-word" id="splash-blog-word">
-                <span>B</span><span>L</span><span>O</span><span>G</span>
-            </div>
+        <p class="splash-typewriter" id="splash-typewriter">
+            <span class="splash-prefix">arigato.</span><span class="splash-suffix splash-suffix--prompt" id="splash-suffix">prompt</span><span class="splash-cursor" id="splash-cursor" aria-hidden="true">|</span>
+        </p>
+        <div class="splash-loading-bar" aria-hidden="true">
+            <span class="splash-loading-bar-fill" id="splash-bar-fill"></span>
         </div>
-        <div class="splash-loading-label" id="splash-loading-label">LOADING CREATIVE REALM</div>
+        <p class="splash-loading-label" id="splash-loading-label">LOADING CREATIVE REALM</p>
     </div>
 </div>
 
@@ -1056,7 +922,7 @@ footer .footer-links a:hover {
         <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
         <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
       </div>
-      <div class="logo-text">ARIGATO<br>DEVAN PROMPTS</div>
+      <div class="logo-text">arigato.<span class="blog-brand-suffix">blog</span></div>
     </div>
     
     <nav class="nav-links desktop-only">
@@ -1221,7 +1087,7 @@ footer .footer-links a:hover {
           <div class="title">Creative Prompter</div>
         </div>
       </div>
-      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ó a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ù a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
       <div class="author-location">
         <i class="fa-solid fa-location-dot"></i> Mumbai, India
       </div>
@@ -1292,146 +1158,8 @@ function filterByTag(tag, btn) {
   if (noRes) noRes.style.display = anyVisible ? 'none' : 'block';
 }
 </script>
+<script src="js/blog-splash.js?v=20260756" defer></script>
 <script>
-// High-End GSAP Splash Screen Loader Logic
-document.addEventListener("DOMContentLoaded", () => {
-    const splash = document.getElementById('blog-splash-screen');
-    if (!splash) return;
-
-    // Helper functions to lock and release scrollbar of both html and body elements
-    const lockScroll = () => {
-        document.documentElement.classList.add('no-scroll');
-        document.body.classList.add('no-scroll');
-    };
-    const unlockScroll = () => {
-        document.documentElement.classList.remove('no-scroll');
-        document.body.classList.remove('no-scroll');
-    };
-
-    // Safety Fallback 1: Instantly hide if GSAP CDN is blocked/offline/delayed
-    if (typeof gsap === "undefined") {
-        splash.style.setProperty('display', 'none', 'important');
-        unlockScroll();
-        return;
-    }
-
-    // Safety Fallback 2: Absolute pure JS timer to force-remove splash screen after 4.2 seconds max
-    setTimeout(() => {
-        if (splash && splash.style.display !== 'none') {
-            splash.style.setProperty('display', 'none', 'important');
-            unlockScroll();
-        }
-    }, 4200);
-
-    // Elegant UX: Only show splash loader if entering the blog system from main site
-    const referrer = document.referrer;
-    const isFromMainSite = referrer === "" || referrer.includes("index") || !referrer.includes("blog");
-
-    if (isFromMainSite) {
-        lockScroll(); // Block scroll completely during transition and hide scrollbar
-        
-        try {
-            // Spin loader infinitely on its own independent tween so it doesn't infinite-inflate the entrance timeline's duration!
-            gsap.to(".splash-ring-loader", { rotation: 360, repeat: -1, duration: 1.0, ease: "none" });
-
-            // GSAP Timeline (Snappy 0.9s build-up and 0.4s slide-up curtain reveal!) - perfectly finite!
-            const tl = gsap.timeline();
-            
-            tl.to(".splash-ring-loader", { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.2)" })
-              .to(".splash-arrow", { opacity: 1, scale: 1, rotation: 360, duration: 0.4, ease: "back.out(1.2)" }, "-=0.25")
-              .to(".prompt-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.35, ease: "power2.out" }, "-=0.25")
-              .to(".blog-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.35, ease: "power2.out" }, "-=0.3")
-              .to(".splash-loading-label", { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
-              .to({}, { duration: 0.45 }) // Short pause to absorb the gorgeous layout
-              .to(".splash-content", { scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in" })
-              .to("#blog-splash-screen", { 
-                  clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", // Fast slide up reveal!
-                  duration: 0.45, 
-                  ease: "power3.inOut",
-                  onComplete: () => {
-                      splash.style.setProperty('display', 'none', 'important');
-                      unlockScroll(); // Restore scrolling and scrollbars
-                  }
-              }, "-=0.1");
-        } catch (err) {
-            splash.style.setProperty('display', 'none', 'important');
-            unlockScroll();
-        }
-    } else {
-        // Instant load with no delay if navigating within blog pages
-        splash.style.setProperty('display', 'none', 'important');
-        unlockScroll();
-    }
-});
-
-// Intercept Outbound Clicks for BLOG ? PROMPT 2-second Reverse Transition
-document.addEventListener('click', (e) => {
-    const link = e.target.closest('a');
-    if (!link) return;
-    
-    const href = link.getAttribute('href');
-    if (!href) return;
-    
-    // Check if link redirects back to index/home page
-    const isGoingBack = href === "index.php" || href === "index" || href.includes("index.php") || href === "gallery.php" || href.includes("gallery.php") || href === "./" || href === "/";
-    
-    if (isGoingBack && typeof gsap !== "undefined") {
-        const splash = document.getElementById('blog-splash-screen');
-        if (splash) {
-            e.preventDefault(); // Intercept redirect
-            
-            // Swap text positions to BLOG ? PROMPT
-            const blogWordHTML = `<span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">B</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">L</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">O</span><span style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4)) !important;">G</span>`;
-            const promptWordHTML = `<span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">R</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">O</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">M</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">P</span><span style="color: #cbd5e1 !important; text-shadow: 0 0 20px rgba(255,255,255,0.1) !important;">T</span>`;
-            
-            document.getElementById('splash-prompt-word').innerHTML = blogWordHTML;
-            document.getElementById('splash-blog-word').innerHTML = promptWordHTML;
-            
-            const arrow = document.getElementById('splash-arrow');
-            arrow.style.transform = 'scale(1) rotate(180deg)'; // Point backwards!
-            arrow.style.color = '#a855f7';
-            
-            document.getElementById('splash-loading-label').textContent = 'RETURNING TO MAIN PORTAL';
-            
-            // Preset states
-            gsap.set("#splash-prompt-word span", { opacity: 0, y: 20, scale: 0.7, filter: "blur(5px)" });
-            gsap.set("#splash-blog-word span", { opacity: 0, y: 20, scale: 0.7, filter: "blur(5px)" });
-            gsap.set(".splash-ring-loader", { opacity: 0, scale: 0.6 });
-            gsap.set(".splash-arrow", { opacity: 0, scale: 0.4 });
-            gsap.set(".splash-loading-label", { opacity: 0, y: 10 });
-            gsap.set(".splash-content", { scale: 1, opacity: 1 });
-            
-            splash.style.display = 'flex';
-            
-            // Hide scrollbar during exit transition
-            document.documentElement.classList.add('no-scroll');
-            document.body.classList.add('no-scroll');
-            
-            // Spin loader infinitely on its own independent tween so it doesn't infinite-inflate the timeline's duration!
-            gsap.to(".splash-ring-loader", { rotation: -360, repeat: -1, duration: 1.0, ease: "none" });
-
-            // Exit Timeline (Snappy 0.85s build-up) - now perfectly finite and guaranteed to trigger onComplete!
-            const exitTl = gsap.timeline({
-                onComplete: () => {
-                    window.location.href = href; // Route to destination
-                }
-            });
-            
-            exitTl.to("#blog-splash-screen", { 
-                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", // Curtain drops super fast!
-                      duration: 0.35, 
-                      ease: "power3.out" 
-                  })
-                  .to(".splash-ring-loader", { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.2)" }, "-=0.15")
-                  .to(".splash-arrow", { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.2)" }, "-=0.2")
-                  .to("#splash-prompt-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.3, ease: "power2.out" }, "-=0.2")
-                  .to("#splash-blog-word span", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", stagger: 0.03, duration: 0.3, ease: "power2.out" }, "-=0.3")
-                  .to(".splash-loading-label", { opacity: 1, y: 0, duration: 0.25 }, "-=0.2")
-                  .to({}, { duration: 0.25 }); // Short pause before instant redirect!
-        }
-    }
-});
-
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {
     const glow = document.getElementById('back-glow');

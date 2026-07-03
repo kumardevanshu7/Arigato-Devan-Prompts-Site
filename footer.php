@@ -1,3 +1,6 @@
+<?php if (!empty($_SESSION['user_id'])): ?>
+<link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
+<?php endif; ?>
 <footer class="store-footer">
     <div class="store-footer-inner">
         <div class="footer-copy">&copy; <?= date("Y") ?> <span class="footer-brand">ARIGATO DEVAN</span>. KEEP CREATING.</div>

@@ -145,46 +145,10 @@ if (!isset($_page_canonical)) {
   });
 })();
 </script>
-<!-- Custom cursor -->
-<style>
-#cc-dot,#cc-ring{position:fixed;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s,opacity .15s;}
-#cc-dot{width:10px;height:10px;background:var(--primary-color,#c084fc);border:2.5px solid #2d2a35;}
-#cc-ring{width:30px;height:30px;border:2.5px solid #2d2a35;z-index:99998;background:transparent;}
-.cc-hover #cc-dot{width:14px;height:14px;background:#2d2a35;}
-.cc-hover #cc-ring{width:44px;height:44px;border-color:var(--primary-color,#c084fc);opacity:.55;}
-.cc-active #cc-dot{transform:translate(-50%,-50%) scale(.7);}
-.cc-active #cc-ring{transform:translate(-50%,-50%) scale(.85);}
-html:has(#cc-dot){cursor:none!important;}
-html:has(#cc-dot) a,html:has(#cc-dot) button,html:has(#cc-dot) input,html:has(#cc-dot) textarea,html:has(#cc-dot) select,html:has(#cc-dot) [onclick],html:has(#cc-dot) [tabindex]{cursor:none!important;}
-#sound-toggle-btn{display:none!important;}
-</style>
+<link rel="stylesheet" href="css/site-cursor.css?v=20260796">
+<script src="js/site-cursor.js?v=20260796" defer></script>
+<style>#sound-toggle-btn{display:none!important;}</style>
 <script>
-(function(){
-  /* ── Cursor (desktop only) ── */
-  if('ontouchstart' in window) return;
-  var dot=document.createElement('div'); dot.id='cc-dot';
-  var ring=document.createElement('div'); ring.id='cc-ring';
-  document.addEventListener('DOMContentLoaded',function(){
-    document.body.appendChild(dot); document.body.appendChild(ring);
-  });
-  var mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove',function(e){
-    mx=e.clientX; my=e.clientY;
-    dot.style.left=mx+'px'; dot.style.top=my+'px';
-  });
-  document.addEventListener('mousedown',function(){ document.body.classList.add('cc-active'); });
-  document.addEventListener('mouseup',function(){ document.body.classList.remove('cc-active'); });
-  document.addEventListener('mouseover',function(e){
-    var el=e.target.closest('a,button,[role=button],[onclick],input,textarea,select,[tabindex]');
-    document.body.classList.toggle('cc-hover',!!el);
-  });
-  (function anim(){
-    rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    requestAnimationFrame(anim);
-  })();
-})();
-
 /* ── Unlock sound (callable globally) ── */
 window.playUnlockSound=function(){
   if(localStorage.getItem('arigatoSound')==='off') return;
