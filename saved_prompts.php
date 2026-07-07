@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+require_once "slug_helper.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
@@ -19,16 +20,32 @@ $stmt = $pdo->prepare("
            p.tag, p.prompt_text, p.reel_link, p.created_at,
            p.best_works_in, p.asset_title, p.asset_images,
            1 AS is_unlocked, 1 AS is_saved,
-           IF(l.id IS NOT NULL, 1, 0) AS is_liked
+           IF(l.id IS NOT NULL, 1, 0) AS is_liked,
+           sp.source AS save_source
     FROM saved_prompts sp
     JOIN prompts p ON p.id = sp.prompt_id
     LEFT JOIN likes l ON l.prompt_id = p.id AND l.user_id = :uid
-    WHERE sp.user_id = :uid2
+    WHERE sp.user_id = :uid2 AND (sp.source = 'prompt' OR sp.source IS NULL OR sp.source = '')
     ORDER BY sp.created_at DESC
 ");
 $stmt->execute([":uid" => $user_id, ":uid2" => $user_id]);
 $saved = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$total = count($saved);
+
+$nm_saved = [];
+try {
+    $nm_stmt = $pdo->prepare("
+        SELECT nm.id, nm.slug, nm.title, nm.thumbnail_image AS image_path, nm.category, nm.tags,
+               'not_mine' AS save_source
+        FROM saved_prompts sp
+        JOIN not_mine_prompts nm ON nm.id = sp.prompt_id
+        WHERE sp.user_id = ? AND sp.source = 'not_mine'
+        ORDER BY sp.created_at DESC
+    ");
+    $nm_stmt->execute([$user_id]);
+    $nm_saved = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {}
+
+$total = count($saved) + count($nm_saved);
 
 $stats = [
     "secret"           => 0,
@@ -36,6 +53,7 @@ $stats = [
     "insta_viral"      => 0,
     "already_uploaded" => 0,
     "direct"           => 0,
+    "not_mine"         => count($nm_saved),
 ];
 foreach ($saved as $p) {
     $pt = $p["prompt_type"] ?? "secret";
@@ -50,6 +68,7 @@ $type_chips = [
     "unreleased"       => ["icon" => "fa-moon",   "label" => "Unreleased"],
     "already_uploaded" => ["icon" => "fa-upload", "label" => "Uploaded"],
     "direct"           => ["icon" => "fa-bolt",   "label" => "Direct"],
+    "not_mine"         => ["icon" => "fa-ban",    "label" => "#not-mine"],
 ];
 
 require_once "includes/prompt_cards.php";
@@ -111,6 +130,23 @@ require_once "includes/prompt_cards.php";
     </div>
     <?php else: ?>
     <?php render_prompt_grid($saved, ["grid_id" => "sp-card-stack"]); ?>
+
+    <?php if (!empty($nm_saved)): ?>
+    <h3 class="nm-gradient-text" style="margin:28px 0 14px;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-ban nm-gradient-icon"></i> #not-mine
+    </h3>
+    <div class="sp-nm-grid">
+        <?php foreach ($nm_saved as $nm): ?>
+        <a href="<?= htmlspecialchars(nm_prompt_url($nm)) ?>" class="sp-nm-card">
+            <div class="sp-nm-img"><img src="<?= htmlspecialchars($nm['image_path']) ?>" alt="" loading="lazy"></div>
+            <div class="sp-nm-body">
+                <span class="sp-nm-cat" data-cat="<?= $nm['category'] ?>"><?= ucfirst($nm['category']) ?></span>
+                <span class="sp-nm-title"><?= htmlspecialchars($nm['title']) ?></span>
+            </div>
+        </a>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
     <?php endif; ?>
 
 </main>

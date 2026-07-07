@@ -224,13 +224,15 @@ body {
    PAGE WRAPPER
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-wrap {
-    height: 100vh;
+    min-height: 100vh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 0 20px;
+    padding: 26px 20px 36px;
     position: relative; z-index: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+.feedback-card { margin: 10px 0 16px; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SECTION LABEL
@@ -611,14 +613,14 @@ body {
    MOBILE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 600px) {
-    .feedback-card { padding: 20px 16px 18px; border-radius: 20px; max-width: 95vw; }
+    .feedback-card { padding: 20px 16px 18px; border-radius: 20px; max-width: 95vw; margin: 8px 0 18px; }
     .card-title { font-size: 1.35rem; }
     .emoji-btn { font-size: .95rem; padding: 5px 1px 4px; border-radius: 8px; }
     .emoji-num { font-size: .38rem; }
     .avatar-ring { width: 58px; height: 58px; }
     .user-name { font-size: 1.1rem; }
     .back-link { top: 12px; left: 12px; font-size: .68rem; padding: 5px 10px; }
-    .page-wrap { height: 100dvh; overflow: hidden; }
+    .page-wrap { min-height: 100dvh; overflow-y: auto; overflow-x: hidden; padding: 18px 12px 24px; }
     .feedback-textarea { min-height: 72px; }
 }
 </style>
@@ -773,11 +775,17 @@ body {
         <form method="POST" id="feedbackForm">
             <!-- Mood Tags -->
             <div class="mood-tags" id="moodTags">
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-fire" style="color: #f97316;"></i> Loved the prompts</span>
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-wand-magic-sparkles" style="color: #eab308;"></i> Clean UI</span>
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-lightbulb" style="color: #eab308;"></i> Need more features</span>
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-bolt" style="color: #eab308;"></i> Super fast</span>
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Keep going!</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Bahut sunder couyple promptts</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-fire" style="color: #f97316;"></i> Best prompt ever! 🔥</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Worked perfectly. Thank you! ❤️</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Finally got the result I wanted.</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Loved the realism ❤️</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-star" style="color: #eab308;"></i> The results exceeded my expectations.</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> Ekdum realistic output mila.</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-rocket" style="color: #a855f7;"></i> Bahut hi OP prompt hai.</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-face-grin-hearts" style="color: #ec4899;"></i> Ye toh next level nikla 😍</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-gem" style="color: #8b5cf6;"></i> Aur aise prompts lao bhai. 💖</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-bullseye" style="color: #0ea5e9;"></i> One of the most accurate prompts I've tested.</span>
             </div>
             <div class="field-wrap">
                 <textarea
@@ -813,7 +821,7 @@ body {
                         '<i class="fa-solid fa-face-laugh" style="color:#34d399"></i>',
                         '<i class="fa-solid fa-face-laugh-beam" style="color:#10b981"></i>',
                         '<i class="fa-solid fa-face-grin-stars" style="color:#0ea5e9"></i>',
-                        '<i class="fa-solid fa-star" style="color:#eab308"></i>'
+                        '<i class="fa-solid fa-heart fa-beat" style="color:#ef4444"></i>'
                     ];
                     foreach ($icons_list as $i => $em):
                     ?>

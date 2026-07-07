@@ -66,6 +66,21 @@ foreach ($prompts as $p) {
 }
 $all_mgr_tags = array_unique($all_mgr_tags);
 sort($all_mgr_tags);
+
+$__sn = $_SESSION['username'] ?? ($_SESSION['user_name'] ?? 'Admin');
+$__sa = $_SESSION['profile_image'] ?? ($_SESSION['avatar'] ?? '');
+if (empty($__sa)) {
+    try {
+        $__q = $pdo->prepare("SELECT username, avatar, profile_image FROM users WHERE id = ? LIMIT 1");
+        $__q->execute([$_SESSION['user_id'] ?? 0]);
+        $__u = $__q->fetch(PDO::FETCH_ASSOC);
+        if ($__u) {
+            $__sn = $__u['username'] ?? $__sn;
+            $__sa = $__u['profile_image'] ?? $__u['avatar'] ?? '';
+        }
+    } catch (Exception $__e) {
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -288,18 +303,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 <aside class="sidebar">
   <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
   <div class="sb-admin">
-    <?php
-      $__sn = $_SESSION['username'] ?? ($_SESSION['user_name'] ?? 'Admin');
-      $__sa = $_SESSION['profile_image'] ?? ($_SESSION['avatar'] ?? '');
-      if(empty($__sa)){
-        try{
-          $__q=$pdo->prepare("SELECT username,avatar,profile_image FROM users WHERE id=? LIMIT 1");
-          $__q->execute([$_SESSION['user_id']??0]);
-          $__u=$__q->fetch(PDO::FETCH_ASSOC);
-          if($__u){$__sn=$__u['username']??$__sn;$__sa=$__u['profile_image']??$__u['avatar']??'';}
-        }catch(Exception $__e){}
-      }
-    ?>
     <?php if(!empty($__sa)): ?><img src="<?= htmlspecialchars($__sa) ?>" class="sb-av" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0" alt="">
     <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($__sn,0,1)) ?></div><?php endif; ?>
     <div><div class="sb-uname"><?= htmlspecialchars($__sn) ?></div><div class="sb-role">Administrator</div></div>

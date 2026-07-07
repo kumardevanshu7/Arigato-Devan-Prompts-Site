@@ -28,10 +28,10 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
-        "url"        => "/insta_viral.php",
+        "url"        => "/not_mine.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => "2026-07-06",
     ],
     [
         "url"        => "/unreleased.php",
@@ -62,6 +62,12 @@ $static_pages = [
         "priority"   => "0.7",
         "changefreq" => "weekly",
         "lastmod"    => "2026-07-02",
+    ],
+    [
+        "url"        => "/web_stories/",
+        "priority"   => "0.75",
+        "changefreq" => "weekly",
+        "lastmod"    => "2026-07-06",
     ],
     [
         "url"        => "/faq.php",
@@ -141,6 +147,26 @@ try {
     // silently skip if error
 }
 
+// Published Web Stories
+$web_stories = [];
+try {
+    $stmt = $pdo->query(
+        "SELECT slug, updated_at, created_at FROM web_stories WHERE is_published = 1 ORDER BY created_at DESC",
+    );
+    $web_stories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+}
+
+// Not Mine prompts — clean URLs only (/not-mine/{slug})
+$not_mine_prompts = [];
+try {
+    $nm_stmt = $pdo->query(
+        "SELECT slug, created_at FROM not_mine_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+    );
+    $not_mine_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+}
+
 $today = date("Y-m-d");
 ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -175,6 +201,27 @@ $today = date("Y-m-d");
     ) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+<?php endforeach; ?>
+
+<?php foreach ($web_stories as $ws): ?>
+  <url>
+    <loc><?= $base . "/web_stories/story.php?slug=" . urlencode($ws["slug"]) ?></loc>
+    <lastmod><?= date(
+        "Y-m-d",
+        strtotime($ws["updated_at"] ?? $ws["created_at"]),
+    ) ?></lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+<?php endforeach; ?>
+
+<?php foreach ($not_mine_prompts as $nm): ?>
+  <url>
+    <loc><?= $base . "/not-mine/" . htmlspecialchars($nm["slug"]) ?></loc>
+    <lastmod><?= date("Y-m-d", strtotime($nm["created_at"])) ?></lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
   </url>
 <?php endforeach; ?>
 

@@ -4,13 +4,29 @@
  * Set $nav_active before include: 'home' | 'gallery' | 'blogs' | etc.
  */
 if (!function_exists('sessionAvatar')) {
-    function sessionAvatar() {
-        return !empty($_SESSION['profile_image'])
-            ? $_SESSION['profile_image']
-            : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($_SESSION['username'] ?? 'user');
+    function sessionAvatar(?string $assetBase = null): string
+    {
+        $img = '';
+        if (!empty($_SESSION['profile_image'])) {
+            $img = (string) $_SESSION['profile_image'];
+        } elseif (!empty($_SESSION['avatar'])) {
+            $img = (string) $_SESSION['avatar'];
+        }
+        if ($img !== '') {
+            if (preg_match('#^https?://#i', $img)) {
+                return $img;
+            }
+            $base = $assetBase ?? '';
+            return $base . ltrim($img, '/');
+        }
+        return 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($_SESSION['username'] ?? 'user');
     }
 }
 $nav_active = $nav_active ?? '';
+$nav_base = $nav_base ?? '';
+$nb = function (string $path) use ($nav_base): string {
+    return htmlspecialchars($nav_base . $path, ENT_QUOTES, 'UTF-8');
+};
 $curPage    = basename($_SERVER['PHP_SELF'] ?? '');
 
 if (!isset($nav_counts) && isset($pdo)) {
@@ -18,7 +34,6 @@ if (!isset($nav_counts) && isset($pdo)) {
         $nc = $pdo->query("SELECT
             SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
             SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
-            SUM(CASE WHEN prompt_type = 'insta_viral' THEN 1 ELSE 0 END) as insta_viral,
             SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
             SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct
         FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)")->fetch(PDO::FETCH_ASSOC);
@@ -34,25 +49,25 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
     <header class="store-header">
         <div class="store-header-inner">
 
-            <a href="index.php" class="store-logo-img" title="Home">
-                <img src="toplogo/logo01.webp" alt="Arigato Devan Prompts Logo" height="36">
+            <a href="<?= $nb('index.php') ?>" class="store-logo-img" title="Home">
+                <img src="<?= $nb('toplogo/logo01.webp') ?>" alt="Arigato Devan Prompts Logo" height="36">
                 <span class="store-logo-text" id="brandTypewriter" aria-label="arigato prompt">
                     <span class="logo-prefix">arigato</span><span class="logo-dot">.</span><span class="logo-suffix" id="brandSuffix">prompt</span><span class="logo-cursor" aria-hidden="true">|</span>
                 </span>
             </a>
 
             <nav class="store-nav">
-                <a href="digital_store/index.php" class="shop-glowing-btn">
+                <a href="<?= $nb('digital_store/index.php') ?>" class="shop-glowing-btn">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     Shop
                 </a>
-                <a href="gallery.php" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
-                <a href="blogs.php" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
-                <a href="my_heroines.php" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
+                <a href="<?= $nb('gallery.php') ?>" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
+                <a href="<?= $nb('blogs.php') ?>" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
+                <a href="<?= $nb('my_heroines.php') ?>" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
                     <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
                     My Heroines
                 </a>
-                <a href="progress.php" class="gal-icon-link" title="Our Journey">
+                <a href="<?= $nb('progress.php') ?>" class="gal-icon-link" title="Our Journey">
                     <i class="fa-solid fa-chart-line"></i>
                 </a>
 
@@ -62,29 +77,32 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
                         <i class="fa-solid fa-chevron-down" style="font-size:0.62rem;"></i>
                     </button>
                     <div class="gal-dropdown-menu">
-                        <a href="secret_code.php">
+                        <a href="<?= $nb('secret_code.php') ?>">
                             <i class="fa-solid fa-lock"></i> Secret Code Reels
                             <?= empty($nav_counts['secret_code']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'secret_code.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="unreleased.php">
+                        <a href="<?= $nb('unreleased.php') ?>">
                             <i class="fa-solid fa-star"></i> Unreleased Reels
                             <?= empty($nav_counts['unreleased']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'unreleased.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="insta_viral.php">
-                            <i class="fa-brands fa-instagram"></i> Insta Viral Reels
-                            <?= empty($nav_counts['insta_viral']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'insta_viral.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
-                        </a>
-                        <a href="already_uploaded.php">
+                        <a href="<?= $nb('already_uploaded.php') ?>">
                             <i class="bx bx-history"></i> Already Uploaded
                             <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'already_uploaded.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="direct_prompts.php">
+                        <a href="<?= $nb('direct_prompts.php') ?>">
                             <i class="fa-solid fa-hand-pointer"></i> Direct Prompts
                             <?= empty($nav_counts['direct']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'direct_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="all_codes.php" class="dd-all-codes">
+                        <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link">
+                            <i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span>
+                        </a>
+                        <a href="<?= $nb('all_codes.php') ?>" class="dd-all-codes">
                             <i class="fa-solid fa-code"></i> All Secret Codes
                             <?= $curPage === 'all_codes.php' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
+                        </a>
+                        <a href="<?= $nb('web_stories/') ?>" class="dd-stories">
+                            <i class="fa-solid fa-bolt"></i> Web Stories
+                            <?= $nav_active === 'web_stories' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                     </div>
                 </div>
@@ -93,7 +111,7 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
                     <i class="fa-brands fa-instagram"></i>
                     @arigato.devan
                     <span class="pulse-dot"></span>
-                    <span class="gal-insta-count">15K+</span>
+                    <span class="gal-insta-count">16K+</span>
                 </a>
             </nav>
 
@@ -102,16 +120,16 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php" class="gal-profile-link">
-                        <img src="<?= htmlspecialchars(sessionAvatar()) ?>" alt="Profile" referrerpolicy="no-referrer">
+                    <a href="<?= $nb('profile.php') ?>" class="gal-profile-link">
+                        <img src="<?= htmlspecialchars(sessionAvatar($nav_base)) ?>" alt="Profile" referrerpolicy="no-referrer">
                         <span class="gal-btn-label">Profile</span>
                     </a>
-                    <a href="login.php?logout=1" class="gal-logout-btn">
+                    <a href="<?= $nb('login.php?logout=1') ?>" class="gal-logout-btn">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span class="gal-btn-label">Logout</span>
                     </a>
                 <?php else: ?>
-                    <a href="login.php" class="store-signin-btn" aria-label="Sign in with Google">
+                    <a href="<?= $nb('login.php') ?>" class="store-signin-btn" aria-label="Sign in with Google">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="15" height="15" alt="">
                         <span class="gal-btn-label">Sign in with Google</span>
                     </a>
@@ -131,33 +149,34 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
         </button>
     </div>
     <nav class="gal-mobile-nav">
-        <a href="digital_store/index.php"><i class="fa-solid fa-shop"></i> Shop</a>
-        <a href="gallery.php"><i class="fa-solid fa-images"></i> Gallery</a>
-        <a href="blogs.php"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
-        <a href="my_heroines.php" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
+        <a href="<?= $nb('digital_store/index.php') ?>"><i class="fa-solid fa-shop"></i> Shop</a>
+        <a href="<?= $nb('gallery.php') ?>"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="<?= $nb('blogs.php') ?>"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
+        <a href="<?= $nb('my_heroines.php') ?>" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
             <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
             My Heroines
         </a>
-        <a href="progress.php"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
+        <a href="<?= $nb('progress.php') ?>"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
         <button type="button" class="gal-mobile-section-btn" id="galMobileReelsBtn">
             <i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down" style="margin-left:auto;font-size:0.7rem;"></i>
         </button>
         <div class="gal-mobile-sub" id="galMobileReelsSub">
-            <a href="secret_code.php">Secret Code Reels</a>
-            <a href="unreleased.php">Unreleased Reels</a>
-            <a href="insta_viral.php">Insta Viral Reels</a>
-            <a href="already_uploaded.php">Already Uploaded</a>
-            <a href="direct_prompts.php">Direct Prompts</a>
-            <a href="all_codes.php">All Secret Codes</a>
+            <a href="<?= $nb('secret_code.php') ?>">Secret Code Reels</a>
+            <a href="<?= $nb('unreleased.php') ?>">Unreleased Reels</a>
+            <a href="<?= $nb('already_uploaded.php') ?>">Already Uploaded</a>
+            <a href="<?= $nb('direct_prompts.php') ?>">Direct Prompts</a>
+            <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link"><i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span></a>
+            <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
+            <a href="<?= $nb('web_stories/') ?>">Web Stories</a>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">
             <i class="fa-brands fa-instagram"></i> @arigato.devan
         </a>
         <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a>
-        <a href="login.php?logout=1" style="color:#e11d48;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <a href="<?= $nb('profile.php') ?>"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="<?= $nb('login.php?logout=1') ?>" style="color:#e11d48;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         <?php else: ?>
-        <a href="login.php"><i class="fa-solid fa-right-to-bracket"></i> Sign in</a>
+        <a href="<?= $nb('login.php') ?>"><i class="fa-solid fa-right-to-bracket"></i> Sign in</a>
         <?php endif; ?>
     </nav>
 </aside>

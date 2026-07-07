@@ -210,6 +210,14 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 .theme-nogoda .store-nav a { color: var(--pal-teal); }
 .theme-nogoda .store-nav a:hover,
 .theme-nogoda .store-nav .gal-nav-active { color: var(--pal-navy); }
+.theme-nogoda .gal-insta-link > .fa-instagram::before,
+.theme-nogoda .gal-mobile-nav a[href*="instagram.com"] > .fa-instagram::before,
+.theme-nogoda .gal-dropdown-menu a[href*="insta_viral"] > .fa-instagram::before {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 .theme-nogoda .store-nav .gal-nav-active::after {
   background: var(--nogoda-gradient);
   height: 2px;
@@ -431,7 +439,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   padding: 10px 14px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 620px) {
   .gal-mobile-menu-btn { display: flex; }
   .theme-nogoda .store-nav { display: none; }
   .theme-nogoda .gal-btn-label { display: none; }
@@ -449,6 +457,127 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
     width: 18px;
     height: 18px;
   }
+  .theme-nogoda .store-header-right { gap: 6px; }
+}
+
+/* Stage 1: keep only Shop + Gallery + Insta(16K+) */
+@media (max-width: 980px) {
+  .theme-nogoda .store-nav {
+    display: flex;
+    gap: 10px;
+  }
+  .theme-nogoda .store-nav .gal-dropdown,
+  .theme-nogoda .store-nav a[href*="blogs.php"],
+  .theme-nogoda .store-nav .nav-heroines-link,
+  .theme-nogoda .store-nav .gal-icon-link {
+    display: none !important;
+  }
+  .theme-nogoda .store-nav .shop-glowing-btn,
+  .theme-nogoda .store-nav a[href*="gallery.php"],
+  .theme-nogoda .store-nav .gal-insta-link {
+    display: inline-flex !important;
+  }
+  .theme-nogoda .store-nav a[href*="gallery.php"] {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .theme-nogoda .gal-insta-link {
+    font-size: 0;
+    gap: 5px;
+    padding: 6px 9px;
+  }
+  .theme-nogoda .gal-insta-link > .fa-instagram { font-size: 0.92rem; }
+  .theme-nogoda .gal-insta-link .gal-insta-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+}
+
+/* Stage 2: keep only Gallery + Insta(16K+) */
+@media (max-width: 840px) {
+  .theme-nogoda .store-nav .shop-glowing-btn { display: none !important; }
+  .theme-nogoda .store-nav a[href*="gallery.php"],
+  .theme-nogoda .store-nav .gal-insta-link {
+    display: inline-flex !important;
+  }
+}
+
+/* Stage 3: keep Gallery + Insta icon only */
+@media (max-width: 700px) {
+  .theme-nogoda .store-nav a[href*="gallery.php"] {
+    font-size: 0.78rem;
+    padding: 6px 2px;
+  }
+  .theme-nogoda .store-nav .gal-insta-link .gal-insta-count,
+  .theme-nogoda .store-nav .gal-insta-link .pulse-dot {
+    display: none !important;
+  }
+  .theme-nogoda .store-nav .gal-insta-link > .fa-instagram {
+    font-size: 0.96rem;
+    background: var(--nogoda-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Progressive navbar compaction: keep key actions longer */
+@media (max-width: 1400px) {
+  .theme-nogoda .store-header-inner { gap: 12px; }
+  .theme-nogoda .store-nav { gap: 12px; }
+  .theme-nogoda .store-logo-text { max-width: 190px; }
+  .theme-nogoda .store-nav .nav-heroines-link,
+  .theme-nogoda .store-nav .gal-icon-link,
+  .theme-nogoda .store-nav a[href*="blogs.php"] {
+    display: none;
+  }
+  .theme-nogoda .gal-insta-link {
+    gap: 6px;
+    padding: 7px 10px;
+  }
+  .theme-nogoda .gal-insta-link .pulse-dot { display: none; }
+  .theme-nogoda .gal-insta-link > .fa-instagram {
+    margin-right: 0;
+    font-size: 0.92rem;
+  }
+  .theme-nogoda .gal-insta-link .gal-insta-count {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .theme-nogoda .gal-profile-link,
+  .theme-nogoda .gal-logout-btn,
+  .theme-nogoda .store-signin-btn {
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 1260px) {
+  .theme-nogoda .store-logo-text { max-width: 150px; }
+  .theme-nogoda .store-nav {
+    gap: 10px;
+    font-size: 0.78rem;
+  }
+  .theme-nogoda .shop-glowing-btn {
+    padding: 6px 12px !important;
+  }
+  .theme-nogoda .gal-dropdown-btn {
+    font-size: 0.78rem;
+    padding: 6px 2px;
+  }
+  /* Keep only icon + 16K+ on tight widths */
+  .theme-nogoda .gal-insta-link {
+    font-size: 0;
+    gap: 5px;
+    min-width: auto;
+  }
+  .theme-nogoda .gal-insta-link > .fa-instagram {
+    font-size: 0.95rem;
+  }
+  .theme-nogoda .gal-insta-link .gal-insta-count {
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+  .theme-nogoda .gal-btn-label { display: none; }
   .theme-nogoda .store-header-right { gap: 6px; }
 }
 
@@ -1331,6 +1460,29 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
 }
 .theme-nogoda .pp-assets-title { font-weight: 600; color: var(--pal-navy); margin-bottom: 10px; }
 .theme-nogoda .pp-assets-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+.theme-nogoda .pp-assets-item {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+.theme-nogoda .pp-download-btn {
+  text-decoration: none;
+  font-size: 0.72rem;
+  padding: 8px 12px;
+  width: 100%;
+  min-width: 100px;
+  background: var(--pal-white);
+  border: 1px solid var(--pal-sky);
+  color: var(--pal-navy);
+  font-weight: 600;
+  box-shadow: none;
+}
+.theme-nogoda .pp-download-btn:hover {
+  border-color: var(--pal-teal);
+  background: rgba(200, 217, 230, 0.28);
+  transform: translateY(-1px);
+}
 .theme-nogoda .pp-assets-grid img {
   width: 100px;
   aspect-ratio: 3/4;
@@ -1381,10 +1533,32 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   display: block;
 }
 .theme-nogoda .pp-rel-card-title {
-  padding: 12px 14px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--pal-navy);
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+}
+.theme-nogoda .pp-rel-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.theme-nogoda .pp-rel-card-likes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--pal-teal);
+  flex-shrink: 0;
+}
+.theme-nogoda .pp-rel-card-likes .fa-heart {
+  color: var(--nogoda-pink);
+  font-size: 0.68rem;
 }
 
 /* Steps guide */
@@ -1568,4 +1742,32 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   }
   .theme-nogoda .store-logo-text { font-size: 0.95rem; }
   .theme-nogoda .store-logo-img img { height: 30px; }
+}
+
+/* ---- Not Mine — Nogoda gradient branding ---- */
+.nm-gradient-text {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.nm-gradient-icon::before {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.theme-nogoda .gal-dropdown-menu .gal-nm-link {
+  border-top: 1px solid var(--pal-sky);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.theme-nogoda .gal-nm-link {
+  font-weight: 800;
+}
+.theme-nogoda .gal-nm-link > i.nm-gradient-icon::before {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

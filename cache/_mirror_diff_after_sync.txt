@@ -1,0 +1,4 @@
+.gitignore
+.htaccess
+db.php
+firebase_auth.php

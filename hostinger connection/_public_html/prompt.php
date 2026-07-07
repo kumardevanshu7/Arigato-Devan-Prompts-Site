@@ -48,7 +48,7 @@ $tinfo = [
     "direct"           => ["label" => "DIRECT PROMPT",      "bg" => "#ffe4e6", "color" => "#be123c"],
 ][$ptype];
 
-$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
+$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path, likes_count FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
 $rel_stmt->execute([$db_type, $id]);
 $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -60,7 +60,7 @@ $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? ''
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
-$page_title   = htmlspecialchars($p["title"]) . " ï¿½ AI Prompt | Arigato Devan";
+$page_title   = htmlspecialchars($p["title"]) . ' — AI Prompt | Arigato Devan';
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
@@ -69,7 +69,7 @@ $meta_desc    = !empty($p['description'])
                 . (!empty($tags_str) ? ' Perfect for ' . $tags_str . '.' : '')
                 . ' Copy and use instantly on ChatGPT or any AI tool.';
 $type_page    = match($ptype) {
-    'insta_viral'      => 'insta_viral.php',
+    'insta_viral'      => 'not_mine.php',
     'unreleased'       => 'unreleased.php',
     'already_uploaded' => 'already_uploaded.php',
     'direct'           => 'gallery.php', // Assuming there's no direct.php list page yet
@@ -87,7 +87,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $meta_desc ?>">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> ï¿½ Arigato Devan">
+    <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
     <link rel="canonical" href="<?= $canonical ?>">
@@ -183,7 +183,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <?php if (isset($_SESSION['user_id'])): ?>
                         <p>Tap the heart <strong>20 times</strong> to unlock this prompt.</p>
                         <?php else: ?>
-                        <p>Tap the heart <strong>90 times</strong> to unlock ï¿½ or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
+                        <p>Tap the heart <strong>90 times</strong> to unlock — or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
                         <?php endif; ?>
                         <div class="pp-love-area">
                             <button id="pp-love-btn" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
@@ -269,9 +269,9 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <div class="pp-assets-title"><i class="fa-solid fa-paperclip"></i> <?= htmlspecialchars($p['asset_title'] ?? 'Assets') ?></div>
                         <div class="pp-assets-grid">
                             <?php foreach ($asset_images as $i => $ai): ?>
-                            <div style="position:relative;display:inline-flex;flex-direction:column;gap:6px;">
+                            <div class="pp-assets-item">
                                 <img loading="lazy" src="<?= htmlspecialchars($ai) ?>" alt="Asset <?= $i+1 ?>">
-                                <a href="<?= htmlspecialchars($ai) ?>" download target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;background:var(--secondary-color);border:2px solid var(--text-color);border-radius:8px;padding:5px 8px;font-size:0.72rem;font-weight:800;font-family:var(--font-main);text-decoration:none;color:var(--text-color);box-shadow:2px 2px 0 var(--text-color);transition:all .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''"><i class="fa-solid fa-download"></i> Download</a>
+                                <a href="<?= htmlspecialchars($ai) ?>" class="pp-btn pp-download-btn" download target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-download"></i> Download</a>
                             </div>
                             <?php endforeach; ?>
                         </div>
@@ -280,7 +280,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
 
                     <?php foreach ($extra_prompts_arr as $ep_i => $ep): ?>
                     <div class="pp-extra-section" id="pp-extra-<?= $ep_i ?>">
-                        <div class="pp-extra-num">? Prompt <?= $ep_i + 2 ?></div>
+                        <div class="pp-extra-num"><i class="fa-solid fa-layer-group"></i> Prompt <?= $ep_i + 2 ?></div>
                         <div class="pp-extra-layout">
                             <?php if (!empty($ep['image_path'])): ?>
                             <div class="pp-extra-img-col">
@@ -316,8 +316,11 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             <div class="pp-rel-grid">
                 <?php foreach ($related as $r): ?>
                 <a href="<?= (!$is_local && !empty($r['slug'])) ? '/prompts/' . htmlspecialchars($r['slug']) : 'prompt.php?id=' . $r['id'] ?>" class="pp-rel-card">
-                    <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy">
-                    <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
+                    <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>">
+                    <div class="pp-rel-card-foot">
+                        <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
+                        <div class="pp-rel-card-likes"><i class="fa-solid fa-heart" aria-hidden="true"></i><span><?= (int)($r['likes_count'] ?? 0) ?></span></div>
+                    </div>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -541,7 +544,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             const url = window.location.href;
             const title = <?= json_encode($p['title']) ?>;
             if (navigator.share) {
-                try { await navigator.share({ title: title + ' ï¿½ Arigato Devan', url: url }); return; } catch(e) {}
+                try { await navigator.share({ title: title + ' — Arigato Devan', url: url }); return; } catch(e) {}
             }
             navigator.clipboard.writeText(url).then(() => {
                 this.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';

@@ -50,12 +50,12 @@ arsort($all_tags);
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs ù Arigato Devan Prompts">
+<meta property="og:title" content="Blogs ÔøΩ Arigato Devan Prompts">
 <meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs ù Arigato Devan Prompts">
+<meta name="twitter:title" content="Blogs ÔøΩ Arigato Devan Prompts">
 <meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
@@ -191,7 +191,7 @@ header .logo-text .blog-brand-suffix {
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
-/* Override style.min.css ù keep arigato.blog visible on all mobile widths */
+/* Override style.min.css ÔøΩ keep arigato.blog visible on all mobile widths */
 header .logo-area .logo-text {
     display: block !important;
     visibility: visible !important;
@@ -200,7 +200,7 @@ header .logo-area .logo-text {
     min-width: 0 !important;
     overflow: visible !important;
 }
-/* logo circle avatar ù css/blog-header-logo.css */
+/* logo circle avatar ÔøΩ css/blog-header-logo.css */
 header nav.nav-links {
     gap: 16px !important; /* Perfect spacious layout */
     border: none !important;
@@ -946,7 +946,7 @@ footer .footer-links a:hover {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
         <span style="font-weight:600;">@arigato.devan</span>
         <span class="pulse-dot"></span>
-        <span style="font-weight:800;font-size:1.1rem;">15K+</span>
+        <span style="font-weight:800;font-size:1.1rem;">16K+</span>
       </a>
     </nav>
     
@@ -980,7 +980,7 @@ footer .footer-links a:hover {
       <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
       <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
       <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (15K+)</a>
+      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (16K+)</a>
       <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
       <?php if (isset($_SESSION["user_id"])): ?>
         <?php if ($_SESSION["role"] === "admin"): ?>
@@ -1087,7 +1087,7 @@ footer .footer-links a:hover {
           <div class="title">Creative Prompter</div>
         </div>
       </div>
-      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ù a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> ÔøΩ a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
       <div class="author-location">
         <i class="fa-solid fa-location-dot"></i> Mumbai, India
       </div>

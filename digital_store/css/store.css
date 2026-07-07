@@ -1498,6 +1498,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .gal-insta-link:hover { color: var(--text-primary) !important; }
 .gal-insta-count { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+.gal-insta-link > .fa-instagram::before,
+.gal-mobile-nav a[href*="instagram.com"] > .fa-instagram::before,
+.gal-dropdown-menu a[href*="insta_viral"] > .fa-instagram::before {
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 .pulse-dot {
     width: 6px; height: 6px;
     background: #22c55e; border-radius: 50%; display: inline-block;

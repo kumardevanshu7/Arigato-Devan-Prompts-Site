@@ -210,6 +210,14 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 .theme-nogoda .store-nav a { color: var(--pal-teal); }
 .theme-nogoda .store-nav a:hover,
 .theme-nogoda .store-nav .gal-nav-active { color: var(--pal-navy); }
+.theme-nogoda .gal-insta-link > .fa-instagram::before,
+.theme-nogoda .gal-mobile-nav a[href*="instagram.com"] > .fa-instagram::before,
+.theme-nogoda .gal-dropdown-menu a[href*="insta_viral"] > .fa-instagram::before {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 .theme-nogoda .store-nav .gal-nav-active::after {
   background: var(--nogoda-gradient);
   height: 2px;
@@ -1331,6 +1339,29 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
 }
 .theme-nogoda .pp-assets-title { font-weight: 600; color: var(--pal-navy); margin-bottom: 10px; }
 .theme-nogoda .pp-assets-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+.theme-nogoda .pp-assets-item {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+.theme-nogoda .pp-download-btn {
+  text-decoration: none;
+  font-size: 0.72rem;
+  padding: 8px 12px;
+  width: 100%;
+  min-width: 100px;
+  background: var(--pal-white);
+  border: 1px solid var(--pal-sky);
+  color: var(--pal-navy);
+  font-weight: 600;
+  box-shadow: none;
+}
+.theme-nogoda .pp-download-btn:hover {
+  border-color: var(--pal-teal);
+  background: rgba(200, 217, 230, 0.28);
+  transform: translateY(-1px);
+}
 .theme-nogoda .pp-assets-grid img {
   width: 100px;
   aspect-ratio: 3/4;
@@ -1381,10 +1412,32 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   display: block;
 }
 .theme-nogoda .pp-rel-card-title {
-  padding: 12px 14px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--pal-navy);
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+}
+.theme-nogoda .pp-rel-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.theme-nogoda .pp-rel-card-likes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--pal-teal);
+  flex-shrink: 0;
+}
+.theme-nogoda .pp-rel-card-likes .fa-heart {
+  color: var(--nogoda-pink);
+  font-size: 0.68rem;
 }
 
 /* Steps guide */
@@ -1568,4 +1621,32 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   }
   .theme-nogoda .store-logo-text { font-size: 0.95rem; }
   .theme-nogoda .store-logo-img img { height: 30px; }
+}
+
+/* ---- Not Mine — Nogoda gradient branding ---- */
+.nm-gradient-text {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.nm-gradient-icon::before {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.theme-nogoda .gal-dropdown-menu .gal-nm-link {
+  border-top: 1px solid var(--pal-sky);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.theme-nogoda .gal-nm-link {
+  font-weight: 800;
+}
+.theme-nogoda .gal-nm-link > i.nm-gradient-icon::before {
+  background: var(--nogoda-gradient-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

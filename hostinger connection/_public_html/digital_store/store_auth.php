@@ -6,6 +6,7 @@
  * Sets $_SESSION['google_uid'] so admin detection works across store pages.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+
 // Reuse parent site's DB connection
 require_once '../db.php';
 

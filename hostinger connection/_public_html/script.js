@@ -706,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Show modal smoothly
       if (modalOverlay) {
+        modalOverlay.removeAttribute('hidden');
         modalOverlay.style.display = "flex";
         setTimeout(() => modalOverlay.classList.add("show"), 10);
       }
@@ -725,7 +726,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeModalBtn && modalOverlay) {
     function hideModal() {
       modalOverlay.classList.remove("show");
-      setTimeout(() => (modalOverlay.style.display = "none"), 300);
+      setTimeout(() => {
+        modalOverlay.style.display = "none";
+        modalOverlay.setAttribute("hidden", "");
+      }, 300);
     }
 
     closeModalBtn.addEventListener("click", hideModal);

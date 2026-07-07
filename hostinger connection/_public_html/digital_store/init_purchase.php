@@ -6,6 +6,7 @@
  * Also accepts guest email for non-logged-in users.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

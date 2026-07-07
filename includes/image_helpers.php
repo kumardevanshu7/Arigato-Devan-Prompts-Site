@@ -84,6 +84,30 @@ function heroine_upload_image(array $file, string $prefix, int $maxW = 600, int 
 /**
  * @return array{path: string, width: int, height: int}|null
  */
+function not_mine_upload_image(array $file, string $prefix = 'nm', int $maxW = 900, int $maxH = 1600): ?string
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return null;
+    }
+    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    $mime    = mime_content_type($file['tmp_name']) ?: ($file['type'] ?? '');
+    if (!in_array($mime, $allowed, true)) {
+        return null;
+    }
+    $ext_map = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif'];
+    $ext     = $ext_map[$mime] ?? 'jpg';
+    $dir     = __DIR__ . '/../uploads/not_mine/';
+    if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+        return null;
+    }
+    $target = $dir . $prefix . '_' . uniqid('', true) . '.' . $ext;
+    if (!move_uploaded_file($file['tmp_name'], $target)) {
+        return null;
+    }
+    $saved = resizeToWebP($target, $maxW, $maxH, 85);
+    return 'uploads/not_mine/' . basename($saved);
+}
+
 function happy_users_upload_image(array $file): ?array
 {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {

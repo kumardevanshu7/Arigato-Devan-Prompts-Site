@@ -145,8 +145,8 @@ if (!isset($_page_canonical)) {
   });
 })();
 </script>
-<link rel="stylesheet" href="css/site-cursor.css?v=20260796">
-<script src="js/site-cursor.js?v=20260796" defer></script>
+<link rel="stylesheet" href="<?= htmlspecialchars($asset_base ?? '') ?>css/site-cursor.css?v=20260796">
+<script src="<?= htmlspecialchars($asset_base ?? '') ?>js/site-cursor.js?v=20260797" defer></script>
 <style>#sound-toggle-btn{display:none!important;}</style>
 <script>
 /* ── Unlock sound (callable globally) ── */

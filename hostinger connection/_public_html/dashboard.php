@@ -218,6 +218,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
 .sb-nav::-webkit-scrollbar{width:2px}
 .sb-nav::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+.nm-dash-brand{background:linear-gradient(135deg,#F5709D,#11FFC9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:900}
+.nm-dash-brand i::before{background:linear-gradient(135deg,#F5709D,#11FFC9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .sb-sec{font-size:.58rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 10px 5px}
 .sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:1px}
 .sb-link:hover{background:rgba(139,92,246,0.08);color:var(--text)}
@@ -467,12 +469,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="d-sec">Blog</div>
     <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
+    <a href="web_stories/admin/" class="d-link"><i class="fa-solid fa-bolt"></i> Web Stories</a>
     <div class="d-sec">Community</div>
-    <a href="heroine_admin.php" class="d-link"><i class="fa-solid fa-venus"></i> My Heroine</a>
     <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
     <div class="d-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="d-link"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
     <a href="happy_users_admin.php?tab=manage" class="d-link"><i class="fa-solid fa-images"></i> Manage Pics</a>
+    <div class="d-sec nm-dash-brand">Not Mine</div>
+    <a href="not_mine_admin.php" class="d-link nm-dash-brand"><i class="fa-solid fa-ban"></i> Not Mine Prompts</a>
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
@@ -512,6 +516,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
+    <a href="web_stories/admin/" class="sb-link"><i class="fa-solid fa-bolt"></i> <span>Web Stories</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
     <a href="heroine_admin.php" class="sb-link"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
@@ -519,6 +524,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="sb-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
     <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
+    <div class="sb-sec nm-dash-brand">Not Mine</div>
+    <a href="not_mine_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-ban"></i> <span>Not Mine Prompts</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
@@ -534,6 +541,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="tb-title"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</div>
     <div class="tb-time"><i class="fa-regular fa-clock"></i> <?= date('D, d M Y | h:i A') ?> IST</div>
     <a href="404.php" target="_blank" class="tb-btn tb-red"><i class="fa-solid fa-triangle-exclamation"></i> Preview 404</a>
+    <a href="500.php" target="_blank" class="tb-btn tb-red"><i class="fa-solid fa-server"></i> Preview 500</a>
   </div>
 
   <?php if ($success): ?><div class="flash flash-ok"><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($success) ?></div><?php endif; ?>
@@ -825,6 +833,7 @@ function closeDrawer(){document.getElementById('sideDrawer').classList.remove('o
     <a href="dashboard.php" class="mob-nav-item active"><i class="fa-solid fa-gauge-high"></i><span>Dash</span></a>
     <a href="manage_prompts.php" class="mob-nav-item"><i class="fa-solid fa-list-check"></i><span>Prompts</span></a>
     <a href="blog_admin.php" class="mob-nav-item"><i class="fa-solid fa-pen-nib"></i><span>Blogs</span></a>
+    <a href="web_stories/admin/" class="mob-nav-item"><i class="fa-solid fa-bolt"></i><span>Stories</span></a>
     <a href="user_management.php" class="mob-nav-item"><i class="fa-solid fa-users"></i><span>Users</span></a>
     <a href="analytics.php" class="mob-nav-item"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
   </div>

@@ -1,0 +1,79 @@
+{
+  "usa_headline": {
+    "label": "USA Headline",
+    "category": "News & Bold",
+    "font_preset": "usa_bold",
+    "preview_gradient": "rgba(0,0,0,0.65)",
+    "slides": [
+      {"bg_color": "#12081c", "title": "WHO RUNS", "body_text": "THE WORLD?", "text_align": "center", "text_valign": "center", "font_preset": "usa_bold", "gradient_opacity": 62, "gradient_color": "#000000", "show_logo": 1, "logo_style": "badge", "logo_position": "bottom-center"},
+      {"bg_color": "#1a0f28", "title": "GIRLS!", "body_text": "", "text_align": "center", "text_valign": "center", "font_preset": "usa_bold", "gradient_opacity": 55, "gradient_color": "#000000", "show_logo": 1, "logo_style": "badge", "logo_position": "bottom-center"},
+      {"bg_color": "#2F4156", "title": "THE STORY", "body_text": "Add your breaking news angle here.", "text_align": "center", "text_valign": "bottom", "font_preset": "usa_bold", "gradient_opacity": 48, "show_logo": 0},
+      {"bg_color": "#1a1028", "title": "KEY FACT", "body_text": "One punchy stat or quote.", "text_align": "left", "text_valign": "bottom", "font_preset": "usa_bold", "gradient_opacity": 50, "show_logo": 0},
+      {"bg_color": "#0d0a14", "title": "READ MORE", "body_text": "", "text_align": "center", "text_valign": "center", "font_preset": "usa_bold", "gradient_opacity": 60, "show_logo": 1, "logo_style": "badge", "logo_position": "bottom-center", "cta_label": "Visit Site", "cta_url": "https://arigatodevan.com"}
+    ]
+  },
+  "editorial_mag": {
+    "label": "Editorial Magazine",
+    "category": "News & Bold",
+    "font_preset": "editorial",
+    "preview_gradient": "rgba(47,65,86,0.5)",
+    "slides": [
+      {"bg_color": "#F5EFEB", "title": "The Edit", "body_text": "Stories worth swiping", "text_align": "left", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 35, "gradient_color": "#2F4156", "show_logo": 1, "logo_style": "square", "logo_position": "top-left"},
+      {"bg_color": "#567C8D", "title": "Chapter One", "body_text": "Set the scene in two lines max.", "text_align": "left", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 42, "show_logo": 0},
+      {"bg_color": "#2F4156", "title": "Pull Quote", "body_text": "\"Your most powerful line goes here.\"", "text_align": "center", "text_valign": "center", "font_preset": "editorial", "gradient_opacity": 38, "show_logo": 0},
+      {"bg_color": "#C8D9E6", "title": "Details", "body_text": "Context, tips, or bullet insight.", "text_align": "left", "text_valign": "top", "font_preset": "editorial", "gradient_opacity": 28, "gradient_color": "#2F4156", "show_logo": 0},
+      {"bg_color": "#2F4156", "title": "Continue Reading", "body_text": "", "text_align": "center", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 45, "show_logo": 1, "logo_style": "ring", "logo_position": "bottom-center", "cta_label": "Explore", "cta_url": "https://arigatodevan.com/blogs.php"}
+    ]
+  },
+  "neon_night": {
+    "label": "Neon Night",
+    "category": "Digital & AI",
+    "font_preset": "neon_pulse",
+    "preview_gradient": "rgba(124,58,237,0.55)",
+    "slides": [
+      {"bg_color": "#0b0a12", "title": "AI PROMPT", "body_text": "Swipe for the secret", "text_align": "center", "text_valign": "center", "font_preset": "neon_pulse", "gradient_opacity": 58, "gradient_color": "#1a0533", "show_logo": 1, "logo_style": "ring", "logo_position": "top-center"},
+      {"bg_color": "#150f24", "title": "STEP 01", "body_text": "Describe subject + lighting + mood", "text_align": "left", "text_valign": "bottom", "font_preset": "neon_pulse", "gradient_opacity": 52, "show_logo": 0},
+      {"bg_color": "#1a1028", "title": "STEP 02", "body_text": "Add 9:16 aspect ratio", "text_align": "left", "text_valign": "bottom", "font_preset": "neon_pulse", "gradient_opacity": 52, "show_logo": 0},
+      {"bg_color": "#2F4156", "title": "STEP 03", "body_text": "Paste in ChatGPT or Gemini", "text_align": "left", "text_valign": "bottom", "font_preset": "neon_pulse", "gradient_opacity": 48, "show_logo": 0},
+      {"bg_color": "#0b0a12", "title": "GET PROMPTS", "body_text": "", "text_align": "center", "text_valign": "center", "font_preset": "neon_pulse", "gradient_opacity": 65, "gradient_color": "#4c1d95", "show_logo": 1, "logo_style": "circle", "logo_position": "bottom-center", "cta_label": "Gallery", "cta_url": "https://arigatodevan.com/gallery.php"}
+    ]
+  },
+  "minimal_clean": {
+    "label": "Minimal Clean",
+    "category": "Minimal",
+    "font_preset": "minimal",
+    "preview_gradient": "rgba(0,0,0,0.25)",
+    "slides": [
+      {"bg_color": "#efeef3", "title": "Less noise.", "body_text": "More clarity.", "text_align": "left", "text_valign": "top", "font_preset": "minimal", "gradient_opacity": 22, "gradient_color": "#2F4156", "show_logo": 1, "logo_style": "square", "logo_position": "top-left"},
+      {"bg_color": "#F5EFEB", "title": "", "body_text": "One idea per slide. White space is your friend.", "text_align": "left", "text_valign": "bottom", "font_preset": "minimal", "gradient_opacity": 30, "show_logo": 0},
+      {"bg_color": "#C8D9E6", "title": "Focus", "body_text": "Short body copy only.", "text_align": "center", "text_valign": "center", "font_preset": "minimal", "gradient_opacity": 18, "show_logo": 0},
+      {"bg_color": "#567C8D", "title": "Proof", "body_text": "Add a result or testimonial.", "text_align": "left", "text_valign": "bottom", "font_preset": "minimal", "gradient_opacity": 35, "show_logo": 0},
+      {"bg_color": "#2F4156", "title": "Start here", "body_text": "", "text_align": "center", "text_valign": "bottom", "font_preset": "minimal", "gradient_opacity": 40, "show_logo": 1, "logo_style": "badge", "logo_position": "bottom-center", "cta_label": "Learn More", "cta_url": "https://arigatodevan.com"}
+    ]
+  },
+  "luxury_gold": {
+    "label": "Luxury Gold",
+    "category": "Business",
+    "font_preset": "luxury",
+    "preview_gradient": "rgba(0,0,0,0.7)",
+    "slides": [
+      {"bg_color": "#1a1410", "title": "Exclusive", "body_text": "Crafted for premium brands", "text_align": "center", "text_valign": "center", "font_preset": "luxury", "gradient_opacity": 68, "gradient_color": "#000000", "show_logo": 1, "logo_style": "ring", "logo_position": "bottom-center"},
+      {"bg_color": "#2a2218", "title": "The Offer", "body_text": "Describe your signature service.", "text_align": "center", "text_valign": "bottom", "font_preset": "luxury", "gradient_opacity": 55, "show_logo": 0},
+      {"bg_color": "#1a1410", "title": "Testimonial", "body_text": "\"Elegant results every time.\"", "text_align": "center", "text_valign": "center", "font_preset": "luxury", "gradient_opacity": 60, "show_logo": 0},
+      {"bg_color": "#3d3428", "title": "By the numbers", "body_text": "One impressive metric.", "text_align": "center", "text_valign": "bottom", "font_preset": "luxury", "gradient_opacity": 50, "show_logo": 0},
+      {"bg_color": "#0f0c08", "title": "Reserve Now", "body_text": "", "text_align": "center", "text_valign": "center", "font_preset": "luxury", "gradient_opacity": 72, "show_logo": 1, "logo_style": "circle", "logo_position": "bottom-center", "cta_label": "Contact", "cta_url": "https://arigatodevan.com/contact.php"}
+    ]
+  },
+  "blank": {
+    "label": "Blank Canvas",
+    "category": "Minimal",
+    "font_preset": "editorial",
+    "slides": [
+      {"bg_color": "#2F4156", "title": "Your Headline", "body_text": "Start typing...", "text_align": "center", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 40, "show_logo": 0},
+      {"bg_color": "#567C8D", "title": "", "body_text": "", "text_align": "left", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 0},
+      {"bg_color": "#2F4156", "title": "", "body_text": "", "text_align": "left", "text_valign": "bottom", "gradient_opacity": 0},
+      {"bg_color": "#567C8D", "title": "", "body_text": "", "text_align": "left", "text_valign": "bottom", "gradient_opacity": 0},
+      {"bg_color": "#2F4156", "title": "Swipe up", "body_text": "Add CTA on last slide", "text_align": "center", "text_valign": "bottom", "font_preset": "editorial", "gradient_opacity": 45, "show_logo": 1, "logo_style": "circle", "logo_position": "bottom-center", "cta_label": "Visit Site", "cta_url": "https://arigatodevan.com"}
+    ]
+  }
+}

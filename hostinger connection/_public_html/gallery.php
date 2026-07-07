@@ -69,7 +69,7 @@ $gal_banner_slides = gallery_banner_slides();
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260793">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20260794">
     <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
@@ -94,7 +94,7 @@ $gal_banner_slides = gallery_banner_slides();
             <div class="gal-search-wrap">
                 <i class="fa-solid fa-magnifying-glass gal-search-icon"></i>
                 <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off">
-                <button class="gal-search-clear" id="search-clear-btn" title="Clear" onclick="clearGallerySearch()">&times;</button>
+                <button type="button" class="gal-search-clear" id="search-clear-btn" aria-label="Clear search" onclick="clearGallerySearch()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
                 <div class="gal-autocomplete" id="search-autocomplete"></div>
             </div>
         </div>
@@ -106,7 +106,7 @@ $gal_banner_slides = gallery_banner_slides();
         <div class="gal-search-wrap">
             <i class="fa-solid fa-magnifying-glass gal-search-icon"></i>
             <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off">
-            <button class="gal-search-clear" id="search-clear-btn" title="Clear" onclick="clearGallerySearch()">&times;</button>
+            <button type="button" class="gal-search-clear" id="search-clear-btn" aria-label="Clear search" onclick="clearGallerySearch()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             <div class="gal-autocomplete" id="search-autocomplete"></div>
         </div>
 
@@ -198,9 +198,9 @@ $gal_banner_slides = gallery_banner_slides();
 <!-- ============================================================
      UNLOCK MODAL
      ============================================================ -->
-<div id="unlock-modal" class="modal-overlay" style="display:none;">
+<div id="unlock-modal" class="modal-overlay" hidden>
     <div class="modal-content split-view">
-        <button class="close-modal">&times;</button>
+        <button type="button" class="close-modal" aria-label="Close dialog">&times;</button>
         <div class="modal-left">
             <img loading="lazy" src="" id="modal-image" alt="Prompt Preview">
         </div>
@@ -373,8 +373,11 @@ function promptPageUrl(card) {
         acMatches.forEach(function(card, i) {
             var type=card.dataset.promptType||'secret_code';
             var tagList=(card.dataset.tags||'').split(',').slice(0,3).map(function(t){return t.trim();}).filter(Boolean).join(' · ');
+            var img=card.dataset.image||'';
+            var thumb=img?'<div class="ac-thumb"><img src="'+escHTML(img)+'" alt="" loading="lazy" decoding="async"></div>':'';
             var item=document.createElement('div'); item.className='ac-item';
-            item.innerHTML='<div class="ac-badge" style="background:'+typeColors[type]+'">'+( typeLabels[type]||'PROMPT')+'</div>'+
+            item.innerHTML=thumb+
+                '<div class="ac-badge" style="background:'+typeColors[type]+'">'+(typeLabels[type]||'PROMPT')+'</div>'+
                 '<div class="ac-info"><div class="ac-title">'+escHTML(card.dataset.title||'')+'</div>'+(tagList?'<div class="ac-tags">'+escHTML(tagList)+'</div>':'')+
                 '</div><i class="fa-solid fa-arrow-right ac-arrow"></i>';
             item.addEventListener('mouseover',function(){setActive(i);});

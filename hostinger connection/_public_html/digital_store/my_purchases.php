@@ -1,5 +1,8 @@
-<?php 
+﻿<?php 
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+
+
+
 require_once '../db.php';
 
 if (!$user_email) {
@@ -24,7 +27,7 @@ $purchases = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Purchases � Arigato Store</title>
+  <title>My Purchases — Arigato Store</title>
   <link rel="stylesheet" href="css/store.css"/>
   <style>
     .purchases-page { padding: 60px 20px 80px; max-width: 1000px; margin: 0 auto; min-height: 70vh; }

@@ -110,6 +110,9 @@ body.page-store::after {
     margin-top: 4px;
     padding-top: 12px;
 }
+.gal-dropdown-menu a.dd-stories {
+    padding-top: 10px;
+}
 
 .gal-insta-link {
     display: flex !important;
@@ -123,6 +126,14 @@ body.page-store::after {
 }
 .gal-insta-link:hover { color: var(--text-primary) !important; }
 .gal-insta-count { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+.gal-insta-link > .fa-instagram::before,
+.gal-mobile-nav a[href*="instagram.com"] > .fa-instagram::before,
+.gal-dropdown-menu a[href*="insta_viral"] > .fa-instagram::before {
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 .pulse-dot {
     width: 6px;
     height: 6px;
@@ -297,10 +308,10 @@ body.page-store::after {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.72rem;
     color: var(--text-secondary);
     transition: var(--transition);
+    padding: 0;
 }
 .gal-search-clear:hover { background: var(--border); }
 .gal-search-clear.visible { display: flex; }
@@ -326,6 +337,21 @@ body.page-store::after {
     cursor: pointer;
     border-bottom: 1px solid var(--border);
     transition: background 0.12s;
+}
+.ac-thumb {
+    flex-shrink: 0;
+    width: 42px;
+    height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+}
+.ac-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 .ac-item:last-child { border-bottom: none; }
 .ac-item.active, .ac-item:hover { background: var(--bg-hover); }
@@ -648,6 +674,11 @@ body.page-store::after {
     align-items: center;
     justify-content: center;
     padding: 20px;
+}
+#unlock-modal.modal-overlay[hidden] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 #unlock-modal .modal-content.split-view {
     background: var(--bg-card);

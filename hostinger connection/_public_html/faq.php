@@ -133,22 +133,6 @@ if (isset($_SESSION['user_id'])) {
 
                 <div class="faq-card">
                     <button class="faq-question">
-                        What are Insta Viral prompts?
-                        <i class="fa-solid fa-plus faq-icon"></i>
-                    </button>
-                    <div class="faq-answer"><div class="faq-answer-inner">These are prompts <strong>spotted going viral on Instagram</strong> — trending reels that everyone is using right now. Collected, curated, and brought here for you!</div></div>
-                </div>
-
-                <div class="faq-card">
-                    <button class="faq-question">
-                        Are these actually viral on Instagram?
-                        <i class="fa-solid fa-plus faq-icon"></i>
-                    </button>
-                    <div class="faq-answer"><div class="faq-answer-inner">Absolutely! These are <strong>actual prompts from viral reels</strong> — real trending content. If you've seen a reel blowing up with AI couple content, the prompt behind it is probably right here.</div></div>
-                </div>
-
-                <div class="faq-card">
-                    <button class="faq-question">
                         Which AI tool should I use?
                         <i class="fa-solid fa-plus faq-icon"></i>
                     </button>

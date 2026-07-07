@@ -158,8 +158,89 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_prompts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        category ENUM('boys','girls','couple','family','creativity') NOT NULL,
+        title VARCHAR(200) NOT NULL,
+        slug VARCHAR(220) DEFAULT NULL,
+        tags VARCHAR(120) DEFAULT '',
+        prompt_text TEXT NOT NULL,
+        meta_description TEXT DEFAULT NULL,
+        meta_keywords VARCHAR(500) DEFAULT '',
+        thumbnail_image VARCHAR(255) NOT NULL,
+        chatgpt_image VARCHAR(255) DEFAULT NULL,
+        chatgpt_failed TINYINT(1) NOT NULL DEFAULT 0,
+        gemini_image VARCHAR(255) DEFAULT NULL,
+        gemini_failed TINYINT(1) NOT NULL DEFAULT 0,
+        is_visible TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_nm_slug (slug)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_votes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        prompt_id INT NOT NULL,
+        voted_for ENUM('chatgpt','gemini') NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_vote (user_id, prompt_id)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_likes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        prompt_id INT NOT NULL,
+        like_type ENUM('unlock','manual') NOT NULL DEFAULT 'manual',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_nm_like (user_id, prompt_id, like_type)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS user_revealed_codes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        prompt_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_code_reveal (user_id, prompt_id)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS web_stories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(200) NOT NULL,
+        slug VARCHAR(200) NOT NULL UNIQUE,
+        description TEXT,
+        meta_keywords VARCHAR(500) DEFAULT '',
+        poster_image VARCHAR(255) DEFAULT '',
+        publisher_name VARCHAR(120) DEFAULT 'Arigato Devan',
+        noindex TINYINT(1) NOT NULL DEFAULT 0,
+        is_published TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS web_story_pages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        story_id INT NOT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        bg_image VARCHAR(255) DEFAULT '',
+        bg_color VARCHAR(20) DEFAULT '#2F4156',
+        title VARCHAR(255) DEFAULT '',
+        body_text TEXT,
+        cta_label VARCHAR(120) DEFAULT '',
+        cta_url VARCHAR(500) DEFAULT '',
+        text_align VARCHAR(12) DEFAULT 'left',
+        animate_in VARCHAR(32) DEFAULT 'fade-in',
+        auto_advance_sec INT NOT NULL DEFAULT 0,
+        INDEX idx_story_order (story_id, sort_order)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS web_stories_settings (
+        setting_key VARCHAR(64) PRIMARY KEY,
+        setting_value TEXT NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+
     // ─── Schema migrations: run once, never block every page load ─────────────
-    $schema_flag = __DIR__ . '/cache/.schema_ready_v4';
+    $schema_flag = __DIR__ . '/cache/.schema_ready_v9';
     if (!is_file($schema_flag)) {
         $cache_dir = __DIR__ . '/cache';
         if (!is_dir($cache_dir)) {
@@ -212,6 +293,59 @@ try {
             foreach ($prompt_alters as $sql) {
                 try { $pdo->exec($sql); } catch (PDOException $e) {}
             }
+
+            $saved_alters = [
+                "ALTER TABLE saved_prompts ADD COLUMN source VARCHAR(20) NOT NULL DEFAULT 'prompt'",
+            ];
+            foreach ($saved_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+
+            $nm_alters = [
+                "ALTER TABLE not_mine_likes ADD COLUMN like_type ENUM('unlock','manual') NOT NULL DEFAULT 'manual'",
+                "ALTER TABLE not_mine_likes DROP INDEX unique_nm_like",
+                "ALTER TABLE not_mine_likes ADD UNIQUE KEY unique_nm_like (user_id, prompt_id, like_type)",
+                "ALTER TABLE not_mine_prompts MODIFY category ENUM('boys','girls','couple','family','creativity') NOT NULL",
+                "ALTER TABLE not_mine_prompts ADD COLUMN slug VARCHAR(220) DEFAULT NULL",
+                "ALTER TABLE not_mine_prompts ADD COLUMN meta_description TEXT DEFAULT NULL",
+                "ALTER TABLE not_mine_prompts ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
+                "ALTER TABLE not_mine_prompts ADD UNIQUE KEY unique_nm_slug (slug)",
+            ];
+            foreach ($nm_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+            try {
+                $pdo->exec("INSERT IGNORE INTO not_mine_likes (user_id, prompt_id, like_type)
+                    SELECT user_id, prompt_id, 'unlock' FROM not_mine_votes");
+            } catch (PDOException $e) {}
+            if (is_file(__DIR__ . '/slug_helper.php')) {
+                require_once __DIR__ . '/slug_helper.php';
+                try {
+                    $nm_rows = $pdo->query("SELECT id, title FROM not_mine_prompts WHERE slug IS NULL OR slug = ''")->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($nm_rows as $nm_row) {
+                        $nm_slug = uniqueNotMineSlug($pdo, $nm_row['title'], (int) $nm_row['id']);
+                        $pdo->prepare('UPDATE not_mine_prompts SET slug = ? WHERE id = ?')->execute([$nm_slug, $nm_row['id']]);
+                    }
+                } catch (PDOException $e) {}
+            }
+
+            $ws_alters = [
+                "ALTER TABLE web_stories ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
+                "ALTER TABLE web_stories ADD COLUMN noindex TINYINT(1) NOT NULL DEFAULT 0",
+                "ALTER TABLE web_story_pages ADD COLUMN text_align VARCHAR(12) DEFAULT 'left'",
+                "ALTER TABLE web_story_pages ADD COLUMN animate_in VARCHAR(32) DEFAULT 'fade-in'",
+                "ALTER TABLE web_story_pages ADD COLUMN auto_advance_sec INT NOT NULL DEFAULT 0",
+            ];
+            foreach ($ws_alters as $sql) {
+                try { $pdo->exec($sql); } catch (PDOException $e) {}
+            }
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS web_stories_settings (
+                    setting_key VARCHAR(64) PRIMARY KEY,
+                    setting_value TEXT NOT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )");
+            } catch (PDOException $e) {}
 
             @file_put_contents($schema_flag, date('c'));
         }

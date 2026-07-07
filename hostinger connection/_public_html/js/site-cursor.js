@@ -51,17 +51,22 @@
     if (root.parentNode) root.parentNode.removeChild(root);
   }
 
-  function onMove(e) {
+  function trackPosition(e) {
     if (!canUse()) {
       unmount();
       return;
     }
+    if (e.pointerType && e.pointerType !== 'mouse') return;
     mount();
     place(e.clientX, e.clientY);
     if (!visible) {
       document.body.classList.remove('cc-hidden');
       visible = true;
     }
+  }
+
+  function onMove(e) {
+    trackPosition(e);
   }
 
   function onOver(e) {
@@ -73,11 +78,20 @@
   }
 
   document.addEventListener('mousemove', onMove, { passive: true });
+  document.addEventListener('pointermove', onMove, { passive: true });
   document.addEventListener('mouseover', onOver, { passive: true });
   document.addEventListener('mousedown', function () {
     if (canUse()) document.body.classList.add('cc-active');
   });
+  document.addEventListener('pointerdown', function (e) {
+    if (canUse() && (!e.pointerType || e.pointerType === 'mouse')) {
+      document.body.classList.add('cc-active');
+    }
+  });
   document.addEventListener('mouseup', function () {
+    document.body.classList.remove('cc-active');
+  });
+  document.addEventListener('pointerup', function () {
     document.body.classList.remove('cc-active');
   });
   document.addEventListener('mouseleave', function () {

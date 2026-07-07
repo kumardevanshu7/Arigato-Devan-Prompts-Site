@@ -74,7 +74,7 @@ $read_time = max(1, (int)ceil($word_count / 200));
                     ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/')
                     : 'https://arigatodevan.com/landingpics/lan9.webp';
     $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
-    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' ù Arigato Devan');
+    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' ÔøΩ Arigato Devan');
 ?>
 <!-- Canonical -->
 <link rel="canonical" href="<?= $blog_url ?>">
@@ -249,7 +249,7 @@ header .logo-text .blog-brand-suffix {
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
-/* Override style.min.css ù keep arigato.blog visible on all mobile widths */
+/* Override style.min.css ÔøΩ keep arigato.blog visible on all mobile widths */
 header .logo-area .logo-text {
     display: block !important;
     visibility: visible !important;
@@ -258,7 +258,7 @@ header .logo-area .logo-text {
     min-width: 0 !important;
     overflow: visible !important;
 }
-/* logo circle avatar ù css/blog-header-logo.css */
+/* logo circle avatar ÔøΩ css/blog-header-logo.css */
 header nav.nav-links {
     gap: 16px !important; /* Perfect spacious layout */
     border: none !important;
@@ -1102,7 +1102,7 @@ footer .footer-links a:hover {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
         <span style="font-weight:600;">@arigato.devan</span>
         <span class="pulse-dot"></span>
-        <span style="font-weight:800;font-size:1.1rem;">15K+</span>
+        <span style="font-weight:800;font-size:1.1rem;">16K+</span>
       </a>
     </nav>
     
@@ -1136,7 +1136,7 @@ footer .footer-links a:hover {
       <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
       <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
       <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (15K+)</a>
+      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (16K+)</a>
       <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
       <?php if (isset($_SESSION["user_id"])): ?>
         <?php if ($_SESSION["role"] === "admin"): ?>
@@ -1229,7 +1229,7 @@ footer .footer-links a:hover {
           : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
     </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>ù All Blogs</a>
+    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>ÔøΩ All Blogs</a>
   </div>
 
   <!-- Comments -->
