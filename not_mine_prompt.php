@@ -269,6 +269,7 @@ $nm_slug = trim($p['slug'] ?? '');
 $is_local = nm_is_local();
 $base_path = $is_local ? nm_local_base() . '/' : '/';
 $canonical = nm_prompt_canonical($p);
+$_page_canonical = $canonical;
 $og_img = 'https://arigatodevan.com/' . ltrim($p['thumbnail_image'] ?? '', '/');
 $about_text = trim($p['meta_description'] ?? '');
 
@@ -290,7 +291,6 @@ $gemini_logo = 'https://www.google.com/favicon.ico';
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= htmlspecialchars($og_img) ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonical) ?>">
-    <link rel="canonical" href="<?= htmlspecialchars($canonical) ?>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<?= htmlspecialchars($p['title']) ?> — Not Mine">
     <meta name="twitter:description" content="<?= $meta_desc ?>">

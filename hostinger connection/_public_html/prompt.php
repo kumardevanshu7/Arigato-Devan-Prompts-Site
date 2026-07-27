@@ -62,6 +62,7 @@ $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
 $page_title   = htmlspecialchars($p["title"]) . ' — AI Prompt | Arigato Devan';
 $canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
+$_page_canonical = $canonical;
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
               ? htmlspecialchars($p['description'])
@@ -94,7 +95,6 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
     <meta property="og:image" content="<?= $og_img ?>">
-    <link rel="canonical" href="<?= $canonical ?>">
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">

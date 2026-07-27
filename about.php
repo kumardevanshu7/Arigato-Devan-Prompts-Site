@@ -16,7 +16,6 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Meet the creator behind Arigato Devan — testing and writing AI couple prompts for Gemini &amp; ChatGPT so your generated photos actually look like you.">
-    <link rel="canonical" href="https://arigatodevan.com/about.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

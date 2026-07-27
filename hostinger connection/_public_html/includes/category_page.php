@@ -21,7 +21,7 @@ $breadcrumb_name = $breadcrumb_name ?? ($cat_title . ' ' . $cat_title_em);
     <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
     <title><?= htmlspecialchars($page_title) ?></title>
     <meta name="description" content="<?= htmlspecialchars($meta_desc) ?>">
-    <link rel="canonical" href="<?= htmlspecialchars($canonical_url) ?>">
+    <?php $_page_canonical = $canonical_url; ?>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">

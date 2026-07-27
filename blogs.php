@@ -44,7 +44,6 @@ arsort($all_tags);
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
-    <link rel="canonical" href="https://arigatodevan.com/blogs.php">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <!-- Open Graph & Twitter Card -->

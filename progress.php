@@ -116,7 +116,6 @@ $milestones = [
 <meta name="theme-color" content="#2F4156">
 <title>Growth Journey — Arigato Devan Prompts</title>
 <meta name="description" content="The story of growing from 693 followers to 10,000+ — a visual journey.">
-<link rel="canonical" href="https://arigatodevan.com/progress.php">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/progress-page.css">
 <script type="application/ld+json">

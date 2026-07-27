@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Contact Arigato Devan — questions about our AI couple prompts for Gemini &amp; ChatGPT, collaborations, or feedback. We reply within 24 hours.">
-    <link rel="canonical" href="https://arigatodevan.com/contact.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

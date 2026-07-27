@@ -175,8 +175,6 @@ try {
     <meta name="twitter:title" content="Arigato Devan Prompts &mdash; Premium AI Couple Prompts">
     <meta name="twitter:description" content="Unlock exclusive AI couple prompts for Instagram Reels. Viral, unreleased &amp; secret prompts &mdash; only on Arigato Devan!">
     <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <!-- Canonical -->
-    <link rel="canonical" href="<?= htmlspecialchars($_page_canonical) ?>">
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">

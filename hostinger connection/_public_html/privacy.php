@@ -10,7 +10,6 @@ require_once "db.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Privacy Policy for Arigato Devan — how we collect, use, and protect your data, including Google Sign-In, analytics, and AdSense advertising cookies.">
-    <link rel="canonical" href="https://arigatodevan.com/privacy.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

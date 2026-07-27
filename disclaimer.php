@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disclaimer &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Disclaimer for Arigato Devan — how AI-generated results from our Gemini &amp; ChatGPT couple prompts can vary, and the limits of our responsibility.">
-    <link rel="canonical" href="https://arigatodevan.com/disclaimer.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

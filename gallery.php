@@ -65,7 +65,6 @@ $gal_banner_slides = gallery_banner_slides();
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/gallery.php">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="canonical" href="<?= htmlspecialchars($_page_canonical) ?>">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>

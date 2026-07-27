@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms &amp; Conditions &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Terms &amp; Conditions for Arigato Devan — rules for using our AI couple prompts, unlock system, accounts, and content on arigatodevan.com.">
-    <link rel="canonical" href="https://arigatodevan.com/terms.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

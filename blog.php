@@ -70,14 +70,13 @@ $read_time = max(1, (int)ceil($word_count / 200));
 ) ?>"><?php endif; ?>
 <?php
     $blog_url     = 'https://arigatodevan.com/blog.php?slug=' . urlencode($blog['slug']);
+    $_page_canonical = $blog_url;
     $blog_og_img  = !empty($blog['image_path'])
                     ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/')
                     : 'https://arigatodevan.com/landingpics/lan9.webp';
     $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
     $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' � Arigato Devan');
 ?>
-<!-- Canonical -->
-<link rel="canonical" href="<?= $blog_url ?>">
 <!-- Favicon -->
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">

@@ -21,7 +21,6 @@ $code_prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="theme-color" content="#2F4156">
     <title>All Secret Codes &mdash; Arigato Devan</title>
     <meta name="description" content="All secret prompt unlock codes in one place. Tap copy and use in your AI app.">
-    <link rel="canonical" href="https://arigatodevan.com/all_codes.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <?php include_once "includes/theme_head.php"; ?>
     <?php include_once "gtag.php"; ?>
