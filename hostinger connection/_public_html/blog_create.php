@@ -1353,7 +1353,7 @@ body {
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
     <?php include_once "gtag.php"; ?>
-</head><body>
+</head><body class="no-site-cursor">
 <div class="aurora-bg"></div>
 <div class="back-glow" id="back-glow"></div>
 <header>

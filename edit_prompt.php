@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text  = trim($_POST["prompt_text"] ?? "");
     $description   = trim($_POST["description"] ?? "");
+    $meta_keywords = trim($_POST["meta_keywords"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
@@ -129,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, extra_prompts=?, is_trial=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, meta_keywords=?, extra_prompts=?, is_trial=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -143,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $asset_title,
         $asset_images_json,
         $description ?: null,
+        $meta_keywords,
         $extra_prompts_json,
         $is_trial,
         $id,
@@ -573,6 +575,11 @@ body::before, body::after { display: none !important; background-image: none !im
         <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
+      </div>
+
+      <div class="form-group">
+        <label for="e-keywords">SEO Keywords <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — comma-separated)</span></label>
+        <input type="text" id="e-keywords" name="meta_keywords" maxlength="500" value="<?= htmlspecialchars($p['meta_keywords'] ?? '') ?>" placeholder="e.g. ai couple prompt, chatgpt portrait, viral reel prompt">
       </div>
 
       <!-- Extra Prompts -->

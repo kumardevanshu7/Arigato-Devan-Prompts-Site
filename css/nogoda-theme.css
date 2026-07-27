@@ -1491,6 +1491,43 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   border: 1px solid var(--pal-sky);
 }
 
+.theme-nogoda .pp-about {
+  margin-top: 32px;
+  padding: 22px 24px;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid var(--pal-sky, #C8D9E6);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.theme-nogoda .pp-about h2 {
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--pal-teal);
+  margin: 0 0 12px;
+}
+.theme-nogoda .pp-about p {
+  font-size: .88rem;
+  line-height: 1.75;
+  color: var(--pal-navy);
+  margin: 0;
+}
+.theme-nogoda .pp-about-kw {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.theme-nogoda .pp-about-kw span {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--pal-sky, #C8D9E6);
+  color: var(--pal-navy);
+}
+
 .theme-nogoda .pp-related {
   margin-top: 32px;
   padding-top: 24px;

@@ -81,17 +81,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}}
 @media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}.desk-table{display:none}.mob-cards{display:flex}}
-/* CUSTOM CURSOR */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
-.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}/* MOBILE TOPBAR */
+/* MOBILE TOPBAR */
 .mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
 .mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
 .mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
@@ -115,9 +105,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 @media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0!important;padding-bottom:90px!important}.mob-topbar{display:flex!important}.topbar{display:none!important}.mob-nav{display:flex!important}}
 </style>
 </head>
-<body>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
+<body class="no-site-cursor">
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>

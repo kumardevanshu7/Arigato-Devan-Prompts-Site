@@ -114,6 +114,16 @@
     </script>
     <?php endif; ?>
 
+    <div class="home-trust-row" aria-label="Site policies and information">
+        <span class="home-trust-label"><i class="fa-solid fa-shield-halved"></i> Verified &amp; Transparent</span>
+        <div class="home-trust-links">
+            <a href="about.php"><i class="fa-solid fa-user"></i> About Us</a>
+            <a href="contact.php"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+            <a href="privacy.php"><i class="fa-solid fa-lock"></i> Privacy Policy</a>
+            <a href="terms.php"><i class="fa-solid fa-file-contract"></i> Terms &amp; Conditions</a>
+        </div>
+    </div>
+
     <div class="home-stickers">
         <span class="home-sticker"><i class="fa-solid fa-wand-magic-sparkles"></i> New</span>
         <span class="home-sticker"><i class="fa-solid fa-fire"></i> Hot</span>
@@ -196,6 +206,37 @@
             </div>
         </div>
     </div>
+
+    <section class="home-seo-about">
+        <p class="hero-label" style="justify-content:center;">Why Arigato Devan</p>
+        <h2>Everything About Our <em>AI Couple Prompts</em> — Gemini, ChatGPT &amp; Nano Banana</h2>
+
+        <p>Arigato Devan is a home for <strong>couple prompts for AI</strong> — a fast-growing library built for one simple reason: most AI photo prompts online are copy-pasted, untested, and end up giving you two random strangers instead of an actual couple photo of you and your partner. Every prompt on this site is written, tested, and refined so that when you upload your own photo, your <strong>face stays exactly the same</strong> — no distortion, no changed features, no random AI-generated faces. That one detail is what most people searching for <strong>couple prompts</strong>, <strong>ai couple prompts</strong>, or a <strong>couple prompts generator</strong> actually care about, and it's the thing we focus on with every single prompt we publish.</p>
+
+        <h3>Couple Prompts for Every AI Platform You Already Use</h3>
+        <p>You don't need any special app or paid software to use what's on this site. Our prompts are written specifically for the tools most people already have on their phone — <strong>Gemini Nano Banana</strong> and <strong>ChatGPT Image 2.0</strong>. If you've been searching for <strong>gemini couple prompts</strong>, <strong>couple prompts for gemini ai</strong>, <strong>simple couple prompts for gemini ai</strong>, <strong>couple prompts for chatgpt</strong>, or <strong>chat gpt couple prompts</strong>, you'll find categorised, ready-to-copy versions for both platforms, so you can pick whichever AI tool you're comfortable with and get the same high-quality, realistic result.</p>
+
+        <h3>Every Mood, Occasion &amp; Style — Not Just "Romantic"</h3>
+        <p>"Couple prompt" doesn't mean one thing to everyone, so we don't treat it like it does. Looking for something soft and everyday? Try our <strong>cute couple prompts</strong> and <strong>love couple prompts</strong>. Planning a shaadi post or festival upload? We've built out <strong>indian wedding couple prompts</strong>, <strong>indian wedding couple prompts free</strong>, <strong>wedding couple prompts</strong>, and seasonal drops like <strong>navratri couple prompts for gemini</strong> — with more festivals (Karwa Chauth, Diwali, Holi, Teej, Valentine's Day) added throughout the year. Want a prompt personalised with your names on it? That's exactly what our <strong>ai couple prompts with name</strong> category is for. Whatever the occasion, if you can describe it, we're probably already building a prompt for it.</p>
+
+        <h3>Built to Actually Rank — And Actually Work</h3>
+        <p>Behind the scenes, every prompt is tagged, categorised, and written with real search intent in mind — that's why whether you land here searching <strong>couple prompts for ai</strong>, <strong>couple prompts ai</strong>, <strong>couple prompts for ai gemini</strong>, or <strong>best couple prompts for gemini</strong>, you'll find a prompt that matches what you were actually looking for, not generic filler content. Beyond the main gallery, we also run a dedicated <strong>Not Mine</strong> section for handpicked viral prompts we didn't create ourselves but think are worth sharing, a <strong>Prompt of the Day</strong> feature so you never run out of fresh ideas, and a blog where we break down prompting techniques, new AI features, and step-by-step guides — all built around the same couple-photography niche.</p>
+
+        <p>New prompts are added every week, existing ones are updated as Gemini and ChatGPT's image models improve, and nothing is left stale. You can copy any prompt for free without logging in — an account is only needed if you want to save your favourites, unlock premium prompts faster, or comment on our blog posts. That's the whole idea: a genuinely useful, constantly-updated <strong>couple prompt</strong> resource, not a one-time list that goes out of date in a month.</p>
+
+        <div class="home-seo-tags" aria-label="Popular searches">
+            <span>couple prompts for ai</span>
+            <span>couple prompts for gemini ai</span>
+            <span>couple prompts for chatgpt</span>
+            <span>best couple prompts for gemini</span>
+            <span>ai couple prompts</span>
+            <span>indian wedding couple prompts</span>
+            <span>chat gpt couple prompts</span>
+            <span>couple prompts ai</span>
+            <span>ai couple prompts with name</span>
+            <span>navratri couple prompts for gemini</span>
+        </div>
+    </section>
 </section>
 
 <div class="marquee-strip">

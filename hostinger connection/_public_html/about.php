@@ -15,18 +15,19 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Meet the creator behind Arigato Devan PromptVerse - a platform crafting beautiful AI prompts for couples and creative souls.">
+    <meta name="description" content="Meet the creator behind Arigato Devan — testing and writing AI couple prompts for Gemini &amp; ChatGPT so your generated photos actually look like you.">
     <link rel="canonical" href="https://arigatodevan.com/about.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">
-    <meta property="og:title" content="About Us - Arigato Devan PromptVerse">
+    <meta property="og:title" content="About Us - Arigato Devan Prompts">
     <meta property="og:description" content="Meet the creator of Arigato Devan - crafting premium AI couple prompts for Instagram Reels using ChatGPT and Gemini.">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
     <meta property="og:url" content="https://arigatodevan.com/about.php">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="index, follow">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/info-pages.css?v=20260719">
+    <link rel="stylesheet" href="css/info-pages.css?v=20260727">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info theme-nogoda">
@@ -66,7 +67,7 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
             <span class="about-tag">#AIArt</span>
             <span class="about-tag">#ViralReels</span>
             <span class="about-tag">#AestheticShots</span>
-            <span class="about-tag">#PromptVerse</span>
+            <span class="about-tag">#GeminiPrompts</span>
             <span class="about-tag">#DigitalCreator</span>
         </div>
         </div>
@@ -82,12 +83,18 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
 
     <div class="info-card">
         <h2><i class="fa-solid fa-user"></i>About Me</h2>
-        <p>Hello! I'm the creator behind <strong>Arigato Devan PromptVerse</strong> — a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
+        <p>Hello! I'm the creator behind <strong>Arigato Devan</strong> — a platform dedicated to crafting beautiful, ready-to-use AI couple prompts for Gemini and ChatGPT.</p>
         <p>Every prompt here is carefully designed to produce stunning visuals — from cinematic couple portraits to viral-worthy aesthetic shots. Just copy, paste into your favourite AI tool, and create magic.</p>
     </div>
 
+    <div class="info-card">
+        <h2><i class="fa-solid fa-lightbulb"></i>Why Arigato Devan Exists</h2>
+        <p>I started Arigato Devan after noticing how many "AI couple prompt" lists online were copy-pasted from each other, never actually tested, and often produced two completely different-looking strangers instead of a real couple photo. That felt broken, so I began writing and testing my own prompts on Gemini and ChatGPT — checking that faces stayed consistent with the reference photo, that lighting and poses looked natural, and that the result was actually shareable.</p>
+        <p>That testing process turned into this site: a constantly growing, categorised library of couple prompts — romantic, wedding, festival, cinematic, and everyday — built around one rule: if a prompt doesn't produce a believable, good-looking result, it doesn't get published.</p>
+    </div>
+
     <div class="about-grid">
-        <div class="about-info-card"><div class="aic-icon purple"><i class="fa-solid fa-robot"></i></div><h3>AI Tools Used</h3><p>All prompts are tested with <strong>ChatGPT (DALL-E)</strong> and <strong>Google Gemini</strong>. They also work on Midjourney, Adobe Firefly, Stable Diffusion and more.</p></div>
+        <div class="about-info-card"><div class="aic-icon purple"><i class="fa-solid fa-robot"></i></div><h3>AI Tools Used</h3><p>Every prompt is written and tested on <strong>Google Gemini (Nano Banana)</strong> and <strong>ChatGPT Image</strong> — the two tools our prompts are built around. Some may work with light editing on other AI image generators, but results aren't guaranteed outside Gemini and ChatGPT.</p></div>
         <div class="about-info-card"><div class="aic-icon pink"><i class="fa-solid fa-lock"></i></div><h3>Your Privacy</h3><p>We use <strong>Google OAuth</strong> for secure login — only your name and email. No passwords stored. Your data is protected and never sold.</p></div>
         <div class="about-info-card"><div class="aic-icon green"><i class="fa-solid fa-globe"></i></div><h3>Platform &amp; Security</h3><p>Runs on <strong>Hostinger</strong> hosting, protected by <strong>Cloudflare</strong> CDN. Analytics via Google Analytics 4 and Search Console.</p></div>
         <div class="about-info-card"><div class="aic-icon blue"><i class="fa-brands fa-instagram"></i></div><h3>Community</h3><p>Most users discover us through Instagram. Follow <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener">@arigato.devan</a> for new prompt drops and tutorials every week.</p></div>

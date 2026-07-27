@@ -1,9 +1,0 @@
-.ws-topbar{background:#fff;border-bottom:1px solid #C8D9E6;position:sticky;top:0;z-index:100}
-.ws-topbar-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ws-topbar-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:#2F4156;font-weight:800;font-size:.95rem}
-.ws-topbar-logo img{border-radius:8px}
-.ws-dot{color:#F5709D}
-.ws-topbar-nav{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;font-weight:700}
-.ws-topbar-nav a{color:#567C8D;text-decoration:none}
-.ws-topbar-nav a:hover,.ws-topbar-nav a.active{color:#2F4156}
-.ws-topbar-nav a.active{border-bottom:2px solid #F5709D;padding-bottom:2px}

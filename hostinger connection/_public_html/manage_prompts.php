@@ -240,22 +240,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .pd-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;font-size:.82rem;font-weight:700;color:var(--text);text-decoration:none;cursor:pointer;transition:background .15s;border:none;background:transparent;width:100%;font-family:var(--font)}
 .pd-item:hover{background:rgba(139,92,246,0.08)}
 .pd-del:hover{background:rgba(248,113,113,0.08)!important}
-/* CUSTOM CURSOR */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
-.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}body::before, body::after { display: none !important; background-image: none !important; }
+body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 </head>
-<body>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
+<body class="no-site-cursor">
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 

@@ -58,6 +58,22 @@ Disallow: /profiledp/
 Disallow: /toplogo/
 Disallow: /private/
 Disallow: /gallery.php?page=
+Disallow: /not_mine_admin.php
+Disallow: /not_mine_manage.php
+Disallow: /not_mine_links.php
+Disallow: /heroine_admin.php
+Disallow: /heroine_orbit_editor.php
+Disallow: /happy_users_admin.php
+Disallow: /generate_sync_report.php
+Disallow: /blog_like.php
+Disallow: /my_heroines.php
+Disallow: /about_backup.php
+Disallow: /steps_guide.php
+Disallow: /digital_store/store_nav.php
+Disallow: /digital_store/store_firebase_js.php
+Disallow: /digital_store/my_purchases.php
+Disallow: /digital_store/view_prompt.php
+Disallow: /digital_store/success.php
 
 # Sitemap location
 Sitemap: https://arigatodevan.com/sitemap.php

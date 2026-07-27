@@ -6,10 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us &ndash; Arigato Devan Prompts</title>
-    <meta name="description" content="Get in touch with Arigato Devan. We'd love to hear your feedback, suggestions, or answer any questions you have about our AI prompts.">
+    <meta name="description" content="Contact Arigato Devan — questions about our AI couple prompts for Gemini &amp; ChatGPT, collaborations, or feedback. We reply within 24 hours.">
+    <link rel="canonical" href="https://arigatodevan.com/contact.php">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="Contact Us - Arigato Devan">
+    <meta property="og:description" content="Questions, collaborations, or feedback about our AI couple prompts? Get in touch with Arigato Devan — we reply within 24 hours.">
+    <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
+    <meta property="og:url" content="https://arigatodevan.com/contact.php">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="index, follow">
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/info-pages.css?v=20260721">
+    <link rel="stylesheet" href="css/info-pages.css?v=20260727">
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info page-contact theme-nogoda">

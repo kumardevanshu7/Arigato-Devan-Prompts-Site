@@ -240,7 +240,7 @@ try {
     )");
 
     // ─── Schema migrations: run once, never block every page load ─────────────
-    $schema_flag = __DIR__ . '/cache/.schema_ready_v9';
+    $schema_flag = __DIR__ . '/cache/.schema_ready_v10';
     if (!is_file($schema_flag)) {
         $cache_dir = __DIR__ . '/cache';
         if (!is_dir($cache_dir)) {
@@ -289,6 +289,7 @@ try {
                 "ALTER TABLE prompts ADD COLUMN slug VARCHAR(255) DEFAULT NULL",
                 "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
                 "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
+                "ALTER TABLE prompts ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
             ];
             foreach ($prompt_alters as $sql) {
                 try { $pdo->exec($sql); } catch (PDOException $e) {}

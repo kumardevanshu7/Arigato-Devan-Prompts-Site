@@ -93,7 +93,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 90px}}
 </style>
 </head>
-<body>
+<body class="no-site-cursor">
 <aside class="sidebar">
   <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
   <div class="sb-admin">

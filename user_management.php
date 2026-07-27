@@ -270,7 +270,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 @media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0!important;padding-bottom:90px!important}.mob-topbar{display:flex!important}.topbar{display:none!important}.mob-nav{display:flex!important}}
 </style>
 </head>
-<body>
+<body class="no-site-cursor">
 <div id="c-dot"></div>
 <div id="c-ring"></div>
 <div id="sp"></div>

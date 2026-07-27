@@ -63,15 +63,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text = trim($_POST["prompt_text"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
-    $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'insta_viral'
+    $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'already_uploaded', 'direct'
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
     $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
     $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
     $asset_images_json = null;
+    $description = trim($_POST["description"] ?? "");
+    $meta_keywords = trim($_POST["meta_keywords"] ?? "");
 
     // Validate prompt_type
-    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct"];
+    $valid_types = ["secret", "unreleased", "already_uploaded", "direct"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
@@ -110,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
     } else {
-        // No code needed for unreleased / insta_viral / already_uploaded
+        // No code needed for unreleased / already_uploaded
         $unlock_code = "XXXXXX";
         if (empty($title) || empty($tag) || empty($prompt_text)) {
             $_SESSION["error_msg"] = "All fields are required!";
@@ -222,7 +224,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, meta_keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -238,6 +240,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $asset_images_json,
                 $extra_prompts_json,
                 $is_trial,
+                $description ?: null,
+                $meta_keywords,
             ]);
 
             $_SESSION["success_msg"] =

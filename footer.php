@@ -9,12 +9,11 @@
             <a href="<?= $site_base ?>about.php">About</a>
             <a href="<?= $site_base ?>contact.php">Contact</a>
             <a href="<?= $site_base ?>faq.php">FAQ</a>
-            <a href="<?= $site_base ?>web_stories/">Stories</a>
             <a href="<?= $site_base ?>feedback.php">Feedback</a>
             <a href="<?= $site_base ?>happy_users.php">Happy Users</a>
             <a href="<?= $site_base ?>privacy.php">Privacy Policy</a>
             <a href="<?= $site_base ?>disclaimer.php">Disclaimer</a>
-            <a href="<?= $site_base ?>terms.php">Terms of Service</a>
+            <a href="<?= $site_base ?>terms.php">Terms &amp; Conditions</a>
         </nav>
     </div>
 </footer>

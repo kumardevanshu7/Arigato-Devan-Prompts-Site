@@ -253,19 +253,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .del-confirm:hover{background:rgba(248,113,113,0.2)}
 
 /* ══════════════════════════════════
-   CUSTOM CURSOR (desktop only)
-══════════════════════════════════ */
-@media(min-width:769px){
-  *{cursor:none!important}
-  #c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-  #c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-  .c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-  .c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5)}
-  .c-click #c-dot{width:6px;height:6px;background:#22d3ee}
-  .c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-}
-
-/* ══════════════════════════════════
    RESPONSIVE BREAKPOINTS
 ══════════════════════════════════ */
 @media(max-width:900px){
@@ -277,7 +264,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 }
 
 @media(max-width:768px){
-  #c-dot,#c-ring{display:none!important}
   /* Hide desktop sidebar completely */
   .sidebar{display:none}
   /* Show mobile top bar */
@@ -301,9 +287,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 body::before, body::after { display: none !important; background-image: none !important; }
 </style>
 </head>
-<body>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
+<body class="no-site-cursor">
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 
@@ -605,20 +589,6 @@ window.addEventListener('scroll',()=>{
   }
   draw();
 })();
-
-/* ── Custom cursor (desktop only) ── */
-if(window.innerWidth > 768){
-  const dot=document.getElementById('c-dot'),ring=document.getElementById('c-ring');
-  let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
-  (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
-  document.querySelectorAll('a,button,input,.act-btn,.mob-more-btn').forEach(el=>{
-    el.addEventListener('mouseenter',()=>document.body.classList.add('c-hover'));
-    el.addEventListener('mouseleave',()=>document.body.classList.remove('c-hover'));
-  });
-  document.addEventListener('mousedown',()=>document.body.classList.add('c-click'));
-  document.addEventListener('mouseup',()=>document.body.classList.remove('c-click'));
-}
 
 /* ── Mobile drawer ── */
 function openDrawer(){

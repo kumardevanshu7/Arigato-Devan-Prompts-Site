@@ -100,10 +100,6 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
                             <i class="fa-solid fa-code"></i> All Secret Codes
                             <?= $curPage === 'all_codes.php' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
-                        <a href="<?= $nb('web_stories/') ?>" class="dd-stories">
-                            <i class="fa-solid fa-bolt"></i> Web Stories
-                            <?= $nav_active === 'web_stories' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
-                        </a>
                     </div>
                 </div>
 
@@ -167,7 +163,6 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
             <a href="<?= $nb('direct_prompts.php') ?>">Direct Prompts</a>
             <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link"><i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span></a>
             <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
-            <a href="<?= $nb('web_stories/') ?>">Web Stories</a>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">
             <i class="fa-brands fa-instagram"></i> @arigato.devan

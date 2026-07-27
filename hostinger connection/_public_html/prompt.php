@@ -68,6 +68,9 @@ $meta_desc    = !empty($p['description'])
               : htmlspecialchars($p['title']) . ' is a ' . $tinfo['label'] . ' AI couple prompt on Arigato Devan.'
                 . (!empty($tags_str) ? ' Perfect for ' . $tags_str . '.' : '')
                 . ' Copy and use instantly on ChatGPT or any AI tool.';
+$meta_keywords = !empty($p['meta_keywords']) ? htmlspecialchars($p['meta_keywords']) : htmlspecialchars($tags_str);
+$meta_desc_raw = trim($p['description'] ?? '');
+$pp_kw_list    = array_filter(array_map('trim', explode(',', $p['meta_keywords'] ?? '')));
 $type_page    = match($ptype) {
     'insta_viral'      => 'not_mine.php',
     'unreleased'       => 'unreleased.php',
@@ -86,6 +89,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     <base href="<?= ($_SERVER['HTTP_HOST'] === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $meta_desc ?>">
+    <?php if (!empty($meta_keywords)): ?><meta name="keywords" content="<?= $meta_keywords ?>"><?php endif; ?>
     <meta property="og:type" content="article">
     <meta property="og:title" content="<?= htmlspecialchars($p['title']) ?> — Arigato Devan">
     <meta property="og:description" content="<?= $meta_desc ?>">
@@ -308,6 +312,20 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 </div>
             </div>
         </div>
+
+        <?php if ($meta_desc_raw !== ''): ?>
+        <section class="pp-about" aria-label="About this prompt">
+            <h2>About this prompt</h2>
+            <p><?= nl2br(htmlspecialchars($meta_desc_raw)) ?></p>
+            <?php if (!empty($pp_kw_list)): ?>
+            <div class="pp-about-kw" aria-label="Keywords">
+                <?php foreach ($pp_kw_list as $kw): ?>
+                <span><?= htmlspecialchars($kw) ?></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </section>
+        <?php endif; ?>
 
         <!-- Related Prompts -->
         <?php if (!empty($related)): ?>

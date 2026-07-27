@@ -439,25 +439,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 </div>
 
 <script>
-// ── Custom Cursor ──────────────────────────────────────────────────────────────
-const dot  = document.getElementById('c-dot');
-const ring = document.getElementById('c-ring');
-if (dot && ring) {
-    let rx=0,ry=0;
-    document.addEventListener('mousemove', e => {
-        dot.style.left=e.clientX+'px'; dot.style.top=e.clientY+'px';
-        rx+=(e.clientX-rx)*.12; ry+=(e.clientY-ry)*.12;
-        ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    });
-    document.querySelectorAll('a,button,label,.toggle').forEach(el=>{
-        el.addEventListener('mouseenter',()=>document.body.classList.add('c-hover'));
-        el.addEventListener('mouseleave',()=>document.body.classList.remove('c-hover'));
-    });
-    document.addEventListener('mousedown',()=>document.body.classList.add('c-click'));
-    document.addEventListener('mouseup',  ()=>document.body.classList.remove('c-click'));
-    (function animate(){requestAnimationFrame(animate);ring.style.left=rx+'px';ring.style.top=ry+'px';rx+=(parseFloat(dot.style.left||0)-rx)*.12;ry+=(parseFloat(dot.style.top||0)-ry)*.12;})();
-}
-
 // ── Scroll Progress ─────────────────────────────────────────────────────────
 const sp=document.getElementById('sp');
 window.addEventListener('scroll',()=>{

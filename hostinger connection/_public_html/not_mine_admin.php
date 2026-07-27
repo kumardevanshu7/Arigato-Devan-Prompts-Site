@@ -535,7 +535,7 @@ input[type="radio"].cat-radio { display: none; }
 }
 </style>
 </head>
-<body>
+<body class="no-site-cursor">
 
 <div class="mob-bar">
     <a href="dashboard.php" class="mob-bar-back" aria-label="Back to Dashboard"><i class="fa-solid fa-arrow-left"></i></a>

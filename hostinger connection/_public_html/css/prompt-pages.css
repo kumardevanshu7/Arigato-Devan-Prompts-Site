@@ -110,10 +110,6 @@ body.page-store::after {
     margin-top: 4px;
     padding-top: 12px;
 }
-.gal-dropdown-menu a.dd-stories {
-    padding-top: 10px;
-}
-
 .gal-insta-link {
     display: flex !important;
     align-items: center;
@@ -1224,6 +1220,115 @@ body.page-store::after {
 .home-cmp-card li i { margin-top: 3px; flex-shrink: 0; }
 .home-cmp-card.with li i { color: #16a34a; }
 .home-cmp-card.without li i { color: #e11d48; }
+
+/* Homepage trust row — About/Contact/Privacy/Terms, sits right below testimonials */
+.home-trust-row {
+    max-width: 640px;
+    margin: 0 auto 28px;
+    padding: 16px clamp(16px, 4vw, 24px);
+    background: rgba(86, 124, 141, 0.06);
+    border: 1px solid var(--border, #C8D9E6);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.home-trust-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pal-teal, #567C8D);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.home-trust-label i { color: var(--nogoda-pink, #F5709D); }
+.home-trust-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 10px;
+}
+.home-trust-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-primary, #2F4156);
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border, #C8D9E6);
+    border-radius: 999px;
+    padding: 7px 14px;
+    text-decoration: none;
+    transition: border-color .15s ease, color .15s ease;
+}
+.home-trust-links a i { color: var(--pal-teal, #567C8D); font-size: 0.75rem; }
+.home-trust-links a:hover {
+    border-color: var(--nogoda-pink, #F5709D);
+    color: var(--nogoda-pink, #F5709D);
+}
+.home-trust-links a:hover i { color: var(--nogoda-pink, #F5709D); }
+
+/* Homepage SEO/about section — sits right below "What you get". Plain typographic
+   section (no card/box) so it reads like an editorial write-up, not a UI widget. */
+.home-seo-about {
+    max-width: 760px;
+    margin: 48px auto 8px;
+    padding: 32px 20px 8px;
+    border-top: 1px solid var(--border);
+}
+.home-seo-about h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3.2vw, 1.6rem);
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.3;
+    margin: 0 0 22px;
+    color: var(--text-primary);
+}
+.home-seo-about h2 em {
+    font-style: italic;
+    background: var(--nogoda-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.home-seo-about h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 26px 0 10px;
+    color: var(--nogoda-pink, #F5709D);
+}
+.home-seo-about p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin: 0 0 14px;
+    text-align: left;
+}
+.home-seo-about p:last-of-type { margin-bottom: 0; }
+.home-seo-about strong { color: var(--text-primary); font-weight: 700; }
+.home-seo-tags {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+.home-seo-tags span {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: var(--pal-sky, #C8D9E6);
+    color: var(--text-primary);
+}
 
 .home-promo-banner {
     max-width: 800px;

@@ -64,12 +64,6 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
-        "url"        => "/web_stories/",
-        "priority"   => "0.75",
-        "changefreq" => "weekly",
-        "lastmod"    => "2026-07-06",
-    ],
-    [
         "url"        => "/faq.php",
         "priority"   => "0.7",
         "changefreq" => "monthly",
@@ -103,6 +97,30 @@ $static_pages = [
         "url"        => "/digital_store/index.php",
         "priority"   => "0.5",
         "changefreq" => "weekly",
+        "lastmod"    => "2026-07-02",
+    ],
+    [
+        "url"        => "/digital_store/about.php",
+        "priority"   => "0.4",
+        "changefreq" => "monthly",
+        "lastmod"    => "2026-07-02",
+    ],
+    [
+        "url"        => "/digital_store/contact.php",
+        "priority"   => "0.3",
+        "changefreq" => "monthly",
+        "lastmod"    => "2026-07-02",
+    ],
+    [
+        "url"        => "/digital_store/privacy.php",
+        "priority"   => "0.2",
+        "changefreq" => "yearly",
+        "lastmod"    => "2026-07-02",
+    ],
+    [
+        "url"        => "/digital_store/terms.php",
+        "priority"   => "0.2",
+        "changefreq" => "yearly",
         "lastmod"    => "2026-07-02",
     ],
     [
@@ -147,16 +165,6 @@ try {
     // silently skip if error
 }
 
-// Published Web Stories
-$web_stories = [];
-try {
-    $stmt = $pdo->query(
-        "SELECT slug, updated_at, created_at FROM web_stories WHERE is_published = 1 ORDER BY created_at DESC",
-    );
-    $web_stories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-}
-
 // Not Mine prompts — clean URLs only (/not-mine/{slug})
 $not_mine_prompts = [];
 try {
@@ -164,6 +172,16 @@ try {
         "SELECT slug, created_at FROM not_mine_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
     );
     $not_mine_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+}
+
+// Active Digital Store products
+$store_products = [];
+try {
+    $sp_stmt = $pdo->query(
+        "SELECT id, updated_at, created_at FROM store_products WHERE active = 1 ORDER BY created_at DESC",
+    );
+    $store_products = $sp_stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
 }
 
@@ -204,24 +222,24 @@ $today = date("Y-m-d");
   </url>
 <?php endforeach; ?>
 
-<?php foreach ($web_stories as $ws): ?>
-  <url>
-    <loc><?= $base . "/web_stories/story.php?slug=" . urlencode($ws["slug"]) ?></loc>
-    <lastmod><?= date(
-        "Y-m-d",
-        strtotime($ws["updated_at"] ?? $ws["created_at"]),
-    ) ?></lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-<?php endforeach; ?>
-
 <?php foreach ($not_mine_prompts as $nm): ?>
   <url>
     <loc><?= $base . "/not-mine/" . htmlspecialchars($nm["slug"]) ?></loc>
     <lastmod><?= date("Y-m-d", strtotime($nm["created_at"])) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
+  </url>
+<?php endforeach; ?>
+
+<?php foreach ($store_products as $sp): ?>
+  <url>
+    <loc><?= $base . "/digital_store/product.php?id=" . urlencode($sp["id"]) ?></loc>
+    <lastmod><?= date(
+        "Y-m-d",
+        strtotime($sp["updated_at"] ?? $sp["created_at"]),
+    ) ?></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 <?php endforeach; ?>
 

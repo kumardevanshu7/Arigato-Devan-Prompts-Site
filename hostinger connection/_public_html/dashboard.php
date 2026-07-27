@@ -425,21 +425,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:12px;text-decoration:none;color:var(--muted);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;transition:all .2s;border:1px solid transparent}
 .mob-nav-item i{font-size:1.1rem}
 .mob-nav-item.active{color:var(--accent2);background:rgba(139,92,246,0.1);border-color:var(--border)}
-/* CUSTOM CURSOR */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
-.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}</style>
+</style>
 </head>
-<body>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
+<body class="no-site-cursor">
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 
@@ -469,7 +457,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="d-sec">Blog</div>
     <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
-    <a href="web_stories/admin/" class="d-link"><i class="fa-solid fa-bolt"></i> Web Stories</a>
     <div class="d-sec">Community</div>
     <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
     <div class="d-sec">Happy Users</div>
@@ -516,7 +503,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
-    <a href="web_stories/admin/" class="sb-link"><i class="fa-solid fa-bolt"></i> <span>Web Stories</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
     <a href="heroine_admin.php" class="sb-link"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
@@ -833,7 +819,6 @@ function closeDrawer(){document.getElementById('sideDrawer').classList.remove('o
     <a href="dashboard.php" class="mob-nav-item active"><i class="fa-solid fa-gauge-high"></i><span>Dash</span></a>
     <a href="manage_prompts.php" class="mob-nav-item"><i class="fa-solid fa-list-check"></i><span>Prompts</span></a>
     <a href="blog_admin.php" class="mob-nav-item"><i class="fa-solid fa-pen-nib"></i><span>Blogs</span></a>
-    <a href="web_stories/admin/" class="mob-nav-item"><i class="fa-solid fa-bolt"></i><span>Stories</span></a>
     <a href="user_management.php" class="mob-nav-item"><i class="fa-solid fa-users"></i><span>Users</span></a>
     <a href="analytics.php" class="mob-nav-item"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
   </div>
