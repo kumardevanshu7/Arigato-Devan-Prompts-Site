@@ -419,6 +419,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
 </main>
 
 <!-- Footer -->
+<?php include 'store_footer_links.php'; ?>
 <?php include '../footer.php'; ?>
 
 <script>

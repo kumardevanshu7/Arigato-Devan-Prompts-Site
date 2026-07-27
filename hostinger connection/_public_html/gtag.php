@@ -21,12 +21,7 @@ if (!isset($_page_canonical)) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Arigato Devan Prompts",
-    "url": "https://arigatodevan.com",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://arigatodevan.com/gallery.php?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    "url": "https://arigatodevan.com"
   }
 ]
 </script>

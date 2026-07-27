@@ -120,7 +120,7 @@ $blog_data   = json_encode(array_column($top_blogs, "views"));
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analytics ó Arigato Admin</title>
+<title>Analytics ù Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
@@ -204,17 +204,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 @media(max-width:1100px){.grid-4{grid-template-columns:1fr 1fr}.grid-2-1{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}.grid-2{grid-template-columns:1fr}.alert-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}.stats-grid{grid-template-columns:1fr 1fr}.s-span2{grid-column:span 1}.grid-2{grid-template-columns:1fr}.grid-4{grid-template-columns:1fr}.grid-2-1{grid-template-columns:1fr}.alert-grid{grid-template-columns:1fr}.chart-scroll{overflow-x:auto}}
-/* CUSTOM CURSOR */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
-.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}/* MOBILE TOPBAR */
+/* REPORT DOWNLOAD BAR */
+.rep-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:18px}
+.rep-bar-title{font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--text);margin-bottom:4px}
+.rep-bar-title i{color:var(--cyan)}
+.rep-bar-sub{font-size:.72rem;color:var(--muted);line-height:1.6;max-width:430px}
+.rep-groups{display:flex;gap:10px;flex-wrap:wrap}
+.rep-group{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.02);border:1px solid var(--border2);border-radius:11px;padding:7px 10px}
+.rep-group-lbl{font-size:.62rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.rep-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none;border:1px solid var(--border);background:rgba(139,92,246,0.06);color:var(--accent2);transition:all .2s;white-space:nowrap}
+.rep-btn:hover{background:rgba(139,92,246,0.16);border-color:rgba(139,92,246,0.4);transform:translateY(-1px)}
+.rep-btn.csv{background:rgba(34,211,238,0.06);border-color:rgba(34,211,238,0.2);color:var(--cyan)}
+.rep-btn.csv:hover{background:rgba(34,211,238,0.16);border-color:rgba(34,211,238,0.45)}
+@media(max-width:600px){.rep-bar{padding:14px}.rep-groups{width:100%}.rep-group{width:100%;justify-content:space-between}}
+/* MOBILE TOPBAR */
 .mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
 .mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
 .mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
@@ -239,8 +242,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 </style>
 </head>
 <body class="no-site-cursor">
-<div id="c-dot"></div>
-<div id="c-ring"></div>
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
@@ -337,8 +338,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="scard s-green"><div class="sc-icon"><i class="fa-solid fa-user-plus"></i></div><div class="sc-val" data-val="<?= $monthly_u ?>"><?= $monthly_u ?></div><div class="sc-lbl">Users (30d)</div></div>
     <div class="scard s-yellow"><div class="sc-icon"><i class="fa-solid fa-route"></i></div><div class="sc-val" data-val="<?= round($avg_journey) ?>"><?= round($avg_journey) ?></div><div class="sc-lbl">Avg Journey (days)</div></div>
     <?php if($most_liked_r): ?>
-    <div class="scard s-pink s-span2"><div class="sc-icon"><i class="fa-solid fa-trophy"></i></div><div class="sc-val" style="font-size:1rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px"><?= htmlspecialchars($most_liked['title']??'ó') ?></div><div class="sc-lbl">Most Liked Prompt ó <?= (int)($most_liked['likes_count']??0) ?> Likes</div></div>
+    <div class="scard s-pink s-span2"><div class="sc-icon"><i class="fa-solid fa-trophy"></i></div><div class="sc-val" style="font-size:1rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px"><?= htmlspecialchars($most_liked['title']??'ù') ?></div><div class="sc-lbl">Most Liked Prompt ù <?= (int)($most_liked['likes_count']??0) ?> Likes</div></div>
     <?php endif; ?>
+  </div>
+
+  <!-- REPORT DOWNLOADS -->
+  <div class="rep-bar">
+    <div>
+      <div class="rep-bar-title"><i class="fa-solid fa-file-arrow-down"></i> Download Report</div>
+      <div class="rep-bar-sub">Signups, prompts, unlocks and saves for the period &mdash; with a day-by-day breakdown and comparison against the previous period.</div>
+    </div>
+    <div class="rep-groups">
+      <div class="rep-group">
+        <span class="rep-group-lbl">Weekly</span>
+        <a class="rep-btn" href="analytics_report.php?period=weekly&amp;format=print" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> View / PDF</a>
+        <a class="rep-btn csv" href="analytics_report.php?period=weekly&amp;format=csv"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      </div>
+      <div class="rep-group">
+        <span class="rep-group-lbl">Monthly</span>
+        <a class="rep-btn" href="analytics_report.php?period=monthly&amp;format=print" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> View / PDF</a>
+        <a class="rep-btn csv" href="analytics_report.php?period=monthly&amp;format=csv"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      </div>
+    </div>
   </div>
 
   <!-- ALERTS: Milestones + Spike Days + Dead + Churn -->

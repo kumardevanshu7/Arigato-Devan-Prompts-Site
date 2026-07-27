@@ -81,7 +81,7 @@ $new_today = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE DATE(CONVERT_TZ(
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Management ó Arigato Admin</title>
+<title>User Management ù Arigato Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
@@ -236,17 +236,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   .tb-title{font-size:1.2rem}
   .topbar{margin-bottom:16px}
 }
-/* CUSTOM CURSOR */
-*{cursor:none!important}
-#c-dot{position:fixed;width:8px;height:8px;background:#c084fc;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px #c084fc,0 0 16px rgba(192,132,252,0.4)}
-#c-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(139,92,246,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,opacity .2s;box-shadow:0 0 10px rgba(139,92,246,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-hover #c-dot{width:12px;height:12px;background:#f472b6;box-shadow:0 0 12px #f472b6,0 0 24px rgba(244,114,182,0.5)}
-.c-hover #c-ring{width:44px;height:44px;border-color:rgba(244,114,182,0.5);box-shadow:0 0 14px rgba(244,114,182,0.2)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}
-.c-click #c-dot{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 10px #22d3ee}
-.c-click #c-ring{width:24px;height:24px;border-color:rgba(34,211,238,0.7)}
-@media(max-width:768px){#c-dot,#c-ring{display:none!important}}/* MOBILE TOPBAR */
+/* MOBILE TOPBAR */
 .mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
 .mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
 .mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
@@ -271,8 +261,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 </style>
 </head>
 <body class="no-site-cursor">
-<div id="c-dot"></div>
-<div id="c-ring"></div>
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
@@ -369,7 +357,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <div class="dual-grid">
     <div class="card" style="margin-bottom:0">
       <div class="card-head">
-        <div class="card-title"><i class="fa-solid fa-chart-line"></i> User Growth ó Last 30 Days</div>
+        <div class="card-title"><i class="fa-solid fa-chart-line"></i> User Growth ù Last 30 Days</div>
       </div>
       <canvas id="growthChart" height="160"></canvas>
     </div>
@@ -505,7 +493,7 @@ function closeDrawer(){document.getElementById('sideDrawer').classList.remove('o
       <tr data-search="<?= htmlspecialchars(strtolower(($u['username']??'').' '.($u['email']??''))) ?>" data-role="<?= $u['role']??'user' ?>" data-gender="<?= $genderFilter ?>">
         <td style="font-size:.7rem;color:var(--muted);font-weight:700"><?= $idx+1 ?></td>
         <td><img loading="lazy" src="<?= htmlspecialchars($u_avatar) ?>" class="u-av" alt=""></td>
-        <td><div class="u-n"><?= htmlspecialchars($u['username']??'ó') ?></div><div class="u-e"><?= htmlspecialchars($u['email']??'') ?></div></td>
+        <td><div class="u-n"><?= htmlspecialchars($u['username']??'ù') ?></div><div class="u-e"><?= htmlspecialchars($u['email']??'') ?></div></td>
         <td class="<?= $ug==='male'?'gi-m':($ug==='female'?'gi-f':'gi-a') ?>"><i class="fa-solid fa-<?= $ug==='male'?'mars':($ug==='female'?'venus':'user-astronaut') ?>"></i> <?= $isAlien?'Alien':ucfirst($ug) ?></td>
         <td><span class="rbadge <?= $u['role']==='admin'?'rb-a':'rb-u' ?>"><?= strtoupper($u['role']??'user') ?></span></td>
         <td style="font-size:.72rem;color:var(--muted)"><?= $jdt->format('d M Y') ?><br><span style="opacity:.6;font-size:.65rem"><?= $jdt->format('h:i A') ?></span></td>
@@ -605,7 +593,7 @@ function renderPage(page){
   getAllRows().forEach(r=>r.style.display='none');
   rows.forEach((r,i)=>r.style.display=(i>=start&&i<end)?'':'none');
   document.getElementById('um-empty').style.display=total===0?'block':'none';
-  document.getElementById('um-info').textContent=total===0?'':`Showing ${Math.min(start+1,total)}ñ${Math.min(end,total)} of ${total}`;
+  document.getElementById('um-info').textContent=total===0?'':`Showing ${Math.min(start+1,total)}ù${Math.min(end,total)} of ${total}`;
   renderPagination(page,pages,total);
 }
 function renderPagination(page,pages,total){
@@ -628,8 +616,8 @@ function openActivity(uid){
     if(!data.ok)return;const u=data.user;
     const av=u.avatar||'https://api.dicebear.com/7.x/avataaars/svg?seed='+encodeURIComponent(u.email||'x');
     document.getElementById('act-avatar').src=av;
-    document.getElementById('act-name').textContent=u.username||'ó';
-    document.getElementById('act-email').textContent=u.email||'ó';
+    document.getElementById('act-name').textContent=u.username||'ù';
+    document.getElementById('act-email').textContent=u.email||'ù';
     const la=u.last_active?new Date(u.last_active.replace(' ','T')+'Z'):null;
     document.getElementById('act-last-active').textContent=la?la.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Never';
     document.getElementById('act-unlocks').textContent=data.unlock_list.length;
@@ -637,7 +625,7 @@ function openActivity(uid){
     document.getElementById('act-likes').textContent=data.likes_count;
     const list=document.getElementById('act-unlock-list');list.innerHTML='';
     if(data.unlock_list.length===0){list.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:8px 0">No prompts unlocked yet.</div>'}
-    else{data.unlock_list.forEach(p=>{const d=document.createElement('div');d.style.cssText='background:rgba(139,92,246,0.07);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text)';d.innerHTML='<i class="fa-solid fa-lock-open" style="color:var(--accent2);margin-right:6px;font-size:.65rem"></i>'+(p.title||'ó');list.appendChild(d)})}
+    else{data.unlock_list.forEach(p=>{const d=document.createElement('div');d.style.cssText='background:rgba(139,92,246,0.07);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text)';d.innerHTML='<i class="fa-solid fa-lock-open" style="color:var(--accent2);margin-right:6px;font-size:.65rem"></i>'+(p.title||'ù');list.appendChild(d)})}
     document.getElementById('act-loading').style.display='none';document.getElementById('act-content').style.display='block';
   });
 }

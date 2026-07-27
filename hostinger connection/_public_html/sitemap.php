@@ -112,6 +112,18 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
+        "url"        => "/digital_store/faq.php",
+        "priority"   => "0.5",
+        "changefreq" => "monthly",
+        "lastmod"    => "2026-07-27",
+    ],
+    [
+        "url"        => "/digital_store/disclaimer.php",
+        "priority"   => "0.2",
+        "changefreq" => "yearly",
+        "lastmod"    => "2026-07-27",
+    ],
+    [
         "url"        => "/digital_store/privacy.php",
         "priority"   => "0.2",
         "changefreq" => "yearly",

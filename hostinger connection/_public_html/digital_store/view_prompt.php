@@ -416,6 +416,7 @@ $buyer_email = $tok['buyer_email'] ?? '';
 <?php endif; ?>
 
 <!-- Footer -->
+<?php include 'store_footer_links.php'; ?>
 <?php include '../footer.php'; ?>
 
 <script>

@@ -146,6 +146,7 @@ if (!$error) {
     <a href="my_purchases.php" class="btn-secondary">My Purchases</a>
   </div>
 </main>
+<?php include 'store_footer_links.php'; ?>
 <?php include '../footer.php'; ?>
 <script src="js/store.js"></script>
 <?php include 'store_firebase_js.php'; ?>

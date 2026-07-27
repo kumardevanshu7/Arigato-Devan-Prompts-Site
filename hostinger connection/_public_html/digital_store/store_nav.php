@@ -20,6 +20,11 @@ $user_avatar    = $_SESSION['profile_image'] ?? '';
 if ($user_avatar && !str_starts_with($user_avatar, 'http')) {
     $user_avatar = '../' . ltrim($user_avatar, '/');
 }
+
+// Shared root includes (footer.php, logout_confirm.php) build their links and
+// asset URLs from $site_base. Store pages live one level down, so without this
+// every footer link resolves inside /digital_store/ and 404s.
+$site_base = '../';
 ?>
 <style>
 .shop-glowing-btn {
@@ -72,6 +77,7 @@ if ($user_avatar && !str_starts_with($user_avatar, 'http')) {
         Shop
       </a>
       <a href="about.php" class="<?= basename($_SERVER['PHP_SELF']) === 'about.php' ? 'nav-active' : '' ?>">About</a>
+      <a href="faq.php" class="<?= basename($_SERVER['PHP_SELF']) === 'faq.php' ? 'nav-active' : '' ?>">FAQ</a>
       <a href="../index.php" class="back-to-home-btn" title="Back to Main Portfolio">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Back to Home

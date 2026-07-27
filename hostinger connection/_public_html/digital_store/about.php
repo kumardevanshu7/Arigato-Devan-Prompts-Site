@@ -398,6 +398,7 @@
 
 </main>
 
+<?php include 'store_footer_links.php'; ?>
 <?php include '../footer.php'; ?>
 <script src="js/store.js"></script>
 <?php include 'store_firebase_js.php'; ?>

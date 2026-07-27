@@ -70,6 +70,7 @@ Disallow: /my_heroines.php
 Disallow: /about_backup.php
 Disallow: /steps_guide.php
 Disallow: /digital_store/store_nav.php
+Disallow: /digital_store/store_footer_links.php
 Disallow: /digital_store/store_firebase_js.php
 Disallow: /digital_store/my_purchases.php
 Disallow: /digital_store/view_prompt.php

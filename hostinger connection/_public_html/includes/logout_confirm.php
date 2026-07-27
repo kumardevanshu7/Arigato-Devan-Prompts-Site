@@ -2,7 +2,8 @@
 /**
  * Logout confirmation modal — included when user is logged in.
  */
-$logout_pic = 'logout-pic/logout-cute-pic-arigato-prompt-devan.webp';
+$site_base = $site_base ?? '';
+$logout_pic = $site_base . 'logout-pic/logout-cute-pic-arigato-prompt-devan.webp';
 ?>
 <div class="logout-confirm-overlay" id="logoutConfirmOverlay" aria-hidden="true">
     <div class="logout-confirm-card" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
@@ -23,7 +24,7 @@ $logout_pic = 'logout-pic/logout-cute-pic-arigato-prompt-devan.webp';
             <button type="button" class="logout-confirm-stay" id="logoutConfirmStay">
                 <i class="fa-solid fa-heart"></i> Stay Logged In
             </button>
-            <a href="login.php?logout=1" class="logout-confirm-go" id="logoutConfirmGo">
+            <a href="<?= htmlspecialchars($site_base) ?>login.php?logout=1" class="logout-confirm-go" id="logoutConfirmGo">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </div>

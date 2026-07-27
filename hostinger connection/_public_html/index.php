@@ -189,15 +189,7 @@ try {
           "@type": "WebSite",
           "name": "Arigato Devan Prompts",
           "url": "https://arigatodevan.com",
-          "description": "Premium AI couple prompts for Instagram Reels. Unlock secret, viral and unreleased prompts on Arigato Devan.",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-              "@type": "EntryPoint",
-              "urlTemplate": "https://arigatodevan.com/gallery.php?search={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-          }
+          "description": "Premium AI couple prompts for Instagram Reels. Unlock secret, viral and unreleased prompts on Arigato Devan."
         },
         {
           "@type": "Organization",

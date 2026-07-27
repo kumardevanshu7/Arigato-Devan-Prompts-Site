@@ -131,6 +131,7 @@ $purchases = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 </main>
 
+<?php include 'store_footer_links.php'; ?>
 <?php include '../footer.php'; ?>
 
 <script>
