@@ -498,6 +498,7 @@ body.page-gallery {
   min-width: 0;
 }
 
+.gal-all-prompts-head h1,
 .gal-all-prompts-head h2 {
   font-family: 'Playfair Display', serif;
   font-size: clamp(1.4rem, 4vw, 1.85rem);
@@ -507,12 +508,74 @@ body.page-gallery {
   line-height: 1.1;
 }
 
+.gal-all-prompts-head h1 em,
 .gal-all-prompts-head h2 em {
   font-style: italic;
   background: var(--nogoda-gradient-h);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Intro copy on indexable collection pages */
+.gal-collection-intro {
+  max-width: 820px;
+  margin: -4px auto var(--gal-gap-md);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--pal-teal, #567c8d);
+}
+
+/* Crawlable collection links */
+.gal-collections {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: var(--gal-line);
+}
+
+.gal-collections-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pal-teal, #567c8d);
+  margin-right: 4px;
+}
+
+.gal-collections a {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pal-navy, #2F4156);
+  background: var(--pal-white, #fff);
+  border: 1px solid var(--pal-sky, #C8D9E6);
+  border-radius: 999px;
+  padding: 5px 12px;
+  text-decoration: none;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.gal-collections a:hover {
+  color: var(--nogoda-pink, #F5709D);
+  border-color: var(--nogoda-pink, #F5709D);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .gal-collections {
+    gap: 6px;
+  }
+
+  .gal-collections a {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
 }
 
 .gal-all-prompts-stat {

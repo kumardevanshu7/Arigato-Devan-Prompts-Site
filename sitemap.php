@@ -155,6 +155,18 @@ $static_pages = [
     ],
 ];
 
+// Indexable gallery collections. Every other ?tag= value is served noindex,
+// so only the curated ones belong here.
+require_once __DIR__ . "/includes/gallery_seo.php";
+foreach (array_keys(gallery_seo_collections()) as $collection_tag) {
+    $static_pages[] = [
+        "url"        => "/gallery.php?tag=" . urlencode($collection_tag),
+        "priority"   => "0.7",
+        "changefreq" => "weekly",
+        "lastmod"    => "2026-07-27",
+    ];
+}
+
 // Fetch all public prompts with slugs dynamically
 $prompts = [];
 try {

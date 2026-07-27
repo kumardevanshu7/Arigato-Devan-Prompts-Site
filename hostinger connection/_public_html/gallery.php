@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once 'db.php';
 require_once __DIR__ . '/includes/prompt_cards.php';
 require_once 'includes/gallery_helpers.php';
+require_once 'includes/gallery_seo.php';
 
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
@@ -27,6 +28,12 @@ $prompts       = $gal_data['prompts'];
 $total         = $gal_data['total'];
 $total_pages   = $gal_data['total_pages'];
 $tag_filter    = $gal_data['tag_filter'];
+
+// Only curated collections with results are indexable; every other ?tag= value
+// is a thin duplicate of the full gallery.
+$gal_seo       = gallery_seo_meta($tag_filter);
+$gal_is_tagged = ($tag_filter !== '' && $tag_filter !== 'all');
+$gal_indexable = !$gal_is_tagged || ($gal_seo !== null && $total > 0);
 
 if ($is_ajax_cards) {
     header('Content-Type: application/json; charset=utf-8');
@@ -57,23 +64,37 @@ $gal_banner_slides = gallery_banner_slides();
     <meta name="theme-color" content="#2F4156">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery &mdash; Arigato Devan Prompts</title>
-    <meta name="description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites &mdash; only on Arigato Devan!">
+    <?php
+    $gal_title = $gal_seo['title'] ?? 'All AI Couple Prompts Gallery &mdash; Arigato Devan';
+    $gal_desc  = $gal_seo['desc']  ?? 'Browse every AI couple prompt in one place &mdash; romantic, candid, traditional and festival looks for Gemini AI and ChatGPT. Save, unlock &amp; share your favourites.';
+    ?>
+    <title><?= $gal_title ?></title>
+    <meta name="description" content="<?= $gal_desc ?>">
+    <meta name="robots" content="<?= $gal_indexable ? 'index, follow' : 'noindex, follow' ?>">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Gallery &mdash; All AI Couple Prompts | Arigato Devan">
-    <meta property="og:description" content="Browse all AI couple prompts in one place. Save, unlock &amp; share your favourites &mdash; only on Arigato Devan!">
+    <meta property="og:title" content="<?= $gal_title ?>">
+    <meta property="og:description" content="<?= $gal_desc ?>">
     <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
-    <meta property="og:url" content="https://arigatodevan.com/gallery.php">
+    <meta property="og:url" content="<?= htmlspecialchars($_page_canonical) ?>">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260794">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20260728">
     <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
+    <?php
+    $gal_crumbs = [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',    'item' => 'https://arigatodevan.com'],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Gallery', 'item' => 'https://arigatodevan.com/gallery.php'],
+    ];
+    if ($gal_seo) {
+        $gal_crumbs[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $gal_seo['label'], 'item' => $_page_canonical];
+    }
+    ?>
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Gallery","item":"https://arigatodevan.com/gallery.php"}]}
+    <?= json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $gal_crumbs], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
     </script>
     <?php include_once "gtag.php"; ?>
 
@@ -147,19 +168,35 @@ $gal_banner_slides = gallery_banner_slides();
                 <?php endforeach; ?>
             </div>
         </div>
+
+        <!-- Real links to the indexable collections. The pills above are JS-only
+             buttons, so crawlers have no other route into these pages. -->
+        <nav class="gal-collections" aria-label="Popular prompt collections">
+            <span class="gal-collections-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Popular collections</span>
+            <?php if ($gal_is_tagged): ?>
+                <a href="gallery.php">All prompts</a>
+            <?php endif; ?>
+            <?php foreach (gallery_seo_collections() as $gal_ct => $gal_cmeta): ?>
+                <?php if ($gal_ct === $tag_filter) { continue; } ?>
+                <a href="gallery.php?tag=<?= urlencode($gal_ct) ?>"><?= htmlspecialchars($gal_cmeta['label']) ?></a>
+            <?php endforeach; ?>
+        </nav>
     </div>
 
         <div class="gal-all-prompts-section">
         <div class="gal-all-prompts-head">
             <div class="gal-all-prompts-titles">
-                <p class="hero-label">Curated Prompt Collection</p>
-                <h2>All Prompts <em>Gallery</em></h2>
+                <p class="hero-label"><?= $gal_seo ? 'Prompt Collection' : 'Curated Prompt Collection' ?></p>
+                <h1><?= $gal_seo['h1'] ?? 'All AI Couple Prompts <em>Gallery</em>' ?></h1>
             </div>
             <div class="gal-all-prompts-stat">
                 <span class="page-hero-num" id="gallery-count-badge"><?= $total ?></span>
                 <span class="page-hero-label">prompts</span>
             </div>
         </div>
+        <?php if ($gal_seo): ?>
+            <p class="gal-collection-intro"><?= $gal_seo['intro'] ?></p>
+        <?php endif; ?>
         </div>
 
         <!-- Card Grid -->
