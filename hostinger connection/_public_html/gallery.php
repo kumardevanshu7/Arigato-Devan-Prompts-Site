@@ -80,7 +80,7 @@ $gal_banner_slides = gallery_banner_slides();
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260728">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20260728solo">
     <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
@@ -365,6 +365,9 @@ $gal_banner_slides = gallery_banner_slides();
 <script>
 function promptPageUrl(card) {
     if (card.dataset.slug) {
+        if (card.dataset.promptType === 'solo') {
+          return 'prompts/solo/' + encodeURIComponent(card.dataset.slug);
+        }
         return 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug);
     }
     return 'prompt.php?id=' + card.dataset.id;

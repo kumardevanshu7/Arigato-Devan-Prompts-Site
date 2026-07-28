@@ -713,6 +713,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 .theme-nogoda .card-badge.ivp { background: linear-gradient(135deg, #e11d48, #F5709D); color: #fff; }
 .theme-nogoda .card-badge.aup { background: linear-gradient(135deg, #11FFC9, #567C8D); color: var(--pal-navy); }
 .theme-nogoda .card-badge.dir { background: linear-gradient(135deg, #567C8D, #2F4156); color: #fff; }
+.theme-nogoda .card-badge.sol { background: linear-gradient(135deg, #22c55e, #0f766e); color: #fff; }
 
 .theme-nogoda .card-lock-icon {
   background: rgba(255, 255, 255, 0.92) !important;

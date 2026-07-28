@@ -171,7 +171,7 @@ foreach (array_keys(gallery_seo_collections()) as $collection_tag) {
 $prompts = [];
 try {
     $stmt = $pdo->query(
-        "SELECT slug, id, created_at FROM prompts WHERE slug IS NOT NULL AND slug != '' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
+        "SELECT slug, id, created_at, prompt_type FROM prompts WHERE slug IS NOT NULL AND slug != '' AND (is_trial = 0 OR is_trial IS NULL) ORDER BY created_at DESC",
     );
     $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -227,7 +227,7 @@ $today = date("Y-m-d");
 
 <?php foreach ($prompts as $prompt): ?>
   <url>
-    <loc><?= $base . "/prompts/" . htmlspecialchars($prompt["slug"]) ?></loc>
+    <loc><?= $base . "/prompts/" . (($prompt["prompt_type"] ?? "") === "solo" ? "solo/" : "") . htmlspecialchars($prompt["slug"]) ?></loc>
     <lastmod><?= date("Y-m-d", strtotime($prompt["created_at"])) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

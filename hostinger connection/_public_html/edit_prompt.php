@@ -43,12 +43,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $prompt_type = trim($_POST["prompt_type"] ?? "secret");
-    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct"];
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct", "solo"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
     $is_secret = $prompt_type === "secret";
-    $is_direct = $prompt_type === "direct";
+    $is_direct = $prompt_type === "direct" || $prompt_type === "solo";
     $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
     // Validate codes based on type
@@ -61,7 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
     } else if ($is_direct) {
-        $unlock_code = $_POST["direct_taps"] ?? "09";
+        $allowed_taps = ["09", "11", "19", "21", "37", "77"];
+        $requested_taps = str_pad((string)(int)($_POST["direct_taps"] ?? "09"), 2, "0", STR_PAD_LEFT);
+        $unlock_code = in_array($requested_taps, $allowed_taps, true) ? $requested_taps : "09";
         if (!$title || !$tag || !$prompt_text) {
             $_SESSION["edit_error"] =
                 "Title, tags and prompt text are required.";
@@ -304,6 +306,7 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 .e-type-card.sel-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:#22d3ee}
 .e-type-card.sel-uploaded{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.3);color:var(--adm-green)}
 .e-type-card.sel-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e}
+.e-type-card.sel-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:#4ade80}
 .tap-card{border:1px solid var(--adm-border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(255,255,255,0.03);position:relative;color:var(--adm-muted);flex:1;min-width:60px;}
 .tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--adm-text);}
 .tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
@@ -489,6 +492,12 @@ body::before, body::after { display: none !important; background-image: none !im
             <input type="radio" name="prompt_type" value="direct" <?= $current_prompt_type === "direct" ? "checked" : "" ?> onchange="onEditTypeChange('direct')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-hand-pointer"></i></span><span>Direct Prompt</span>
           </label>
+          <?php if ($current_prompt_type === "solo"): ?>
+          <label class="e-type-card sel-solo" id="e-card-solo">
+            <input type="radio" name="prompt_type" value="solo" <?= $current_prompt_type === "solo" ? "checked" : "" ?> onchange="onEditTypeChange('solo')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-user"></i></span><span>SOLO</span>
+          </label>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -703,6 +712,10 @@ body::before, body::after { display: none !important; background-image: none !im
             <input type="radio" name="direct_taps" value="37" <?= $taps == '37' ? 'checked' : '' ?> onchange="onTapChange('37')">
             <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>37
           </label>
+          <label class="tap-card <?= $taps == '77' ? 'sel-tap' : '' ?>" id="tap-77">
+            <input type="radio" name="direct_taps" value="77" <?= $taps == '77' ? 'checked' : '' ?> onchange="onTapChange('77')">
+            <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>77
+          </label>
         </div>
       </div>
 
@@ -822,9 +835,9 @@ body::before, body::after { display: none !important; background-image: none !im
         });
 
         function onEditTypeChange(type) {
-            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct'};
-            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct'};
-            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct'].forEach(id => {
+            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct',solo:'sel-solo'};
+            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct',solo:'e-card-solo'};
+            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct','e-card-solo'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.className = 'e-type-card';
             });
@@ -852,7 +865,7 @@ body::before, body::after { display: none !important; background-image: none !im
                 reelLinkInput.required = false;
             }
             if (directTapsGroup) {
-                directTapsGroup.style.display = selectedType === 'direct' ? 'block' : 'none';
+                directTapsGroup.style.display = (selectedType === 'direct' || selectedType === 'solo') ? 'block' : 'none';
             }
         }
 

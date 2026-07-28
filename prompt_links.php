@@ -200,7 +200,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
       <thead><tr><th>#</th><th>Cover</th><th>Title</th><th>Type</th><th>Likes</th><th>Copy Link</th></tr></thead>
       <tbody>
       <?php
-      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP']];
+      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO']];
       foreach($prompts as $idx=>$p):
         $ptype=$p['prompt_type']??'secret';
         $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];
@@ -218,7 +218,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
           <?php if(!empty($p['is_trial'])): ?><span class="type-badge tb-trial" style="margin-left:4px">TRIAL</span><?php endif; ?>
         </td>
         <td style="font-weight:800;color:var(--red)"><i class="fa-solid fa-heart" style="font-size:.65rem"></i> <?= (int)($p['likes_count']??0) ?></td>
-        <td><button class="copy-btn" onclick="copyLink('<?= addslashes($p['slug']??'') ?>',<?= (int)$p['id'] ?>,this)"><i class="fa-solid fa-copy"></i> Copy Link</button></td>
+        <td><button class="copy-btn" onclick="copyLink('<?= addslashes($p['slug']??'') ?>',<?= (int)$p['id'] ?>,'<?= addslashes($ptype) ?>',this)"><i class="fa-solid fa-copy"></i> Copy Link</button></td>
       </tr>
       <?php endforeach; ?>
       </tbody>
@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
           <span style="font-size:.65rem;color:var(--muted)"><i class="fa-solid fa-heart" style="color:var(--red)"></i> <?= (int)($p['likes_count']??0) ?></span>
         </div>
       </div>
-      <button class="copy-btn" onclick="copyLink('<?= addslashes($p['slug']??'') ?>',<?= (int)$p['id'] ?>,this)" style="padding:8px 12px;flex-shrink:0"><i class="fa-solid fa-copy"></i></button>
+      <button class="copy-btn" onclick="copyLink('<?= addslashes($p['slug']??'') ?>',<?= (int)$p['id'] ?>,'<?= addslashes($ptype) ?>',this)" style="padding:8px 12px;flex-shrink:0"><i class="fa-solid fa-copy"></i></button>
     </div>
     <?php endforeach; ?>
     </div>
@@ -301,8 +301,8 @@ function filterTable(q){renderPage(1)}
 window.addEventListener('load',()=>renderPage(1));
 window.addEventListener('resize',()=>renderPage(currentPage));
 
-function copyLink(slug,id,btn){
-  var link=slug?window.location.origin+'/prompts/'+slug:window.location.origin+'/prompt.php?id='+id;
+function copyLink(slug,id,type,btn){
+  var link=slug?window.location.origin+'/prompts/'+(type==='solo'?'solo/':'')+slug:window.location.origin+'/prompt.php?id='+id;
   navigator.clipboard.writeText(link).then(function(){
     var orig=btn.innerHTML;
     btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';

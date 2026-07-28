@@ -50,6 +50,44 @@ function resizeToWebP(string $src, int $maxW = 800, int $maxH = 800, int $qualit
     return $dest;
 }
 
+/**
+ * Validate, store and re-encode one uploaded image.
+ *
+ * @throws RuntimeException when the upload is invalid.
+ */
+function storePromptImage(array $file, string $directory, string $prefix): string {
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Image upload failed. Please choose the image again.');
+    }
+    if (($file['size'] ?? 0) > 5 * 1024 * 1024) {
+        throw new RuntimeException('Image too large. Maximum allowed size is 5MB per image.');
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = $finfo ? finfo_file($finfo, $file['tmp_name']) : false;
+    if ($finfo) finfo_close($finfo);
+    $mime_to_ext = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+    ];
+    if (!$mime || !isset($mime_to_ext[$mime])) {
+        throw new RuntimeException('Invalid image format. Use JPG, PNG, GIF or WebP.');
+    }
+
+    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+        throw new RuntimeException('Image folder could not be created.');
+    }
+
+    $path = rtrim($directory, '/\\') . '/' . uniqid($prefix, true) . '.' . $mime_to_ext[$mime];
+    if (!move_uploaded_file($file['tmp_name'], $path)) {
+        throw new RuntimeException('Failed to save uploaded image.');
+    }
+
+    return resizeToWebP($path);
+}
+
 
 // Protect endpoint â€” must be logged in AND be an admin
 if (!isset($_SESSION["user_id"]) || ($_SESSION["role"] ?? "") !== "admin") {
@@ -63,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text = trim($_POST["prompt_text"] ?? "");
     $reel_link = trim($_POST["reel_link"] ?? "");
-    $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // 'secret', 'unreleased', 'already_uploaded', 'direct'
+    $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // secret, unreleased, already_uploaded, direct, solo
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
     $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
@@ -71,11 +109,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $asset_images_json = null;
     $description = trim($_POST["description"] ?? "");
     $meta_keywords = trim($_POST["meta_keywords"] ?? "");
+    $solo_before_image = null;
+    $solo_examples_json = null;
 
     // Validate prompt_type
-    $valid_types = ["secret", "unreleased", "already_uploaded", "direct"];
+    $valid_types = ["secret", "unreleased", "already_uploaded", "direct", "solo"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
+    }
+    if ($prompt_type === "solo") {
+        $tag_list = array_filter(array_map("trim", explode(",", $tag)));
+        $has_solo_tag = false;
+        foreach ($tag_list as $existing_tag) {
+            if (strtolower($existing_tag) === "solo") {
+                $has_solo_tag = true;
+                break;
+            }
+        }
+        if (!$has_solo_tag) {
+            array_unshift($tag_list, "Solo");
+            $tag = implode(",", $tag_list);
+        }
     }
     $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
@@ -104,8 +158,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: upload_prompt.php");
             exit();
         }
-    } else if ($prompt_type === "direct") {
-        $unlock_code = trim($_POST["direct_taps"] ?? "09");
+    } else if ($prompt_type === "direct" || $prompt_type === "solo") {
+        $allowed_taps = ["09", "11", "19", "21", "37", "77"];
+        $requested_taps = str_pad((string)(int)($_POST["direct_taps"] ?? "09"), 2, "0", STR_PAD_LEFT);
+        $unlock_code = in_array($requested_taps, $allowed_taps, true) ? $requested_taps : "09";
         if (empty($title) || empty($tag) || empty($prompt_text)) {
             $_SESSION["error_msg"] = "All fields are required!";
             header("Location: upload_prompt.php");
@@ -121,37 +177,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // Handle Image Upload
+    // Handle cover image upload. SOLO uses its result/after image as the cover.
+    $cover_field = $prompt_type === "solo" ? "solo_after_image" : "image";
     if (
-        !isset($_FILES["image"]) ||
-        $_FILES["image"]["error"] !== UPLOAD_ERR_OK
+        !isset($_FILES[$cover_field]) ||
+        $_FILES[$cover_field]["error"] !== UPLOAD_ERR_OK
     ) {
-        $err_code = $_FILES["image"]["error"] ?? "N/A";
+        $err_code = $_FILES[$cover_field]["error"] ?? "N/A";
         $_SESSION[
             "error_msg"
-        ] = "Image upload failed! Error code: $err_code. Make sure file size is under PHP limit.";
+        ] = ($prompt_type === "solo" ? "SOLO result image" : "Cover image") . " upload failed! Error code: $err_code. Make sure file size is under PHP limit.";
         header("Location: upload_prompt.php");
         exit();
     }
 
-    $upload_dir = "uploads/";
+    $cover_file = $_FILES[$cover_field];
+    $upload_dir = $prompt_type === "solo" ? "uploads/solo/after/" : "uploads/";
     // Create dir if somehow deleted
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
     }
 
-    $file_info = pathinfo($_FILES["image"]["name"]);
+    $file_info = pathinfo($cover_file["name"]);
     $ext = strtolower($file_info["extension"]);
 
     // Security Checks: File Size and MIME type
-    if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+    if ($cover_file["size"] > 5 * 1024 * 1024) {
         $_SESSION["error_msg"] = "Image too large! Maximum allowed size is 5MB.";
         header("Location: upload_prompt.php");
         exit();
     }
     
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+    $mime = finfo_file($finfo, $cover_file["tmp_name"]);
     if (!str_starts_with($mime, 'image/')) {
         $_SESSION["error_msg"] = "Invalid file type. Only actual images are allowed.";
         finfo_close($finfo);
@@ -170,12 +228,80 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Generate unique filename
-    $new_filename = uniqid("img_") . "." . $ext;
+    $new_filename = uniqid($prompt_type === "solo" ? "solo_after_" : "img_") . "." . $ext;
     $target_file = $upload_dir . $new_filename;
 
-    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+    if (move_uploaded_file($cover_file["tmp_name"], $target_file)) {
         $target_file = resizeToWebP($target_file);
         $new_filename = basename($target_file);
+        if ($prompt_type === "solo") {
+            $solo_created_paths = [];
+            try {
+                if (!isset($_FILES["solo_before_image"])) {
+                    throw new RuntimeException("SOLO before image is required.");
+                }
+                $solo_before_image = storePromptImage(
+                    $_FILES["solo_before_image"],
+                    "uploads/solo/before/",
+                    "solo_before_"
+                );
+                $solo_created_paths[] = $solo_before_image;
+
+                $example_pairs = [];
+                $before_files = $_FILES["solo_example_before"] ?? null;
+                $after_files  = $_FILES["solo_example_after"] ?? null;
+                $example_count = max(
+                    is_array($before_files["name"] ?? null) ? count($before_files["name"]) : 0,
+                    is_array($after_files["name"] ?? null) ? count($after_files["name"]) : 0
+                );
+                if ($example_count > 5) {
+                    throw new RuntimeException("A maximum of 5 SOLO examples is allowed.");
+                }
+
+                for ($i = 0; $i < $example_count; $i++) {
+                    $before_error = $before_files["error"][$i] ?? UPLOAD_ERR_NO_FILE;
+                    $after_error  = $after_files["error"][$i] ?? UPLOAD_ERR_NO_FILE;
+                    if ($before_error === UPLOAD_ERR_NO_FILE && $after_error === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
+                    if ($before_error !== UPLOAD_ERR_OK || $after_error !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException("Every SOLO example needs both a before and an after image.");
+                    }
+
+                    $before_file = [
+                        "name"     => $before_files["name"][$i],
+                        "type"     => $before_files["type"][$i],
+                        "tmp_name" => $before_files["tmp_name"][$i],
+                        "error"    => $before_error,
+                        "size"     => $before_files["size"][$i],
+                    ];
+                    $after_file = [
+                        "name"     => $after_files["name"][$i],
+                        "type"     => $after_files["type"][$i],
+                        "tmp_name" => $after_files["tmp_name"][$i],
+                        "error"    => $after_error,
+                        "size"     => $after_files["size"][$i],
+                    ];
+                    $example_before_path = storePromptImage($before_file, "uploads/solo/examples/before/", "solo_ex_before_");
+                    $solo_created_paths[] = $example_before_path;
+                    $example_after_path = storePromptImage($after_file, "uploads/solo/examples/after/", "solo_ex_after_");
+                    $solo_created_paths[] = $example_after_path;
+                    $example_pairs[] = [
+                        "before" => $example_before_path,
+                        "after"  => $example_after_path,
+                    ];
+                }
+                $solo_examples_json = $example_pairs ? json_encode($example_pairs) : null;
+            } catch (RuntimeException $e) {
+                @unlink($target_file);
+                foreach ($solo_created_paths as $created_path) {
+                    @unlink($created_path);
+                }
+                $_SESSION["error_msg"] = $e->getMessage();
+                header("Location: upload_prompt.php");
+                exit();
+            }
+        }
         // Handle asset images upload (max 2)
         if ($has_assets && isset($_FILES["asset_images"]) && !empty($_FILES["asset_images"]["name"][0])) {
             $asset_dir = "uploads/assets/";
@@ -224,7 +350,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, meta_keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, meta_keywords, solo_before_image, solo_examples) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -242,6 +368,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $is_trial,
                 $description ?: null,
                 $meta_keywords,
+                $solo_before_image,
+                $solo_examples_json,
             ]);
 
             $_SESSION["success_msg"] =
@@ -252,7 +380,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 require_once __DIR__ . '/fcm_notify.php';
                 @sendFCMNotification(
                     'âœ¨ New Prompt: ' . $title,
-                    'A new AI couple prompt just dropped! Tap to check it out. ðŸ’«',
+                    $prompt_type === 'solo'
+                        ? 'A new SOLO AI photo prompt just dropped! Tap to see the transformation.'
+                        : 'A new AI couple prompt just dropped! Tap to check it out. ðŸ’«',
                     'https://arigatodevan.com'
                 );
             }

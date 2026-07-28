@@ -344,14 +344,20 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1' ||
         window.location.hostname === 'arigato.local';
+      const cardPromptType = (card.dataset.promptType || '').trim();
+      const isSoloPrompt = cardPromptType === 'solo';
 
-      if (!isGalleryPage && (isSavedPage || !isDevHost)) {
+      // SOLO always opens its detail page so the full before/after comparison
+      // is visible; the legacy quick modal only contains one image.
+      if (!isGalleryPage && (isSoloPrompt || isSavedPage || !isDevHost)) {
         const slug = (card.dataset.slug || '').trim();
         const id = (card.dataset.id || '').trim();
         const isCustomPotd = card.dataset.customPotd === '1';
         let url = '';
         if (!isCustomPotd) {
-          if (slug && !isDevHost) {
+          if (slug && isSoloPrompt) {
+            url = (isDevHost ? 'prompts/solo/' : '/prompts/solo/') + encodeURIComponent(slug);
+          } else if (slug && !isDevHost) {
             url = '/prompts/' + encodeURIComponent(slug);
           } else if (slug) {
             url = 'prompt.php?slug=' + encodeURIComponent(slug);

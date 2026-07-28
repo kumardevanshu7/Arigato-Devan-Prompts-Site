@@ -10,13 +10,15 @@ $redirect = "gallery.php";
 
 try {
     $stmt = $pdo->query(
-        "SELECT id, slug FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) ORDER BY RAND() LIMIT 1"
+        "SELECT id, slug, prompt_type FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) ORDER BY RAND() LIMIT 1"
     );
     $p = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($p) {
         if (!empty($p["slug"])) {
-            $redirect = "prompt.php?slug=" . rawurlencode($p["slug"]);
+            $redirect = ($p["prompt_type"] ?? "") === "solo"
+                ? "prompts/solo/" . rawurlencode($p["slug"])
+                : "prompt.php?slug=" . rawurlencode($p["slug"]);
         } else {
             $redirect = "prompt.php?id=" . (int)$p["id"];
         }

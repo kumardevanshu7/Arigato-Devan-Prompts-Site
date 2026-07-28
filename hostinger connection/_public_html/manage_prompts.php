@@ -338,7 +338,7 @@ body::before, body::after { display: none !important; background-image: none !im
     </div>
     <div id="prompts-list">
     <?php
-    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP']];
+    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO']];
     foreach($prompts as $p):
       $ptype=$p['prompt_type']??'secret';
       $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];

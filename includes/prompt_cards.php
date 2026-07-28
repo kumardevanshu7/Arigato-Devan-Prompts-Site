@@ -12,6 +12,8 @@ function prompt_resolve_type(string $db_type): array {
         $ptype = 'already_uploaded';
     } elseif ($db_type === 'direct') {
         $ptype = 'direct';
+    } elseif ($db_type === 'solo') {
+        $ptype = 'solo';
     } else {
         $ptype = 'secret_code';
     }
@@ -21,6 +23,7 @@ function prompt_resolve_type(string $db_type): array {
         'insta_viral'      => ['label' => 'VIRAL',     'cls' => 'ivp'],
         'already_uploaded' => ['label' => 'UPLOADED',  'cls' => 'aup'],
         'direct'           => ['label' => 'DIRECT',    'cls' => 'dir'],
+        'solo'             => ['label' => 'SOLO',      'cls' => 'sol'],
     ];
     $tinfo = $labels[$ptype] ?? $labels['secret_code'];
     return ['ptype' => $ptype, 'label' => $tinfo['label'], 'cls' => $tinfo['cls']];
@@ -95,6 +98,7 @@ function render_trending_row(array $prompts, array $opts = []): void {
         'ivp' => 'Viral',
         'aup' => 'Uploaded',
         'dir' => 'Direct',
+        'sol' => 'Solo',
     ];
     ?>
     <section class="gal-trending-section" id="gal-trending">
@@ -166,6 +170,9 @@ function prompt_page_url_js(): string {
     return <<<'JS'
 function promptPageUrl(card) {
     if (card.dataset.slug) {
+        if (card.dataset.promptType === 'solo') {
+            return 'prompts/solo/' + encodeURIComponent(card.dataset.slug);
+        }
         return 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug);
     }
     return 'prompt.php?id=' + card.dataset.id;

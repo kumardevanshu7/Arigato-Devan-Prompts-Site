@@ -38,6 +38,7 @@ $ptype    = match($db_type) {
     "unreleased"      => "unreleased",
     "already_uploaded"=> "already_uploaded",
     "direct"          => "direct",
+    "solo"            => "solo",
     default           => "secret_code"
 };
 $tinfo = [
@@ -46,9 +47,10 @@ $tinfo = [
     "insta_viral"      => ["label" => "INSTA VIRAL",        "bg" => "#c8f5d4", "color" => "#1a5c30"],
     "already_uploaded" => ["label" => "ALREADY UPLOADED",   "bg" => "#e6f2ff", "color" => "#00509e"],
     "direct"           => ["label" => "DIRECT PROMPT",      "bg" => "#ffe4e6", "color" => "#be123c"],
+    "solo"             => ["label" => "SOLO",               "bg" => "#dcfce7", "color" => "#166534"],
 ][$ptype];
 
-$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path, likes_count FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
+$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path, likes_count, prompt_type FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
 $rel_stmt->execute([$db_type, $id]);
 $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -56,17 +58,21 @@ $is_unlocked  = (bool)$p["is_unlocked"];
 // Track view
 $pdo->prepare("UPDATE prompts SET view_count = view_count + 1 WHERE id = ?")->execute([$id]);
 $asset_images = json_decode($p['asset_images'] ?? '[]', true) ?: [];
+$solo_before_image = trim($p['solo_before_image'] ?? '');
+$solo_examples = json_decode($p['solo_examples'] ?? '[]', true) ?: [];
 $tags_arr          = array_filter(array_map('trim', explode(',', $p['tag'] ?? '')));
 $extra_prompts_arr = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
 $total_prompts     = 1 + count($extra_prompts_arr);
 $og_img       = "https://arigatodevan.com/" . ltrim($p["image_path"] ?? "landingpics/lan9.webp", "/");
 $page_title   = htmlspecialchars($p["title"]) . ' — AI Prompt | Arigato Devan';
-$canonical    = !empty($p['slug']) ? "https://arigatodevan.com/prompts/" . $p['slug'] : "https://arigatodevan.com/prompt.php?id={$id}";
+$canonical    = !empty($p['slug'])
+              ? "https://arigatodevan.com/prompts/" . ($ptype === 'solo' ? 'solo/' : '') . $p['slug']
+              : "https://arigatodevan.com/prompt.php?id={$id}";
 $_page_canonical = $canonical;
 $tags_str     = !empty($tags_arr) ? implode(', ', array_slice($tags_arr, 0, 3)) : '';
 $meta_desc    = !empty($p['description'])
               ? htmlspecialchars($p['description'])
-              : htmlspecialchars($p['title']) . ' is a ' . $tinfo['label'] . ' AI couple prompt on Arigato Devan.'
+              : htmlspecialchars($p['title']) . ' is a ' . $tinfo['label'] . ($ptype === 'solo' ? ' AI solo photo prompt' : ' AI couple prompt') . ' on Arigato Devan.'
                 . (!empty($tags_str) ? ' Perfect for ' . $tags_str . '.' : '')
                 . ' Copy and use instantly on ChatGPT or any AI tool.';
 $meta_keywords = !empty($p['meta_keywords']) ? htmlspecialchars($p['meta_keywords']) : htmlspecialchars($tags_str);
@@ -77,6 +83,7 @@ $type_page    = match($ptype) {
     'unreleased'       => 'unreleased.php',
     'already_uploaded' => 'already_uploaded.php',
     'direct'           => 'gallery.php', // Assuming there's no direct.php list page yet
+    'solo'             => 'gallery.php',
     default            => 'gallery.php',
 };
 $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], true);
@@ -131,7 +138,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     <?php include_once 'includes/theme_head.php'; ?>
     <?php include_once "gtag.php"; ?>
 </head>
-<body class="page-store theme-nogoda page-prompt">
+<body class="page-store theme-nogoda page-prompt <?= $ptype === 'solo' ? 'page-prompt-solo' : '' ?>">
 
 <?php $nav_active = 'gallery'; include 'includes/site_nav.php'; ?>
 <div class="nogoda-mesh" aria-hidden="true"></div>
@@ -139,11 +146,25 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
   
         <div class="pp-layout">
             <!-- Image Column -->
-            <div class="pp-img-col <?= ($ptype === 'unreleased' && !$is_unlocked) ? 'blurred' : '' ?>" id="pp-img-col">
+            <div class="pp-img-col <?= ($ptype === 'unreleased' && !$is_unlocked) ? 'blurred' : '' ?> <?= $ptype === 'solo' ? 'pp-solo-img-col' : '' ?>" id="pp-img-col">
+                <?php if ($ptype === 'solo' && $solo_before_image !== ''): ?>
+                <div class="pp-solo-compare" aria-label="Before and after comparison">
+                    <figure class="pp-solo-shot before pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview before image">
+                        <span class="pp-solo-label">Before</span>
+                        <img loading="eager" src="<?= htmlspecialchars($solo_before_image) ?>" class="pp-prompt-img" alt="Before — <?= htmlspecialchars($p['title']) ?>">
+                    </figure>
+                    <div class="pp-solo-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+                    <figure class="pp-solo-shot after pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview after image">
+                        <span class="pp-solo-label">After</span>
+                        <img loading="eager" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="After — <?= htmlspecialchars($p['title']) ?>">
+                    </figure>
+                </div>
+                <?php else: ?>
                 <div class="pp-img-frame">
                     <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
                     <span class="pp-badge"><?= $tinfo['label'] ?></span>
                 </div>
+                <?php endif; ?>
                 <div class="pp-img-meta">
                     <div class="pp-like-mini">
                         <i class="fa-solid fa-heart"></i>
@@ -215,10 +236,10 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
                         </div>
 
-                    <?php elseif ($ptype === 'direct'): ?>
+                    <?php elseif ($ptype === 'direct' || $ptype === 'solo'): ?>
                         <?php $req_taps = (int)($p['unlock_code'] ?: 9); ?>
                         <div class="pp-task-icon"><i class="fa-solid fa-hand-pointer" style="color:#f43f5e"></i></div>
-                        <h3>Direct Unlock!</h3>
+                        <h3><?= $ptype === 'solo' ? 'Unlock This SOLO Prompt!' : 'Direct Unlock!' ?></h3>
                         <p>Tap the heart <strong><?= $req_taps ?> times</strong> to unlock this prompt!</p>
                         <div class="pp-love-area">
                             <button id="pp-love-btn-dir" class="pp-love-btn" style="color:#f43f5e;border-color:#f43f5e"><i class="fa-solid fa-heart"></i></button>
@@ -313,6 +334,35 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             </div>
         </div>
 
+        <?php if ($ptype === 'solo' && !empty($solo_examples)): ?>
+        <section class="pp-solo-examples" aria-labelledby="solo-examples-title">
+            <div class="pp-solo-examples-head">
+                <p class="hero-label">More Transformations</p>
+                <h2 id="solo-examples-title">Before &amp; After <em>Examples</em></h2>
+                <p>Tap any photo to open a full preview. Swipe or use arrows to move between shots.</p>
+            </div>
+            <div class="pp-solo-examples-grid">
+                <?php foreach (array_slice($solo_examples, 0, 5) as $example_i => $example): ?>
+                    <?php if (empty($example['before']) || empty($example['after'])) continue; ?>
+                    <article class="pp-solo-example-card">
+                        <div class="pp-solo-example-num">Example <?= $example_i + 1 ?> · tap to preview</div>
+                        <div class="pp-solo-example-pair">
+                            <figure class="pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview example <?= $example_i + 1 ?> before">
+                                <span>Before</span>
+                                <img loading="lazy" src="<?= htmlspecialchars($example['before']) ?>" alt="Example <?= $example_i + 1 ?> before">
+                            </figure>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            <figure class="pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview example <?= $example_i + 1 ?> after">
+                                <span>After</span>
+                                <img loading="lazy" src="<?= htmlspecialchars($example['after']) ?>" alt="Example <?= $example_i + 1 ?> after result">
+                            </figure>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
         <?php if ($meta_desc_raw !== ''): ?>
         <section class="pp-about" aria-label="About this prompt">
             <h2>About this prompt</h2>
@@ -333,7 +383,15 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             <h2>More <?= htmlspecialchars($tinfo['label']) ?> Prompts</h2>
             <div class="pp-rel-grid">
                 <?php foreach ($related as $r): ?>
-                <a href="<?= (!$is_local && !empty($r['slug'])) ? '/prompts/' . htmlspecialchars($r['slug']) : 'prompt.php?id=' . $r['id'] ?>" class="pp-rel-card">
+                <?php
+                $related_url = 'prompt.php?id=' . (int)$r['id'];
+                if (!empty($r['slug']) && ($r['prompt_type'] ?? '') === 'solo') {
+                    $related_url = 'prompts/solo/' . $r['slug'];
+                } elseif (!$is_local && !empty($r['slug'])) {
+                    $related_url = '/prompts/' . $r['slug'];
+                }
+                ?>
+                <a href="<?= htmlspecialchars($related_url) ?>" class="pp-rel-card">
                     <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>">
                     <div class="pp-rel-card-foot">
                         <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
@@ -493,7 +551,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             setTimeout(() => this.style.transform = '', 120);
             if (tapCountDir >= TAPS_DIR) {
                 this.disabled = true;
-                const fd = new FormData(); fd.append('action', 'direct'); fd.append('prompt_id', promptId);
+                const fd = new FormData(); fd.append('action', ptype === 'solo' ? 'solo' : 'direct'); fd.append('prompt_id', promptId);
                 const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
                 if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
                 else { tapCountDir = 0; document.getElementById('pp-tap-count-dir').textContent = '0'; document.getElementById('pp-progress-fill-dir').style.width = '0%'; this.disabled = false; showError(res.message); }
@@ -591,6 +649,117 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         });
     }
     </script>
+
+    <?php if ($ptype === 'solo'): ?>
+    <div class="pp-solo-lb" id="ppSoloLb" aria-hidden="true" role="dialog" aria-label="Image preview">
+        <div class="pp-solo-lb-backdrop" aria-hidden="true"></div>
+        <button type="button" class="pp-solo-lb-close" aria-label="Close preview"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="pp-solo-lb-nav pp-solo-lb-prev" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="pp-solo-lb-stage">
+            <div class="pp-solo-lb-frame">
+                <img class="pp-solo-lb-img" src="" alt="">
+                <p class="pp-solo-lb-caption" aria-live="polite"></p>
+            </div>
+        </div>
+        <button type="button" class="pp-solo-lb-nav pp-solo-lb-next" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
+        <p class="pp-solo-lb-counter" aria-live="polite"></p>
+    </div>
+    <script>
+    (function () {
+        var items = Array.prototype.slice.call(document.querySelectorAll('[data-solo-lb]'));
+        var lb = document.getElementById('ppSoloLb');
+        if (!items.length || !lb) return;
+        if (lb.parentNode !== document.body) document.body.appendChild(lb);
+
+        var lbImg = lb.querySelector('.pp-solo-lb-img');
+        var lbCaption = lb.querySelector('.pp-solo-lb-caption');
+        var lbCounter = lb.querySelector('.pp-solo-lb-counter');
+        var lbPrev = lb.querySelector('.pp-solo-lb-prev');
+        var lbNext = lb.querySelector('.pp-solo-lb-next');
+        var current = 0;
+        var touchStartX = 0, touchStartY = 0, touchActive = false;
+
+        function getSrc(el) {
+            var img = el.querySelector('img');
+            return img ? (img.currentSrc || img.src || '') : '';
+        }
+        function getLabel(el) {
+            var badge = el.querySelector('.pp-solo-label, span');
+            var alt = el.querySelector('img');
+            if (badge && badge.textContent.trim()) return badge.textContent.trim();
+            return alt ? (alt.alt || 'Preview') : 'Preview';
+        }
+        function show(i) {
+            current = (i + items.length) % items.length;
+            var el = items[current];
+            var label = getLabel(el);
+            lbImg.src = getSrc(el);
+            lbImg.alt = label;
+            if (lbCaption) {
+                lbCaption.textContent = label;
+                lbCaption.classList.toggle('is-before', /before/i.test(label));
+                lbCaption.classList.toggle('is-after', /after/i.test(label));
+            }
+            if (lbCounter) lbCounter.textContent = (current + 1) + ' / ' + items.length;
+            if (lbPrev) lbPrev.disabled = items.length <= 1;
+            if (lbNext) lbNext.disabled = items.length <= 1;
+        }
+        function open(i) {
+            show(i);
+            lb.classList.add('is-open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('pp-solo-lb-open');
+        }
+        function close() {
+            lb.classList.remove('is-open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('pp-solo-lb-open');
+            lbImg.removeAttribute('src');
+        }
+        function prev() { if (items.length > 1) show(current - 1); }
+        function next() { if (items.length > 1) show(current + 1); }
+
+        items.forEach(function (el, i) {
+            el.addEventListener('click', function () { open(i); });
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    open(i);
+                }
+            });
+        });
+
+        lb.querySelector('.pp-solo-lb-close').addEventListener('click', close);
+        lb.querySelector('.pp-solo-lb-backdrop').addEventListener('click', close);
+        if (lbPrev) lbPrev.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+        if (lbNext) lbNext.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+
+        document.addEventListener('keydown', function (e) {
+            if (!lb.classList.contains('is-open')) return;
+            if (e.key === 'Escape') close();
+            if (e.key === 'ArrowLeft') prev();
+            if (e.key === 'ArrowRight') next();
+        });
+
+        lb.addEventListener('touchstart', function (e) {
+            if (!lb.classList.contains('is-open') || !e.touches.length) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchActive = true;
+        }, { passive: true });
+        lb.addEventListener('touchend', function (e) {
+            if (!touchActive) return;
+            touchActive = false;
+            var t = e.changedTouches[0];
+            if (!t) return;
+            var dx = t.clientX - touchStartX;
+            var dy = t.clientY - touchStartY;
+            if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+            if (dx < 0) next(); else prev();
+        }, { passive: true });
+    })();
+    </script>
+    <?php endif; ?>
 </body>
 </html>
 

@@ -1,0 +1,10 @@
+# Copy this file as: public_html/prompts/solo/.htaccess
+#
+# The rules are intentionally relative, so the same file works in local XAMPP
+# and in Hostinger's public_html folder.
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9-]*)/?$ index.php?slug=$1 [L,QSA,NC]

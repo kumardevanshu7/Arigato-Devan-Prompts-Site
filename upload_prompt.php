@@ -55,7 +55,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 textarea.form-input{resize:vertical;min-height:100px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 /* TYPE SELECTOR */
-.type-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px}
+.type-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:4px}
 .type-card{border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--muted)}
 .type-card:hover{transform:translateY(-2px);border-color:rgba(139,92,246,0.3);color:var(--text)}
 .type-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
@@ -65,6 +65,7 @@ textarea.form-input{resize:vertical;min-height:100px}
 .type-card.selected-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:var(--cyan);box-shadow:0 0 0 2px rgba(34,211,238,0.07)}
 .type-card.selected-uploaded{background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.3);color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,0.07)}
 .type-card.selected-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.07)}
+.type-card.selected-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:var(--green);box-shadow:0 0 0 2px rgba(74,222,128,0.08)}
 .tap-card{border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--muted);flex:1;min-width:60px;}
 .tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--text);}
 .tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
@@ -115,12 +116,36 @@ textarea.form-input{resize:vertical;min-height:100px}
 .submit-btn:hover{background:linear-gradient(135deg,rgba(139,92,246,0.98),rgba(192,132,252,0.85));box-shadow:0 6px 24px rgba(139,92,246,0.35);transform:translateY(-1px)}
 .asset-preview-thumb img{width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border2)}
 #asset-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+/* SOLO BEFORE / AFTER */
+#solo-media-card{display:none}
+.solo-main-upload{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:14px;align-items:stretch}
+.solo-upload-panel{border:1px solid var(--border);border-radius:14px;padding:16px;background:rgba(7,6,15,.45)}
+.solo-upload-panel.after{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.035)}
+.solo-upload-title{display:flex;align-items:center;gap:7px;color:var(--accent2);font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.solo-upload-panel.after .solo-upload-title{color:var(--green)}
+.solo-image-preview{display:none;margin-top:13px;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:#07060f}
+.solo-image-preview.show{display:block}
+.solo-image-preview img{display:block;width:100%;aspect-ratio:9/16;max-height:360px;object-fit:cover}
+.solo-arrow{display:flex;align-items:center;justify-content:center;color:var(--green);font-size:1.5rem}
+.solo-help{font-size:.72rem;line-height:1.55;color:var(--muted);margin-top:9px}
+.solo-example{border:1px solid var(--border2);border-radius:14px;padding:16px;margin-top:12px;background:rgba(7,6,15,.38)}
+.solo-example-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.solo-example-title{font-size:.76rem;font-weight:900;color:var(--text)}
+.solo-example-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.solo-example-side{min-width:0}
+.solo-example-preview{display:none;margin-top:10px;overflow:hidden;border:1px solid var(--border2);border-radius:11px;background:#07060f}
+.solo-example-preview.show{display:block}
+.solo-example-preview img{display:block;width:100%;aspect-ratio:9/16;max-height:300px;object-fit:cover}
+.solo-example-remove{border:1px solid rgba(248,113,113,.25);background:rgba(248,113,113,.07);color:var(--red);border-radius:8px;padding:6px 10px;font-weight:800;font-size:.7rem;cursor:pointer}
+.solo-add-example{margin-top:14px;display:inline-flex;align-items:center;gap:7px;border:1px dashed rgba(74,222,128,.35);background:rgba(74,222,128,.06);color:var(--green);border-radius:11px;padding:10px 15px;font-family:var(--font);font-size:.78rem;font-weight:900;cursor:pointer}
+.solo-add-example:disabled{opacity:.45;cursor:not-allowed}
+.solo-count{font-size:.7rem;color:var(--muted);margin-left:8px}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(7,6,15,0.97);border-top:1px solid var(--border);z-index:500;padding:8px 0 max(8px,env(safe-area-inset-bottom));flex-direction:row;justify-content:space-around;align-items:center}
 .mn-link{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.6rem;font-weight:700;color:var(--muted);text-decoration:none;padding:4px 8px;min-width:48px;transition:all .2s}
 .mn-link.active,.mn-link:hover{color:var(--accent2)}.mn-link i{font-size:1.1rem}
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}}
-@media(max-width:700px){.type-selector{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}}
+@media(max-width:700px){.type-selector{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}.solo-main-upload{grid-template-columns:1fr}.solo-arrow{transform:rotate(90deg);min-height:34px}.solo-example-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}.type-selector{grid-template-columns:1fr 1fr}}
 /* MOBILE TOPBAR */
 .mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
@@ -264,6 +289,10 @@ body::before, body::after { display: none !important; background-image: none !im
           <input type="radio" name="prompt_type" value="direct" onchange="onTypeChange('direct')">
           <i class="fa-solid fa-hand-pointer type-icon"></i> Direct Prompt
         </label>
+        <label class="type-card" id="card-solo">
+          <input type="radio" name="prompt_type" value="solo" onchange="onTypeChange('solo')">
+          <i class="fa-solid fa-user type-icon"></i> SOLO
+        </label>
       </div>
     </div>
 
@@ -399,6 +428,10 @@ body::before, body::after { display: none !important; background-image: none !im
           <input type="radio" name="direct_taps" value="37" onchange="onTapChange('37')">
           <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>37
         </label>
+        <label class="tap-card" id="tap-77">
+          <input type="radio" name="direct_taps" value="77" onchange="onTapChange('77')">
+          <span style="font-size:1.1rem;display:block;margin-bottom:2px;"><i class="fa-solid fa-heart"></i></span>77
+        </label>
       </div>
     </div>
 
@@ -412,7 +445,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="card">
       <div class="section-label"><i class="fa-solid fa-images"></i> Assets (Optional)</div>
       <label id="assets-toggle-label">
-        <input type="checkbox" name="has_assets" id="has_assets" onchange="toggleAssets(this)">
+        <input type="checkbox" name="has_assets" id="has_assets" value="1" onchange="toggleAssets(this)">
         <i class="fa-solid fa-paperclip"></i> Include Extra Asset Images
       </label>
       <div id="assets-fields">
@@ -444,10 +477,48 @@ body::before, body::after { display: none !important; background-image: none !im
       </div>
     </div>
 
+    <!-- SOLO BEFORE / AFTER -->
+    <div class="card" id="solo-media-card">
+      <div class="section-label"><i class="fa-solid fa-arrow-right-arrow-left"></i> SOLO Before &amp; After</div>
+      <div class="solo-main-upload">
+        <div class="solo-upload-panel">
+          <div class="solo-upload-title"><i class="fa-solid fa-image"></i> Before Image</div>
+          <label class="file-upload-btn">
+            <input type="file" name="solo_before_image" id="solo-before-image" accept="image/*" style="display:none" onchange="previewSoloMain(this,'solo-before-name','solo-before-preview')">
+            <i class="fa-solid fa-upload"></i> Choose Before
+          </label>
+          <div class="file-upload-name" id="solo-before-name" style="margin-top:9px">No file chosen</div>
+          <div class="solo-image-preview" id="solo-before-preview"><img alt="Before image preview"></div>
+          <p class="solo-help">Upload the original/reference photo.</p>
+        </div>
+        <div class="solo-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="solo-upload-panel after">
+          <div class="solo-upload-title"><i class="fa-solid fa-wand-magic-sparkles"></i> After / Result Image</div>
+          <label class="file-upload-btn">
+            <input type="file" name="solo_after_image" id="solo-after-image" accept="image/*" style="display:none" onchange="previewSoloMain(this,'solo-after-name','solo-after-preview')">
+            <i class="fa-solid fa-upload"></i> Choose Result
+          </label>
+          <div class="file-upload-name" id="solo-after-name" style="margin-top:9px">No file chosen</div>
+          <div class="solo-image-preview" id="solo-after-preview"><img alt="After result preview"></div>
+          <p class="solo-help">This result image will also become the public gallery cover.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border2)">
+        <div class="section-label" style="margin-bottom:4px"><i class="fa-solid fa-images"></i> Set Examples (Optional)</div>
+        <p class="solo-help" style="margin:0">Each example contains one before and one after image. Maximum 5 examples.</p>
+        <div id="solo-examples"></div>
+        <button type="button" class="solo-add-example" id="solo-add-example" onclick="addSoloExample()">
+          <i class="fa-solid fa-plus"></i> Add Example
+        </button>
+        <span class="solo-count" id="solo-example-count">0 / 5</span>
+      </div>
+    </div>
+
     <!-- COVER IMAGE + SUBMIT -->
     <div class="card">
       <div class="section-label"><i class="fa-solid fa-image"></i> Cover Image &amp; Final</div>
-      <div class="form-row">
+      <div class="form-row" id="standard-cover-row">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Cover Image <span style="color:var(--red)">*</span></label>
           <div class="file-upload-row">
@@ -464,7 +535,7 @@ body::before, body::after { display: none !important; background-image: none !im
         </div>
       </div>
       <div style="margin-top:20px">
-        <button type="submit" class="submit-btn"><i class="fa-solid fa-upload"></i> Upload Prompt</button>
+        <button type="submit" class="submit-btn" id="upload-submit-btn"><i class="fa-solid fa-upload"></i> Upload Prompt</button>
       </div>
     </div>
 
@@ -492,14 +563,30 @@ const codeInput=document.getElementById('unlock-code-input');
 const directTapsGroup=document.getElementById('direct-taps-group');
 const reelLinkGroup=document.getElementById('reel-link-group');
 const reelLinkInput=document.getElementById('reel_link');
+const soloMediaCard=document.getElementById('solo-media-card');
+const soloBeforeInput=document.getElementById('solo-before-image');
+const soloAfterInput=document.getElementById('solo-after-image');
+const standardCoverRow=document.getElementById('standard-cover-row');
+const standardCoverInput=document.getElementById('image');
+const uploadSubmitBtn=document.getElementById('upload-submit-btn');
 let tags=[];
 
 function onTypeChange(type){
   document.querySelectorAll('.type-card').forEach(c=>c.className='type-card');
+  const isSolo=type==='solo';
+  soloMediaCard.style.display=isSolo?'block':'none';
+  standardCoverRow.style.display=isSolo?'none':'grid';
+  soloBeforeInput.required=isSolo;
+  soloAfterInput.required=isSolo;
+  standardCoverInput.required=!isSolo;
+  uploadSubmitBtn.innerHTML=isSolo
+    ? '<i class="fa-solid fa-floppy-disk"></i> Save SOLO Prompt'
+    : '<i class="fa-solid fa-upload"></i> Upload Prompt';
   if(type==='secret'){document.getElementById('card-secret').className='type-card selected-secret';codeGroup.style.display='block';codeInput.required=true;reelLinkGroup.style.display='block';reelLinkInput.required=true;if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='unreleased'){document.getElementById('card-unreleased').className='type-card selected-unreleased';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='already_uploaded'){document.getElementById('card-uploaded').className='type-card selected-uploaded';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='direct'){document.getElementById('card-direct').className='type-card selected-direct';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
+  else if(type==='solo'){document.getElementById('card-solo').className='type-card selected-solo';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
 }
 
 function onTapChange(val){
@@ -552,6 +639,18 @@ document.querySelector('form').addEventListener('submit',function(e){
     if(!codeInput.value.trim()||codeInput.value.trim().length!==6){e.preventDefault();alert('Access Code must be exactly 6 characters!');codeInput.focus();return;}
     if(!reelLinkInput.value.trim()){e.preventDefault();alert('Reel Link is required for Secret Code type!');reelLinkInput.focus();return;}
   }
+  if(selectedType==='solo'){
+    if(!soloBeforeInput.files.length){e.preventDefault();alert('Please choose the SOLO before image.');soloBeforeInput.click();return;}
+    if(!soloAfterInput.files.length){e.preventDefault();alert('Please choose the SOLO after/result image.');soloAfterInput.click();return;}
+    const pairs=Array.from(document.querySelectorAll('.solo-example'));
+    for(const pair of pairs){
+      const before=pair.querySelector('input[name="solo_example_before[]"]');
+      const after=pair.querySelector('input[name="solo_example_after[]"]');
+      if((before.files.length&&!after.files.length)||(!before.files.length&&after.files.length)){
+        e.preventDefault();alert('Every SOLO example needs both a before and an after image.');return;
+      }
+    }
+  }
   hiddenTagInput.value=tags.join(',');
 });
 
@@ -582,6 +681,69 @@ function handleAssetFiles(input){
   if(input.files.length>2)alert('Max 2 images allowed. Only first 2 will be used.');
   const previews=document.getElementById('asset-previews');previews.innerHTML='';
   files.forEach(f=>{const reader=new FileReader();reader.onload=e=>{const div=document.createElement('div');div.className='asset-preview-thumb';div.innerHTML=`<img loading="lazy" src="${e.target.result}" alt="preview">`;previews.appendChild(div)};reader.readAsDataURL(f)});
+}
+let soloExampleIndex=0;
+function readSoloPreview(input,preview){
+  const file=input.files[0];
+  const img=preview?.querySelector('img');
+  if(!file||!preview||!img){if(preview)preview.classList.remove('show');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{img.src=e.target.result;preview.classList.add('show');};
+  reader.readAsDataURL(file);
+}
+function previewSoloMain(input,nameId,previewId){
+  document.getElementById(nameId).textContent=input.files[0]?.name||'No file chosen';
+  readSoloPreview(input,document.getElementById(previewId));
+}
+function previewSoloExample(input){
+  const side=input.closest('.solo-example-side');
+  if(!side)return;
+  side.querySelector('.solo-example-fname').textContent=input.files[0]?.name||'No file chosen';
+  readSoloPreview(input,side.querySelector('.solo-example-preview'));
+}
+function addSoloExample(){
+  const wrap=document.getElementById('solo-examples');
+  if(wrap.querySelectorAll('.solo-example').length>=5)return;
+  soloExampleIndex++;
+  const item=document.createElement('div');
+  item.className='solo-example';
+  item.innerHTML=`
+    <div class="solo-example-head">
+      <div class="solo-example-title"><i class="fa-solid fa-layer-group" style="color:var(--green);margin-right:6px"></i>Example <span class="solo-example-number"></span></div>
+      <button type="button" class="solo-example-remove" onclick="removeSoloExample(this)"><i class="fa-solid fa-trash"></i> Remove</button>
+    </div>
+    <div class="solo-example-grid">
+      <div class="solo-example-side">
+        <label class="form-label">Before Picture</label>
+        <label class="file-upload-btn">
+          <input type="file" name="solo_example_before[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+          <i class="fa-solid fa-image"></i> Choose Before
+        </label>
+        <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+        <div class="solo-example-preview"><img alt="Example before preview"></div>
+      </div>
+      <div class="solo-example-side">
+        <label class="form-label">After Picture</label>
+        <label class="file-upload-btn">
+          <input type="file" name="solo_example_after[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Choose After
+        </label>
+        <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+        <div class="solo-example-preview"><img alt="Example after preview"></div>
+      </div>
+    </div>`;
+  wrap.appendChild(item);
+  renumberSoloExamples();
+}
+function removeSoloExample(btn){
+  btn.closest('.solo-example').remove();
+  renumberSoloExamples();
+}
+function renumberSoloExamples(){
+  const items=Array.from(document.querySelectorAll('#solo-examples .solo-example'));
+  items.forEach((item,i)=>item.querySelector('.solo-example-number').textContent=i+1);
+  document.getElementById('solo-example-count').textContent=items.length+' / 5';
+  document.getElementById('solo-add-example').disabled=items.length>=5;
 }
 function toggleTrialUI(cb){
   const label=document.getElementById('trial-toggle-label');const info=document.getElementById('trial-info-box');

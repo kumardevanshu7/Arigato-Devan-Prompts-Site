@@ -13,6 +13,9 @@
 
   function promptPageUrl(card) {
     if (card.dataset.slug) {
+      if (card.dataset.promptType === 'solo') {
+        return 'prompts/solo/' + encodeURIComponent(card.dataset.slug);
+      }
       return 'prompt.php?slug=' + encodeURIComponent(card.dataset.slug);
     }
     return 'prompt.php?id=' + card.dataset.id;
