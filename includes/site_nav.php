@@ -35,7 +35,8 @@ if (!isset($nav_counts) && isset($pdo)) {
             SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
             SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
             SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
-            SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct
+            SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct,
+            SUM(CASE WHEN prompt_type = 'solo' THEN 1 ELSE 0 END) as solo
         FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)")->fetch(PDO::FETCH_ASSOC);
         $nav_counts = $nc ?: [];
     } catch (Exception $e) {
@@ -92,6 +93,10 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
                         <a href="<?= $nb('direct_prompts.php') ?>">
                             <i class="fa-solid fa-hand-pointer"></i> Direct Prompts
                             <?= empty($nav_counts['direct']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'direct_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                        </a>
+                        <a href="<?= $nb('solo_prompts.php') ?>">
+                            <i class="fa-solid fa-user"></i> Solo Prompts
+                            <?= empty($nav_counts['solo']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'solo_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
                         <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link">
                             <i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span>
@@ -161,6 +166,7 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
             <a href="<?= $nb('unreleased.php') ?>">Unreleased Reels</a>
             <a href="<?= $nb('already_uploaded.php') ?>">Already Uploaded</a>
             <a href="<?= $nb('direct_prompts.php') ?>">Direct Prompts</a>
+            <a href="<?= $nb('solo_prompts.php') ?>">Solo Prompts</a>
             <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link"><i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span></a>
             <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
         </div>

@@ -108,7 +108,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
     $asset_images_json = null;
     $description = trim($_POST["description"] ?? "");
+    if (mb_strlen($description) > 160) {
+        $description = mb_substr($description, 0, 160);
+    }
+    $about_prompt = trim($_POST["about_prompt"] ?? "");
+    if ($about_prompt !== "") {
+        $about_words = preg_split('/\s+/u', $about_prompt, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($about_words) > 200) {
+            $about_prompt = implode(' ', array_slice($about_words, 0, 200));
+        }
+    }
     $meta_keywords = trim($_POST["meta_keywords"] ?? "");
+    if ($meta_keywords !== "") {
+        $kw_parts = array_values(array_filter(array_map("trim", explode(",", $meta_keywords)), static function ($k) {
+            return $k !== "";
+        }));
+        if (count($kw_parts) > 10) {
+            $kw_parts = array_slice($kw_parts, 0, 10);
+        }
+        $meta_keywords = implode(", ", $kw_parts);
+    }
     $solo_before_image = null;
     $solo_examples_json = null;
 
@@ -350,7 +369,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, meta_keywords, solo_before_image, solo_examples) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, about_prompt, meta_keywords, solo_before_image, solo_examples) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -367,6 +386,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $extra_prompts_json,
                 $is_trial,
                 $description ?: null,
+                $about_prompt ?: null,
                 $meta_keywords,
                 $solo_before_image,
                 $solo_examples_json,

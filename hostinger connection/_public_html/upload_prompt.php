@@ -464,16 +464,21 @@ body::before, body::after { display: none !important; background-image: none !im
       </div>
     </div>
 
-    <!-- SEO -->
+    <!-- ABOUT + SEO -->
     <div class="card">
-      <div class="section-label"><i class="fa-solid fa-magnifying-glass-chart"></i> SEO (applies to all prompt types)</div>
+      <div class="section-label"><i class="fa-solid fa-magnifying-glass-chart"></i> About &amp; SEO (applies to all prompt types)</div>
+      <div class="form-group">
+        <label class="form-label">About This Prompt <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— shown on the prompt page (max 200 words)</span></label>
+        <textarea name="about_prompt" id="about-prompt-input" class="form-input" rows="6" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);font-weight:700;margin-top:6px"><span id="about-word-count">0</span> / 200 words</div>
+      </div>
       <div class="form-group">
         <label class="form-label">SEO Description <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— shows in Google search results (max 160 chars)</span></label>
         <textarea name="description" class="form-input" rows="3" maxlength="160" placeholder="Short description for search engines. Leave blank to auto-generate."></textarea>
       </div>
       <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">SEO Keywords</label>
-        <input type="text" name="meta_keywords" class="form-input" maxlength="500" placeholder="e.g. ai couple prompt, chatgpt portrait, viral reel prompt">
+        <label class="form-label">SEO Keywords <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— max 10 phrases</span></label>
+        <input type="text" name="meta_keywords" class="form-input" maxlength="500" placeholder="e.g. ai solo prompt, chatgpt portrait, viral reel prompt">
       </div>
     </div>
 
@@ -752,6 +757,20 @@ function toggleTrialUI(cb){
 }
 function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
 function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+function countWords(text){
+  return (text||'').trim().split(/\s+/).filter(Boolean).length;
+}
+function updateAboutWordCount(el){
+  const countEl=document.getElementById('about-word-count');
+  if(!countEl||!el)return;
+  let words=(el.value||'').trim().split(/\s+/).filter(Boolean);
+  if(words.length>200){
+    el.value=words.slice(0,200).join(' ');
+    words=words.slice(0,200);
+  }
+  countEl.textContent=words.length;
+  countEl.style.color=words.length>=200?'var(--red)':'';
+}
 </script>
 </html>
 

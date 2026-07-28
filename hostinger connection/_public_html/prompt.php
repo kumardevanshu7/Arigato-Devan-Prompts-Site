@@ -77,6 +77,7 @@ $meta_desc    = !empty($p['description'])
                 . ' Copy and use instantly on ChatGPT or any AI tool.';
 $meta_keywords = !empty($p['meta_keywords']) ? htmlspecialchars($p['meta_keywords']) : htmlspecialchars($tags_str);
 $meta_desc_raw = trim($p['description'] ?? '');
+$about_prompt_raw = trim($p['about_prompt'] ?? '');
 $pp_kw_list    = array_filter(array_map('trim', explode(',', $p['meta_keywords'] ?? '')));
 $type_page    = match($ptype) {
     'insta_viral'      => 'not_mine.php',
@@ -363,10 +364,15 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         </section>
         <?php endif; ?>
 
-        <?php if ($meta_desc_raw !== ''): ?>
+        <?php if ($about_prompt_raw !== '' || $meta_desc_raw !== '' || !empty($pp_kw_list)): ?>
         <section class="pp-about" aria-label="About this prompt">
+            <?php if ($about_prompt_raw !== ''): ?>
             <h2>About this prompt</h2>
-            <p><?= nl2br(htmlspecialchars($meta_desc_raw)) ?></p>
+            <p class="pp-about-body"><?= nl2br(htmlspecialchars($about_prompt_raw)) ?></p>
+            <?php endif; ?>
+            <?php if ($meta_desc_raw !== ''): ?>
+            <p class="pp-about-seo"><?= nl2br(htmlspecialchars($meta_desc_raw)) ?></p>
+            <?php endif; ?>
             <?php if (!empty($pp_kw_list)): ?>
             <div class="pp-about-kw" aria-label="Keywords">
                 <?php foreach ($pp_kw_list as $kw): ?>

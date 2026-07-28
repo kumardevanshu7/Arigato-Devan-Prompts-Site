@@ -18,7 +18,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text  = trim($_POST["prompt_text"] ?? "");
     $description   = trim($_POST["description"] ?? "");
+    if (mb_strlen($description) > 160) {
+        $description = mb_substr($description, 0, 160);
+    }
+    $about_prompt  = trim($_POST["about_prompt"] ?? "");
+    if ($about_prompt !== "") {
+        $about_words = preg_split('/\s+/u', $about_prompt, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($about_words) > 200) {
+            $about_prompt = implode(' ', array_slice($about_words, 0, 200));
+        }
+    }
     $meta_keywords = trim($_POST["meta_keywords"] ?? "");
+    if ($meta_keywords !== "") {
+        $kw_parts = array_values(array_filter(array_map("trim", explode(",", $meta_keywords)), static function ($k) {
+            return $k !== "";
+        }));
+        if (count($kw_parts) > 10) {
+            $kw_parts = array_slice($kw_parts, 0, 10);
+        }
+        $meta_keywords = implode(", ", $kw_parts);
+    }
     $reel_link = trim($_POST["reel_link"] ?? "");
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
     $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
@@ -132,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, meta_keywords=?, extra_prompts=?, is_trial=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, about_prompt=?, meta_keywords=?, extra_prompts=?, is_trial=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -146,6 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $asset_title,
         $asset_images_json,
         $description ?: null,
+        $about_prompt ?: null,
         $meta_keywords,
         $extra_prompts_json,
         $is_trial,
@@ -581,14 +601,23 @@ body::before, body::after { display: none !important; background-image: none !im
       ) ?></textarea></div>
 
       <div class="form-group">
+        <label for="e-about">About This Prompt <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown on prompt page, max 200 words)</span></label>
+        <textarea id="e-about" name="about_prompt" rows="6" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"><?= htmlspecialchars($p['about_prompt'] ?? '') ?></textarea>
+        <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="about-word-count"><?php
+          $about_wc = trim($p['about_prompt'] ?? '');
+          echo $about_wc === '' ? 0 : count(preg_split('/\s+/u', $about_wc, -1, PREG_SPLIT_NO_EMPTY));
+        ?></span>/200 words</div>
+      </div>
+
+      <div class="form-group">
         <label for="e-desc">SEO Description <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — shown in Google search results)</span></label>
         <textarea id="e-desc" name="description" rows="3" maxlength="160" placeholder="Short description for Google search results (max 160 chars). Leave blank to auto-generate."><?= htmlspecialchars($p['description'] ?? '') ?></textarea>
         <div style="font-size:.78rem;color:#888;font-weight:600;margin-top:4px;"><span id="desc-char-count"><?= strlen($p['description'] ?? '') ?></span>/160 characters</div>
       </div>
 
       <div class="form-group">
-        <label for="e-keywords">SEO Keywords <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — comma-separated)</span></label>
-        <input type="text" id="e-keywords" name="meta_keywords" maxlength="500" value="<?= htmlspecialchars($p['meta_keywords'] ?? '') ?>" placeholder="e.g. ai couple prompt, chatgpt portrait, viral reel prompt">
+        <label for="e-keywords">SEO Keywords <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — max 10 comma-separated phrases)</span></label>
+        <input type="text" id="e-keywords" name="meta_keywords" maxlength="500" value="<?= htmlspecialchars($p['meta_keywords'] ?? '') ?>" placeholder="e.g. ai solo prompt, chatgpt portrait, viral reel prompt">
       </div>
 
       <!-- Extra Prompts -->
@@ -895,6 +924,18 @@ body::before, body::after { display: none !important; background-image: none !im
         document.getElementById('e-desc').addEventListener('input', function() {
             document.getElementById('desc-char-count').textContent = this.value.length;
         });
+
+        function updateAboutWordCount(el) {
+            const countEl = document.getElementById('about-word-count');
+            if (!countEl || !el) return;
+            let words = (el.value || '').trim().split(/\s+/).filter(Boolean);
+            if (words.length > 200) {
+                el.value = words.slice(0, 200).join(' ');
+                words = words.slice(0, 200);
+            }
+            countEl.textContent = words.length;
+            countEl.style.color = words.length >= 200 ? '#f87171' : '';
+        }
 
         function addEP(num) {
             document.getElementById('ep'+num+'-section').style.display = 'block';

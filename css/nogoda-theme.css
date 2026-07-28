@@ -1514,6 +1514,18 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   color: var(--pal-navy);
   margin: 0;
 }
+.theme-nogoda .pp-about-body + .pp-about-seo {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pal-sky, #C8D9E6);
+  color: var(--text-secondary, #567c8d);
+  font-size: .84rem;
+}
+.theme-nogoda .pp-about-seo {
+  color: var(--text-secondary, #567c8d);
+  font-size: .84rem;
+  line-height: 1.7;
+}
 .theme-nogoda .pp-about-kw {
   margin-top: 14px;
   display: flex;
