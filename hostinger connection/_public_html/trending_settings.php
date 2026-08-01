@@ -109,7 +109,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
-    <a href="trending_settings.php" class="sb-link active"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
+    <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
+    <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
@@ -136,7 +137,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 
   <div class="info-box">
     <strong>Gallery → Trending Now</strong> section mein dikhane ke liye kisi bhi <strong>published</strong> prompt ka toggle ON karo.
-    Trial prompts yahan nahi dikhte. Banner images ke liye project root mein <code>banner/</code> folder mein 16:9 images daalo.
+    Trial prompts yahan nahi dikhte. Gallery hero carousel ke liye <a href="gallery_carousel_manager.php" style="color:var(--accent2);font-weight:800">Edit Gallery Carousel</a> use karo.
   </div>
 
   <input type="search" class="search-bar" id="trend-search" placeholder="Search by title..." autocomplete="off">

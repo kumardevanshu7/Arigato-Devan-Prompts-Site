@@ -454,6 +454,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
     <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
+    <a href="gallery_carousel_manager.php" class="d-link"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
     <div class="d-sec">Blog</div>
     <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
     <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
@@ -501,6 +502,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
+    <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>

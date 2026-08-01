@@ -4,6 +4,38 @@
  */
 
 function gallery_banner_slides(): array {
+    global $pdo;
+
+    // Prefer admin-managed carousel rows when the table exists and has active slides.
+    if (isset($pdo) && $pdo instanceof PDO) {
+        try {
+            $rows = $pdo->query(
+                "SELECT image_path, alt_text FROM gallery_carousel WHERE is_active = 1 ORDER BY sort_order ASC, id ASC"
+            )->fetchAll(PDO::FETCH_ASSOC);
+            $slides = [];
+            foreach ($rows as $row) {
+                $path = trim((string) ($row['image_path'] ?? ''));
+                if ($path === '' || !is_file(__DIR__ . '/../' . ltrim($path, '/'))) {
+                    continue;
+                }
+                $alt = trim((string) ($row['alt_text'] ?? ''));
+                $slides[] = [
+                    'image'    => $path,
+                    'alt'      => $alt !== '' ? $alt : 'Gallery banner',
+                    'title'    => $alt !== '' ? $alt : 'Featured Prompt',
+                    'subtitle' => 'Discover viral AI prompts',
+                    'cta'      => 'Explore Gallery',
+                    'href'     => '#card-stack',
+                ];
+            }
+            if (!empty($slides)) {
+                return $slides;
+            }
+        } catch (Throwable $e) {
+            // Fall through to legacy folder scan.
+        }
+    }
+
     $dir = __DIR__ . '/../banner';
     $slides = [];
     $exts = ['webp', 'jpg', 'jpeg', 'png'];
@@ -36,7 +68,7 @@ function gallery_banner_slides(): array {
     if (!empty($slides)) {
         return $slides;
     }
-    // Placeholders until admin adds images to /banner/
+    // Placeholders until admin adds images
     return [
         [
             'image' => '',

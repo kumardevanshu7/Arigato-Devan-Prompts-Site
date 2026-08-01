@@ -11,7 +11,7 @@ if (empty($gal_banner_slides)) {
             <?php foreach ($gal_banner_slides as $i => $slide): ?>
             <div class="gal-banner-slide">
                 <?php if (!empty($slide['image'])): ?>
-                    <img src="<?= htmlspecialchars($slide['image']) ?>" alt="<?= htmlspecialchars($slide['title'] ?? 'Banner') ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>">
+                    <img src="<?= htmlspecialchars($slide['image']) ?>" alt="<?= htmlspecialchars($slide['alt'] ?? ($slide['title'] ?? 'Gallery banner')) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>">
                 <?php else: ?>
                     <div class="gal-banner-ph" style="background:<?= htmlspecialchars($slide['gradient'] ?? 'linear-gradient(135deg,#2F4156,#567C8D)') ?>;"></div>
                 <?php endif; ?>
