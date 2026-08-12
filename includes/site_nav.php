@@ -44,7 +44,7 @@ if (!isset($nav_counts) && isset($pdo)) {
     }
 }
 $nav_counts = $nav_counts ?? [];
-$nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
+$nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
 ?>
 <div id="navStickyWrap">
     <header class="store-header">
@@ -52,8 +52,8 @@ $nav_brand_words = $nav_brand_words ?? ['prompt', 'devan'];
 
             <a href="<?= $nb('index.php') ?>" class="store-logo-img" title="Home">
                 <img src="<?= $nb('toplogo/logo01.webp') ?>" alt="Arigato Devan Prompts Logo" height="36">
-                <span class="store-logo-text" id="brandTypewriter" aria-label="arigato prompt">
-                    <span class="logo-prefix">arigato</span><span class="logo-dot">.</span><span class="logo-suffix" id="brandSuffix">prompt</span><span class="logo-cursor" aria-hidden="true">|</span>
+                <span class="store-logo-text" id="brandTypewriter" aria-label="arigato devan">
+                    <span class="logo-prefix">arigato</span><span class="logo-dot">.</span><span class="logo-suffix" id="brandSuffix">devan</span><span class="logo-cursor" aria-hidden="true">|</span>
                 </span>
             </a>
 

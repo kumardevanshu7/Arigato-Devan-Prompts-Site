@@ -224,32 +224,6 @@ $badges = [
                             </label>
                             <?php endforeach; ?>
                         </div>
-
-                        <div class="avatar-divider avatar-divider--real">Real Avatars</div>
-
-                        <div class="avatar-divider">Male</div>
-                        <div class="avatar-grid avatar-grid--real">
-                            <?php foreach ($real_male_avatars as $av): ?>
-                            <label class="avatar-option">
-                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
-                                <div class="avatar-img-wrap avatar-img-wrap--real">
-                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Real avatar">
-                                </div>
-                            </label>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <div class="avatar-divider" style="margin-top:16px;">Female</div>
-                        <div class="avatar-grid avatar-grid--real">
-                            <?php foreach ($real_female_avatars as $av): ?>
-                            <label class="avatar-option">
-                                <input type="radio" name="avatar" value="<?= htmlspecialchars($av) ?>" <?= $cur_avatar === $av ? "checked" : "" ?>>
-                                <div class="avatar-img-wrap avatar-img-wrap--real">
-                                    <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="Real avatar">
-                                </div>
-                            </label>
-                            <?php endforeach; ?>
-                        </div>
                     </div>
                 </div>
 

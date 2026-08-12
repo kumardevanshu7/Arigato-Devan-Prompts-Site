@@ -38,7 +38,7 @@ $blob_colors = ['#FFE4EC', '#F5D0E0', '#FFD6E8', '#F0E6F5', '#FFF0F5', '#FAD4E4'
 <body class="page-store theme-nogoda page-heroines">
 
 <?php
-$nav_brand_words = ['prompt', 'devan', 'heroines'];
+$nav_brand_words = ['devan', 'prompt', 'myra', 'heroines'];
 $nav_active = 'heroines';
 include 'includes/site_nav.php';
 ?>

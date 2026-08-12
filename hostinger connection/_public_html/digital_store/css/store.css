@@ -222,7 +222,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.03em;
-  line-height: 1;
+  line-height: 1.3;
+  padding-bottom: 3px;
 }
 
 .logo-dot {
