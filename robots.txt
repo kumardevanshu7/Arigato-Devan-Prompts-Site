@@ -1,85 +1,87 @@
 User-agent: *
 Allow: /
 
-# Block admin & private pages from Google
+# Admin & Management Dashboards
 Disallow: /dashboard.php
 Disallow: /analytics.php
+Disallow: /analytics_report.php
+Disallow: /user_management.php
+Disallow: /trending_settings.php
 Disallow: /manage_prompts.php
-Disallow: /upload_prompt.php
 Disallow: /upload.php
+Disallow: /upload_prompt.php
+Disallow: /upload_editor_image.php
 Disallow: /edit_prompt.php
 Disallow: /delete_prompt.php
+Disallow: /already_uploaded.php
+Disallow: /all_codes.php
+Disallow: /generate_sync_report.php
+Disallow: /webp_updater.php
+Disallow: /steps_guide.php
+Disallow: /about_backup.php
+
+# Blog & Content Management
 Disallow: /blog_admin.php
 Disallow: /blog_create.php
 Disallow: /blog_edit.php
 Disallow: /blog_delete.php
 Disallow: /blog_toggle.php
-Disallow: /blog_comment.php
+Disallow: /curated_admin.php
+Disallow: /curated_manage.php
+Disallow: /curated_links.php
 Disallow: /prompt_links.php
 Disallow: /potd_manager.php
 Disallow: /potd_toggle.php
 Disallow: /potd_delete_custom.php
-Disallow: /trending_settings.php
-Disallow: /user_management.php
-Disallow: /feedback.php
+Disallow: /gallery_carousel_manager.php
+Disallow: /happy_users_admin.php
 Disallow: /feedback_admin.php
-Disallow: /digital_store/admin.php
-Disallow: /digital_store/webhook.php
-Disallow: /digital_store/init_purchase.php
-Disallow: /digital_store/store_auth.php
-Disallow: /digital_store/test_webhook.php
-Disallow: /onboarding.php
-Disallow: /saved_prompts.php
+
+# User Account & Authentication
 Disallow: /profile.php
-Disallow: /firebase_auth.php
-Disallow: /unlock.php
-Disallow: /like.php
-Disallow: /save_prompt.php
-Disallow: /get_prompt.php
+Disallow: /saved_prompts.php
+Disallow: /onboarding.php
+Disallow: /signup.php
 Disallow: /user_data.php
+Disallow: /firebase_auth.php
+Disallow: /secret_code.php
+
+# Backend APIs, Actions & Endpoints
 Disallow: /db.php
 Disallow: /gtag.php
-Disallow: /react.php
+Disallow: /activity_ping.php
 Disallow: /track.php
 Disallow: /track_action.php
-Disallow: /activity_ping.php
 Disallow: /send_contact.php
-Disallow: /feature_prompt.php
+Disallow: /feedback.php
 Disallow: /fcm_init.php
 Disallow: /fcm_notify.php
 Disallow: /fcm_subscribe.php
-Disallow: /slug_helper.php
-Disallow: /surprise_me.php
-Disallow: /webp_updater.php
-Disallow: /card.php
-Disallow: /signup.php
-Disallow: /uploads/
-Disallow: /profiledp/
-Disallow: /toplogo/
-Disallow: /private/
-Disallow: /gallery.php?page=
-Disallow: /curated_admin.php
-Disallow: /curated_manage.php
-Disallow: /curated_links.php
-Disallow: /curated_prompt.php
-Disallow: /not_mine_admin.php
-Disallow: /not_mine_manage.php
-Disallow: /not_mine_links.php
-# Public pages stay crawlable: /curated_ai_prompts.php and /curated-ai-prompts/{slug}
-Disallow: /heroine_admin.php
-Disallow: /heroine_orbit_editor.php
-Disallow: /happy_users_admin.php
-Disallow: /generate_sync_report.php
+Disallow: /like.php
 Disallow: /blog_like.php
-Disallow: /my_heroines.php
-Disallow: /about_backup.php
-Disallow: /steps_guide.php
-Disallow: /digital_store/store_nav.php
-Disallow: /digital_store/store_footer_links.php
-Disallow: /digital_store/store_firebase_js.php
-Disallow: /digital_store/my_purchases.php
-Disallow: /digital_store/view_prompt.php
-Disallow: /digital_store/success.php
+Disallow: /blog_comment.php
+Disallow: /react.php
+Disallow: /save_prompt.php
+Disallow: /get_prompt.php
+Disallow: /feature_prompt.php
+Disallow: /unlock.php
+Disallow: /surprise_me.php
+Disallow: /card.php
+Disallow: /slug_helper.php
+
+# Sensitive & Private Directories
+Disallow: /private/
+Disallow: /Arigato Hidden/
+
+# Prevent Duplicate Pagination Indexing
+Disallow: /gallery.php?page=
+
+# Explicitly Allow AdSense & Google Crawlers
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
 
 # Sitemap location
 Sitemap: https://arigatodevan.com/sitemap.php
