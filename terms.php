@@ -35,7 +35,7 @@
         </div>
 
         <h2>1. Who We Are &amp; What This Site Does</h2>
-        <p><strong>Arigato Devan</strong> ("we", "us", "our", "the Service") is a website at <strong>arigatodevan.com</strong> that publishes ready-to-copy AI prompts for creating couple-themed photos and reels using third-party AI image tools such as <strong>Google Gemini</strong> and <strong>ChatGPT</strong>. We provide a searchable gallery of prompts, a "Curated AI Prompts" section of carefully refined and enhanced prompts inspired by various creative sources, a Prompt of the Day feature, a blog with prompting guides, and an optional digital store for premium prompt packs. These Terms &amp; Conditions ("Terms") govern your use of the Service, whether or not you create an account.</p>
+        <p><strong>Arigato Devan</strong> ("we", "us", "our", "the Service") is a website at <strong>arigatodevan.com</strong> that publishes ready-to-copy AI prompts for creating couple-themed photos and reels using third-party AI image tools such as <strong>Google Gemini</strong> and <strong>ChatGPT</strong>. We provide a searchable gallery of prompts, a "Curated AI Prompts" section of carefully refined and enhanced prompts inspired by various creative sources, a Prompt of the Day feature, and a blog with prompting guides. These Terms &amp; Conditions ("Terms") govern your use of the Service, whether or not you create an account.</p>
 
         <h2>2. Acceptance of Terms</h2>
         <p>By accessing or using Arigato Devan, you confirm that you have read, understood, and agree to these Terms and our <a href="privacy.php">Privacy Policy</a>. If you do not agree with any part of these Terms, please stop using the Service immediately.</p>
@@ -46,18 +46,15 @@
         <h2>4. How the Service Works</h2>
         <ul>
             <li><strong>Browsing without an account:</strong> Anyone can view and copy prompts from the public gallery for free — no login is required to copy a prompt.</li>
-            <li><strong>Accounts:</strong> Signing in with <strong>Google (Firebase Authentication)</strong> lets you save prompts permanently, unlock content with fewer taps, purchase premium prompt packs, and comment on blog posts.</li>
+            <li><strong>Accounts:</strong> Signing in with <strong>Google (Firebase Authentication)</strong> lets you save prompts permanently, unlock content with fewer taps, and comment on blog posts.</li>
             <li><strong>Unlock system:</strong> Some prompts require an interaction ("tap") count or an unlock code before the full prompt text is revealed. Unlock thresholds may differ for logged-in and logged-out visitors and may change at our discretion without prior notice.</li>
             <li><strong>Unlock codes:</strong> Codes are distributed only through our official channels (Instagram, on-site giveaways, community events). Selling, trading, or publicly redistributing unlock codes without our written permission is not allowed, and we may revoke access for accounts found misusing codes.</li>
-            <li><strong>Premium prompts / digital store:</strong> Certain prompt packs or digital products may be offered for a one-time payment, listed in Indian Rupees (₹ INR). All sales are for a limited, non-exclusive licence to use the content as described in Section 5 — not a transfer of ownership.</li>
-            <li><strong>Payment processing:</strong> Payments for the digital store are processed securely by our third-party payment partner, <strong>SuperProfile</strong>. We do not collect, handle, or store your card details, UPI ID, or other payment credentials on our own servers — SuperProfile processes the transaction and emails you a receipt directly.</li>
-            <li><strong>Refunds:</strong> Because premium prompt packs are digital content delivered and unlocked instantly upon successful payment, all sales are final and non-refundable once the content has been delivered, except where required by applicable consumer protection law. If you completed a payment but did not receive access to your prompt, contact us with your payment confirmation and we will resolve it.</li>
         </ul>
 
         <h2>5. Licence to Use Prompts &amp; Content</h2>
         <p>Subject to these Terms, we grant you a limited, non-exclusive, non-transferable licence to use prompts obtained from Arigato Devan for <strong>personal and commercial purposes</strong>, including social media posts, reels, client work, and other creative projects. This licence is subject to the following conditions:</p>
         <ul>
-            <li>You may use unlocked or purchased prompts to generate images or videos for your own use, including monetised content.</li>
+            <li>You may use unlocked prompts to generate images or videos for your own use, including monetised content.</li>
             <li>You may <strong>not</strong> resell, redistribute, republish, or repackage our prompt text itself (as opposed to the images you generate from it) as a standalone product, course, or prompt pack without our prior written permission.</li>
             <li>You may <strong>not</strong> claim authorship or ownership of the original prompt wording, nor represent an unmodified copy of it as your own creative work.</li>
             <li>Images or videos you generate using our prompts belong to you, subject to the terms of service of whichever AI platform (Gemini, ChatGPT, or otherwise) you used to generate them.</li>
