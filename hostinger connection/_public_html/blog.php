@@ -31,7 +31,7 @@ if (isset($_SESSION["user_id"])) {
 }
 
 // Reactions
-$reaction_counts = ['heart'=>0,'fire'=>0,'wow'=>0];
+$reaction_counts = ['heart'=>0,'fire'=>0,'wow'=>0,'clap'=>0,'laugh'=>0];
 $my_reactions = [];
 try {
     $rk = isset($_SESSION['user_id']) ? 'u'.$_SESSION['user_id'] : 'ip'.md5($_SERVER['REMOTE_ADDR']);
@@ -53,6 +53,22 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 // Calculate reading time (200 words per minute average)
 $word_count = str_word_count(strip_tags($blog["content"] ?? ""));
 $read_time = max(1, (int)ceil($word_count / 200));
+$tags_list = array_values(array_filter(array_map('trim', explode(',', (string) ($blog['tags'] ?? '')))));
+$author_av = !empty($blog['author_avatar'])
+    ? $blog['author_avatar']
+    : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($blog['author_name'] ?? 'Admin');
+$cover_portrait = !empty($blog['image_path']) ? $blog['image_path'] : '';
+$cover_landscape = !empty($blog['image_path_landscape']) ? $blog['image_path_landscape'] : '';
+$has_cover = ($cover_portrait !== '' || $cover_landscape !== '');
+$blog_content_en = $blog['content'] ?? '';
+$blog_content_hi = $blog['content_hindi'] ?? '';
+foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
+    if ($cover_src === '') continue;
+    $hero_base = preg_quote(basename($cover_src), '/');
+    $cover_pat = '/<img[^>]+src=["\'][^"\']*' . $hero_base . '["\'][^>]*>/i';
+    $blog_content_en = preg_replace($cover_pat, '', $blog_content_en, 1);
+    $blog_content_hi = preg_replace($cover_pat, '', $blog_content_hi, 1);
+}
 ?><!DOCTYPE html>
 <html lang="en" class="theme-nogoda">
 <head>
@@ -63,6 +79,7 @@ $read_time = max(1, (int)ceil($word_count / 200));
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260820k">
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
 ) ?>">
@@ -72,8 +89,9 @@ $read_time = max(1, (int)ceil($word_count / 200));
 <?php
     $blog_url     = 'https://arigatodevan.com/blog.php?slug=' . urlencode($blog['slug']);
     $_page_canonical = $blog_url;
-    $blog_og_img  = !empty($blog['image_path'])
-                    ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/')
+    $og_file = $cover_landscape !== '' ? $cover_landscape : ($cover_portrait !== '' ? $cover_portrait : '');
+    $blog_og_img  = $og_file
+                    ? 'https://arigatodevan.com/' . ltrim($og_file, '/')
                     : 'https://arigatodevan.com/landingpics/lan9.webp';
     $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
     $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' � Arigato Devan');
@@ -929,7 +947,7 @@ html.blog-read-medium .blog-content { font-size: 1.28rem; line-height: 1.85; }
 .blog-reactions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     padding: 24px 0 10px;
     flex-wrap: wrap;
 }
@@ -955,11 +973,34 @@ html.blog-read-medium .blog-content { font-size: 1.28rem; line-height: 1.85; }
     border-color: #cbd5e1;
 }
 .react-btn.reacted {
-    background: linear-gradient(135deg, #06b6d4 0%, #0db8a6 100%); /* Premium gradient button overlay inspired by Pic 2 */
     color: #ffffff;
     border-color: transparent;
-    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
 }
+.react-btn[data-reaction="heart"].reacted {
+    background: #ef4444;
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.28);
+}
+.react-btn[data-reaction="fire"].reacted {
+    background: #f97316;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.28);
+}
+.react-btn[data-reaction="wow"].reacted {
+    background: #eab308;
+    box-shadow: 0 8px 18px rgba(234, 179, 8, 0.28);
+}
+.react-btn[data-reaction="clap"].reacted {
+    background: #8b5cf6;
+    box-shadow: 0 8px 18px rgba(139, 92, 246, 0.28);
+}
+.react-btn[data-reaction="laugh"].reacted {
+    background: #22c55e;
+    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.28);
+}
+.react-btn[data-reaction="heart"] .r-emoji i { color: #ef4444; }
+.react-btn[data-reaction="fire"] .r-emoji i { color: #f97316; }
+.react-btn[data-reaction="wow"] .r-emoji i { color: #ca8a04; }
+.react-btn[data-reaction="clap"] .r-emoji i { color: #8b5cf6; }
+.react-btn[data-reaction="laugh"] .r-emoji i { color: #22c55e; }
 .react-btn.reacted .r-count {
     color: #ffffff;
 }
@@ -1053,12 +1094,19 @@ footer .footer-links a:hover {
     animation: wowBounce 0.6s infinite;
     color: #eab308;
 }
+.react-btn[data-reaction="clap"]:hover .r-emoji i, .react-btn[data-reaction="clap"].reacted .r-emoji i {
+    animation: wowBounce 0.5s infinite;
+    color: #8b5cf6;
+}
+.react-btn[data-reaction="laugh"]:hover .r-emoji i, .react-btn[data-reaction="laugh"].reacted .r-emoji i {
+    animation: heartBeat 1.1s infinite;
+    color: #22c55e;
+}
 .react-btn.reacted .r-emoji i {
     color: #ffffff !important;
 }
 .r-emoji i {
     transition: color 0.2s;
-    color: #94a3b8;
 }
 
 /* Language Toggle UI */
@@ -1227,6 +1275,7 @@ footer .footer-links a:hover {
     border-radius: 999px;
     padding: 3px;
     gap: 2px;
+    width: auto;
 }
 .read-size-btn {
     border: 0;
@@ -1241,90 +1290,135 @@ footer .footer-links a:hover {
 }
 
 @media (max-width: 720px) {
+    html { -webkit-text-size-adjust: 100%; }
     body.page-store.theme-nogoda { background: #fff !important; }
-    .aurora-bg, .back-glow { display: none !important; }
+    .aurora-bg,
+    .back-glow,
+    .scroll-bg-container { display: none !important; }
     .blog-detail-wrap {
         max-width: none !important;
-        padding: 72px 0 48px !important;
+        padding: 70px 0 40px !important;
     }
-    .blog-back-link { margin: 0 20px 10px; }
+    .blog-back-link {
+        margin: 0 18px 6px;
+        font-size: 0.78rem;
+        min-height: 36px;
+    }
     .blog-detail-hero-img {
         border-radius: 0 !important;
         border: 0 !important;
         box-shadow: none !important;
-        margin: 0 0 4px !important;
-        max-height: 280px !important;
+        margin: 0 0 8px !important;
+        max-height: 220px !important;
+        width: 100%;
+        object-fit: cover;
     }
     .blog-paper {
         background: #fff !important;
-        padding: 8px 20px 36px !important;
+        padding: 4px 18px 40px !important;
+        padding-left: max(18px, env(safe-area-inset-left)) !important;
+        padding-right: max(18px, env(safe-area-inset-right)) !important;
         border: 0 !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         margin: 0 !important;
     }
     h1.blog-detail-title {
-        font-size: 1.55rem !important;
-        line-height: 1.22 !important;
+        font-size: 1.48rem !important;
+        line-height: 1.25 !important;
         font-weight: 800 !important;
-        letter-spacing: -0.035em !important;
-        margin: 12px 0 16px !important;
+        letter-spacing: -0.03em !important;
+        margin: 8px 0 14px !important;
+        overflow-wrap: anywhere;
     }
     .blog-detail-meta {
         display: grid !important;
-        grid-template-columns: auto 1fr;
-        grid-template-areas:
-            "avatar byline"
-            "size size";
-        gap: 10px 12px !important;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas: "avatar byline size";
+        gap: 10px 10px !important;
         align-items: center !important;
-        margin: 0 0 18px !important;
-        padding-bottom: 16px !important;
+        margin: 0 0 16px !important;
+        padding-bottom: 14px !important;
         border-bottom: 1px solid #eef2f6;
         flex-wrap: unset !important;
     }
     .blog-author-avatar {
         grid-area: avatar;
-        width: 40px !important;
-        height: 40px !important;
+        width: 36px !important;
+        height: 36px !important;
         border: 0 !important;
     }
     .blog-byline { grid-area: byline; }
-    .blog-author-name { font-size: 0.92rem !important; font-weight: 700 !important; }
-    .blog-detail-date { font-size: 0.78rem !important; font-weight: 500 !important; margin-top: 1px !important; color: #64748b !important; }
+    .blog-author-name {
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+    }
+    .blog-detail-date {
+        font-size: 0.72rem !important;
+        font-weight: 500 !important;
+        margin-top: 2px !important;
+        color: #64748b !important;
+        line-height: 1.3 !important;
+    }
     .read-size-bar {
         grid-area: size;
         margin: 0 !important;
-        width: 100%;
-        justify-content: flex-start;
+        width: auto !important;
+        max-width: none;
+        justify-content: flex-end;
+        padding: 2px !important;
+        background: #f1f5f9 !important;
     }
-    .blog-meta-pills { margin: 0 0 16px !important; gap: 6px !important; }
+    .read-size-btn {
+        min-width: 28px !important;
+        min-height: 32px !important;
+        padding: 4px 7px !important;
+        font-size: 0.68rem !important;
+        border-radius: 999px;
+    }
+    .blog-meta-pills { margin: 0 0 14px !important; gap: 6px !important; }
     .meta-pill { padding: 4px 10px !important; font-size: 0.68rem !important; }
     .blog-content {
-        font-size: 1.05rem !important;
-        line-height: 1.75 !important;
+        font-size: 1.0625rem !important;
+        line-height: 1.7 !important;
         color: #1e293b !important;
+        overflow-wrap: break-word;
     }
-    .blog-content p { margin-bottom: 1.05em !important; }
-    .blog-content h2 { font-size: 1.2rem !important; margin: 1.4em 0 0.55em !important; border: 0 !important; padding: 0 !important; }
-    .blog-content h3 { font-size: 1.08rem !important; margin: 1.2em 0 0.4em !important; }
-    .blog-content ul, .blog-content ol { padding-left: 1.15em !important; margin-bottom: 1em !important; }
-    .blog-content li { margin-bottom: 0.4em !important; }
+    .blog-content p { margin-bottom: 1em !important; }
+    .blog-content h2 { font-size: 1.18rem !important; margin: 1.35em 0 0.5em !important; border: 0 !important; padding: 0 !important; }
+    .blog-content h3 { font-size: 1.05rem !important; margin: 1.15em 0 0.4em !important; }
+    .blog-content ul, .blog-content ol { padding-left: 1.2em !important; margin-bottom: 1em !important; }
+    .blog-content li { margin-bottom: 0.35em !important; }
+    .blog-content img { border-radius: 10px !important; margin: 12px 0 !important; }
     .blog-content blockquote {
-        margin: 1.2em 0 !important;
-        padding: 4px 0 4px 14px !important;
-        font-size: 1.02rem !important;
+        margin: 1.15em 0 !important;
+        padding: 2px 0 2px 12px !important;
+        font-size: 1rem !important;
         background: transparent !important;
         border-radius: 0 !important;
         border-left: 3px solid #c4b5fd !important;
         color: #475569 !important;
     }
-    html.blog-read-little .blog-content { font-size: 1.14rem !important; line-height: 1.8 !important; }
-    html.blog-read-medium .blog-content { font-size: 1.24rem !important; line-height: 1.82 !important; }
+    .blog-table-wrap {
+        margin: 14px -6px !important;
+        border-radius: 10px !important;
+    }
+    .blog-reactions { gap: 8px !important; margin: 22px 0 12px !important; }
+    .blog-action-bar {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 8px 0 20px !important;
+    }
+    .comments-section { margin-top: 8px !important; }
+    .comments-section h3 { font-size: 1.05rem !important; }
+    .comment-form textarea { min-height: 88px; }
+    html.blog-read-little .blog-content { font-size: 1.15rem !important; line-height: 1.75 !important; }
+    html.blog-read-medium .blog-content { font-size: 1.26rem !important; line-height: 1.8 !important; }
 }
 </style>
 </head>
-<body class="page-store theme-nogoda">
+<body class="page-store theme-nogoda bm-article">
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -1351,122 +1445,143 @@ footer .footer-links a:hover {
     </div>
 <?php $nav_active = 'blogs'; include 'includes/site_nav.php'; ?>
 
-<div class="blog-detail-wrap">
-  <a href="blogs.php" class="blog-back-link"><i class="fa-solid fa-arrow-left"></i> Blogs</a>
-
-  <!-- Hero image (Fully responsive, rounded with outline border) -->
-  <?php if ($blog["image_path"]): 
-      $hero_ratio = ($blog["image_ratio"] ?? "16:9") === "9:16" ? "9/16" : "16/9";
-  ?>
-  <img loading="lazy" src="<?= htmlspecialchars($blog["image_path"]) ?>" class="blog-detail-hero-img" alt="<?= htmlspecialchars($blog["title"]) ?>" style="aspect-ratio: <?= $hero_ratio ?>;">
-  <?php endif; ?>
-
-  <div class="blog-paper">
-    <h1 class="blog-detail-title"><?= htmlspecialchars($blog["title"]) ?></h1>
-
-    <div class="blog-detail-meta">
-      <img loading="lazy" src="<?= htmlspecialchars(
-          !empty($blog["author_avatar"])
-              ? $blog["author_avatar"]
-              : "https://api.dicebear.com/7.x/avataaars/svg?seed=" . urlencode($blog["author_name"] ?? "Admin"),
-      ) ?>" class="blog-author-avatar" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($blog["author_name"] ?? "Admin") ?>'">
-      <div class="blog-byline">
-        <div class="blog-author-name"><?= htmlspecialchars($blog["author_name"] ?? "Admin") ?></div>
-        <div class="blog-detail-date"><?= date("M j, Y", strtotime($blog["created_at"])) ?> · <?= $read_time ?> min read</div>
+<div class="ba-page">
+  <div class="ba-hero<?= $has_cover ? ' has-photo' : '' ?>">
+    <?php if ($has_cover): ?>
+    <div class="ba-gallery is-single">
+      <div class="ba-gallery-main">
+        <picture class="ba-cover-pic">
+          <?php if ($cover_landscape !== ''): ?>
+          <source media="(min-width: 721px)" srcset="<?= htmlspecialchars($cover_landscape) ?>">
+          <?php endif; ?>
+          <img loading="lazy" src="<?= htmlspecialchars($cover_portrait !== '' ? $cover_portrait : $cover_landscape) ?>" alt="<?= htmlspecialchars($blog["title"]) ?>">
+        </picture>
       </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="ba-hero-copy">
+      <a href="blogs.php" class="ba-kicker"><i class="fa-solid fa-arrow-left"></i> Blogs</a>
+      <div class="ba-head">
+        <h1><?= htmlspecialchars($blog["title"]) ?></h1>
+        <div class="ba-tools ba-tools-desk">
+          <div class="read-size-bar" role="group" aria-label="Reading size">
+            <button type="button" class="read-size-btn is-on" data-size="default" title="Default size">A</button>
+            <button type="button" class="read-size-btn" data-size="little" title="Larger">A+</button>
+            <button type="button" class="read-size-btn" data-size="medium" title="Largest">A++</button>
+          </div>
+        </div>
+      </div>
+      <div class="ba-byline">
+        <img loading="lazy" src="<?= htmlspecialchars($author_av) ?>" alt="">
+        <div>
+          <strong><?= htmlspecialchars($blog["author_name"] ?? "Admin") ?></strong>
+          <div><?= date("M j, Y", strtotime($blog["created_at"])) ?> · <?= $read_time ?> min read</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ba-sheet">
+    <div class="ba-share">
       <div class="read-size-bar" role="group" aria-label="Reading size">
         <button type="button" class="read-size-btn is-on" data-size="default" title="Default size">A</button>
         <button type="button" class="read-size-btn" data-size="little" title="Larger">A+</button>
         <button type="button" class="read-size-btn" data-size="medium" title="Largest">A++</button>
       </div>
+      <span class="ba-share-comments"><?= count($comments) ?> comments</span>
     </div>
 
-    <?php if ($blog["tags"]): ?>
-    <div class="blog-meta-pills">
-        <?php foreach (array_filter(array_map("trim", explode(",", $blog["tags"]))) as $tag): ?>
-          <span class="meta-pill tag-pill"><?= htmlspecialchars($tag) ?></span>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
-    <?php if(!empty($blog["content_hindi"])): ?>
-    <!-- Language Toggle -->
-    <div class="meta-flex-row" style="margin-top:24px;margin-bottom:20px;">
-      <div class="lang-toggle-wrapper" id="lang-toggle">
-        <button class="lang-btn active" id="btn-en" onclick="switchLang('en')"><i class="fa-solid fa-language"></i> English</button>
-        <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')"><i class="fa-solid fa-language"></i> Hindi / Hinglish</button>
+  <div class="ba-layout">
+    <div>
+      <?php if(!empty($blog["content_hindi"])): ?>
+      <div class="meta-flex-row" style="margin-bottom:20px;">
+        <div class="lang-toggle-wrapper" id="lang-toggle">
+          <button class="lang-btn active" id="btn-en" onclick="switchLang('en')"><i class="fa-solid fa-language"></i> English</button>
+          <button class="lang-btn" id="btn-hi" onclick="switchLang('hi')"><i class="fa-solid fa-language"></i> Hindi / Hinglish</button>
+        </div>
       </div>
+      <?php endif; ?>
+      <div class="blog-content ba-content" id="blog-content-en"><?= $blog_content_en ?></div>
+      <?php if(!empty($blog["content_hindi"])): ?>
+      <div class="blog-content ba-content" id="blog-content-hi" style="display:none;"><?= $blog_content_hi ?></div>
+      <?php endif; ?>
     </div>
-    <?php endif; ?>
 
-    <div class="blog-content" id="blog-content-en"><?= $blog["content"] ?></div>
-    <?php if(!empty($blog["content_hindi"])): ?>
-    <div class="blog-content" id="blog-content-hi" style="display:none;"><?= $blog["content_hindi"] ?></div>
-    <?php endif; ?>
-
-  <!-- Reactions -->
-  <div class="blog-reactions" id="blog-reactions">
-    <?php foreach (['heart'=>'<i class="fa-solid fa-heart"></i>','fire'=>'<i class="fa-solid fa-fire"></i>','wow'=>'<i class="fa-solid fa-face-surprise"></i>'] as $rtype=>$remoji): ?>
-    <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
-      <span class="r-emoji"><?= $remoji ?></span>
-      <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
-    </button>
-    <?php endforeach; ?>
+    <aside class="ba-side">
+      <div class="ba-panel">
+        <h3>Highlights</h3>
+        <ul class="ba-hl">
+          <li><i class="fa-solid fa-check"></i> <?= $read_time ?> minute read</li>
+          <li><i class="fa-solid fa-check"></i> <?= (int)($blog["view_count"] ?? 0) ?> views</li>
+          <?php foreach (array_slice($tags_list, 0, 5) as $tag): ?>
+          <li><i class="fa-solid fa-check"></i> <?= htmlspecialchars($tag) ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+      <div class="ba-panel">
+        <div class="ba-author">
+          <img loading="lazy" src="<?= htmlspecialchars($author_av) ?>" alt="">
+          <div>
+            <strong><?= htmlspecialchars($blog["author_name"] ?? "Admin") ?></strong>
+            <span>Writer</span>
+          </div>
+        </div>
+        <div class="ba-stats">
+          <div>
+            <b><?= (int) $blog["likes_count"] ?></b>
+            <span>Likes</span>
+          </div>
+          <div>
+            <b><?= count($comments) ?></b>
+            <span>Comments</span>
+          </div>
+        </div>
+      </div>
+      <div class="ba-panel">
+        <div class="blog-reactions" id="blog-reactions">
+          <?php foreach (['heart'=>'<i class="fa-solid fa-heart"></i>','fire'=>'<i class="fa-solid fa-fire"></i>','wow'=>'<i class="fa-solid fa-face-surprise"></i>','clap'=>'<i class="fa-solid fa-hands-clapping"></i>','laugh'=>'<i class="fa-solid fa-face-laugh-beam"></i>'] as $rtype=>$remoji): ?>
+          <button class="react-btn <?= in_array($rtype,$my_reactions)?'reacted':'' ?>" data-reaction="<?= $rtype ?>" data-blog="<?= $blog['id'] ?>">
+            <span class="r-emoji"><?= $remoji ?></span>
+            <span class="r-count" id="rc-<?= $rtype ?>"><?= $reaction_counts[$rtype] ?></span>
+          </button>
+          <?php endforeach; ?>
+        </div>
+        <button class="blog-like-btn <?= $user_liked ? "liked" : "" ?>" id="blog-like-btn" data-blog-id="<?= $blog["id"] ?>" style="margin-top:12px;width:100%;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="<?= $user_liked ? "#fff" : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
+        </button>
+      </div>
+    </aside>
   </div>
 
-  <!-- Like + action bar -->
-  <div class="blog-action-bar">
-    <button class="blog-like-btn <?= $user_liked
-        ? "liked"
-        : "" ?>" id="blog-like-btn" data-blog-id="<?= $blog["id"] ?>">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="<?= $user_liked
-          ? "#fff"
-          : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
-    </button>
-    <a href="blogs.php" style="font-weight:700;color:#888;font-size:.9rem;text-decoration:none;"><i class="fa-solid fa-arrow-left"></i>� All Blogs</a>
-  </div>
-
-  <!-- Comments -->
-  <div class="comments-section">
-    <h3><i class="fa-solid fa-comment"></i> Comments (<?= count(
-        $comments,
-    ) ?>)</h3>
-
+  <div class="ba-comments comments-section">
+    <h3>Comments (<?= count($comments) ?>)</h3>
     <?php if (count($comments) > 0): ?>
     <div id="comments-list">
       <?php foreach ($comments as $c): ?>
       <div class="comment-item">
         <?= renderAvatar($c["profile_image"] ?? "", "comment-avatar", "") ?>
         <div class="comment-body">
-          <div class="comment-name"><?= htmlspecialchars(
-              $c["username"] ?? "User",
-          ) ?></div>
-          <div class="comment-text"><?= nl2br(
-              htmlspecialchars($c["comment"]),
-          ) ?></div>
-          <div class="comment-time"><?= date(
-              "d M Y H:i",
-              strtotime($c["created_at"]),
-          ) ?></div>
+          <div class="comment-name"><?= htmlspecialchars($c["username"] ?? "User") ?></div>
+          <div class="comment-text"><?= nl2br(htmlspecialchars($c["comment"])) ?></div>
+          <div class="comment-time"><?= date("d M Y H:i", strtotime($c["created_at"])) ?></div>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
     <?php else: ?>
-    <p id="no-comments-msg" style="color:#aaa;font-weight:600;margin-bottom:20px;">Be the first to comment! <i class="fa-solid fa-hand-point-down"></i></p>
+    <p id="no-comments-msg" style="color:#aaa;font-weight:600;margin-bottom:20px;">Be the first to comment.</p>
     <?php endif; ?>
-
     <?php if (isset($_SESSION["user_id"])): ?>
     <div class="comment-form">
       <textarea id="comment-input" placeholder="Share your thoughts..."></textarea>
-      <button class="comment-submit" id="comment-submit-btn" data-blog-id="<?= $blog[
-          "id"
-      ] ?>">Post Comment <i class="fa-solid fa-paper-plane"></i></button>
+      <button class="comment-submit" id="comment-submit-btn" data-blog-id="<?= $blog["id"] ?>">Post Comment <i class="fa-solid fa-paper-plane"></i></button>
     </div>
     <?php else: ?>
-    <div class="login-to-comment">Login to leave a comment <i class="fa-solid fa-arrow-right"></i> <a href="login.php">Sign in with Google</a></div>
+    <div class="login-to-comment">Login to leave a comment <a href="login.php">Sign in with Google</a></div>
     <?php endif; ?>
+  </div>
   </div>
 </div>
 

@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 $blog_id  = (int)($_POST['blog_id'] ?? 0);
 $reaction = trim($_POST['reaction'] ?? '');
-$valid    = ['heart', 'fire', 'wow'];
+$valid    = ['heart', 'fire', 'wow', 'clap', 'laugh'];
 
 if (!$blog_id || !in_array($reaction, $valid, true)) {
     echo json_encode(['ok' => false, 'msg' => 'invalid']);
@@ -32,7 +32,7 @@ try {
 
     $counts_stmt = $pdo->prepare("SELECT reaction, COUNT(*) as cnt FROM blog_reactions WHERE blog_id=? GROUP BY reaction");
     $counts_stmt->execute([$blog_id]);
-    $counts = ['heart' => 0, 'fire' => 0, 'wow' => 0];
+    $counts = ['heart' => 0, 'fire' => 0, 'wow' => 0, 'clap' => 0, 'laugh' => 0];
     foreach ($counts_stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $counts[$row['reaction']] = (int)$row['cnt'];
     }

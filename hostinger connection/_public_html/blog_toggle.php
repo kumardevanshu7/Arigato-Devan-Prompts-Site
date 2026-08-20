@@ -5,10 +5,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') { header("Loc
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     $id     = (int)($_POST['blog_id'] ?? 0);
-    $status = (int)($_POST['status'] ?? 0);
     if ($id) {
-        $pdo->prepare("UPDATE blogs SET is_published=? WHERE id=?")->execute([$status, $id]);
-        $_SESSION['success_msg'] = $status ? '<i class="fa-solid fa-check"></i> Blog published!' : '<i class="fa-solid fa-check"></i> Blog unpublished.';
+        if (isset($_POST['slider'])) {
+            $on = (int)$_POST['slider'] ? 1 : 0;
+            $pdo->prepare("UPDATE blogs SET in_slider=? WHERE id=?")->execute([$on, $id]);
+            $_SESSION['success_msg'] = $on
+                ? '<i class="fa-solid fa-check"></i> Added to homepage slider.'
+                : '<i class="fa-solid fa-check"></i> Removed from homepage slider.';
+        } else {
+            $status = (int)($_POST['status'] ?? 0);
+            $pdo->prepare("UPDATE blogs SET is_published=? WHERE id=?")->execute([$status, $id]);
+            $_SESSION['success_msg'] = $status ? '<i class="fa-solid fa-check"></i> Blog published!' : '<i class="fa-solid fa-check"></i> Blog unpublished.';
+        }
     }
 }
 header("Location: blog_admin.php"); exit();

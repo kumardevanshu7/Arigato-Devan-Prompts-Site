@@ -34,6 +34,34 @@ function sqOne($pdo, $sql, $params = [], $default = 0) {
     }
 }
 
+function nd_type_label(string $type): string {
+    $type = trim($type);
+    if ($type === '') {
+        $type = 'General';
+    }
+    return ucwords(str_replace('_', ' ', $type));
+}
+
+function nd_type_class(string $type): string {
+    $k = strtolower(trim($type));
+    if ($k === '') {
+        $k = 'general';
+    }
+    $map = [
+        'already_uploaded' => 'nd-tag-sky',
+        'insta_viral' => 'nd-tag-pink',
+        'unreleased' => 'nd-tag-amber',
+        'secret' => 'nd-tag-violet',
+        'solo' => 'nd-tag-green',
+        'general' => 'nd-tag-slate',
+    ];
+    if (isset($map[$k])) {
+        return $map[$k];
+    }
+    $palette = ['nd-tag-teal', 'nd-tag-rose', 'nd-tag-indigo', 'nd-tag-orange', 'nd-tag-lime'];
+    return $palette[abs(crc32($k)) % count($palette)];
+}
+
 function fillDailyTrends($pdo, $sql, $days_count = 30) {
     try {
         $stmt = $pdo->prepare($sql);
@@ -104,7 +132,7 @@ $top_blogs = sqAll($pdo, "SELECT id, title, slug, view_count, created_at, tags F
 
 // Power Users List
 $power_users = sqAll($pdo, "
-    SELECT u.id, u.username, u.email, u.profile_image, u.streak_count, u.last_active, u.created_at, COUNT(up.id) as unlock_cnt
+    SELECT u.id, u.username, u.email, u.avatar, u.profile_image, u.streak_count, u.last_active, u.created_at, COUNT(up.id) as unlock_cnt
     FROM users u
     JOIN unlocked_prompts up ON u.id = up.user_id
     GROUP BY u.id
@@ -142,11 +170,13 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard &ndash; Arigato Devan</title>
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -197,6 +227,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             padding: 16px;
             gap: 16px;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
         }
 
         /* ── Left Sidebar (Floating White Card) ── */
@@ -225,8 +258,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             color: var(--nd-text-main);
         }
         .nd-brand-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: #0f172a;
             color: #ffffff;
             border-radius: 10px;
@@ -234,12 +267,22 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             align-items: center;
             justify-content: center;
             font-size: 0.95rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .nd-brand-icon img,
+        .nd-brand-logo {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            display: block;
         }
         .nd-brand-name {
             font-size: 1.15rem;
             font-weight: 800;
             letter-spacing: -0.02em;
         }
+        .nd-nav-short { display: none; }
 
         .nd-nav {
             flex: 1;
@@ -331,9 +374,12 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         .nd-main {
             flex: 1;
             min-width: 0;
+            width: 100%;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            overflow-x: hidden;
         }
 
         /* ── Top App Bar ── */
@@ -357,11 +403,19 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             margin-top: 2px;
         }
 
-        .nd-top-actions {
+        .nd-topbar-lead {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .nd-topbar-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         /* Date Range Selector Pills */
@@ -389,6 +443,16 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         .nd-pill-btn.active {
             background: #0f172a;
             color: #ffffff;
+        }
+        .nd-pill-short { display: none; }
+        .nd-chart-box {
+            height: 280px;
+            position: relative;
+        }
+        .nd-chart-box-sm {
+            height: 180px;
+            position: relative;
+            margin-bottom: 14px;
         }
 
         .nd-icon-btn {
@@ -507,6 +571,14 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             gap: 18px;
         }
 
+        .nd-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            min-width: 0;
+            width: 100%;
+        }
+
         .nd-card {
             background: var(--nd-surface);
             border-radius: var(--nd-radius-lg);
@@ -515,6 +587,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             box-shadow: var(--nd-shadow);
             display: flex;
             flex-direction: column;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .nd-card-head {
@@ -532,6 +607,12 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             display: flex;
             align-items: center;
             gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+        .nd-card-title span {
+            min-width: 0;
+            overflow-wrap: anywhere;
         }
 
         .nd-btn-lime {
@@ -635,7 +716,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         }
         .nd-search-input {
             flex: 1;
-            min-width: 200px;
+            min-width: 0;
+            width: 100%;
             background: #f8fafc;
             border: 1px solid var(--nd-border);
             border-radius: var(--nd-radius-sm);
@@ -651,31 +733,115 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         .nd-select-filter {
-            background: #f8fafc;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+        .nd-dd {
+            position: relative;
+            min-width: 200px;
+        }
+        .nd-dd-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #fff;
             border: 1px solid var(--nd-border);
-            border-radius: var(--nd-radius-sm);
-            padding: 8px 12px;
+            border-radius: 999px;
+            padding: 9px 14px;
             font-family: inherit;
-            font-size: 0.84rem;
-            font-weight: 600;
+            font-size: 0.82rem;
+            font-weight: 700;
             color: var(--nd-text-main);
-            outline: none;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        }
+        .nd-dd-btn i { color: var(--nd-text-muted); font-size: 0.7rem; transition: transform .15s; }
+        .nd-dd.is-open .nd-dd-btn {
+            border-color: #d4f938;
+            box-shadow: 0 0 0 3px rgba(212, 249, 56, .35);
+        }
+        .nd-dd.is-open .nd-dd-btn i { transform: rotate(180deg); }
+        .nd-dd-menu {
+            display: none;
+            position: absolute;
+            z-index: 40;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            min-width: 220px;
+            background: #fff;
+            border: 1px solid var(--nd-border);
+            border-radius: 16px;
+            padding: 6px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, .12);
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .nd-dd.is-open .nd-dd-menu { display: block; }
+        .nd-dd-opt {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--nd-text-sec);
             cursor: pointer;
         }
-        .nd-select-filter:focus {
-            background: #ffffff;
-            border-color: #3b82f6;
+        .nd-dd-opt:hover { background: #f8fafc; color: var(--nd-text-main); }
+        .nd-dd-opt.is-on {
+            background: var(--nd-lime);
+            color: var(--nd-lime-text);
+            font-weight: 800;
         }
+        .nd-dd-count {
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--nd-text-muted);
+            background: #f1f5f9;
+            border-radius: 999px;
+            padding: 1px 7px;
+        }
+        .nd-dd-opt.is-on .nd-dd-count { background: rgba(15,23,42,.08); color: var(--nd-lime-text); }
 
         /* ── Data Tables ── */
         .nd-table-wrap {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
+            margin: 0 -4px;
+            padding-bottom: 4px;
         }
         .nd-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.84rem;
             text-align: left;
+        }
+        .nd-title-clip {
+            font-weight: 700;
+            color: var(--nd-text-main);
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .nd-email {
+            font-size: 0.7rem;
+            color: var(--nd-text-muted);
+            word-break: break-word;
         }
         .nd-table th {
             padding: 12px 14px;
@@ -705,13 +871,26 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
             background: #f1f5f9;
             color: var(--nd-text-sec);
         }
+        .nd-tag-sky { background: #e0f2fe; color: #0369a1; }
+        .nd-tag-pink { background: #fce7f3; color: #be185d; }
+        .nd-tag-amber { background: #fef3c7; color: #b45309; }
+        .nd-tag-violet { background: #ede9fe; color: #6d28d9; }
+        .nd-tag-green { background: #dcfce7; color: #15803d; }
+        .nd-tag-teal { background: #ccfbf1; color: #0f766e; }
+        .nd-tag-rose { background: #ffe4e6; color: #e11d48; }
+        .nd-tag-indigo { background: #e0e7ff; color: #3730a3; }
+        .nd-tag-orange { background: #ffedd5; color: #c2410c; }
+        .nd-tag-lime { background: #ecfccb; color: #3f6212; }
+        .nd-tag-slate { background: #f1f5f9; color: #475569; }
 
         .nd-prompt-thumb {
             width: 38px;
@@ -732,63 +911,329 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             }
         }
 
-        @media (max-width: 860px) {
-            body {
-                flex-direction: column;
+        /* Tablet: icon-only rail */
+        @media (max-width: 1080px) and (min-width: 721px) {
+            body { padding: 12px; gap: 12px; }
+            .nd-sidebar {
+                width: 78px;
+                padding: 18px 10px;
+                align-items: center;
+            }
+            .nd-brand {
+                padding: 0 0 18px;
+                justify-content: center;
+                border-bottom: 1px solid var(--nd-border);
+            }
+            .nd-brand-name,
+            .nd-nav-item span,
+            .nd-user-name,
+            .nd-user-role,
+            .nd-btn-logout span { display: none; }
+            .nd-nav {
+                width: 100%;
+                align-items: stretch;
+            }
+            .nd-nav-item {
+                justify-content: center;
+                padding: 12px 8px;
+                gap: 0;
+            }
+            .nd-sidebar-user {
+                width: 100%;
+                align-items: center;
+            }
+            .nd-user-info { justify-content: center; }
+            .nd-btn-logout {
+                justify-content: center;
                 padding: 10px;
             }
+        }
+
+        /* Phone: sleek stacked layout — no overlap, real breathing room */
+        @media (max-width: 720px) {
+            body {
+                flex-direction: column;
+                padding: 12px;
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+                gap: 14px;
+            }
+            .nd-main { gap: 16px; }
             .nd-sidebar {
                 width: 100%;
                 height: auto;
                 position: static;
+                padding: 16px 14px 14px;
+                gap: 0;
             }
+            .nd-brand {
+                padding: 0 2px 14px;
+                gap: 10px;
+            }
+            .nd-nav {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                flex: none;
+                overflow: visible;
+                padding: 14px 0;
+            }
+            .nd-nav-item {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 6px;
+                padding: 12px 4px 10px;
+                font-size: 0.68rem;
+                font-weight: 700;
+                text-align: center;
+                min-width: 0;
+            }
+            .nd-nav-item i { font-size: 1rem; width: auto; }
+            .nd-nav-full { display: none; }
+            .nd-nav-short {
+                display: block;
+                line-height: 1.2;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .nd-sidebar-user {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding-top: 12px;
+            }
+            .nd-btn-logout {
+                padding: 9px 12px;
+                flex-shrink: 0;
+            }
+            .nd-btn-logout span { display: none; }
             .nd-kpi-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
             }
+            .nd-kpi-card { padding: 16px 14px; }
+            .nd-kpi-val { font-size: 1.45rem; margin-bottom: 4px; }
+            .nd-kpi-header { font-size: 0.68rem; margin-bottom: 10px; }
+            .nd-kpi-sub { font-size: 0.72rem; }
+            .nd-btn-kpi-cta { margin-top: 12px; padding: 8px 12px; }
+            .nd-page-title { font-size: 1.32rem; }
+            .nd-page-subtitle { font-size: 0.78rem; margin-top: 4px; }
+            .nd-topbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .nd-topbar-lead { align-items: flex-start; }
+            .nd-pill-group {
+                width: 100%;
+                display: flex;
+                justify-content: stretch;
+            }
+            .nd-pill-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px 4px;
+                font-size: 0.72rem;
+            }
+            .nd-pill-full { display: none; }
+            .nd-pill-short { display: inline; }
+            .nd-card { padding: 16px 14px; }
+            .nd-card-title { font-size: 0.95rem; align-items: flex-start; }
+            .nd-card-head { margin-bottom: 14px; gap: 10px; }
+            .nd-grid-2,
+            .nd-grid-chart {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .nd-chart-box { height: 210px; }
+            .nd-chart-box-sm { height: 160px; }
+            .nd-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                margin-bottom: 14px;
+            }
+            .nd-select-filter { width: 100%; }
+            .nd-hide-sm { display: none !important; }
+            .nd-title-clip {
+                max-width: none;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: unset;
+                line-height: 1.35;
+            }
+            .nd-table { font-size: 0.8rem; }
+            .nd-table th,
+            .nd-table td { padding: 12px 10px; }
+            .nd-table th:first-child,
+            .nd-table td:first-child {
+                position: sticky;
+                left: 0;
+                background: #fff;
+                z-index: 1;
+                box-shadow: 4px 0 8px -4px rgba(15, 23, 42, .12);
+            }
+            .nd-table th:first-child { background: #f8fafc; z-index: 2; }
+            .nd-table td > div { min-width: 0; }
+            .nd-prompt-thumb { width: 32px; height: 32px; }
+            .nd-action-item { padding: 12px; }
+            .nd-action-desc { display: none; }
+        }
+
+        @media (max-width: 420px) {
+            .nd-kpi-sub { display: none; }
+        }
+
+        .nd-back-dash {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 0 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--nd-lime-text);
+            background: var(--nd-lime);
+            border: 1px solid var(--nd-lime);
+        }
+        .nd-back-dash-top {
+            margin: 0;
+            padding: 8px 12px;
+            white-space: nowrap;
+        }
+        .nd-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #f3f5f8 0%, #fff 48%, #eef6d4 100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nd-splash.is-out { transform: translateY(-100%); pointer-events: none; }
+        .nd-splash-inner {
+            width: min(380px, 88vw);
+            text-align: center;
+        }
+        .nd-splash-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            object-fit: cover;
+            margin: 0 auto 18px;
+            display: block;
+            background: #0f172a;
+        }
+        .nd-splash-type {
+            margin: 0 0 22px;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(1.7rem, 5vw, 2.3rem);
+            font-weight: 700;
+            color: #111827;
+            min-height: 1.25em;
+        }
+        .nd-splash-word {
+            background: linear-gradient(90deg, #6D2D52, #F5709D, #11FFC9, #2FA6C6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nd-splash-cursor {
+            display: inline-block;
+            margin-left: 2px;
+            color: #567C8D;
+            font-style: normal;
+            animation: nd-blink 0.9s step-end infinite;
+        }
+        @keyframes nd-blink { 50% { opacity: 0; } }
+        .nd-splash-bar {
+            height: 6px;
+            border-radius: 999px;
+            background: #e8ecf2;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .nd-splash-fill {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--nd-lime);
+            animation: nd-fill 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes nd-fill { to { width: 100%; } }
+        .nd-splash-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        body.nd-splash-lock { overflow: hidden; }
+
+        @media (max-width: 1080px) and (min-width: 721px) {
+            .nd-back-dash span { display: none; }
+            .nd-back-dash { padding: 10px; }
+        }
+        @media (max-width: 720px) {
+            .nd-back-dash { margin: 4px 0 10px; }
+            .nd-back-dash-top span { display: none; }
+            .nd-back-dash-top { width: 36px; height: 36px; padding: 0; border-radius: 50%; }
         }
     </style>
 </head>
-<body>
-
-    <!-- ── Left Sidebar ── -->
+<body class="nd-splash-lock">
+<div id="nd-splash" class="nd-splash" role="status" aria-live="polite">
+    <div class="nd-splash-inner">
+        <img src="toplogo/logo01.webp" alt="" class="nd-splash-logo">
+        <p class="nd-splash-type" aria-label="arigato.intel">
+            arigato.<span class="nd-splash-word" id="nd-splash-word"></span><span class="nd-splash-cursor" aria-hidden="true">|</span>
+        </p>
+        <div class="nd-splash-bar" aria-hidden="true"><div class="nd-splash-fill"></div></div>
+        <div class="nd-splash-label">Loading live intelligence</div>
+    </div>
+</div>
     <aside class="nd-sidebar">
         <a href="dashboard.php" class="nd-brand">
             <div class="nd-brand-icon">
-                <i class="fa-solid fa-shapes"></i>
+                <img src="toplogo/logo01.webp" alt="Arigato" class="nd-brand-logo" width="36" height="36">
             </div>
             <div class="nd-brand-name">Arigato Studio</div>
         </a>
 
-        <nav class="nd-nav">
-            <a href="analytics.php" class="nd-nav-item active">
+        <nav class="nd-nav" aria-label="Analytics sections">
+            <a href="analytics.php" class="nd-nav-item active" title="Dashboard">
                 <i class="fa-solid fa-table-columns"></i>
-                <span>Dashboard</span>
+                <span class="nd-nav-full">Dashboard</span>
+                <span class="nd-nav-short">Home</span>
             </a>
-            <a href="#section-prompts" class="nd-nav-item">
+            <a href="#section-prompts" class="nd-nav-item" title="Top Prompts">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>Top Prompts</span>
+                <span class="nd-nav-full">Top Prompts</span>
+                <span class="nd-nav-short">Prompts</span>
             </a>
-            <a href="#section-blogs" class="nd-nav-item">
+            <a href="#section-blogs" class="nd-nav-item" title="Blog Insights">
                 <i class="fa-solid fa-newspaper"></i>
-                <span>Blog Insights</span>
+                <span class="nd-nav-full">Blog Insights</span>
+                <span class="nd-nav-short">Blogs</span>
             </a>
-            <a href="#section-users" class="nd-nav-item">
+            <a href="#section-users" class="nd-nav-item" title="Users & Retention">
                 <i class="fa-solid fa-users"></i>
-                <span>Users & Retention</span>
-            </a>
-            <a href="manage_prompts.php" class="nd-nav-item">
-                <i class="fa-solid fa-list-check"></i>
-                <span>Manage Prompts</span>
-            </a>
-            <a href="blog_admin.php" class="nd-nav-item">
-                <i class="fa-solid fa-pen-nib"></i>
-                <span>Blog Admin</span>
-            </a>
-            <a href="dashboard.php" class="nd-nav-item">
-                <i class="fa-solid fa-gear"></i>
-                <span>Settings</span>
+                <span class="nd-nav-full">Users & Retention</span>
+                <span class="nd-nav-short">Users</span>
             </a>
         </nav>
+        <a href="dashboard.php" class="nd-back-dash" title="Back to old dashboard">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Old Dashboard</span>
+        </a>
 
         <div class="nd-sidebar-user">
             <div class="nd-user-info">
@@ -798,7 +1243,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     <div class="nd-user-role">Super Admin</div>
                 </div>
             </div>
-            <a href="logout.php" class="nd-btn-logout">
+            <a href="login.php?logout=1" class="nd-btn-logout">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Log Out</span>
             </a>
@@ -810,29 +1255,28 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 
         <!-- Top Bar Header -->
         <header class="nd-topbar">
-            <div>
-                <h1 class="nd-page-title">Dashboard</h1>
-                <div class="nd-page-subtitle"><?= date('l, jS F Y') ?> &bull; Live Intelligence & Study Engine</div>
-            </div>
-
-            <div class="nd-top-actions">
-                <!-- Date Range Filter Selector -->
-                <div class="nd-pill-group">
-                    <a href="analytics.php?range=7" class="nd-pill-btn <?= $range_days === 7 ? 'active' : '' ?>">7 Days</a>
-                    <a href="analytics.php?range=14" class="nd-pill-btn <?= $range_days === 14 ? 'active' : '' ?>">14 Days</a>
-                    <a href="analytics.php?range=30" class="nd-pill-btn <?= $range_days === 30 ? 'active' : '' ?>">30 Days</a>
-                    <a href="analytics.php?range=90" class="nd-pill-btn <?= $range_days === 90 ? 'active' : '' ?>">90 Days</a>
-                    <a href="analytics.php?range=365" class="nd-pill-btn <?= $range_days === 365 ? 'active' : '' ?>">Year</a>
+            <div class="nd-topbar-lead">
+                <div>
+                    <h1 class="nd-page-title">Dashboard</h1>
+                    <div class="nd-page-subtitle"><?= date('l, jS F Y') ?> &bull; Live Intelligence & Study Engine</div>
                 </div>
-
-                <a href="analytics_report.php?format=csv&period=<?= $range_days <= 7 ? 'weekly' : 'monthly' ?>" class="nd-btn-lime" title="Download Complete CSV Report">
-                    <i class="fa-solid fa-file-arrow-down"></i>
-                    <span>Export CSV</span>
-                </a>
-
-                <a href="dashboard.php" class="nd-icon-btn" title="Admin Settings">
-                    <i class="fa-solid fa-gear"></i>
-                </a>
+                <div class="nd-topbar-tools">
+                    <a href="analytics_report.php?format=csv&period=<?= $range_days <= 7 ? 'weekly' : 'monthly' ?>" class="nd-btn-lime" title="Download Complete CSV Report">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>CSV</span>
+                    </a>
+                    <a href="dashboard.php" class="nd-back-dash nd-back-dash-top" title="Back to old dashboard">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Old Dashboard</span>
+                    </a>
+                </div>
+            </div>
+            <div class="nd-pill-group">
+                <a href="analytics.php?range=7" class="nd-pill-btn <?= $range_days === 7 ? 'active' : '' ?>"><span class="nd-pill-full">7 Days</span><span class="nd-pill-short">7D</span></a>
+                <a href="analytics.php?range=14" class="nd-pill-btn <?= $range_days === 14 ? 'active' : '' ?>"><span class="nd-pill-full">14 Days</span><span class="nd-pill-short">14D</span></a>
+                <a href="analytics.php?range=30" class="nd-pill-btn <?= $range_days === 30 ? 'active' : '' ?>"><span class="nd-pill-full">30 Days</span><span class="nd-pill-short">30D</span></a>
+                <a href="analytics.php?range=90" class="nd-pill-btn <?= $range_days === 90 ? 'active' : '' ?>"><span class="nd-pill-full">90 Days</span><span class="nd-pill-short">90D</span></a>
+                <a href="analytics.php?range=365" class="nd-pill-btn <?= $range_days === 365 ? 'active' : '' ?>"><span class="nd-pill-full">Year</span><span class="nd-pill-short">1Y</span></a>
             </div>
         </header>
 
@@ -921,7 +1365,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     </div>
                 </div>
 
-                <div style="height: 280px; position: relative;">
+                <div class="nd-chart-box">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
@@ -935,7 +1379,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     <span style="font-size:0.75rem; font-weight:700; color:var(--nd-text-muted);"><?= count($type_breakdown) ?> Types</span>
                 </div>
 
-                <div style="height: 180px; position: relative; margin-bottom: 14px;">
+                <div class="nd-chart-box-sm">
                     <canvas id="categoryDoughnut"></canvas>
                 </div>
 
@@ -1016,11 +1460,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <tr>
                             <th>Prompt Title</th>
                             <th>Category</th>
-                            <th>Views</th>
-                            <th>Copies</th>
-                            <th>Likes</th>
+                            <th class="nd-hide-sm">Views</th>
+                            <th class="nd-hide-sm">Copies</th>
+                            <th class="nd-hide-sm">Likes</th>
                             <th>Unlocks</th>
-                            <th>Conversion</th>
+                            <th class="nd-hide-sm">Conversion</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1040,7 +1484,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 <div style="display:flex; align-items:center; gap:10px;">
                                     <img src="<?= htmlspecialchars($thumb) ?>" class="nd-prompt-thumb" alt="" onerror="this.src='toplogo/logo01.webp'">
                                     <div>
-                                        <div style="font-weight:700; color:var(--nd-text-main); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="<?= htmlspecialchars($p['title']) ?>">
+                                        <div class="nd-title-clip" title="<?= htmlspecialchars($p['title']) ?>">
                                             <?= htmlspecialchars($p['title']) ?>
                                         </div>
                                         <div style="font-size:0.72rem; color:var(--nd-text-muted);">
@@ -1050,15 +1494,15 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 </div>
                             </td>
                             <td>
-                                <span class="nd-tag-pill"><?= htmlspecialchars($p['prompt_type'] ?: 'General') ?></span>
+                                <span class="nd-tag-pill <?= nd_type_class((string) ($p['prompt_type'] ?? '')) ?>"><?= htmlspecialchars(nd_type_label((string) ($p['prompt_type'] ?? ''))) ?></span>
                             </td>
-                            <td><?= number_format($p['view_count']) ?></td>
-                            <td><?= number_format($p['copy_count']) ?></td>
-                            <td><?= number_format($p['likes_count']) ?></td>
+                            <td class="nd-hide-sm"><?= number_format($p['view_count']) ?></td>
+                            <td class="nd-hide-sm"><?= number_format($p['copy_count']) ?></td>
+                            <td class="nd-hide-sm"><?= number_format($p['likes_count']) ?></td>
                             <td>
                                 <span style="font-weight:700; color:#059669;"><?= number_format($p['unlock_count']) ?></span>
                             </td>
-                            <td>
+                            <td class="nd-hide-sm">
                                 <span style="font-weight:700; color:<?= $p_conv >= 10 ? '#059669' : ($p_conv >= 3 ? '#d97706' : '#94a3b8') ?>;">
                                     <?= $p_conv ?>%
                                 </span>
@@ -1076,7 +1520,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         </section>
 
         <!-- ── Section: Blog Insights & Power Users (2-Columns) ── -->
-        <section style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;" id="section-blogs">
+        <section class="nd-grid-2" id="section-blogs">
             
             <!-- Blog Performance Table -->
             <div class="nd-card">
@@ -1107,7 +1551,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                             <?php foreach ($top_blogs as $b): ?>
                             <tr data-title="<?= htmlspecialchars(strtolower($b['title'])) ?>">
                                 <td>
-                                    <div style="font-weight:700; color:var(--nd-text-main); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    <div class="nd-title-clip">
                                         <?= htmlspecialchars($b['title']) ?>
                                     </div>
                                     <div style="font-size:0.7rem; color:var(--nd-text-muted);">
@@ -1156,31 +1600,42 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                             <tr>
                                 <th>User</th>
                                 <th>Unlocks</th>
-                                <th>Streak</th>
-                                <th>Last Active</th>
+                                <th class="nd-hide-sm">Streak</th>
+                                <th class="nd-hide-sm">Last Active</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($power_users as $u): 
-                                $u_av = !empty($u['profile_image']) ? $u['profile_image'] : 'toplogo/logo01.webp';
+                            <?php foreach ($power_users as $u):
+                                $u_av = trim((string) ($u['avatar'] ?? ''));
+                                $u_pi = trim((string) ($u['profile_image'] ?? ''));
+                                if ($u_av === '' || preg_match('#^https?://#i', $u_av)) {
+                                    if ($u_pi !== '' && !preg_match('#^https?://#i', $u_pi)) {
+                                        $u_av = $u_pi;
+                                    }
+                                }
+                                $u_initial = strtoupper(substr((string) ($u['username'] ?: 'U'), 0, 1));
                             ?>
                             <tr data-name="<?= htmlspecialchars(strtolower($u['username'] . ' ' . $u['email'])) ?>">
                                 <td>
                                     <div style="display:flex; align-items:center; gap:8px;">
-                                        <img src="<?= htmlspecialchars($u_av) ?>" style="width:28px; height:28px; border-radius:50%; object-fit:cover;" onerror="this.src='toplogo/logo01.webp'" alt="">
-                                        <div>
+                                        <?php if ($u_av !== '' && !preg_match('#^https?://#i', $u_av)): ?>
+                                        <img src="<?= htmlspecialchars($u_av) ?>" style="width:28px; height:28px; border-radius:50%; object-fit:cover;" alt="">
+                                        <?php else: ?>
+                                        <div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#0f172a;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;flex-shrink:0;"><?= htmlspecialchars($u_initial) ?></div>
+                                        <?php endif; ?>
+                                        <div style="min-width:0;">
                                             <div style="font-weight:700; font-size:0.82rem;"><?= htmlspecialchars($u['username']) ?></div>
-                                            <div style="font-size:0.7rem; color:var(--nd-text-muted);"><?= htmlspecialchars($u['email'] ?: 'No email') ?></div>
+                                            <div class="nd-email"><?= htmlspecialchars($u['email'] ?: 'No email') ?></div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <span style="font-weight:700; color:#059669;"><?= number_format($u['unlock_cnt']) ?></span>
                                 </td>
-                                <td>
+                                <td class="nd-hide-sm">
                                     <span style="font-weight:600; color:#f59e0b;"><i class="fa-solid fa-fire"></i> <?= (int)$u['streak_count'] ?>d</span>
                                 </td>
-                                <td>
+                                <td class="nd-hide-sm">
                                     <span style="font-size:0.74rem; color:var(--nd-text-muted);">
                                         <?= !empty($u['last_active']) ? date('d M', strtotime($u['last_active'])) : 'Recent' ?>
                                     </span>
@@ -1195,7 +1650,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         </section>
 
         <!-- ── Section: Optimization Hub (Dead Prompts & Churn Risk) ── -->
-        <section style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;">
+        <section class="nd-grid-2">
             
             <!-- Churn Risk Users -->
             <div class="nd-card">
@@ -1210,7 +1665,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <thead>
                             <tr>
                                 <th>Username</th>
-                                <th>Email</th>
+                                <th class="nd-hide-sm">Email</th>
                                 <th>Last Active</th>
                             </tr>
                         </thead>
@@ -1221,7 +1676,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 <?php foreach ($churn_users as $cu): ?>
                                 <tr>
                                     <td style="font-weight:700;"><?= htmlspecialchars($cu['username']) ?></td>
-                                    <td style="color:var(--nd-text-muted);"><?= htmlspecialchars($cu['email'] ?: '-') ?></td>
+                                    <td class="nd-hide-sm" style="color:var(--nd-text-muted);"><?= htmlspecialchars($cu['email'] ?: '-') ?></td>
                                     <td style="color:#ef4444; font-weight:600;"><?= !empty($cu['last_active']) ? date('M j, Y', strtotime($cu['last_active'])) : '-' ?></td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -1245,7 +1700,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                             <tr>
                                 <th>Prompt Title</th>
                                 <th>Views</th>
-                                <th>Category</th>
+                                <th class="nd-hide-sm">Category</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -1255,11 +1710,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                             <?php else: ?>
                                 <?php foreach ($dead_prompts as $dp): ?>
                                 <tr>
-                                    <td style="font-weight:700; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    <td class="nd-title-clip">
                                         <?= htmlspecialchars($dp['title']) ?>
                                     </td>
                                     <td><?= number_format($dp['view_count']) ?></td>
-                                    <td><span class="nd-tag-pill"><?= htmlspecialchars($dp['prompt_type'] ?: 'General') ?></span></td>
+                                    <td class="nd-hide-sm"><span class="nd-tag-pill <?= nd_type_class((string) ($dp['prompt_type'] ?? '')) ?>"><?= htmlspecialchars(nd_type_label((string) ($dp['prompt_type'] ?? ''))) ?></span></td>
                                     <td>
                                         <a href="edit_prompt.php?id=<?= $dp['id'] ?>" class="nd-btn-outline" style="padding:3px 7px; font-size:0.72rem;">
                                             Optimize
@@ -1423,5 +1878,97 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         });
     }
     </script>
+<script>
+(function () {
+  var splash = document.getElementById('nd-splash');
+  if (!splash) return;
+  if (/analytics\.php/i.test(document.referrer || '')) {
+    splash.remove();
+    document.body.classList.remove('nd-splash-lock');
+    return;
+  }
+  var word = document.getElementById('nd-splash-word');
+  var text = 'intel';
+  var i = 0;
+  function type() {
+    if (!word) return;
+    if (i <= text.length) {
+      word.textContent = text.slice(0, i);
+      i += 1;
+      setTimeout(type, 90);
+    }
+  }
+  setTimeout(type, 280);
+  setTimeout(function () {
+    splash.classList.add('is-out');
+    document.body.classList.remove('nd-splash-lock');
+    setTimeout(function () { splash.remove(); }, 520);
+  }, 4000);
+})();
+    </script>
+<script>
+(function () {
+  function prettyLabel(text) {
+    return String(text || '').replace(/_/g, ' ');
+  }
+  function enhanceSelect(sel) {
+    if (!sel || sel.dataset.enhanced) return;
+    sel.dataset.enhanced = '1';
+    var wrap = document.createElement('div');
+    wrap.className = 'nd-dd';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'nd-dd-btn';
+    var menu = document.createElement('div');
+    menu.className = 'nd-dd-menu';
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+
+    function selectedText() {
+      var opt = sel.options[sel.selectedIndex];
+      return prettyLabel(opt ? opt.textContent : '');
+    }
+    function render() {
+      btn.innerHTML = '<span>' + selectedText() + '</span><i class="fa-solid fa-chevron-down"></i>';
+      menu.innerHTML = '';
+      Array.from(sel.options).forEach(function (opt, idx) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'nd-dd-opt' + (idx === sel.selectedIndex ? ' is-on' : '');
+        var raw = prettyLabel(opt.textContent);
+        var m = raw.match(/^(.*)\s+\((\d+)\)\s*$/);
+        if (m) {
+          item.innerHTML = '<span>' + m[1] + '</span><span class="nd-dd-count">' + m[2] + '</span>';
+        } else {
+          item.textContent = raw;
+        }
+        item.addEventListener('click', function () {
+          sel.selectedIndex = idx;
+          sel.dispatchEvent(new Event('change'));
+          render();
+          wrap.classList.remove('is-open');
+        });
+        menu.appendChild(item);
+      });
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      document.querySelectorAll('.nd-dd.is-open').forEach(function (other) {
+        if (other !== wrap) other.classList.remove('is-open');
+      });
+      wrap.classList.toggle('is-open');
+    });
+    render();
+  }
+  document.querySelectorAll('.nd-select-filter').forEach(enhanceSelect);
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.nd-dd.is-open').forEach(function (el) {
+      el.classList.remove('is-open');
+    });
+  });
+})();
+</script>
 </body>
 </html>

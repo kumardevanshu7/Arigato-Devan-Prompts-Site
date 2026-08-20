@@ -33,6 +33,26 @@ foreach ($blogs as $b) {
 }
 arsort($all_tags);
 
+function blog_list_cover_html(array $b, bool $wide = false): string {
+    $p = trim((string) ($b['image_path'] ?? ''));
+    $l = trim((string) ($b['image_path_landscape'] ?? ''));
+    if ($p === '' && $l === '') {
+        return '<div class="bm-ph"><i class="fa-solid fa-image"></i></div>';
+    }
+    $alt = htmlspecialchars($b['title'] ?? '');
+    if ($wide) {
+        $src = $l !== '' ? $l : $p;
+        return '<img class="bm-cover-img" loading="lazy" src="' . htmlspecialchars($src) . '" alt="' . $alt . '">';
+    }
+    $html = '<picture class="bm-cover-pic">';
+    if ($l !== '') {
+        $html .= '<source media="(min-width: 721px)" srcset="' . htmlspecialchars($l) . '">';
+    }
+    $html .= '<img loading="lazy" src="' . htmlspecialchars($p !== '' ? $p : $l) . '" alt="' . $alt . '">';
+    $html .= '</picture>';
+    return $html;
+}
+
 // Google auth url for login button
 ?><!DOCTYPE html>
 <html lang="en" class="theme-nogoda">
@@ -884,7 +904,7 @@ footer .footer-links a:hover {
     font-size: 1.1rem;
 }
 </style>
-<link rel="stylesheet" href="css/blog-header-logo.css?v=20260758">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260820p">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -899,7 +919,7 @@ footer .footer-links a:hover {
 <link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
 <?php endif; ?>
 </head>
-<body class="blog-splash-active page-store theme-nogoda">
+<body class="blog-splash-active page-store theme-nogoda bm-list">
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -917,165 +937,167 @@ footer .footer-links a:hover {
 <div class="back-glow" id="back-glow"></div>
 <?php $nav_active = 'blogs'; include 'includes/site_nav.php'; ?>
 
-<!-- Hero -->
-<div class="blogs-hero">
-  <div class="badge"><i class="fa-solid fa-pen-nib"></i> FRESH READS</div>
-  <h1>The <span class="highlight">Arigato Devan</span> Blog</h1>
-  <p>Tips, stories, and ideas to fuel your creative AI journey.</p>
-</div>
+<div class="bm-page">
+  <div class="bm-hero">
+    <p class="bm-brand-type" aria-label="arigato.blog">
+      <span class="bm-brand-prefix">arigato.</span><span class="bm-brand-word" id="bm-type-text"></span><span class="bm-type-cursor" aria-hidden="true">|</span>
+    </p>
+    <h1>Stories for your creative AI journey</h1>
+    <p class="bm-lead">Tips, habits, and ideas from Arigato Devan.</p>
+  </div>
 
 <?php if (count($blogs) === 0): ?>
-<div class="empty-blogs"><i class="fa-solid fa-pen"></i> No blogs published yet &mdash; check back soon!</div>
-<?php else: ?>
+  <div class="bm-empty">No blogs published yet — check back soon.</div>
+<?php else:
+  $slider = array_values(array_filter($blogs, static function ($b) {
+      return !empty($b['in_slider']);
+  }));
+  $rest = array_values(array_filter($blogs, static function ($b) {
+      return empty($b['in_slider']);
+  }));
+?>
 
-<!-- Tag Filter -->
-<?php if (!empty($all_tags)): ?>
-<div class="tag-filter-wrap" id="tag-filters">
-  <button class="tag-pill active" data-tag="all" onclick="filterByTag('all', this)">ALL</button>
-  <?php foreach ($all_tags as $tag => $count): ?>
-  <button class="tag-pill" data-tag="<?= htmlspecialchars(
-      strtolower($tag),
-  ) ?>" onclick="filterByTag('<?= htmlspecialchars(
-    strtolower($tag),
-) ?>', this)"><?= htmlspecialchars(
-    $tag,
-) ?> <span style="opacity:.5;font-size:.7em;"><?= $count ?></span></button>
-  <?php endforeach; ?>
-</div>
-<?php endif; ?>
+  <?php if ($slider): ?>
+  <div class="bm-slider-wrap">
+    <button type="button" class="bm-slider-btn bm-slider-prev" aria-label="Previous stories"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="bm-featured" id="bm-featured">
+    <?php foreach ($slider as $b):
+      $preview = trim(preg_replace('/\s+/', ' ', strip_tags($b['content'] ?? '')));
+      $preview = mb_strlen($preview) > 90 ? mb_substr($preview, 0, 90) . '…' : $preview;
+      $tag0 = $b['tags'] ? trim(explode(',', $b['tags'])[0]) : 'Story';
+      $mins = max(1, (int) ceil(str_word_count(strip_tags($b['content'] ?? '')) / 200));
+    ?>
+    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-feature">
+      <?= blog_list_cover_html($b, true) ?>
+      <div class="bm-feature-body">
+        <span class="bm-chip"><?= htmlspecialchars($tag0) ?> · <?= $mins ?> min read</span>
+        <h2><?= htmlspecialchars($b['title']) ?></h2>
+        <?php if ($preview): ?><p><?= htmlspecialchars($preview) ?></p><?php endif; ?>
+      </div>
+    </a>
+    <?php endforeach; ?>
+    </div>
+    <button type="button" class="bm-slider-btn bm-slider-next" aria-label="Next stories"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+  <?php endif; ?>
 
-<!-- Container Layout holding main grid + premium sidebar -->
-<div class="blogs-container-layout">
-
-  <div class="blogs-wrap">
-    <div class="blogs-grid" id="blogs-grid">
-      <?php foreach ($blogs as $b):
-          $ratio_class = ($b["image_ratio"] ?? "16:9") === "9:16" ? "ratio-9-16" : "ratio-16-9";
-          $short_preview = mb_substr(strip_tags($b["content"]), 0, 75) . "...";
-          ?>
-      <a href="blog.php?slug=<?= urlencode($b["slug"]) ?>" class="blog-card"
-         data-tags="<?= htmlspecialchars(strtolower($b["tags"] ?? "")) ?>">
-        <?php if ($b["image_path"]): ?>
-          <div class="blog-card-img-wrapper <?= $ratio_class ?>">
-            <img loading="lazy" src="<?= htmlspecialchars($b["image_path"]) ?>" class="blog-card-img" alt="<?= htmlspecialchars($b["title"]) ?>">
-          </div>
-        <?php else: ?>
-          <div class="blog-card-img-wrapper <?= $ratio_class ?>">
-            <div class="blog-card-img-placeholder"><i class="fa-solid fa-image"></i></div>
-          </div>
-        <?php endif; ?>
-        
-        <div class="blog-card-body">
-          <?php if ($b["tags"]): ?>
-            <div class="blog-card-tag"><?= htmlspecialchars(explode(",", $b["tags"])[0]) ?></div>
-          <?php endif; ?>
-          <h2 class="blog-card-title"><?= htmlspecialchars($b["title"]) ?></h2>
-          <p class="blog-card-desc"><?= htmlspecialchars($short_preview) ?></p>
-
-          <div class="blog-card-meta">
-            <div class="blog-card-meta-left">
-              <img loading="lazy" src="<?= htmlspecialchars(!empty($b["author_avatar"]) ? $b["author_avatar"] : "https://api.dicebear.com/7.x/avataaars/svg?seed=" . urlencode($b["author_name"] ?? "Admin")) ?>" class="blog-author-av" alt="" style="width:26px;height:26px;">
-              <span style="font-weight: 700; color: #334155;"><?= htmlspecialchars($b["author_name"] ?? "Admin") ?></span>
-              <span>&middot;</span>
-              <span><?= date("M d, Y", strtotime($b["created_at"])) ?></span>
-            </div>
-            <div class="blog-card-likes">
-              <span style="color:#94a3b8;margin-right:6px;">&middot;</span>
-              <span style="margin-right:8px;"><i class="fa-solid fa-heart" style="color:#f43f5e;"></i> <?= (int)$b["likes_count"] ?></span>
-              <span><i class="fa-solid fa-eye"></i> <?= (int)($b["views_count"] ?? 0) ?></span>
-            </div>
-          </div>
-        </div>
-      </a>
+  <?php if (!empty($all_tags) || count($blogs) > 0): ?>
+  <div class="bm-toolbar">
+    <?php if (!empty($all_tags)): ?>
+    <div class="bm-tags" id="tag-filters">
+      <button type="button" class="bm-tag is-on" data-tag="all" onclick="filterByTag('all', this)">All</button>
+      <?php foreach ($all_tags as $tag => $count): ?>
+      <button type="button" class="bm-tag" data-tag="<?= htmlspecialchars(strtolower($tag)) ?>" onclick="filterByTag('<?= htmlspecialchars(strtolower($tag)) ?>', this)"><?= htmlspecialchars($tag) ?> <span><?= (int)$count ?></span></button>
       <?php endforeach; ?>
     </div>
+    <?php else: ?>
+    <div class="bm-tags"></div>
+    <?php endif; ?>
+  </div>
+  <?php endif; ?>
 
-    <!-- No results message -->
-    <div id="no-results-msg" style="display:none;text-align:center;padding:60px 20px;color:#64748b;font-weight:700;font-size:1.1rem;">
-      No blogs found for this tag <i class="fa-solid fa-magnifying-glass"></i>
+  <?php if ($rest): ?>
+  <div class="bm-latest-head">
+    <h2>Latest</h2>
+    <div class="bm-views" role="group" aria-label="Latest layout">
+      <button type="button" class="bm-view" data-view="one" aria-label="One column"><i class="fa-solid fa-square"></i></button>
+      <button type="button" class="bm-view is-on" data-view="grid" aria-label="Two column grid"><i class="fa-solid fa-grip"></i></button>
+      <button type="button" class="bm-view" data-view="list" aria-label="List view"><i class="fa-solid fa-list"></i></button>
     </div>
   </div>
 
-  <!-- RIGHT SIDEBAR (Matching Pic 1 exactly) -->
-  <aside class="blog-sidebar">
-    <!-- About Card -->
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">ABOUT ARIGATO DEVAN</div>
-      <div class="author-profile-box">
-        <img src="aboutmepics/new.webp" alt="Arigato Devan" style="object-fit: cover !important;">
-        <div>
-          <div class="name">Arigato Devan</div>
-          <div class="title">Creative Prompter</div>
+  <div class="bm-grid" id="blogs-grid">
+    <?php foreach ($rest as $b):
+      $preview = trim(preg_replace('/\s+/', ' ', strip_tags($b['description'] ?: ($b['content'] ?? ''))));
+      $preview = mb_strlen($preview) > 140 ? mb_substr($preview, 0, 140) . '…' : $preview;
+      $tag0 = $b['tags'] ? trim(explode(',', $b['tags'])[0]) : '';
+      $mins = max(1, (int) ceil(str_word_count(strip_tags($b['content'] ?? '')) / 200));
+      $av = !empty($b['author_avatar']) ? $b['author_avatar'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($b['author_name'] ?? 'Admin');
+    ?>
+    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-tags="<?= htmlspecialchars(strtolower($b['tags'] ?? '')) ?>">
+      <div class="bm-card-img">
+        <?= !empty($b['image_path']) || !empty($b['image_path_landscape']) ? blog_list_cover_html($b, true) : '' ?>
+        <?php if ($tag0): ?><span class="bm-chip"><?= htmlspecialchars($tag0) ?></span><?php endif; ?>
+      </div>
+      <div class="bm-card-body">
+        <h3><?= htmlspecialchars($b['title']) ?></h3>
+        <?php if ($preview): ?><p><?= htmlspecialchars($preview) ?></p><?php endif; ?>
+        <div class="bm-meta">
+          <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="">
+          <span><?= htmlspecialchars($b['author_name'] ?? 'Admin') ?></span>
+          <span>·</span>
+          <span><?= date('M j, Y', strtotime($b['created_at'])) ?></span>
+          <span>·</span>
+          <span><?= $mins ?> min</span>
         </div>
       </div>
-      <p class="author-bio">I'm the creator behind <strong>Arigato Devan PromptVerse</strong> � a platform dedicated to crafting beautiful, ready-to-use AI prompts for couples, romantics, and creative souls.</p>
-      <div class="author-location">
-        <i class="fa-solid fa-location-dot"></i> Mumbai, India
-      </div>
-    </div>
-
-    <!-- Featured Posts Card (Dynamic) -->
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">FEATURED POSTS</div>
-      <?php 
-      $featured_limit = array_slice($blogs, 0, 3);
-      foreach ($featured_limit as $fb): ?>
-        <a href="blog.php?slug=<?= urlencode($fb["slug"]) ?>" class="sidebar-featured-item">
-          <?php if ($fb["image_path"]): ?>
-            <img src="<?= htmlspecialchars($fb["image_path"]) ?>" class="sidebar-featured-img" alt="">
-          <?php else: ?>
-            <div class="sidebar-featured-img" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><i class="fa-solid fa-image"></i></div>
-          <?php endif; ?>
-          <div class="sidebar-featured-info">
-            <h4 class="sidebar-featured-title"><?= htmlspecialchars($fb["title"]) ?></h4>
-            <span class="sidebar-featured-date"><?= date("M d, Y", strtotime($fb["created_at"])) ?></span>
-          </div>
-        </a>
-      <?php endforeach; ?>
-    </div>
-
-  </aside>
-
-</div>
+    </a>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+  <div id="no-results-msg" class="bm-empty" style="display:none;">No blogs found for this tag.</div>
 <?php endif; ?>
+</div>
 
 <?php include 'footer.php'; ?>
 
 <script defer src="script.min.js?v=20260616"></script>
 <script>
+function setBlogView(view) {
+  var page = document.querySelector('.bm-page');
+  if (!page) return;
+  if (view !== 'one' && view !== 'list' && view !== 'grid') view = 'grid';
+  page.classList.remove('is-list', 'is-grid', 'is-one');
+  page.classList.add(view === 'list' ? 'is-list' : (view === 'one' ? 'is-one' : 'is-grid'));
+  document.querySelectorAll('.bm-view').forEach(function(btn) {
+    btn.classList.toggle('is-on', btn.getAttribute('data-view') === view);
+  });
+  try { localStorage.setItem('blogView', view); } catch (e) {}
+}
+document.querySelectorAll('.bm-view').forEach(function(btn) {
+  btn.addEventListener('click', function() { setBlogView(btn.getAttribute('data-view')); });
+});
+try { setBlogView(localStorage.getItem('blogView') || 'grid'); } catch (e) {}
+
+(function () {
+  var el = document.getElementById('bm-type-text');
+  if (!el) return;
+  var text = 'blog';
+  var i = 0;
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i += 1;
+      setTimeout(type, i < 3 ? 160 : 78);
+    }
+  }
+  setTimeout(type, 180);
+})();
+
+(function () {
+  var track = document.getElementById('bm-featured');
+  if (!track) return;
+  function slide(dir) {
+    var card = track.querySelector('.bm-feature');
+    var w = card ? card.getBoundingClientRect().width + 16 : track.clientWidth * 0.85;
+    track.scrollBy({ left: dir * w, behavior: 'smooth' });
+  }
+  var prev = document.querySelector('.bm-slider-prev');
+  var next = document.querySelector('.bm-slider-next');
+  if (prev) prev.addEventListener('click', function () { slide(-1); });
+  if (next) next.addEventListener('click', function () { slide(1); });
+})();
+
 function filterByTag(tag, btn) {
-  // Update active pill
-  document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-
-  const featured = document.getElementById('featured-post');
-  const grid     = document.getElementById('blogs-grid');
-  const noRes    = document.getElementById('no-results-msg');
-
-  if (tag === 'all') {
-    if (featured) featured.style.display = '';
-    document.querySelectorAll('#blogs-grid .blog-card').forEach(c => c.style.display = '');
-    if (noRes) noRes.style.display = 'none';
-    return;
-  }
-
-  // Filter featured
+  document.querySelectorAll('.bm-tag').forEach(p => p.classList.remove('is-on'));
+  btn.classList.add('is-on');
+  const noRes = document.getElementById('no-results-msg');
   let anyVisible = false;
-  if (featured) {
-    const ftags = (featured.dataset.tags || '').toLowerCase();
-    const show = ftags.includes(tag);
-    featured.style.display = show ? '' : 'none';
-    if (show) anyVisible = true;
-  }
-
-  // Filter grid cards
-  document.querySelectorAll('#blogs-grid .blog-card').forEach(card => {
-    const ctags = (card.dataset.tags || '').toLowerCase();
-    const show = ctags.includes(tag);
+  document.querySelectorAll('.bm-card-filter').forEach(card => {
+    const show = tag === 'all' || (card.dataset.tags || '').toLowerCase().includes(tag);
     card.style.display = show ? '' : 'none';
     if (show) anyVisible = true;
   });
-
   if (noRes) noRes.style.display = anyVisible ? 'none' : 'block';
 }
 </script>

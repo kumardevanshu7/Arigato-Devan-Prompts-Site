@@ -193,7 +193,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .act-pub:hover{background:rgba(74,222,128,0.14);transform:translateY(-2px)}
 .act-unpub{color:var(--yellow);border-color:rgba(251,191,36,0.25);background:rgba(251,191,36,0.06)}
 .act-unpub:hover{background:rgba(251,191,36,0.14);transform:translateY(-2px)}
-.act-del{color:var(--red);border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.06)}
+.act-slider{color:var(--cyan);border-color:rgba(34,211,238,0.25);background:rgba(34,211,238,0.06)}
+.act-slider:hover{background:rgba(34,211,238,0.14);transform:translateY(-2px)}
+.act-slider.is-on{color:#083344;background:var(--cyan);border-color:var(--cyan)}
 .act-del:hover{background:rgba(248,113,113,0.16);transform:translateY(-2px)}
 
 /* ══════════════════════════════════
@@ -425,6 +427,7 @@ body::before, body::after { display: none !important; background-image: none !im
       $authorAv = getAuthorAvatar($bl);
       $tagsArr  = $bl["tags"] ? array_filter(array_map("trim", explode(",", $bl["tags"]))) : [];
       $isPub    = (bool)$bl["is_published"];
+      $inSlider = !empty($bl["in_slider"]);
     ?>
 
     <!-- ── DESKTOP ITEM ── -->
@@ -459,6 +462,14 @@ body::before, body::after { display: none !important; background-image: none !im
       </div>
       <div class="action-btns">
         <a href="blog_edit.php?id=<?= $bl["id"] ?>" class="act-btn act-edit" title="Edit"><i class="fa-solid fa-pencil"></i></a>
+        <form action="blog_toggle.php" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
+          <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">
+          <input type="hidden" name="slider" value="<?= $inSlider ? 0 : 1 ?>">
+          <button type="submit" class="act-btn act-slider<?= $inSlider ? " is-on" : "" ?>" title="<?= $inSlider ? "Remove from slider" : "Add to homepage slider" ?>">
+            <i class="fa-solid fa-images"></i>
+          </button>
+        </form>
         <form action="blog_toggle.php" method="POST" style="margin:0;">
           <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
           <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">
@@ -506,6 +517,15 @@ body::before, body::after { display: none !important; background-image: none !im
             <a href="blog_edit.php?id=<?= $bl["id"] ?>" class="mob-dd-item dd-edit">
               <i class="fa-solid fa-pencil"></i> Edit Post
             </a>
+            <form action="blog_toggle.php" method="POST" style="margin:0;">
+              <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
+              <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">
+              <input type="hidden" name="slider" value="<?= $inSlider ? 0 : 1 ?>">
+              <button type="submit" class="mob-dd-item" style="width:100%;background:none;border:none;font-family:var(--font);text-align:left;border-bottom:1px solid var(--border2);color:var(--cyan);">
+                <i class="fa-solid fa-images"></i>
+                <?= $inSlider ? "Remove from slider" : "Add to slider" ?>
+              </button>
+            </form>
             <form action="blog_toggle.php" method="POST" style="margin:0;">
               <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
               <input type="hidden" name="blog_id" value="<?= $bl["id"] ?>">

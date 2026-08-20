@@ -68,35 +68,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $image_path = $_POST["current_image"] ?? "";
-        if (isset($_FILES["image"]) && $_FILES["image"]["error"] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
-            $allowed = ["jpg", "jpeg", "png", "webp", "gif"];
-            
+        $image_path_landscape = $_POST["current_image_landscape"] ?? "";
+        $allowed = ["jpg", "jpeg", "png", "webp", "gif"];
+        foreach (["image" => "image_path", "image_landscape" => "image_path_landscape"] as $fileKey => $destVar) {
+            if (!isset($_FILES[$fileKey]) || $_FILES[$fileKey]["error"] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+            $ext = strtolower(pathinfo($_FILES[$fileKey]["name"], PATHINFO_EXTENSION));
             if (!in_array($ext, $allowed)) {
                 $error = "Invalid file type. Allowed types: JPG, PNG, WEBP, GIF.";
-            } elseif ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
-                $error = "Image too large! Maximum allowed size is 5MB.";
-            } else {
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
-                finfo_close($finfo);
-                
-                if (!str_starts_with($mime, 'image/')) {
-                    $error = "Invalid image file.";
-                } else {
-                    $fn = "uploads/blog_" . uniqid() . "." . $ext;
-                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
-                        $image_path = $fn;
-                    } else {
-                        $error = "Could not save uploaded image.";
-                    }
-                }
+                break;
             }
+            if ($_FILES[$fileKey]["size"] > 5 * 1024 * 1024) {
+                $error = "Image too large! Maximum allowed size is 5MB.";
+                break;
+            }
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES[$fileKey]["tmp_name"]);
+            finfo_close($finfo);
+            if (!str_starts_with($mime, 'image/')) {
+                $error = "Invalid image file.";
+                break;
+            }
+            $fn = "uploads/blog_" . uniqid() . "." . $ext;
+            if (!move_uploaded_file($_FILES[$fileKey]["tmp_name"], $fn)) {
+                $error = "Could not save uploaded image.";
+                break;
+            }
+            $$destVar = $fn;
+        }
+        if ($image_path && $image_path_landscape) {
+            $image_ratio = "9:16";
+        } elseif ($image_path_landscape) {
+            $image_ratio = "16:9";
+        } elseif ($image_path) {
+            $image_ratio = "9:16";
         }
 
         if (empty($error)) {
             $stmt = $pdo->prepare(
-                "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, is_published=?, updated_at=NOW() WHERE id=?"
+                "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, is_published=?, updated_at=NOW() WHERE id=?"
             );
             $stmt->execute([
                 $title,
@@ -105,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $content,
                 $content_hindi,
                 $image_path,
+                $image_path_landscape,
                 $image_ratio,
                 $meta_title,
                 $meta_desc,
@@ -186,7 +198,10 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
 
         html, body {
             height: 100vh !important;
+            width: 100% !important;
+            max-width: 100% !important;
             overflow: hidden !important;
+            overflow-x: hidden !important;
             background-color: var(--be-bg) !important;
             color: var(--be-text-main) !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -198,6 +213,7 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
         /* ── Top Header ── */
         .be-header {
             height: 54px !important;
+            width: 100% !important;
             flex-shrink: 0 !important;
             background: #ffffff !important;
             border-bottom: 1px solid var(--be-border) !important;
@@ -356,6 +372,7 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             overflow: hidden !important;
             max-width: 1600px !important;
             width: 100% !important;
+            min-width: 0 !important;
             margin: 0 auto !important;
         }
 
@@ -365,6 +382,8 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             border: 1px solid var(--be-border) !important;
             border-radius: var(--be-radius-md) !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
             height: 100% !important;
             overflow-y: auto !important;
             padding: 32px 42px !important;
@@ -472,6 +491,17 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             align-items: center;
             gap: 3px;
             flex-wrap: wrap;
+        }
+        .be-tb-row {
+            display: contents;
+        }
+        .be-editor-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .be-tb-btn {
@@ -812,6 +842,22 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             font-weight: 600;
             color: var(--be-text-sec);
         }
+        .be-cover-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 768px) {
+            .be-cover-pair { grid-template-columns: 1fr; }
+        }
+        .be-cover-slot-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--be-text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
 
         .be-btn-delete {
             width: 100%;
@@ -856,28 +902,194 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
+        .be-app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-height: 0;
+            width: 100%;
+            max-width: 100%;
+            align-self: stretch;
+        }
+
+        .be-breadcrumb-active {
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         @media (max-width: 1024px) {
             html, body {
                 height: auto !important;
-                overflow: auto !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+            }
+            .be-app {
+                height: auto !important;
+                min-height: 100dvh;
+                overflow: visible !important;
+                overflow-x: hidden !important;
             }
             .be-layout {
                 grid-template-columns: 1fr !important;
                 height: auto !important;
                 overflow: visible !important;
+                overflow-x: hidden !important;
+                padding: 10px 12px 28px !important;
+                gap: 12px !important;
+                max-width: 100% !important;
             }
             .be-paper, .be-panel {
                 height: auto !important;
                 overflow: visible !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .be-header {
+                height: 56px !important;
+                min-height: 56px;
+                padding: 0 12px !important;
+                position: sticky;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .be-header-left,
+            .be-header-right {
+                flex: 0 0 auto;
+                gap: 8px;
+                min-width: 0;
+            }
+            .be-breadcrumb {
+                display: none !important;
+            }
+            .be-btn-back {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                justify-content: center;
+            }
+            .be-btn-back span,
+            .be-btn-sec,
+            .be-btn-primary span,
+            .be-btn-preview span {
+                display: none !important;
+            }
+            .be-status-pill {
+                padding: 5px 10px;
+                font-size: 0.72rem;
+            }
+            .be-btn-primary,
+            .be-btn-preview {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                padding: 0;
+                justify-content: center;
+            }
+            .be-paper {
+                padding: 16px 14px 24px !important;
+            }
+            .be-panel {
+                padding: 16px 14px 36px !important;
+            }
+            .be-title-input {
+                font-size: 1.35rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+            .be-subtitle-input {
+                font-size: 0.9rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                white-space: pre-wrap !important;
+                overflow-wrap: anywhere;
+                line-height: 1.45 !important;
+            }
+            .be-meta-bar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 10px;
+                align-items: start;
+            }
+            .be-meta-bar span {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .be-toolbar {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                flex-wrap: nowrap;
+                overflow: visible;
+                gap: 8px;
+                padding: 8px;
+                position: static;
+            }
+            .be-tb-row {
+                display: flex;
+                flex-wrap: wrap;
+                width: 100%;
+                gap: 6px;
+            }
+            .be-tb-row-selects .be-tb-select {
+                flex: 1 1 calc(50% - 3px);
+                max-width: none;
+                min-width: 0;
+                height: 40px;
+                background: #f8fafc;
+                border: 1px solid var(--be-border);
+                border-radius: 8px;
+                padding: 0 10px;
+                font-size: 0.82rem;
+            }
+            .be-tb-row-format {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 6px;
+            }
+            .be-tb-divider {
+                display: none;
+            }
+            .be-tb-btn {
+                width: 100%;
+                min-width: 0;
+                height: 40px;
+                border-radius: 8px;
+                background: #f8fafc;
+            }
+            .be-editor-wrap {
+                min-height: 260px;
+            }
+            .tox-tinymce,
+            .tox-editor-container,
+            .tox-sidebar-wrap,
+            .tox-edit-area,
+            .tox-edit-area__iframe {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
             }
         }
     </style>
 </head>
 <body>
 
-<form method="POST" action="blog_edit.php?id=<?= $id ?>" enctype="multipart/form-data" id="blogForm" style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
+<form method="POST" action="blog_edit.php?id=<?= $id ?>" enctype="multipart/form-data" id="blogForm" class="be-app">
     <input type="hidden" name="csrf_token" value="<?= generate_csrf() ?>">
-    <input type="hidden" name="current_image" value="<?= htmlspecialchars($bl["image_path"]) ?>">
+    <input type="hidden" name="current_image" value="<?= htmlspecialchars($bl["image_path"] ?? "") ?>">
+    <input type="hidden" name="current_image_landscape" value="<?= htmlspecialchars($bl["image_path_landscape"] ?? "") ?>">
 
     <!-- ── App Top Navigation Bar ── -->
     <header class="be-header">
@@ -961,56 +1173,44 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
 
             <!-- Sleek Minimalist Formatting Toolbar -->
             <div class="be-toolbar">
-                <select class="be-tb-select" onchange="fmtBlock(this.value); this.selectedIndex=0;" title="Headings">
-                    <option value="">Style</option>
-                    <option value="p">Paragraph</option>
-                    <option value="h1">Heading 1</option>
-                    <option value="h2">Heading 2</option>
-                    <option value="h3">Heading 3</option>
-                    <option value="blockquote">Quote</option>
-                </select>
-
-                <div class="be-tb-divider"></div>
-
-                <select class="be-tb-select" onchange="applyFontFamily(this.value); this.selectedIndex=0;" title="Font Family">
-                    <option value="">Font</option>
-                    <option value="Lora, Georgia, serif">Editorial Serif (Lora)</option>
-                    <option value="'Playfair Display', serif">Display Serif (Playfair)</option>
-                    <option value="'Plus Jakarta Sans', sans-serif">Modern Bold (Jakarta)</option>
-                    <option value="'Inter', sans-serif">Clean Sans (Inter)</option>
-                    <option value="'JetBrains Mono', monospace">Monospace (Code)</option>
-                </select>
-
-                <div class="be-tb-divider"></div>
-
-                <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
-
-                <div class="be-tb-divider"></div>
-
-                <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
-
-                <div class="be-tb-divider"></div>
-
-                <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
-                <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
-
-                <div class="be-tb-divider"></div>
-
-                <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
-                <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
-                <button type="button" class="be-tb-btn" onclick="document.getElementById('editor-inline-img').click()" title="Insert Image into Content"><i class="fa-regular fa-image"></i></button>
-                <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
-                
-                <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                <div class="be-tb-row be-tb-row-selects">
+                    <select class="be-tb-select" onchange="fmtBlock(this.value); this.selectedIndex=0;" title="Headings">
+                        <option value="">Style</option>
+                        <option value="p">Paragraph</option>
+                        <option value="h1">Heading 1</option>
+                        <option value="h2">Heading 2</option>
+                        <option value="h3">Heading 3</option>
+                        <option value="blockquote">Quote</option>
+                    </select>
+                    <select class="be-tb-select" onchange="applyFontFamily(this.value); this.selectedIndex=0;" title="Font Family">
+                        <option value="">Font</option>
+                        <option value="Lora, Georgia, serif">Editorial Serif (Lora)</option>
+                        <option value="'Playfair Display', serif">Display Serif (Playfair)</option>
+                        <option value="'Plus Jakarta Sans', sans-serif">Modern Bold (Jakarta)</option>
+                        <option value="'Inter', sans-serif">Clean Sans (Inter)</option>
+                        <option value="'JetBrains Mono', monospace">Monospace (Code)</option>
+                    </select>
+                </div>
+                <div class="be-tb-row be-tb-row-format">
+                    <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="document.getElementById('editor-inline-img').click()" title="Insert Image into Content"><i class="fa-regular fa-image"></i></button>
+                    <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
+                    <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                </div>
             </div>
 
             <!-- Rich Text Area -->
-            <div style="flex:1; display:flex; flex-direction:column; min-height:400px;">
+            <div class="be-editor-wrap">
                 <textarea id="blog-editor" name="content" style="width:100%; height:100%;"><?= htmlspecialchars($bl["content"]) ?></textarea>
             </div>
         </main>
@@ -1050,28 +1250,42 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
             <div>
                 <div class="be-sec-title">
                     <i class="fa-regular fa-image"></i>
-                    <span>Cover Image</span>
+                    <span>Cover thumbnails</span>
                 </div>
-                <div class="be-dropzone" onclick="document.getElementById('bc-img-file').click()">
-                    <?php if (!empty($bl["image_path"])): ?>
-                        <img src="<?= htmlspecialchars($bl["image_path"]) ?>" id="coverPreviewImg" class="be-dropzone-preview" alt="Cover Image">
-                        <div class="be-dropzone-text"><i class="fa-solid fa-arrow-rotate-right"></i> Replace Cover</div>
-                    <?php else: ?>
-                        <img src="" id="coverPreviewImg" class="be-dropzone-preview" alt="Cover Image" style="display:none;">
-                        <div style="padding: 8px 0;">
-                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.3rem; color:var(--be-text-muted); margin-bottom:4px;"></i>
-                            <div class="be-dropzone-text">Click to upload cover</div>
+                <p class="be-form-hint" style="margin-bottom:10px;">Portrait shows on phone. Landscape shows on laptop.</p>
+                <div class="be-cover-pair">
+                    <div>
+                        <div class="be-cover-slot-label">Portrait · mobile</div>
+                        <div class="be-dropzone" onclick="document.getElementById('bc-img-file').click()">
+                            <?php if (!empty($bl["image_path"])): ?>
+                                <img src="<?= htmlspecialchars($bl["image_path"]) ?>" id="coverPreviewImg" class="be-dropzone-preview" alt="Portrait cover">
+                                <div class="be-dropzone-text"><i class="fa-solid fa-arrow-rotate-right"></i> Replace portrait</div>
+                            <?php else: ?>
+                                <img src="" id="coverPreviewImg" class="be-dropzone-preview" alt="Portrait cover" style="display:none;">
+                                <div style="padding: 8px 0;">
+                                    <i class="fa-solid fa-mobile-screen" style="font-size:1.1rem; color:var(--be-text-muted); margin-bottom:4px;"></i>
+                                    <div class="be-dropzone-text">9:16 portrait</div>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-                </div>
-                <input type="file" id="bc-img-file" name="image" accept="image/*" style="display:none;" onchange="previewCoverImage(this)">
-
-                <div class="be-form-group" style="margin-top: 8px;">
-                    <label class="be-form-label">Aspect Ratio</label>
-                    <select name="image_ratio" class="be-form-select">
-                        <option value="16:9" <?= ($bl["image_ratio"] ?? "") === "16:9" ? "selected" : "" ?>>Landscape (16:9)</option>
-                        <option value="9:16" <?= ($bl["image_ratio"] ?? "") === "9:16" ? "selected" : "" ?>>Portrait (9:16)</option>
-                    </select>
+                        <input type="file" id="bc-img-file" name="image" accept="image/*" style="display:none;" onchange="previewCoverImage(this, 'coverPreviewImg')">
+                    </div>
+                    <div>
+                        <div class="be-cover-slot-label">Landscape · laptop</div>
+                        <div class="be-dropzone" onclick="document.getElementById('bc-img-land-file').click()">
+                            <?php if (!empty($bl["image_path_landscape"])): ?>
+                                <img src="<?= htmlspecialchars($bl["image_path_landscape"]) ?>" id="coverPreviewLand" class="be-dropzone-preview" alt="Landscape cover">
+                                <div class="be-dropzone-text"><i class="fa-solid fa-arrow-rotate-right"></i> Replace landscape</div>
+                            <?php else: ?>
+                                <img src="" id="coverPreviewLand" class="be-dropzone-preview" alt="Landscape cover" style="display:none;">
+                                <div style="padding: 8px 0;">
+                                    <i class="fa-solid fa-laptop" style="font-size:1.1rem; color:var(--be-text-muted); margin-bottom:4px;"></i>
+                                    <div class="be-dropzone-text">16:9 landscape</div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <input type="file" id="bc-img-land-file" name="image_landscape" accept="image/*" style="display:none;" onchange="previewCoverImage(this, 'coverPreviewLand')">
+                    </div>
                 </div>
             </div>
 
@@ -1181,11 +1395,357 @@ $last_updated = !empty($bl["updated_at"]) ? date("M j, Y, g:i A", strtotime($bl[
 
 <!-- ── JavaScript Engine ── -->
 <script>
+function escapeImgAttr(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;');
+}
+function applyImageSeoMeta(editor) {
+    if (!editor || !editor.dom) return;
+    editor.dom.select('img').forEach(function (img) {
+        var alt = (img.getAttribute('alt') || '').trim();
+        if (alt) img.setAttribute('title', alt);
+    });
+}
+function getImageAlign(img) {
+    var saved = (img.getAttribute('data-align') || '').toLowerCase();
+    if (saved === 'left' || saved === 'right' || saved === 'center') return saved;
+    var ml = (img.style.marginLeft || '').trim();
+    var mr = (img.style.marginRight || '').trim();
+    if (ml === '0px' || ml === '0') return 'left';
+    if (mr === '0px' || mr === '0') return 'right';
+    return 'center';
+}
+function setImageAlign(editor, img, align) {
+    if (!img || img.nodeName !== 'IMG') return;
+    if (align !== 'left' && align !== 'right' && align !== 'center') align = 'left';
+    var keepWidth = (img.style.width || '').trim();
+    if (!keepWidth && img.getAttribute('width')) keepWidth = img.getAttribute('width') + 'px';
+    img.setAttribute('data-align', align);
+    editor.dom.removeClass(img, 'align-left');
+    editor.dom.removeClass(img, 'align-right');
+    editor.dom.removeClass(img, 'align-center');
+    editor.dom.addClass(img, 'align-' + align);
+    editor.dom.setAttrib(img, 'align', '');
+    editor.dom.setStyles(img, {
+        float: 'none',
+        display: 'block',
+        clear: 'both',
+        maxWidth: '100%',
+        height: 'auto',
+        marginTop: '1.5em',
+        marginBottom: '1.25em',
+        marginLeft: align === 'left' ? '0' : 'auto',
+        marginRight: align === 'right' ? '0' : 'auto'
+    });
+    if (keepWidth && keepWidth !== 'auto') {
+        editor.dom.setStyle(img, 'width', keepWidth);
+    }
+    var parent = img.parentNode;
+    if (parent && (parent.nodeName === 'P' || parent.nodeName === 'FIGURE' || parent.nodeName === 'DIV')) {
+        editor.dom.setStyle(parent, 'textAlign', align);
+        parent.setAttribute('data-img-align', align);
+    }
+}
+function syncImageDisplayWidth(editor, img) {
+    if (!img || img.nodeName !== 'IMG') return;
+    var shown = Math.round(img.getBoundingClientRect().width);
+    if (shown < 8) return;
+    var declared = parseInt(img.style.width, 10) || parseInt(img.getAttribute('width'), 10) || 0;
+    if (!declared || declared > shown + 8) {
+        editor.dom.setStyle(img, 'width', shown + 'px');
+        editor.dom.setStyle(img, 'height', 'auto');
+        img.removeAttribute('width');
+        img.removeAttribute('height');
+    }
+}
+function isolateImageBlock(editor, img) {
+    var align = getImageAlign(img);
+    var parent = img.parentNode;
+    var block;
+    if (parent && parent.nodeName === 'FIGURE') {
+        block = parent;
+    } else if (parent && parent.nodeName === 'P') {
+        if (parent.childNodes.length === 1) {
+            block = parent;
+        } else {
+            block = editor.dom.create('p');
+            parent.parentNode.insertBefore(block, parent);
+            block.appendChild(img);
+            if (!(parent.textContent || '').replace(/\u00a0/g, '').trim() && !parent.querySelector('img')) {
+                editor.dom.remove(parent);
+            }
+        }
+    } else {
+        block = editor.dom.create('p');
+        img.parentNode.insertBefore(block, img);
+        block.appendChild(img);
+    }
+    setImageAlign(editor, img, align);
+    return block;
+}
+function insertWritePara(editor, where) {
+    var node = editor.selection.getNode();
+    if (node && node.nodeName !== 'IMG') node = editor.dom.getParent(node, 'img');
+    if (!node || node.nodeName !== 'IMG') return;
+    var block = isolateImageBlock(editor, node);
+    var p = editor.dom.create('p', { style: 'margin-top:1.15em;min-height:1.8em;' }, '<br data-mce-bogus="1">');
+    if (where === 'before') editor.dom.insertBefore(p, block);
+    else editor.dom.insertAfter(p, block);
+    editor.selection.setCursorLocation(p, 0);
+    editor.nodeChanged();
+    editor.focus();
+}
+function ensureWriteSpaceAroundImages(editor) {
+    if (!editor || !editor.getBody) return;
+    var body = editor.getBody();
+    if (!body) return;
+    var last = body.lastElementChild;
+    if (!last) {
+        body.appendChild(editor.dom.create('p', {}, '<br data-mce-bogus="1">'));
+        return;
+    }
+    var hasImg = last.nodeName === 'IMG' || (last.querySelector && last.querySelector('img'));
+    var empty = !(last.textContent || '').replace(/\u00a0/g, '').trim();
+    if (hasImg && (last.nodeName === 'IMG' || empty)) {
+        var next = last.nextElementSibling;
+        if (!next || next.nodeName !== 'P') {
+            body.appendChild(editor.dom.create('p', {}, '<br data-mce-bogus="1">'));
+        }
+    }
+}
+function registerImageWriteButtons(editor) {
+    editor.ui.registry.addButton('writebefore', {
+        text: 'Write before',
+        tooltip: 'Type above this image',
+        onAction: function () { insertWritePara(editor, 'before'); }
+    });
+    editor.ui.registry.addButton('writeafter', {
+        text: 'Write after',
+        tooltip: 'Type below this image',
+        onAction: function () { insertWritePara(editor, 'after'); }
+    });
+    function currentImg() {
+        var node = editor.selection.getNode();
+        if (node && node.nodeName !== 'IMG') node = editor.dom.getParent(node, 'img');
+        return node && node.nodeName === 'IMG' ? node : null;
+    }
+    editor.ui.registry.addButton('imgalignleft', {
+        icon: 'align-left',
+        tooltip: 'Align left',
+        onAction: function () {
+            var img = currentImg();
+            if (img) setImageAlign(editor, img, 'left');
+        }
+    });
+    editor.ui.registry.addButton('imgaligncenter', {
+        icon: 'align-center',
+        tooltip: 'Align center',
+        onAction: function () {
+            var img = currentImg();
+            if (img) setImageAlign(editor, img, 'center');
+        }
+    });
+    editor.ui.registry.addButton('imgalignright', {
+        icon: 'align-right',
+        tooltip: 'Align right',
+        onAction: function () {
+            var img = currentImg();
+            if (img) setImageAlign(editor, img, 'right');
+        }
+    });
+    editor.on('click', function (e) {
+        if (e.target && e.target.nodeName === 'IMG') {
+            editor.selection.select(e.target);
+            syncImageDisplayWidth(editor, e.target);
+        }
+    });
+    editor.on('ObjectResized', function (e) {
+        if (e.target && e.target.nodeName === 'IMG') {
+            editor.dom.setStyle(e.target, 'height', 'auto');
+        }
+    });
+    editor.on('SetContent NodeChange', function () {
+        ensureWriteSpaceAroundImages(editor);
+    });
+}
+function ensureTinyImageDialogStyles() {
+    if (document.getElementById('blog-tinymce-image-css')) return;
+    var css = document.createElement('style');
+    css.id = 'blog-tinymce-image-css';
+    css.textContent = `
+        .tox-dialog.blog-img-dialog {
+            max-width: 460px !important;
+        }
+        .tox-dialog.blog-img-dialog .tox-dialog__body-nav {
+            display: none !important;
+        }
+        .tox-dialog.blog-img-dialog .tox-dialog__body {
+            display: block !important;
+        }
+        .tox-dialog.blog-img-dialog .tox-dialog__body-content {
+            padding: 4px 2px 2px !important;
+            max-height: none !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-stack {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 16px !important;
+            width: 100% !important;
+        }
+        .tox-dialog.blog-img-dialog .tox-dropzone {
+            width: 100% !important;
+            min-height: 150px !important;
+            margin: 0 !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-seo {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-seo label {
+            font-weight: 600 !important;
+            color: #334155 !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-seo textarea {
+            width: 100% !important;
+            min-height: 84px !important;
+            resize: vertical !important;
+            box-sizing: border-box !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            padding: 10px 12px !important;
+            font-size: 14px !important;
+            line-height: 1.45 !important;
+            font-family: inherit !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-seo textarea:focus {
+            outline: none !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.15) !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-hint {
+            margin: 0 !important;
+            font-size: 12px !important;
+            color: #64748b !important;
+            line-height: 1.4 !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-seo,
+        .tox-dialog.blog-img-dialog .blog-img-width {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-sizes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-sizes button {
+            height: 36px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+        }
+        .tox-dialog.blog-img-dialog .blog-img-sizes button:hover {
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+    `;
+    document.head.appendChild(css);
+}
+function simplifyTinyImageDialog() {
+    ensureTinyImageDialogStyles();
+    var dialog = document.querySelector('.tox-dialog');
+    if (!dialog) return;
+    var title = dialog.querySelector('.tox-dialog__title');
+    if (!title || !/image/i.test(title.textContent || '')) return;
+
+    var uploadTab = null;
+    dialog.querySelectorAll('.tox-tab').forEach(function (tab) {
+        var label = (tab.textContent || '').trim();
+        if (/general|advanced/i.test(label)) tab.style.display = 'none';
+        if (/upload/i.test(label)) uploadTab = tab;
+    });
+    if (uploadTab) uploadTab.click();
+
+    window.setTimeout(function () {
+        dialog.classList.add('blog-img-dialog');
+        var seoGroup = null;
+        var host = dialog.querySelector('.tox-dialog__body-content') || dialog;
+
+        dialog.querySelectorAll('label').forEach(function (label) {
+            var text = (label.textContent || '').replace(/\s+/g, ' ').trim();
+            if (/^(Source|Width|Height)$/i.test(text)) {
+                var box = label.closest('.tox-form__group') || label.parentElement;
+                if (box) box.style.display = 'none';
+            }
+        });
+        dialog.querySelectorAll('.tox-form__group').forEach(function (group) {
+            var label = group.querySelector('label');
+            var text = label ? (label.textContent || '').replace(/\s+/g, ' ').trim() : '';
+            if (/source|width|height|caption|border|vspace|hspace|style|class|title/i.test(text) && !/description|seo/i.test(text)) {
+                group.style.display = 'none';
+            }
+            if (/alternative description|description/i.test(text)) {
+                seoGroup = group;
+                group.style.display = '';
+                group.classList.add('blog-img-seo');
+                if (label) label.textContent = 'SEO description';
+            }
+        });
+
+        var dropzone = dialog.querySelector('.tox-dropzone');
+        var uploadPanel = dropzone ? dropzone.parentElement : host;
+        uploadPanel.classList.add('blog-img-stack');
+
+        if (seoGroup) {
+            var nativeInput = seoGroup.querySelector('input:not(.blog-img-seo-field), textarea:not(.blog-img-seo-field)');
+            if (nativeInput && !seoGroup.querySelector('.blog-img-seo-field')) {
+                var ta = document.createElement('textarea');
+                ta.className = 'blog-img-seo-field';
+                ta.rows = 3;
+                ta.placeholder = 'What is this image about? Used as alt text.';
+                ta.value = nativeInput.value || '';
+                ta.addEventListener('input', function () {
+                    nativeInput.value = ta.value;
+                    nativeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    nativeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                nativeInput.style.display = 'none';
+                nativeInput.setAttribute('tabindex', '-1');
+                seoGroup.appendChild(ta);
+                var hint = document.createElement('p');
+                hint.className = 'blog-img-hint';
+                hint.textContent = 'Saved on the image as alt and title for search engines.';
+                seoGroup.appendChild(hint);
+            }
+            uploadPanel.appendChild(seoGroup);
+        }
+
+        var tabNav = dialog.querySelector('.tox-dialog__body-nav');
+        if (tabNav) tabNav.style.display = 'none';
+    }, 50);
+}
+
 // --- TinyMCE Editor Initialization ------------------------------------------
 tinymce.init({
     selector: '#blog-editor',
-    min_height: 380,
-    height: 440,
+    min_height: window.matchMedia('(max-width: 768px)').matches ? 240 : 380,
+    height: window.matchMedia('(max-width: 768px)').matches ? 280 : 440,
     menubar: false,
     statusbar: false,
     branding: false,
@@ -1193,20 +1753,28 @@ tinymce.init({
     toolbar: false,
     plugins: 'image link lists table code codesample charmap emoticons wordcount autosave visualblocks quickbars',
     quickbars_selection_toolbar: 'bold italic underline | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
-    quickbars_insert_toolbar: 'image link table codesample',
+    quickbars_insert_toolbar: window.matchMedia('(max-width: 768px)').matches ? false : 'image link table codesample',
     table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
     paste_webkit_styles: 'all',
-    extended_valid_elements: 'table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width]',
+    extended_valid_elements: 'img[class|src|alt|title|width|height|style|data-align],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width]',
     font_family_formats: 'Editorial Serif=Lora, serif; Display Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Monospace=JetBrains Mono, monospace',
-    quickbars_image_toolbar: 'alignleft aligncenter alignright | rotateleft rotateright | editimage imageoptions',
-    image_advtab: true,
-    image_caption: true,
-    image_dimensions: true,
+    quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | editimage',
+    image_advtab: false,
+    image_caption: false,
+    image_dimensions: false,
+    image_title: false,
+    image_description: true,
+    image_uploadtab: true,
+    image_prepend_upload_tab: true,
+    automatic_uploads: true,
+    object_resizing: true,
+    resize_img_proportional: true,
     paste_data_images: true,
     
     setup: function (editor) {
+        registerImageWriteButtons(editor);
         editor.on('init', function () {
             editor.getContainer().style.border = 'none';
             editor.getContainer().style.boxShadow = 'none';
@@ -1215,6 +1783,15 @@ tinymce.init({
         });
         editor.on('NodeChange keyup change input', function () {
             updateEditorialStats();
+        });
+        editor.on('OpenWindow', function () {
+            window.setTimeout(function () {
+                simplifyTinyImageDialog();
+            }, 0);
+        });
+        editor.on('CloseWindow', function () {
+            applyImageSeoMeta(editor);
+            ensureWriteSpaceAroundImages(editor);
         });
     },
     
@@ -1265,8 +1842,26 @@ tinymce.init({
             max-width: 100%;
             height: auto;
             border-radius: 10px;
-            margin: 1.4em auto;
+            margin: 1.5em auto 1.35em;
             display: block;
+            float: none;
+            clear: both;
+            cursor: pointer;
+        }
+        img[data-align="left"], img.align-left {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
+        img[data-align="center"], img.align-center {
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        img[data-align="right"], img.align-right {
+            margin-left: auto !important;
+            margin-right: 0 !important;
+        }
+        p {
+            clear: both;
         }
         table {
             width: 100%;
@@ -1283,24 +1878,22 @@ tinymce.init({
         th { background: #f8fafc; font-weight: 700; }
     `,
     
-    images_upload_handler: function (blobInfo, success, failure, progress) {
-        const formData = new FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        
-        fetch('upload_editor_image.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.url) {
-                success(data.url);
-            } else {
-                failure('Upload failed: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(err => {
-            failure('Upload error: ' + err.message);
+    images_upload_handler: function (blobInfo, progress) {
+        return new Promise(function (resolve, reject) {
+            const formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            fetch('upload_editor_image.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && data.url) resolve(data.url);
+                else reject(data && data.error ? data.error : 'Upload failed');
+            })
+            .catch(function (err) {
+                reject(err && err.message ? err.message : 'Upload error');
+            });
         });
     }
 });
@@ -1338,6 +1931,7 @@ function insertCodeBlock() {
     }
 }
 function uploadEditorImage(file) {
+    const seo = window.prompt('SEO description for this image', '') || '';
     const formData = new FormData();
     formData.append('file', file);
     fetch('upload_editor_image.php', {
@@ -1347,7 +1941,8 @@ function uploadEditorImage(file) {
     .then(res => res.json())
     .then(data => {
         if (data.url && tinymce.activeEditor) {
-            tinymce.activeEditor.execCommand('mceInsertContent', false, `<img src="${data.url}" alt="" style="max-width:100%; border-radius:10px;">`);
+            const safe = escapeImgAttr(seo.trim());
+            tinymce.activeEditor.execCommand('mceInsertContent', false, `<p style="text-align:left"><img src="${data.url}" alt="${safe}" title="${safe}" data-align="left" class="align-left" style="max-width:100%; border-radius:10px; display:block; margin:1.5em 0 1.25em;"></p><p><br></p>`);
         } else {
             alert('Upload failed: ' + (data.error || 'Unknown error'));
         }
@@ -1367,11 +1962,11 @@ function updatePublishStatusBadge(isPublished) {
     }
 }
 
-function previewCoverImage(input) {
-    if (input.files && input.files[0]) {
+function previewCoverImage(input, previewId) {
+    const img = document.getElementById(previewId || 'coverPreviewImg');
+    if (input.files && input.files[0] && img) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const img = document.getElementById('coverPreviewImg');
             img.src = e.target.result;
             img.style.display = 'block';
         };

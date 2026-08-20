@@ -26,6 +26,19 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_TIMEOUT, 5);
 
+    try {
+        $coverCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'image_path_landscape'")->fetch();
+        if (!$coverCol) {
+            $pdo->exec("ALTER TABLE blogs ADD COLUMN image_path_landscape VARCHAR(255) NULL DEFAULT NULL AFTER image_path");
+        }
+        $sliderCol = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'in_slider'")->fetch();
+        if (!$sliderCol) {
+            $pdo->exec("ALTER TABLE blogs ADD COLUMN in_slider TINYINT(1) NOT NULL DEFAULT 0 AFTER is_published");
+        }
+    } catch (Exception $e) {
+        // blogs table may not exist on a fresh install
+    }
+
     // Create users table
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
