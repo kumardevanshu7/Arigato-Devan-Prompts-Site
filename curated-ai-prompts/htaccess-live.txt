@@ -1,0 +1,10 @@
+# ─── LIVE (Hostinger root public_html) ───
+# Copy this into: curated-ai-prompts/.htaccess
+# Replace local RewriteBase line with this single line:
+
+RewriteEngine On
+RewriteBase /curated-ai-prompts/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9-]*)/?$ prompt.php?slug=$1 [L,QSA,NC]

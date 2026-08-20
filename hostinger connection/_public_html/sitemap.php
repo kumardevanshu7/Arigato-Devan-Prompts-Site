@@ -28,7 +28,7 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
-        "url"        => "/not_mine.php",
+        "url"        => "/curated_ai_prompts.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
         "lastmod"    => "2026-07-06",
@@ -189,17 +189,27 @@ try {
     // silently skip if error
 }
 
-// Not Mine prompts — clean URLs only (/not-mine/{slug})
-$not_mine_prompts = [];
+// Curated AI Prompts — clean URLs only (/curated-ai-prompts/{slug})
+$curated_prompts = [];
 try {
     $nm_stmt = $pdo->query(
-        "SELECT slug, created_at FROM not_mine_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+        "SELECT slug, created_at FROM curated_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
     );
-    $not_mine_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+    $curated_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
 }
 
-// Active Digital Store products
+if (!$curated_prompts) {
+    try {
+        $nm_stmt = $pdo->query(
+            "SELECT slug, created_at FROM not_mine_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+        );
+        $curated_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+    }
+}
+
+// Active Digital Store products (still live — not removed from Hostinger)
 $store_products = [];
 try {
     $sp_stmt = $pdo->query(
@@ -246,9 +256,9 @@ $today = date("Y-m-d");
   </url>
 <?php endforeach; ?>
 
-<?php foreach ($not_mine_prompts as $nm): ?>
+<?php foreach ($curated_prompts as $nm): ?>
   <url>
-    <loc><?= $base . "/not-mine/" . htmlspecialchars($nm["slug"]) ?></loc>
+    <loc><?= $base . "/curated-ai-prompts/" . htmlspecialchars($nm["slug"]) ?></loc>
     <lastmod><?= date("Y-m-d", strtotime($nm["created_at"])) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>

@@ -158,7 +158,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_prompts (
+    $pdo->exec("CREATE TABLE IF NOT EXISTS curated_prompts (
         id INT AUTO_INCREMENT PRIMARY KEY,
         category ENUM('boys','girls','couple','family','creativity') NOT NULL,
         title VARCHAR(200) NOT NULL,
@@ -177,7 +177,7 @@ try {
         UNIQUE KEY unique_nm_slug (slug)
     )");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_votes (
+    $pdo->exec("CREATE TABLE IF NOT EXISTS curated_votes (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         prompt_id INT NOT NULL,
@@ -186,7 +186,7 @@ try {
         UNIQUE KEY unique_vote (user_id, prompt_id)
     )");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS not_mine_likes (
+    $pdo->exec("CREATE TABLE IF NOT EXISTS curated_likes (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         prompt_id INT NOT NULL,
@@ -303,29 +303,29 @@ try {
             }
 
             $nm_alters = [
-                "ALTER TABLE not_mine_likes ADD COLUMN like_type ENUM('unlock','manual') NOT NULL DEFAULT 'manual'",
-                "ALTER TABLE not_mine_likes DROP INDEX unique_nm_like",
-                "ALTER TABLE not_mine_likes ADD UNIQUE KEY unique_nm_like (user_id, prompt_id, like_type)",
-                "ALTER TABLE not_mine_prompts MODIFY category ENUM('boys','girls','couple','family','creativity') NOT NULL",
-                "ALTER TABLE not_mine_prompts ADD COLUMN slug VARCHAR(220) DEFAULT NULL",
-                "ALTER TABLE not_mine_prompts ADD COLUMN meta_description TEXT DEFAULT NULL",
-                "ALTER TABLE not_mine_prompts ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
-                "ALTER TABLE not_mine_prompts ADD UNIQUE KEY unique_nm_slug (slug)",
+                "ALTER TABLE curated_likes ADD COLUMN like_type ENUM('unlock','manual') NOT NULL DEFAULT 'manual'",
+                "ALTER TABLE curated_likes DROP INDEX unique_nm_like",
+                "ALTER TABLE curated_likes ADD UNIQUE KEY unique_nm_like (user_id, prompt_id, like_type)",
+                "ALTER TABLE curated_prompts MODIFY category ENUM('boys','girls','couple','family','creativity') NOT NULL",
+                "ALTER TABLE curated_prompts ADD COLUMN slug VARCHAR(220) DEFAULT NULL",
+                "ALTER TABLE curated_prompts ADD COLUMN meta_description TEXT DEFAULT NULL",
+                "ALTER TABLE curated_prompts ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
+                "ALTER TABLE curated_prompts ADD UNIQUE KEY unique_nm_slug (slug)",
             ];
             foreach ($nm_alters as $sql) {
                 try { $pdo->exec($sql); } catch (PDOException $e) {}
             }
             try {
-                $pdo->exec("INSERT IGNORE INTO not_mine_likes (user_id, prompt_id, like_type)
-                    SELECT user_id, prompt_id, 'unlock' FROM not_mine_votes");
+                $pdo->exec("INSERT IGNORE INTO curated_likes (user_id, prompt_id, like_type)
+                    SELECT user_id, prompt_id, 'unlock' FROM curated_votes");
             } catch (PDOException $e) {}
             if (is_file(__DIR__ . '/slug_helper.php')) {
                 require_once __DIR__ . '/slug_helper.php';
                 try {
-                    $nm_rows = $pdo->query("SELECT id, title FROM not_mine_prompts WHERE slug IS NULL OR slug = ''")->fetchAll(PDO::FETCH_ASSOC);
+                    $nm_rows = $pdo->query("SELECT id, title FROM curated_prompts WHERE slug IS NULL OR slug = ''")->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($nm_rows as $nm_row) {
-                        $nm_slug = uniqueNotMineSlug($pdo, $nm_row['title'], (int) $nm_row['id']);
-                        $pdo->prepare('UPDATE not_mine_prompts SET slug = ? WHERE id = ?')->execute([$nm_slug, $nm_row['id']]);
+                        $nm_slug = uniqueCuratedSlug($pdo, $nm_row['title'], (int) $nm_row['id']);
+                        $pdo->prepare('UPDATE curated_prompts SET slug = ? WHERE id = ?')->execute([$nm_slug, $nm_row['id']]);
                     }
                 } catch (PDOException $e) {}
             }

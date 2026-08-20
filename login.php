@@ -34,7 +34,7 @@ unset($_SESSION["error_msg"]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login &ndash; Arigato Devan Prompts</title>
     <meta name="description" content="Login to Arigato Devan PromptVerse and unlock premium AI couple prompts.">
-    <link rel="stylesheet" href="digital_store/css/store.css">
+    <link rel="stylesheet" href="css/site-nav.css?v=20260818">
     <style>
         /* ─── Nogoda Palette Styles ─── */
         :root {

@@ -35,15 +35,29 @@ $nm_saved = [];
 try {
     $nm_stmt = $pdo->prepare("
         SELECT nm.id, nm.slug, nm.title, nm.thumbnail_image AS image_path, nm.category, nm.tags,
-               'not_mine' AS save_source
+               'curated' AS save_source
         FROM saved_prompts sp
-        JOIN not_mine_prompts nm ON nm.id = sp.prompt_id
-        WHERE sp.user_id = ? AND sp.source = 'not_mine'
+        JOIN curated_prompts nm ON nm.id = sp.prompt_id
+        WHERE sp.user_id = ? AND sp.source = 'curated'
         ORDER BY sp.created_at DESC
     ");
     $nm_stmt->execute([$user_id]);
     $nm_saved = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {}
+if (!$nm_saved) {
+    try {
+        $nm_stmt = $pdo->prepare("
+            SELECT nm.id, nm.slug, nm.title, nm.thumbnail_image AS image_path, nm.category, nm.tags,
+                   'curated' AS save_source
+            FROM saved_prompts sp
+            JOIN not_mine_prompts nm ON nm.id = sp.prompt_id
+            WHERE sp.user_id = ? AND sp.source IN ('not_mine', 'curated')
+            ORDER BY sp.created_at DESC
+        ");
+        $nm_stmt->execute([$user_id]);
+        $nm_saved = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {}
+}
 
 $total = count($saved) + count($nm_saved);
 
@@ -53,7 +67,7 @@ $stats = [
     "insta_viral"      => 0,
     "already_uploaded" => 0,
     "direct"           => 0,
-    "not_mine"         => count($nm_saved),
+    "curated"         => count($nm_saved),
 ];
 foreach ($saved as $p) {
     $pt = $p["prompt_type"] ?? "secret";
@@ -68,7 +82,7 @@ $type_chips = [
     "unreleased"       => ["icon" => "fa-moon",   "label" => "Unreleased"],
     "already_uploaded" => ["icon" => "fa-upload", "label" => "Uploaded"],
     "direct"           => ["icon" => "fa-bolt",   "label" => "Direct"],
-    "not_mine"         => ["icon" => "fa-ban",    "label" => "#not-mine"],
+    "curated"         => ["icon" => "fa-wand-magic-sparkles",    "label" => "Curated AI Prompts"],
 ];
 
 require_once "includes/prompt_cards.php";
@@ -133,7 +147,7 @@ require_once "includes/prompt_cards.php";
 
     <?php if (!empty($nm_saved)): ?>
     <h3 class="nm-gradient-text" style="margin:28px 0 14px;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px;">
-        <i class="fa-solid fa-ban nm-gradient-icon"></i> #not-mine
+        <i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> Curated AI Prompts
     </h3>
     <div class="sp-nm-grid">
         <?php foreach ($nm_saved as $nm): ?>

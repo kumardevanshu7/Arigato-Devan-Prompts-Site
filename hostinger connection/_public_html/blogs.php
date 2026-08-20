@@ -35,13 +35,14 @@ arsort($all_tags);
 
 // Google auth url for login button
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-nogoda">
 <head>
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
+<?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -132,7 +133,7 @@ html.no-scroll, body.no-scroll {
 }
 
 /* Override Header to be stunningly premium & clean (0% comic, 100% professional) */
-header {
+header:not(.store-header) {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -270,7 +271,7 @@ header .admin-avatar {
     header .header-right.desktop-only {
         display: none !important; /* Force hide desktop-only items with absolute authority */
     }
-    header {
+    header:not(.store-header) {
         padding: 0 16px !important; /* Center elements vertically inside a 64px capsule */
         margin: 15px 12px 0 !important;
         border-radius: 20px !important;
@@ -569,7 +570,7 @@ footer .footer-links a:hover {
 
 /* Robust responsive floating header styling for mobile */
 @media (max-width: 768px) {
-    header {
+    header:not(.store-header) {
         padding: 8px 16px !important;
         margin: 10px 12px 0 !important;
         border-radius: 16px !important;
@@ -898,7 +899,7 @@ footer .footer-links a:hover {
 <link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
 <?php endif; ?>
 </head>
-<body class="blog-splash-active">
+<body class="blog-splash-active page-store theme-nogoda">
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -914,86 +915,7 @@ footer .footer-links a:hover {
 
 <div class="aurora-bg"></div>
 <div class="back-glow" id="back-glow"></div>
-<header>
-  <div class="header-top-row">
-    <div class="logo-area" id="logo-container" style="cursor:pointer">
-      <div class="logo-flipper">
-        <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-        <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
-      </div>
-      <div class="logo-text">arigato.<span class="blog-brand-suffix">blog</span></div>
-    </div>
-    
-    <nav class="nav-links desktop-only">
-      <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-      <a href="gallery.php">GALLERY</a>
-      <a href="blogs.php" class="active">BLOGS</a>
-      <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-      <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
-      <div class="nav-dropdown">
-          <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-          <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
-          <div class="nav-dropdown-menu">
-              <a href="secret_code.php" <?= $curPage == "secret_code.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts["secret_code"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "secret_code.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="unreleased.php" <?= $curPage == "unreleased.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts["unreleased"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "unreleased.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="insta_viral.php" <?= $curPage == "insta_viral.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts["insta_viral"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "insta_viral.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="already_uploaded.php" <?= $curPage == "already_uploaded.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts["already_uploaded"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "already_uploaded.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-                    <a href="direct_prompts.php" <?= $curPage == "direct_prompts.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-hand-pointer"></i> Direct Prompts <?= empty($nav_counts["direct"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "direct_prompts.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-                </div>
-      </div>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <span style="font-weight:600;">@arigato.devan</span>
-        <span class="pulse-dot"></span>
-        <span style="font-weight:800;font-size:1.1rem;">16K+</span>
-      </a>
-    </nav>
-    
-    <div class="header-right desktop-only">
-      <div class="header-divider"></div>
-      <?php if (isset($_SESSION["user_id"])): ?>
-        <?php if ($_SESSION["role"] === "admin"): ?>
-          <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Admin", 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
-        <?php else: ?>
-          <a href="profile.php" style="color:var(--text-color);display:flex;align-items:center;gap:8px"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Profile") ?></a>
-        <?php endif; ?>
-        <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
-      <?php else: ?>
-        <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
-      <?php endif; ?>
-    </div>
-
-    <!-- macOS style 3-dot mobile toggle -->
-    <button class="dots-menu-toggle" id="mobile-dots-toggle" type="button" aria-label="Toggle Menu">
-      <span class="dot red"></span>
-      <span class="dot yellow"></span>
-      <span class="dot green"></span>
-    </button>
-  </div>
-
-  <!-- Mobile Sliding Menu Drawer -->
-  <div class="mobile-menu-drawer">
-    <nav class="mobile-nav-links">
-      <a href="index.php"><i class="fa-solid fa-house"></i> HOME</a>
-      <a href="gallery.php"><i class="fa-solid fa-images"></i> GALLERY</a>
-      <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
-      <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
-      <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (16K+)</a>
-      <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
-      <?php if (isset($_SESSION["user_id"])): ?>
-        <?php if ($_SESSION["role"] === "admin"): ?>
-          <a href="dashboard.php"><i class="fa-solid fa-lock"></i> ADMIN DASHBOARD</a>
-        <?php else: ?>
-          <a href="profile.php"><i class="fa-solid fa-user"></i> MY PROFILE</a>
-        <?php endif; ?>
-        <a href="login.php?logout=1" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
-      <?php else: ?>
-        <a href="login.php" style="color:#6366f1; background:rgba(99,102,241,0.05);"><i class="fa-solid fa-right-to-bracket"></i> LOGIN</a>
-      <?php endif; ?>
-    </nav>
-  </div>
-</header>
+<?php $nav_active = 'blogs'; include 'includes/site_nav.php'; ?>
 
 <!-- Hero -->
 <div class="blogs-hero">

@@ -35,7 +35,7 @@
         </div>
 
         <h2>1. Who We Are &amp; What This Site Does</h2>
-        <p><strong>Arigato Devan</strong> ("we", "us", "our", "the Service") is a website at <strong>arigatodevan.com</strong> that publishes ready-to-copy AI prompts for creating couple-themed photos and reels using third-party AI image tools such as <strong>Google Gemini</strong> and <strong>ChatGPT</strong>. We provide a searchable gallery of prompts, a "Not Mine" section of handpicked prompts sourced from elsewhere and credited where possible, a Prompt of the Day feature, a blog with prompting guides, and an optional digital store for premium prompt packs. These Terms &amp; Conditions ("Terms") govern your use of the Service, whether or not you create an account.</p>
+        <p><strong>Arigato Devan</strong> ("we", "us", "our", "the Service") is a website at <strong>arigatodevan.com</strong> that publishes ready-to-copy AI prompts for creating couple-themed photos and reels using third-party AI image tools such as <strong>Google Gemini</strong> and <strong>ChatGPT</strong>. We provide a searchable gallery of prompts, a "Curated AI Prompts" section of carefully refined and enhanced prompts inspired by various creative sources, a Prompt of the Day feature, a blog with prompting guides, and an optional digital store for premium prompt packs. These Terms &amp; Conditions ("Terms") govern your use of the Service, whether or not you create an account.</p>
 
         <h2>2. Acceptance of Terms</h2>
         <p>By accessing or using Arigato Devan, you confirm that you have read, understood, and agree to these Terms and our <a href="privacy.php">Privacy Policy</a>. If you do not agree with any part of these Terms, please stop using the Service immediately.</p>
@@ -84,7 +84,7 @@
         <p>If you leave a blog comment, testimonial, or feedback submission, you agree that it will not contain hate speech, harassment, spam, illegal content, or content that infringes someone else's rights. You grant us a non-exclusive, royalty-free licence to display, edit for length/clarity, or remove such content on the Service. We may moderate, hide, or delete any submission at our discretion.</p>
 
         <h2>9. Intellectual Property Ownership</h2>
-        <p>Unless otherwise credited (such as in the "Not Mine" section), all original prompt text, site design, graphics, logos, and written content on Arigato Devan are the intellectual property of Arigato Devan and are protected under applicable copyright and trademark laws. The "Not Mine" section republishes prompts we did not personally write; where the original source is known, we aim to credit it — if you are a creator and want a prompt credited, amended, or removed, contact us using the details in Section 16.</p>
+        <p>Unless otherwise credited (such as in the "Curated AI Prompts" section), all original prompt text, site design, graphics, logos, and written content on Arigato Devan are the intellectual property of Arigato Devan and are protected under applicable copyright and trademark laws. The "Curated AI Prompts" section includes prompts that have been refined and enhanced from various creative sources; where the original source is known, we aim to credit it — if you are a creator and want a prompt credited, amended, or removed, contact us using the details in Section 16.</p>
 
         <h2>10. Advertising</h2>
         <p>Arigato Devan may display advertisements served by <strong>Google AdSense</strong> and other advertising partners to support the free content on this site. These ads may use cookies to show relevant advertising, as described in full in our <a href="privacy.php">Privacy Policy</a>. We do not control the specific ad creative shown by these networks and are not responsible for the content of third-party advertisements.</p>
@@ -113,7 +113,7 @@
         <p>These Terms are governed by and construed in accordance with the laws of <strong>India</strong>, without regard to conflict-of-law principles. Any disputes arising from these Terms or your use of the Service shall be subject to the jurisdiction of the courts of India.</p>
 
         <h2>16. Contact Us</h2>
-        <p>If you have questions about these Terms, need a "Not Mine" prompt credited or removed, or want to report misuse, reach us at:</p>
+        <p>If you have questions about these Terms, need a "Curated AI Prompts" prompt credited or removed, or want to report misuse, reach us at:</p>
         <ul>
             <li>Email: <a href="mailto:devansh.grow@gmail.com">devansh.grow@gmail.com</a></li>
             <li>Contact form: <a href="contact.php">arigatodevan.com/contact.php</a></li>

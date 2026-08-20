@@ -58,16 +58,8 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             </a>
 
             <nav class="store-nav">
-                <a href="<?= $nb('digital_store/index.php') ?>" class="shop-glowing-btn">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    Shop
-                </a>
                 <a href="<?= $nb('gallery.php') ?>" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
                 <a href="<?= $nb('blogs.php') ?>" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
-                <a href="<?= $nb('my_heroines.php') ?>" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
-                    <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
-                    My Heroines
-                </a>
                 <a href="<?= $nb('progress.php') ?>" class="gal-icon-link" title="Our Journey">
                     <i class="fa-solid fa-chart-line"></i>
                 </a>
@@ -98,8 +90,8 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
                             <i class="fa-solid fa-user"></i> Solo Prompts
                             <?= empty($nav_counts['solo']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'solo_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link">
-                            <i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span>
+                        <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link">
+                            <i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span>
                         </a>
                         <a href="<?= $nb('all_codes.php') ?>" class="dd-all-codes">
                             <i class="fa-solid fa-code"></i> All Secret Codes
@@ -150,13 +142,8 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
         </button>
     </div>
     <nav class="gal-mobile-nav">
-        <a href="<?= $nb('digital_store/index.php') ?>"><i class="fa-solid fa-shop"></i> Shop</a>
         <a href="<?= $nb('gallery.php') ?>"><i class="fa-solid fa-images"></i> Gallery</a>
         <a href="<?= $nb('blogs.php') ?>"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
-        <a href="<?= $nb('my_heroines.php') ?>" class="nav-heroines-link <?= $nav_active === 'heroines' ? 'gal-nav-active' : '' ?>">
-            <i class="fa-solid fa-heart nav-heroines-heart" aria-hidden="true"></i>
-            My Heroines
-        </a>
         <a href="<?= $nb('progress.php') ?>"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
         <button type="button" class="gal-mobile-section-btn" id="galMobileReelsBtn">
             <i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down" style="margin-left:auto;font-size:0.7rem;"></i>
@@ -167,7 +154,7 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             <a href="<?= $nb('already_uploaded.php') ?>">Already Uploaded</a>
             <a href="<?= $nb('direct_prompts.php') ?>">Direct Prompts</a>
             <a href="<?= $nb('solo_prompts.php') ?>">Solo Prompts</a>
-            <a href="<?= $nb('not_mine.php') ?>" class="gal-nm-link"><i class="fa-solid fa-ban nm-gradient-icon"></i> <span class="nm-gradient-text">Not Mine</span></a>
+            <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link"><i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span></a>
             <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
         </div>
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">

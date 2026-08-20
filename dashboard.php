@@ -463,8 +463,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="d-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="d-link"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
     <a href="happy_users_admin.php?tab=manage" class="d-link"><i class="fa-solid fa-images"></i> Manage Pics</a>
-    <div class="d-sec nm-dash-brand">Not Mine</div>
-    <a href="not_mine_admin.php" class="d-link nm-dash-brand"><i class="fa-solid fa-ban"></i> Not Mine Prompts</a>
+    <div class="d-sec nm-dash-brand">Curated AI Prompts</div>
+    <a href="curated_admin.php" class="d-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles"></i> Curated AI Prompts</a>
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
@@ -507,13 +507,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
     <div class="sb-sec">Community</div>
-    <a href="heroine_admin.php" class="sb-link"><i class="fa-solid fa-venus"></i> <span>My Heroine</span></a>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
     <div class="sb-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
     <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
-    <div class="sb-sec nm-dash-brand">Not Mine</div>
-    <a href="not_mine_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-ban"></i> <span>Not Mine Prompts</span></a>
+    <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
+    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Curated AI Prompts</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>

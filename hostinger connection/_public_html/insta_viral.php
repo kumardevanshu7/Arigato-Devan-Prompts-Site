@@ -1,3 +1,3 @@
 <?php
-header('Location: not_mine.php', true, 301);
+header('Location: curated_ai_prompts.php', true, 301);
 exit;

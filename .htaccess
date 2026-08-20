@@ -2,8 +2,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^prompts/([a-zA-Z0-9_-]+)/?$ prompt.php?slug=$1 [L,QSA]
-    # Not Mine clean URLs only — /not-mine/{slug}
-    RewriteRule ^not-mine/([a-z0-9][a-z0-9-]*)/?$ not-mine/prompt.php?slug=$1 [L,QSA,NC]
+    # Curated AI Prompts — /curated-ai-prompts/{slug} (does not affect /prompts/)
+    RewriteRule ^curated-ai-prompts/([a-z0-9][a-z0-9-]*)/?$ curated-ai-prompts/prompt.php?slug=$1 [L,QSA,NC]
 </IfModule>
 
 ErrorDocument 404 /404.php

@@ -1,591 +1,1427 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     header("Location: index.php");
     exit();
 }
 
-function sqAll($pdo, $sql) {
-    try { return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC); }
-    catch (Exception $e) { return []; }
+// Time range filter (default: 30 days)
+$range_days = isset($_GET['range']) ? (int)$_GET['range'] : 30;
+if (!in_array($range_days, [7, 14, 30, 90, 365])) {
+    $range_days = 30;
 }
-function sqOne($pdo, $sql, $default = 0) {
-    try { $v = $pdo->query($sql)->fetchColumn(); return ($v !== false && $v !== null) ? $v : $default; }
-    catch (Exception $e) { return $default; }
+
+function sqAll($pdo, $sql, $params = []) {
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
 }
-function fill30($pdo, $sql) {
-    try { $raw = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC); }
-    catch (Exception $e) { $raw = []; }
+
+function sqOne($pdo, $sql, $params = [], $default = 0) {
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $v = $stmt->fetchColumn();
+        return ($v !== false && $v !== null) ? $v : $default;
+    } catch (Exception $e) {
+        return $default;
+    }
+}
+
+function fillDailyTrends($pdo, $sql, $days_count = 30) {
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$days_count]);
+        $raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $raw = [];
+    }
     $map = [];
-    foreach ($raw as $r) $map[$r['d']] = (int)$r['c'];
-    $days = []; $vals = [];
-    for ($i = 29; $i >= 0; $i--) {
+    foreach ($raw as $r) {
+        $map[$r['d']] = (int)$r['c'];
+    }
+    $days = [];
+    $vals = [];
+    for ($i = $days_count - 1; $i >= 0; $i--) {
         $d = date('Y-m-d', strtotime("-{$i} days"));
         $days[] = date('d M', strtotime($d));
         $vals[] = $map[$d] ?? 0;
     }
-    return ['l' => json_encode($days), 'd' => json_encode($vals)];
+    return ['labels' => $days, 'values' => $vals];
 }
 
-// -- Core stats --
-$total_prompts = sqOne($pdo, "SELECT COUNT(*) FROM prompts");
-$total_likes   = sqOne($pdo, "SELECT COALESCE(SUM(likes_count),0) FROM prompts");
-$total_users   = sqOne($pdo, "SELECT COUNT(*) FROM users");
-$total_unlocks = sqOne($pdo, "SELECT COUNT(*) FROM unlocked_prompts");
-$total_saves   = sqOne($pdo, "SELECT COUNT(*) FROM saved_prompts");
-$weekly_p      = sqOne($pdo, "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)");
-$monthly_p     = sqOne($pdo, "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)");
-$weekly_u      = sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)");
-$monthly_u     = sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)");
-$total_views   = sqOne($pdo, "SELECT COALESCE(SUM(view_count),0) FROM prompts");
-$total_copies  = sqOne($pdo, "SELECT COALESCE(SUM(copy_count),0) FROM prompts");
-$total_shares  = sqOne($pdo, "SELECT COALESCE(SUM(share_count),0) FROM prompts");
-$most_liked_r  = sqAll($pdo, "SELECT title,likes_count FROM prompts ORDER BY likes_count DESC LIMIT 1");
-$most_liked    = $most_liked_r[0] ?? null;
-$avg_journey   = round((float)sqOne($pdo, "SELECT AVG(DATEDIFF(f.fu,u.created_at)) FROM users u JOIN (SELECT user_id,MIN(created_at) as fu FROM unlocked_prompts GROUP BY user_id) f ON u.id=f.user_id", 0), 1);
+// Core Stats
+$total_prompts = (int)sqOne($pdo, "SELECT COUNT(*) FROM prompts");
+$total_likes   = (int)sqOne($pdo, "SELECT COALESCE(SUM(likes_count),0) FROM prompts");
+$total_views   = (int)sqOne($pdo, "SELECT COALESCE(SUM(view_count),0) FROM prompts");
+$total_copies  = (int)sqOne($pdo, "SELECT COALESCE(SUM(copy_count),0) FROM prompts");
+$total_users   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users");
+$total_unlocks = (int)sqOne($pdo, "SELECT COUNT(*) FROM unlocked_prompts");
+$total_saves   = (int)sqOne($pdo, "SELECT COUNT(*) FROM saved_prompts");
+$total_blogs   = (int)sqOne($pdo, "SELECT COUNT(*) FROM blogs WHERE is_published=1");
+$total_blog_views = (int)sqOne($pdo, "SELECT COALESCE(SUM(view_count),0) FROM blogs WHERE is_published=1");
 
-// -- Chart data --
-$top_prompts    = sqAll($pdo, "SELECT title, likes_count FROM prompts ORDER BY likes_count DESC LIMIT 10");
-$top_unlocked   = sqAll($pdo, "SELECT p.title, COUNT(u.id) as c FROM unlocked_prompts u JOIN prompts p ON p.id=u.prompt_id GROUP BY p.id,p.title ORDER BY c DESC LIMIT 10");
-$type_breakdown = sqAll($pdo, "SELECT prompt_type, COUNT(*) as cnt FROM prompts GROUP BY prompt_type ORDER BY cnt DESC");
+// Recent Periodic Stats
+$weekly_p  = (int)sqOne($pdo, "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+$weekly_u  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+$weekly_un = (int)sqOne($pdo, "SELECT COUNT(*) FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
 
-// -- 30-day trends --
-$ug  = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM users WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
-$pg  = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
-$spd = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM saved_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
-$upd = fill30($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY d ASC");
+$monthly_p  = (int)sqOne($pdo, "SELECT COUNT(*) FROM prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)", [$range_days]);
+$monthly_u  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)", [$range_days]);
+$monthly_un = (int)sqOne($pdo, "SELECT COUNT(*) FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)", [$range_days]);
 
-// -- Blog reads --
-$top_blogs = sqAll($pdo, "SELECT title, COALESCE(view_count,0) as views FROM blogs WHERE is_published=1 ORDER BY views DESC LIMIT 10");
+// Conversion & Unlock Rate
+$conv_rate = $total_views > 0 ? round(($total_unlocks / $total_views) * 100, 2) : 0;
+$copy_rate = $total_views > 0 ? round(($total_copies / $total_views) * 100, 2) : 0;
 
-// -- New users by hour (IST, UTC+5:30) --
-$ubh_raw = sqAll($pdo, "SELECT HOUR(CONVERT_TZ(created_at,'+00:00','+05:30')) as h, COUNT(*) as c FROM users GROUP BY h ORDER BY h ASC");
-$hmap = array_fill(0, 24, 0);
-foreach ($ubh_raw as $r) $hmap[(int)$r['h']] = (int)$r['c'];
+// Chart Trends
+$trend_users   = fillDailyTrends($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY DATE(created_at) ORDER BY d ASC", $range_days);
+$trend_unlocks = fillDailyTrends($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY DATE(created_at) ORDER BY d ASC", $range_days);
+$trend_prompts = fillDailyTrends($pdo, "SELECT DATE(created_at) as d, COUNT(*) as c FROM prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY DATE(created_at) ORDER BY d ASC", $range_days);
 
-// -- Retention (requires last_active column) --
-$coh1   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 1 DAY)");
-$r1cnt  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 1 DAY) AND last_active > DATE_ADD(created_at,INTERVAL 1 DAY)");
-$coh7   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 7 DAY)");
-$r7cnt  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 7 DAY) AND last_active > DATE_ADD(created_at,INTERVAL 7 DAY)");
-$coh30  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 30 DAY)");
-$r30cnt = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 30 DAY) AND last_active > DATE_ADD(created_at,INTERVAL 30 DAY)");
-$ret_d1  = $coh1  > 0 ? round($r1cnt*100/$coh1,1)   : 0;
-$ret_d7  = $coh7  > 0 ? round($r7cnt*100/$coh7,1)   : 0;
-$ret_d30 = $coh30 > 0 ? round($r30cnt*100/$coh30,1) : 0;
+// Category / Type Distribution
+$type_breakdown = sqAll($pdo, "SELECT COALESCE(NULLIF(TRIM(prompt_type),''), 'General') as ptype, COUNT(*) as cnt FROM prompts GROUP BY ptype ORDER BY cnt DESC");
 
-// -- New vs Returning (last 7 days) --
-$new_7    = (int)$weekly_u;
-$return_7 = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(),INTERVAL 7 DAY) AND last_active >= DATE_SUB(NOW(),INTERVAL 7 DAY)");
+// Top Prompts Detailed List
+$all_prompts = sqAll($pdo, "
+    SELECT p.id, p.title, p.prompt_type, p.image_path, p.likes_count, p.view_count, p.copy_count, p.slug, p.created_at,
+           COUNT(u.id) as unlock_count
+    FROM prompts p
+    LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id
+    GROUP BY p.id
+    ORDER BY unlock_count DESC, p.view_count DESC
+    LIMIT 100
+");
 
-// -- Top saved prompts --
-$top_saved = sqAll($pdo, "SELECT p.title, COUNT(sp.id) as c FROM saved_prompts sp JOIN prompts p ON p.id=sp.prompt_id GROUP BY p.id,p.title ORDER BY c DESC LIMIT 10");
+// Top Blogs Performance List
+$top_blogs = sqAll($pdo, "SELECT id, title, slug, view_count, created_at, tags FROM blogs WHERE is_published=1 ORDER BY view_count DESC LIMIT 20");
 
-// -- Unlock-to-view ratio --
-$unlock_view = sqAll($pdo, "SELECT p.title, COUNT(up.id) as unlocks, COALESCE(p.view_count,0) as views FROM unlocked_prompts up JOIN prompts p ON p.id=up.prompt_id GROUP BY p.id,p.title ORDER BY unlocks DESC LIMIT 10");
+// Power Users List
+$power_users = sqAll($pdo, "
+    SELECT u.id, u.username, u.email, u.profile_image, u.streak_count, u.last_active, u.created_at, COUNT(up.id) as unlock_cnt
+    FROM users u
+    JOIN unlocked_prompts up ON u.id = up.user_id
+    GROUP BY u.id
+    ORDER BY unlock_cnt DESC
+    LIMIT 20
+");
 
-// -- Prompt age vs performance --
-$age_perf = sqAll($pdo, "SELECT p.title, DATEDIFF(NOW(),p.created_at) as age, COUNT(up.id) as unlocks, p.likes_count FROM prompts p LEFT JOIN unlocked_prompts up ON p.id=up.prompt_id GROUP BY p.id,p.title,p.created_at,p.likes_count ORDER BY unlocks DESC LIMIT 12");
+// User Retention Metrics
+$coh7   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+$r7cnt  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) AND last_active > DATE_ADD(created_at, INTERVAL 7 DAY)");
+$ret_d7 = $coh7 > 0 ? round(($r7cnt * 100) / $coh7, 1) : 0;
 
-// -- Power users (5+ unlocks) --
-$power_users = sqAll($pdo, "SELECT u.username, u.email, COUNT(up.id) as cnt FROM users u JOIN unlocked_prompts up ON u.id=up.user_id GROUP BY u.id,u.username,u.email HAVING cnt >= 5 ORDER BY cnt DESC LIMIT 15");
+$coh30   = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+$r30cnt  = (int)sqOne($pdo, "SELECT COUNT(*) FROM users WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 DAY) AND last_active > DATE_ADD(created_at, INTERVAL 30 DAY)");
+$ret_d30 = $coh30 > 0 ? round(($r30cnt * 100) / $coh30, 1) : 0;
 
-// -- Churn risk (active 8?30 days ago, not in last 7 days) --
-$churn_users = sqAll($pdo, "SELECT username, email, last_active FROM users WHERE last_active >= DATE_SUB(NOW(),INTERVAL 30 DAY) AND last_active < DATE_SUB(NOW(),INTERVAL 7 DAY) ORDER BY last_active ASC LIMIT 10");
+// Churn Risk Users
+$churn_users = sqAll($pdo, "SELECT username, email, last_active FROM users WHERE last_active >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND last_active < DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY last_active ASC LIMIT 10");
 
-// -- Dead prompts (0 unlocks in last 30 days) --
-$dead_prompts = sqAll($pdo, "SELECT p.title, p.created_at, p.likes_count FROM prompts p WHERE p.id NOT IN (SELECT DISTINCT prompt_id FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)) ORDER BY p.likes_count DESC LIMIT 10");
+// Dead Prompts (0 unlocks in last 30 days)
+$dead_prompts = sqAll($pdo, "
+    SELECT p.id, p.title, p.created_at, p.likes_count, p.view_count, p.prompt_type
+    FROM prompts p
+    WHERE p.id NOT IN (SELECT DISTINCT prompt_id FROM unlocked_prompts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY))
+    ORDER BY p.view_count DESC
+    LIMIT 10
+");
 
-// -- Spike days (50+ signups) --
-$spike_days = sqAll($pdo, "SELECT DATE(CONVERT_TZ(created_at,'+00:00','+05:30')) as d, COUNT(*) as cnt FROM users GROUP BY d HAVING cnt >= 50 ORDER BY d DESC LIMIT 5");
-
-// -- Milestones --
-$ms_all     = [50, 100, 150, 200, 300, 500, 750, 1000];
-$next_ms    = null;
-foreach ($ms_all as $m) { if ((int)$total_users < $m) { $next_ms = $m; break; } }
-$reached_ms = array_values(array_filter($ms_all, fn($m) => (int)$total_users >= $m));
-
-// -- JSON for charts --
-$bar_labels  = json_encode(array_column($top_prompts, "title"));
-$bar_data    = json_encode(array_column($top_prompts, "likes_count"));
-$ul_labels   = json_encode(array_column($top_unlocked, "title"));
-$ul_data     = json_encode(array_column($top_unlocked, "c"));
-$type_labels = json_encode(array_column($type_breakdown, "prompt_type"));
-$type_data   = json_encode(array_column($type_breakdown, "cnt"));
-$blog_labels = json_encode(array_column($top_blogs, "title"));
-$blog_data   = json_encode(array_column($top_blogs, "views"));
+// Admin Info
+$admin_name = $_SESSION["username"] ?? "Admin";
+$admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analytics � Arigato Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js">function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
-function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
-</script>
-<?php include_once "gtag.php"; ?>
-<style>
-:root{--bg:#07060f;--surface:#0f0d1e;--border:rgba(139,92,246,0.18);--border2:rgba(139,92,246,0.08);--accent:#8b5cf6;--accent2:#c084fc;--pink:#f472b6;--cyan:#22d3ee;--green:#4ade80;--yellow:#fbbf24;--orange:#fb923c;--red:#f87171;--text:#e2e0ff;--muted:#9490bb;--font:'Inter',sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh}
-#sp{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--pink),var(--cyan));z-index:9999;box-shadow:0 0 10px var(--accent)}
-#pc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,6,15,0.98);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column}
-.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--border2)}
-.sb-brand{font-size:.72rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
-.sb-brand i{-webkit-text-fill-color:#a78bfa}
-.sb-admin{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border2)}
-.sb-av-ph{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
-.sb-uname{font-size:.78rem;font-weight:800;color:var(--text)}.sb-role{font-size:.6rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em}
-.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}.sb-nav::-webkit-scrollbar{width:2px}.sb-nav::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
-.sb-sec{font-size:.58rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 10px 5px}
-.sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:1px}
-.sb-link:hover{background:rgba(139,92,246,0.08);color:var(--text)}.sb-link.active{background:rgba(139,92,246,0.15);color:var(--accent2);border-color:var(--border)}
-.sb-link i{width:16px;text-align:center;flex-shrink:0}
-.sb-bottom{padding:12px 8px;border-top:1px solid var(--border2)}
-.sb-logout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:.78rem;font-weight:700;color:var(--red);text-decoration:none;transition:all .2s}.sb-logout:hover{background:rgba(248,113,113,0.1)}
-.main{margin-left:220px;min-height:100vh;padding:28px 32px 80px;position:relative;z-index:1}
-.topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
-.tb-title{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
-/* STAT GRID */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:18px}
-.scard{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:15px;padding:16px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
-.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
-.scard:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3)}.scard:hover::before{opacity:1}
-.sc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;margin-bottom:10px}
-.sc-val{font-size:1.6rem;font-weight:900;line-height:1;margin-bottom:2px}
-.sc-lbl{font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.sc-sub{font-size:.65rem;font-weight:700;color:var(--muted);margin-top:4px}
-.s-purple .sc-icon{background:rgba(139,92,246,0.12);color:var(--accent2)}.s-purple .sc-val{color:var(--accent2)}.s-purple::before{background:var(--accent2)}
-.s-pink .sc-icon{background:rgba(244,114,182,0.1);color:var(--pink)}.s-pink .sc-val{color:var(--pink)}.s-pink::before{background:var(--pink)}
-.s-cyan .sc-icon{background:rgba(34,211,238,0.08);color:var(--cyan)}.s-cyan .sc-val{color:var(--cyan)}.s-cyan::before{background:var(--cyan)}
-.s-orange .sc-icon{background:rgba(251,146,60,0.1);color:var(--orange)}.s-orange .sc-val{color:var(--orange)}.s-orange::before{background:var(--orange)}
-.s-green .sc-icon{background:rgba(74,222,128,0.08);color:var(--green)}.s-green .sc-val{color:var(--green)}.s-green::before{background:var(--green)}
-.s-yellow .sc-icon{background:rgba(251,191,36,0.08);color:var(--yellow)}.s-yellow .sc-val{color:var(--yellow)}.s-yellow::before{background:var(--yellow)}
-.s-red .sc-icon{background:rgba(248,113,113,0.08);color:var(--red)}.s-red .sc-val{color:var(--red)}.s-red::before{background:var(--red)}
-.s-span2{grid-column:span 2}
-/* CARD */
-.card{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px;backdrop-filter:blur(8px);transition:border-color .3s}
-.card:hover{border-color:rgba(139,92,246,0.28)}
-.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border2);gap:10px;flex-wrap:wrap}
-.card-title{font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--text)}
-.card-title i{color:var(--accent2)}
-/* GRIDS */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.grid-2-1{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
-/* ALERT CARDS */
-.alert-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.alert-card{background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:14px;padding:16px}
-.alert-title{font-size:.78rem;font-weight:900;display:flex;align-items:center;gap:7px;margin-bottom:10px;color:var(--text)}
-.ms-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:.63rem;font-weight:900;border:1px solid;margin:2px}
-.ms-done{background:rgba(74,222,128,0.08);color:var(--green);border-color:rgba(74,222,128,0.2)}
-.ms-next{background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.25)}
-/* RETENTION BARS */
-.ret-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.ret-label{font-size:.72rem;font-weight:800;color:var(--muted);width:40px;flex-shrink:0}
-.ret-bar-wrap{flex:1;height:10px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden}
-.ret-bar{height:100%;border-radius:100px;transition:width 1s ease}
-.ret-pct{font-size:.72rem;font-weight:900;color:var(--text);width:40px;text-align:right;flex-shrink:0}
-/* TABLE */
-.dtable{width:100%;border-collapse:collapse;font-size:.78rem}
-.dtable th{background:rgba(139,92,246,0.07);color:var(--accent2);font-weight:800;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
-.dtable td{padding:10px 13px;border-bottom:1px solid var(--border2);color:var(--muted);vertical-align:middle}
-.dtable tr:last-child td{border-bottom:none}.dtable tr:hover td{background:rgba(139,92,246,0.03)}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
-/* MOBILE */
-.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(7,6,15,0.97);border-top:1px solid var(--border);z-index:500;padding:8px 0 max(8px,env(safe-area-inset-bottom));flex-direction:row;justify-content:space-around;align-items:center}
-.mn-link{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.6rem;font-weight:700;color:var(--muted);text-decoration:none;padding:4px 8px;min-width:48px;transition:all .2s}
-.mn-link.active,.mn-link:hover{color:var(--accent2)}.mn-link i{font-size:1.1rem}
-@media(max-width:1100px){.grid-4{grid-template-columns:1fr 1fr}.grid-2-1{grid-template-columns:1fr 1fr}}
-@media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px;padding:20px 16px 80px}.grid-2{grid-template-columns:1fr}.alert-grid{grid-template-columns:1fr}}
-@media(max-width:600px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-nav{display:flex}.stats-grid{grid-template-columns:1fr 1fr}.s-span2{grid-column:span 1}.grid-2{grid-template-columns:1fr}.grid-4{grid-template-columns:1fr}.grid-2-1{grid-template-columns:1fr}.alert-grid{grid-template-columns:1fr}.chart-scroll{overflow-x:auto}}
-/* REPORT DOWNLOAD BAR */
-.rep-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:rgba(15,13,30,0.7);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:18px}
-.rep-bar-title{font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--text);margin-bottom:4px}
-.rep-bar-title i{color:var(--cyan)}
-.rep-bar-sub{font-size:.72rem;color:var(--muted);line-height:1.6;max-width:430px}
-.rep-groups{display:flex;gap:10px;flex-wrap:wrap}
-.rep-group{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.02);border:1px solid var(--border2);border-radius:11px;padding:7px 10px}
-.rep-group-lbl{font-size:.62rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px}
-.rep-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none;border:1px solid var(--border);background:rgba(139,92,246,0.06);color:var(--accent2);transition:all .2s;white-space:nowrap}
-.rep-btn:hover{background:rgba(139,92,246,0.16);border-color:rgba(139,92,246,0.4);transform:translateY(-1px)}
-.rep-btn.csv{background:rgba(34,211,238,0.06);border-color:rgba(34,211,238,0.2);color:var(--cyan)}
-.rep-btn.csv:hover{background:rgba(34,211,238,0.16);border-color:rgba(34,211,238,0.45)}
-@media(max-width:600px){.rep-bar{padding:14px}.rep-groups{width:100%}.rep-group{width:100%;justify-content:space-between}}
-/* MOBILE TOPBAR */
-.mob-topbar{display:none;position:sticky;top:0;z-index:300;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);padding:13px 16px;align-items:center;gap:12px}
-.mob-menu-btn{width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1rem;cursor:pointer;flex-shrink:0}
-.mob-page-title{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
-.mob-home-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-size:.75rem;font-weight:800;text-decoration:none;background:rgba(34,211,238,0.08);color:var(--cyan);border:1px solid rgba(34,211,238,0.2);flex-shrink:0}
-.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500}
-.drawer{position:fixed;left:0;top:0;bottom:0;width:265px;background:rgba(7,6,15,0.99);border-right:1px solid var(--border);z-index:600;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.drawer.open{transform:translateX(0)}.drawer-overlay.open{display:block}
-.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px;border-bottom:1px solid var(--border2)}
-.drawer-brand{font-size:.8rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.drawer-close{width:32px;height:32px;border-radius:8px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem}
-.drawer-user{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border2)}
-.d-av-ph2{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0}
-.d-uname{font-size:.85rem;font-weight:800}.d-role2{font-size:.65rem;color:var(--accent2);font-weight:700;text-transform:uppercase}
-.drawer-nav2{flex:1;overflow-y:auto;padding:8px 10px}
-.d-sec2{font-size:.6rem;font-weight:900;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:10px 8px 5px}
-.d-link2{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;margin-bottom:2px}
-.d-link2:hover,.d-link2.active{background:rgba(139,92,246,0.1);color:var(--accent2)}.d-link2 i{width:18px;text-align:center}
-.drawer-bot{padding:12px 10px;border-top:1px solid var(--border2)}
-.d-out{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;font-size:.85rem;font-weight:700;color:var(--red);text-decoration:none}
-.d-out:hover{background:rgba(248,113,113,0.08)}
-@media(max-width:768px){.sidebar{display:none!important}.main{margin-left:0!important;padding-bottom:90px!important}.mob-topbar{display:flex!important}.topbar{display:none!important}.mob-nav{display:flex!important}}
-</style>
-</head>
-<body class="no-site-cursor">
-<div id="sp"></div>
-<canvas id="pc"></canvas>
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="sideDrawer">
-  <div class="drawer-head"><div class="drawer-brand">Arigato Admin</div><div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div></div>
-  <div class="drawer-user">
-    <div class="d-av-ph2" id="d-letter">A</div>
-    <div><div class="d-uname" id="d-name">Admin</div><div class="d-role2">Admin</div></div>
-  </div>
-  <nav class="drawer-nav2">
-    <div class="d-sec2">Overview</div>
-    <a href="dashboard.php" class="d-link2 "><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="analytics.php" class="d-link2 active"><i class="fa-solid fa-chart-line"></i> Analytics</a>
-    <div class="d-sec2">Content</div>
-    <a href="upload_prompt.php" class="d-link2 "><i class="fa-solid fa-upload"></i> Upload Prompt</a>
-    <a href="manage_prompts.php" class="d-link2 "><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
-    <a href="prompt_links.php" class="d-link2 "><i class="fa-solid fa-link"></i> Prompt Links</a>
-    <a href="potd_manager.php" class="d-link2 "><i class="fa-solid fa-sun"></i> POTD Manager</a>
-    <div class="d-sec2">Blog</div>
-    <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
-    <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus"></i> New Post</a>
-    <div class="d-sec2">Users</div>
-    <a href="user_management.php" class="d-link2 "><i class="fa-solid fa-users"></i> Users</a>
-    <div class="d-sec2">Tools</div>
-    <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
-  </nav>
-  <div class="drawer-bot"><a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div>
-</div>
-
-<!-- MOBILE TOP BAR -->
-<div class="mob-topbar">
-  <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
-  <div class="mob-page-title"><i class="fa-solid fa-chart-line" style="-webkit-text-fill-color:var(--accent2);margin-right:6px"></i>Analytics</div>
-  <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
-</div>
-<aside class="sidebar">
-  <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
-  <div class="sb-admin">
-    <?php
-      $__sn = $_SESSION['username'] ?? ($_SESSION['user_name'] ?? 'Admin');
-      $__sa = $_SESSION['profile_image'] ?? ($_SESSION['avatar'] ?? '');
-      if(empty($__sa)){
-        try{
-          $__q=$pdo->prepare("SELECT username,avatar,profile_image FROM users WHERE id=? LIMIT 1");
-          $__q->execute([$_SESSION['user_id']??0]);
-          $__u=$__q->fetch(PDO::FETCH_ASSOC);
-          if($__u){$__sn=$__u['username']??$__sn;$__sa=$__u['profile_image']??$__u['avatar']??'';}
-        }catch(Exception $__e){}
-      }
-    ?>
-    <?php if(!empty($__sa)): ?><img src="<?= htmlspecialchars($__sa) ?>" class="sb-av" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0" alt="">
-    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($__sn,0,1)) ?></div><?php endif; ?>
-    <div><div class="sb-uname"><?= htmlspecialchars($__sn) ?></div><div class="sb-role">Administrator</div></div>
-  </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Overview</div>
-    <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
-    <a href="analytics.php" class="sb-link active"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
-    <div class="sb-sec">Content</div>
-    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
-    <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
-    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
-    <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
-    <div class="sb-sec">Blog</div>
-    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
-    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
-    <div class="sb-sec">Users</div>
-    <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
-    <div class="sb-sec">Tools</div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard &ndash; Arigato Devan</title>
     
-    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
-  </nav>
-  <div class="sb-bottom"><a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></div>
-</aside>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<main class="main">
-  <div class="topbar">
-    <div class="tb-title"><i class="fa-solid fa-chart-line" style="color:var(--accent2);-webkit-text-fill-color:var(--accent2)"></i> Analytics</div>
-    <div style="font-size:.72rem;font-weight:700;color:var(--muted);background:rgba(15,13,30,0.8);border:1px solid var(--border2);padding:6px 14px;border-radius:100px"><i class="fa-regular fa-clock"></i> <?= date('D, d M Y') ?> IST</div>
-    <a href="dashboard.php" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:.75rem;font-weight:800;border:1px solid rgba(139,92,246,0.22);background:rgba(139,92,246,0.07);color:var(--accent2);text-decoration:none"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
-  </div>
+    <style>
+        :root {
+            --nd-bg: #f3f5f8;
+            --nd-surface: #ffffff;
+            --nd-border: #e8ecf2;
+            --nd-text-main: #111827;
+            --nd-text-sec: #64748b;
+            --nd-text-muted: #94a3b8;
+            
+            /* Pastel Theme Colors matching Reference */
+            --nd-lime: #d4f938;
+            --nd-lime-dark: #b8de24;
+            --nd-lime-text: #0f172a;
+            
+            --nd-card-purple: #ebe5fc;
+            --nd-card-purple-text: #5b21b6;
+            --nd-card-blue: #dcf0fe;
+            --nd-card-blue-text: #0369a1;
+            --nd-card-green: #dcfce7;
+            --nd-card-green-text: #15803d;
+            --nd-card-teal: #0d7973;
+            
+            --nd-radius-sm: 12px;
+            --nd-radius-md: 18px;
+            --nd-radius-lg: 24px;
+            --nd-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+        }
 
-  <!-- 12 STAT CARDS -->
-  <div class="stats-grid">
-    <div class="scard s-purple"><div class="sc-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="sc-val" data-val="<?= $total_prompts ?>"><?= $total_prompts ?></div><div class="sc-lbl">Total Prompts</div><div class="sc-sub">+<?= $weekly_p ?> this week</div></div>
-    <div class="scard s-pink"><div class="sc-icon"><i class="fa-solid fa-heart"></i></div><div class="sc-val" data-val="<?= $total_likes ?>"><?= number_format($total_likes) ?></div><div class="sc-lbl">Total Likes</div></div>
-    <div class="scard s-cyan"><div class="sc-icon"><i class="fa-solid fa-users"></i></div><div class="sc-val" data-val="<?= $total_users ?>"><?= $total_users ?></div><div class="sc-lbl">Total Users</div><div class="sc-sub">+<?= $weekly_u ?> this week</div></div>
-    <div class="scard s-orange"><div class="sc-icon"><i class="fa-solid fa-lock-open"></i></div><div class="sc-val" data-val="<?= $total_unlocks ?>"><?= number_format($total_unlocks) ?></div><div class="sc-lbl">Total Unlocks</div></div>
-    <div class="scard s-green"><div class="sc-icon"><i class="fa-solid fa-bookmark"></i></div><div class="sc-val" data-val="<?= $total_saves ?>"><?= number_format($total_saves) ?></div><div class="sc-lbl">Total Saves</div></div>
-    <div class="scard s-purple"><div class="sc-icon"><i class="fa-solid fa-eye"></i></div><div class="sc-val" data-val="<?= $total_views ?>"><?= number_format($total_views) ?></div><div class="sc-lbl">Total Views</div></div>
-    <div class="scard s-yellow"><div class="sc-icon"><i class="fa-solid fa-copy"></i></div><div class="sc-val" data-val="<?= $total_copies ?>"><?= number_format($total_copies) ?></div><div class="sc-lbl">Total Copies</div></div>
-    <div class="scard s-cyan"><div class="sc-icon"><i class="fa-solid fa-share-nodes"></i></div><div class="sc-val" data-val="<?= $total_shares ?>"><?= number_format($total_shares) ?></div><div class="sc-lbl">Total Shares</div></div>
-    <div class="scard s-orange"><div class="sc-icon"><i class="fa-solid fa-bolt"></i></div><div class="sc-val" data-val="<?= $monthly_p ?>"><?= $monthly_p ?></div><div class="sc-lbl">Prompts (30d)</div></div>
-    <div class="scard s-green"><div class="sc-icon"><i class="fa-solid fa-user-plus"></i></div><div class="sc-val" data-val="<?= $monthly_u ?>"><?= $monthly_u ?></div><div class="sc-lbl">Users (30d)</div></div>
-    <div class="scard s-yellow"><div class="sc-icon"><i class="fa-solid fa-route"></i></div><div class="sc-val" data-val="<?= round($avg_journey) ?>"><?= round($avg_journey) ?></div><div class="sc-lbl">Avg Journey (days)</div></div>
-    <?php if($most_liked_r): ?>
-    <div class="scard s-pink s-span2"><div class="sc-icon"><i class="fa-solid fa-trophy"></i></div><div class="sc-val" style="font-size:1rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px"><?= htmlspecialchars($most_liked['title']??'�') ?></div><div class="sc-lbl">Most Liked Prompt � <?= (int)($most_liked['likes_count']??0) ?> Likes</div></div>
-    <?php endif; ?>
-  </div>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <!-- REPORT DOWNLOADS -->
-  <div class="rep-bar">
-    <div>
-      <div class="rep-bar-title"><i class="fa-solid fa-file-arrow-down"></i> Download Report</div>
-      <div class="rep-bar-sub">Signups, prompts, unlocks and saves for the period &mdash; with a day-by-day breakdown and comparison against the previous period.</div>
-    </div>
-    <div class="rep-groups">
-      <div class="rep-group">
-        <span class="rep-group-lbl">Weekly</span>
-        <a class="rep-btn" href="analytics_report.php?period=weekly&amp;format=print" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> View / PDF</a>
-        <a class="rep-btn csv" href="analytics_report.php?period=weekly&amp;format=csv"><i class="fa-solid fa-file-csv"></i> CSV</a>
-      </div>
-      <div class="rep-group">
-        <span class="rep-group-lbl">Monthly</span>
-        <a class="rep-btn" href="analytics_report.php?period=monthly&amp;format=print" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> View / PDF</a>
-        <a class="rep-btn csv" href="analytics_report.php?period=monthly&amp;format=csv"><i class="fa-solid fa-file-csv"></i> CSV</a>
-      </div>
-    </div>
-  </div>
+        body {
+            background-color: var(--nd-bg);
+            color: var(--nd-text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
 
-  <!-- ALERTS: Milestones + Spike Days + Dead + Churn -->
-  <div class="alert-grid">
-    <!-- MILESTONES -->
-    <div class="alert-card">
-      <div class="alert-title"><i class="fa-solid fa-trophy" style="color:var(--yellow)"></i> User Milestones</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
-        <?php foreach($reached_ms as $m): ?><span class="ms-pill ms-done"><i class="fa-solid fa-check"></i> <?= $m ?>+</span><?php endforeach; ?>
-      </div>
-      <?php if($next_ms): ?>
-      <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px">Next target:</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="ms-pill ms-next"><i class="fa-solid fa-flag"></i> <?= $next_ms ?>+ users</span>
-        <div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));width:<?= min(100,round($total_users/$next_ms*100)) ?>%;border-radius:100px"></div></div>
-        <span style="font-size:.68rem;font-weight:900;color:var(--yellow)"><?= $total_users ?>/<?= $next_ms ?></span>
-      </div>
-      <?php endif; ?>
-    </div>
-    <!-- SPIKE DAYS -->
-    <div class="alert-card">
-      <div class="alert-title"><i class="fa-solid fa-fire" style="color:var(--orange)"></i> Spike Days (50+ signups)</div>
-      <?php if(empty($spike_days)): ?>
-      <div style="font-size:.78rem;color:var(--muted)"><i class="fa-solid fa-circle-info"></i> No spike days yet (50+ signups in a day).</div>
-      <?php else: ?>
-      <?php foreach($spike_days as $sd): ?>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)">
-        <span style="font-size:.78rem;font-weight:700;color:var(--text)"><?= htmlspecialchars($sd['d']??'') ?></span>
-        <span style="font-size:.78rem;font-weight:900;color:var(--orange)"><i class="fa-solid fa-arrow-up"></i> <?= (int)($sd['cnt']??0) ?></span>
-      </div>
-      <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
-    <!-- DEAD PROMPTS ALERT -->
-    <div class="alert-card" style="border-color:rgba(248,113,113,0.18)">
-      <div class="alert-title"><i class="fa-solid fa-skull" style="color:var(--red)"></i> Dead Prompts (0 unlocks/30d)</div>
-      <?php if(empty($dead_prompts)): ?>
-      <div style="font-size:.78rem;color:var(--muted)"><i class="fa-solid fa-party-horn" style="color:var(--green)"></i> No dead prompts! All active.</div>
-      <?php else: ?>
-      <?php foreach(array_slice($dead_prompts,0,5) as $dp): ?>
-      <div style="font-size:.75rem;padding:5px 0;border-bottom:1px solid var(--border2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)"><?= htmlspecialchars($dp['title']??'') ?></div>
-      <?php endforeach; ?>
-      <?php if(count($dead_prompts)>5): ?><div style="font-size:.68rem;color:var(--red);margin-top:6px">+ <?= count($dead_prompts)-5 ?> more</div><?php endif; ?>
-      <?php endif; ?>
-    </div>
-    <!-- CHURN RISK -->
-    <div class="alert-card" style="border-color:rgba(251,191,36,0.18)">
-      <div class="alert-title"><i class="fa-solid fa-user-clock" style="color:var(--yellow)"></i> Churn Risk (8-30d inactive)</div>
-      <?php if(empty($churn_users)): ?>
-      <div style="font-size:.78rem;color:var(--muted)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> No churn risk users detected.</div>
-      <?php else: ?>
-      <?php foreach(array_slice($churn_users,0,5) as $cu): ?>
-      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2)">
-        <div style="font-size:.75rem;font-weight:700;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($cu['username']??'User') ?></div>
-        <div style="font-size:.65rem;color:var(--yellow)"><?= htmlspecialchars($cu['email']??'') ?></div>
-      </div>
-      <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
-  </div>
+        /* ── Left Sidebar (Floating White Card) ── */
+        .nd-sidebar {
+            width: 240px;
+            background: var(--nd-surface);
+            border-radius: var(--nd-radius-lg);
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: var(--nd-shadow);
+            border: 1px solid var(--nd-border);
+            height: calc(100vh - 32px);
+            position: sticky;
+            top: 16px;
+        }
 
-  <!-- 4 LINE TREND CHARTS -->
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-bookmark"></i> Saves per Day (30d)</div></div><div class="chart-scroll"><canvas id="savesChart" height="160"></canvas></div></div>
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-lock-open"></i> Unlocks per Day (30d)</div></div><div class="chart-scroll"><canvas id="unlocksPerDayChart" height="160"></canvas></div></div>
-  </div>
-  <div style="margin-bottom:18px"></div>
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-user-plus"></i> User Growth (30d)</div></div><div class="chart-scroll"><canvas id="userLineChart" height="160"></canvas></div></div>
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-upload"></i> Prompt Uploads (30d)</div></div><div class="chart-scroll"><canvas id="promptLineChart" height="160"></canvas></div></div>
-  </div>
-  <div style="margin-bottom:18px"></div>
+        .nd-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 8px 24px;
+            border-bottom: 1px solid var(--nd-border);
+            text-decoration: none;
+            color: var(--nd-text-main);
+        }
+        .nd-brand-icon {
+            width: 32px;
+            height: 32px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+        .nd-brand-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
 
-  <!-- BLOG + HOUR CHARTS -->
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-newspaper"></i> Blog Reads Top 10</div></div><div class="chart-scroll"><canvas id="blogChart" height="180"></canvas></div></div>
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-clock"></i> New Users by Hour (IST)</div></div><div class="chart-scroll"><canvas id="hourChart" height="180"></canvas></div></div>
-  </div>
-  <div style="margin-bottom:18px"></div>
+        .nd-nav {
+            flex: 1;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
 
-  <!-- RETENTION + NEW vs RETURN -->
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-rotate-right"></i> User Retention</div></div>
-      <div class="ret-row">
-        <div class="ret-label">Day 1</div>
-        <div class="ret-bar-wrap"><div class="ret-bar" style="width:<?= $ret_d1 ?>%;background:linear-gradient(90deg,var(--accent),var(--pink))"></div></div>
-        <div class="ret-pct" style="color:var(--accent2)"><?= $ret_d1 ?>%</div>
-      </div>
-      <div class="ret-row">
-        <div class="ret-label">Day 7</div>
-        <div class="ret-bar-wrap"><div class="ret-bar" style="width:<?= $ret_d7 ?>%;background:linear-gradient(90deg,var(--cyan),var(--accent))"></div></div>
-        <div class="ret-pct" style="color:var(--cyan)"><?= $ret_d7 ?>%</div>
-      </div>
-      <div class="ret-row">
-        <div class="ret-label">Day 30</div>
-        <div class="ret-bar-wrap"><div class="ret-bar" style="width:<?= $ret_d30 ?>%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div></div>
-        <div class="ret-pct" style="color:var(--green)"><?= $ret_d30 ?>%</div>
-      </div>
-      <div style="font-size:.65rem;color:var(--muted);margin-top:12px"><i class="fa-solid fa-circle-info"></i> Based on last_active vs signup date.</div>
-    </div>
-    <div class="card" style="margin-bottom:0"><div class="card-head"><div class="card-title"><i class="fa-solid fa-circle-half-stroke"></i> New vs Returning (7d)</div></div><canvas id="newReturnChart" height="160"></canvas></div>
-  </div>
-  <div style="margin-bottom:18px"></div>
+        .nd-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--nd-radius-sm);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--nd-text-sec);
+            transition: all 0.15s ease;
+        }
+        .nd-nav-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        .nd-nav-item:hover {
+            color: var(--nd-text-main);
+            background: #f8fafc;
+        }
+        .nd-nav-item.active {
+            background: var(--nd-lime);
+            color: var(--nd-lime-text);
+            font-weight: 700;
+        }
+        .nd-nav-item.active i {
+            color: var(--nd-lime-text);
+        }
 
-  <!-- FULL WIDTH CHARTS -->
-  <div class="card"><div class="card-head"><div class="card-title"><i class="fa-solid fa-heart"></i> Top 10 Prompts by Likes</div></div><div class="chart-scroll"><canvas id="barChart" height="120"></canvas></div></div>
-  <div class="card"><div class="card-head"><div class="card-title"><i class="fa-solid fa-lock-open"></i> Top 10 Most Unlocked Prompts</div></div><div class="chart-scroll"><canvas id="unlockChart" height="120"></canvas></div></div>
-  <div class="card"><div class="card-head"><div class="card-title"><i class="fa-solid fa-tag"></i> Prompt Type Breakdown</div></div><div style="max-width:400px;margin:0 auto"><canvas id="typeChart" height="200"></canvas></div></div>
+        .nd-sidebar-user {
+            padding-top: 16px;
+            border-top: 1px solid var(--nd-border);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .nd-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nd-user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+        }
+        .nd-user-name {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--nd-text-main);
+            line-height: 1.2;
+        }
+        .nd-user-role {
+            font-size: 0.72rem;
+            color: var(--nd-text-muted);
+            font-weight: 500;
+        }
+        .nd-btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #ef4444;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: var(--nd-radius-sm);
+            background: #fef2f2;
+            transition: all 0.15s;
+        }
+        .nd-btn-logout:hover {
+            background: #fee2e2;
+        }
 
-  <!-- 4 TABLES -->
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-bookmark"></i> Top Saved Prompts</div></div>
-      <div style="overflow-x:auto">
-      <table class="dtable"><thead><tr><th>#</th><th>Prompt</th><th>Saves</th></tr></thead><tbody>
-      <?php foreach($top_saved as $i=>$ts): ?>
-      <tr><td style="font-weight:900;color:var(--accent2)"><?= $i+1 ?></td><td style="font-weight:700;color:var(--text)"><?= htmlspecialchars($ts['title']??'') ?></td><td style="font-weight:900;color:var(--green)"><?= (int)($ts['save_count']??0) ?></td></tr>
-      <?php endforeach; ?>
-      </tbody></table>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-percent"></i> Unlock-to-View Ratio</div></div>
-      <div style="overflow-x:auto">
-      <table class="dtable"><thead><tr><th>Prompt</th><th>Views</th><th>Unlocks</th><th>Ratio</th></tr></thead><tbody>
-      <?php foreach($unlock_view as $uv): $ratio=$uv['view_count']>0?round($uv['uc']/$uv['view_count']*100):0; ?>
-      <tr><td style="font-weight:700;color:var(--text);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($uv['title']??'') ?></td><td style="color:var(--cyan)"><?= number_format($uv['view_count']??0) ?></td><td style="color:var(--orange)"><?= (int)($uv['uc']??0) ?></td><td style="font-weight:900;color:<?= $ratio>50?'var(--green)':($ratio>20?'var(--yellow)':'var(--red)') ?>"><?= $ratio ?>%</td></tr>
-      <?php endforeach; ?>
-      </tbody></table>
-      </div>
-    </div>
-  </div>
-  <div style="margin-bottom:18px"></div>
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-crown"></i> Power Users (5+ unlocks)</div></div>
-      <div style="overflow-x:auto">
-      <table class="dtable"><thead><tr><th>#</th><th>User</th><th>Email</th><th>Unlocks</th></tr></thead><tbody>
-      <?php foreach($power_users as $i=>$pu): ?>
-      <tr><td style="font-weight:900;color:var(--yellow)"><?= $i+1 ?></td><td style="font-weight:700;color:var(--text)"><?= htmlspecialchars($pu['username']??'') ?></td><td style="color:var(--muted);font-size:.68rem"><?= htmlspecialchars($pu['email']??'') ?></td><td style="font-weight:900;color:var(--orange)"><?= (int)($pu['cnt']??0) ?></td></tr>
-      <?php endforeach; ?>
-      </tbody></table>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-hourglass"></i> Prompt Age vs Performance</div></div>
-      <div style="overflow-x:auto">
-      <table class="dtable"><thead><tr><th>Prompt</th><th>Age</th><th>Unlocks</th><th>Likes</th></tr></thead><tbody>
-      <?php foreach($age_perf as $ap): ?>
-      <tr><td style="font-weight:700;color:var(--text);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($ap['title']??'') ?></td><td style="color:var(--muted)"><?= (int)($ap['age_days']??0) ?>d</td><td style="color:var(--orange)"><?= (int)($ap['unlocks']??0) ?></td><td style="color:var(--red)"><?= (int)($ap['likes']??0) ?></td></tr>
-      <?php endforeach; ?>
-      </tbody></table>
-      </div>
-    </div>
-  </div>
-</main>
+        /* ── Main Content Area ── */
+        .nd-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-<nav class="mob-nav">
-  <a href="dashboard.php" class="mn-link"><i class="fa-solid fa-gauge-high"></i><span>Home</span></a>
-  <a href="manage_prompts.php" class="mn-link"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Prompts</span></a>
-  <a href="user_management.php" class="mn-link"><i class="fa-solid fa-users"></i><span>Users</span></a>
-  <a href="analytics.php" class="mn-link active"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
-  <a href="upload_prompt.php" class="mn-link" style="color:var(--accent2)"><i class="fa-solid fa-plus"></i><span>Upload</span></a>
-</nav>
+        /* ── Top App Bar ── */
+        .nd-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .nd-page-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--nd-text-main);
+            letter-spacing: -0.02em;
+        }
+        .nd-page-subtitle {
+            font-size: 0.84rem;
+            color: var(--nd-text-sec);
+            font-weight: 500;
+            margin-top: 2px;
+        }
 
-<script>
-window.addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('sp').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
-(function(){const c=document.getElementById('pc');if(!c)return;const ctx=c.getContext('2d');let W,H,pts=[];function rs(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}rs();window.addEventListener('resize',rs);class P{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.2+.3;this.a=Math.random()*.35+.1;const cols=['139,92,246','244,114,182','34,211,238'];this.col=cols[Math.floor(Math.random()*cols.length)]}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(${this.col},${this.a})`;ctx.fill()}}for(let i=0;i<50;i++)pts.push(new P());function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw()});requestAnimationFrame(loop)}loop();})();
+        .nd-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-// CountUp
-document.querySelectorAll('.sc-val[data-val]').forEach(el=>{
-  const n=parseInt(el.dataset.val)||0;
-  if(n>0){el.textContent='0';let s=0,step=Math.max(1,n/60);const t=setInterval(()=>{s+=step;if(s>=n){s=n;clearInterval(t)}el.textContent=Math.floor(s).toLocaleString()},16)}
-});
+        /* Date Range Selector Pills */
+        .nd-pill-group {
+            display: inline-flex;
+            background: #ffffff;
+            border: 1px solid var(--nd-border);
+            padding: 4px;
+            border-radius: 999px;
+            gap: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .nd-pill-btn {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--nd-text-sec);
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .nd-pill-btn:hover {
+            color: var(--nd-text-main);
+        }
+        .nd-pill-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+        }
 
-// Chart defaults
-Chart.defaults.color='#9490bb';
-Chart.defaults.borderColor='rgba(139,92,246,0.1)';
+        .nd-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: #ffffff;
+            border: 1px solid var(--nd-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nd-text-sec);
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.15s;
+        }
+        .nd-icon-btn:hover {
+            color: var(--nd-text-main);
+            border-color: #cbd5e1;
+        }
 
-function mkLine(id,labels,data,color='#8b5cf6',fill=true){
-  new Chart(document.getElementById(id),{
-    type:'line',
-    data:{labels,datasets:[{data,borderColor:color,backgroundColor:fill?color.replace(')',',0.1)').replace('rgb','rgba'):'transparent',borderWidth:2,fill,tension:.4,pointBackgroundColor:color,pointRadius:3,pointHoverRadius:5}]},
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(139,92,246,0.06)'},ticks:{color:'#9490bb',font:{size:9},maxTicksLimit:8}},y:{grid:{color:'rgba(139,92,246,0.06)'},ticks:{color:'#9490bb',font:{size:9}}}}}
-  });
-}
-function mkBar(id,labels,data,color='rgba(139,92,246,0.5)',borderColor='#8b5cf6'){
-  new Chart(document.getElementById(id),{
-    type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:color,borderColor,borderWidth:1,borderRadius:5}]},
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(139,92,246,0.06)'},ticks:{color:'#9490bb',font:{size:9},maxRotation:30}},y:{grid:{color:'rgba(139,92,246,0.06)'},ticks:{color:'#9490bb',font:{size:9}}}}}
-  });
-}
+        /* ── 4 Top KPI Highlights Cards ── */
+        .nd-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
 
-window.addEventListener('DOMContentLoaded',()=>{
-  const spd=<?= json_encode($spd) ?>;
-  const upd=<?= json_encode($upd) ?>;
-  const ug=<?= json_encode($ug) ?>;
-  const pg=<?= json_encode($pg) ?>;
-  mkLine('savesChart',JSON.parse(spd.l),JSON.parse(spd.d),'#8b5cf6');
-  mkLine('unlocksPerDayChart',JSON.parse(upd.l),JSON.parse(upd.d),'#f472b6');
-  mkLine('userLineChart',JSON.parse(ug.l),JSON.parse(ug.d),'#22d3ee');
-  mkLine('promptLineChart',JSON.parse(pg.l),JSON.parse(pg.d),'#fb923c');
+        .nd-kpi-card {
+            border-radius: var(--nd-radius-md);
+            padding: 22px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: var(--nd-shadow);
+            border: 1px solid transparent;
+            transition: transform 0.15s ease;
+        }
+        .nd-kpi-card:hover {
+            transform: translateY(-2px);
+        }
 
-  mkBar('blogChart',<?= $blog_labels ?>,<?= $blog_data ?>,'rgba(244,114,182,0.5)','#f472b6');
-  mkBar('hourChart',[...Array(24).keys()].map(h=>h+':00'),<?= json_encode($hmap) ?>,'rgba(34,211,238,0.4)','#22d3ee');
+        .nd-kpi-purple {
+            background: var(--nd-card-purple);
+            color: var(--nd-card-purple-text);
+        }
+        .nd-kpi-blue {
+            background: var(--nd-card-blue);
+            color: var(--nd-card-blue-text);
+        }
+        .nd-kpi-green {
+            background: var(--nd-card-green);
+            color: var(--nd-card-green-text);
+        }
+        .nd-kpi-teal {
+            background: linear-gradient(135deg, #0f766e, #0c5e58);
+            color: #ffffff;
+        }
 
-  new Chart(document.getElementById('newReturnChart'),{
-    type:'doughnut',
-    data:{labels:['New Users','Returning'],datasets:[{data:[<?= $new_7 ?>,<?= $return_7 ?>],backgroundColor:['#8b5cf6','#f472b6'],borderColor:'rgba(15,13,30,0.5)',borderWidth:2}]},
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9490bb',font:{size:11},padding:16}}}}
-  });
+        .nd-kpi-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+        .nd-kpi-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
 
-  mkBar('barChart',<?= $bar_labels ?>,<?= $bar_data ?>,'rgba(139,92,246,0.55)','#8b5cf6');
-  mkBar('unlockChart',<?= $ul_labels ?>,<?= $ul_data ?>,'rgba(251,146,60,0.5)','#fb923c');
+        .nd-kpi-val {
+            font-size: 1.95rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .nd-kpi-sub {
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.75;
+        }
 
-  new Chart(document.getElementById('typeChart'),{
-    type:'doughnut',
-    data:{labels:<?= $type_labels ?>,datasets:[{data:<?= $type_data ?>,backgroundColor:['#8b5cf6','#fbbf24','#22d3ee','#60a5fa'],borderColor:'rgba(15,13,30,0.5)',borderWidth:2}]},
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9490bb',font:{size:11},padding:16}}}}
-  });
-});
-function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
-function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
-</script>
+        .nd-btn-kpi-cta {
+            margin-top: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--nd-lime);
+            color: var(--nd-lime-text);
+            padding: 8px 14px;
+            border-radius: var(--nd-radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .nd-btn-kpi-cta:hover {
+            background: var(--nd-lime-dark);
+        }
+
+        /* ── Middle Section: Chart & Analytics Overview ── */
+        .nd-grid-chart {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+        }
+
+        .nd-card {
+            background: var(--nd-surface);
+            border-radius: var(--nd-radius-lg);
+            padding: 24px;
+            border: 1px solid var(--nd-border);
+            box-shadow: var(--nd-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nd-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nd-card-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--nd-text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nd-btn-lime {
+            background: var(--nd-lime);
+            color: var(--nd-lime-text);
+            padding: 6px 14px;
+            border-radius: var(--nd-radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .nd-btn-lime:hover {
+            background: var(--nd-lime-dark);
+        }
+
+        .nd-btn-outline {
+            background: #ffffff;
+            color: var(--nd-text-sec);
+            padding: 6px 12px;
+            border-radius: var(--nd-radius-sm);
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid var(--nd-border);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .nd-btn-outline:hover {
+            background: #f8fafc;
+            color: var(--nd-text-main);
+        }
+
+        /* Interactive Action List */
+        .nd-action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .nd-action-item {
+            background: #f8fafc;
+            border: 1px solid var(--nd-border);
+            border-radius: var(--nd-radius-md);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--nd-text-main);
+            transition: all 0.15s ease;
+        }
+        .nd-action-item:hover {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transform: translateX(2px);
+        }
+        .nd-action-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nd-action-icon {
+            width: 36px;
+            height: 36px;
+            background: #ffffff;
+            border: 1px solid var(--nd-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--nd-text-sec);
+        }
+        .nd-action-title {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--nd-text-main);
+        }
+        .nd-action-desc {
+            font-size: 0.74rem;
+            color: var(--nd-text-muted);
+            font-weight: 500;
+        }
+
+        /* ── Filter Bar for Tables ── */
+        .nd-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .nd-search-input {
+            flex: 1;
+            min-width: 200px;
+            background: #f8fafc;
+            border: 1px solid var(--nd-border);
+            border-radius: var(--nd-radius-sm);
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.84rem;
+            outline: none;
+            transition: all 0.15s;
+        }
+        .nd-search-input:focus {
+            background: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .nd-select-filter {
+            background: #f8fafc;
+            border: 1px solid var(--nd-border);
+            border-radius: var(--nd-radius-sm);
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--nd-text-main);
+            outline: none;
+            cursor: pointer;
+        }
+        .nd-select-filter:focus {
+            background: #ffffff;
+            border-color: #3b82f6;
+        }
+
+        /* ── Data Tables ── */
+        .nd-table-wrap {
+            overflow-x: auto;
+        }
+        .nd-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+            text-align: left;
+        }
+        .nd-table th {
+            padding: 12px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--nd-text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--nd-border);
+            background: #f8fafc;
+        }
+        .nd-table th:first-child { border-radius: var(--nd-radius-sm) 0 0 var(--nd-radius-sm); }
+        .nd-table th:last-child { border-radius: 0 var(--nd-radius-sm) var(--nd-radius-sm) 0; }
+        
+        .nd-table td {
+            padding: 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--nd-text-main);
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        .nd-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .nd-tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: var(--nd-text-sec);
+        }
+
+        .nd-prompt-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        /* ── Responsive Layout ── */
+        @media (max-width: 1200px) {
+            .nd-kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .nd-grid-chart {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 860px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .nd-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            .nd-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Left Sidebar ── -->
+    <aside class="nd-sidebar">
+        <a href="dashboard.php" class="nd-brand">
+            <div class="nd-brand-icon">
+                <i class="fa-solid fa-shapes"></i>
+            </div>
+            <div class="nd-brand-name">Arigato Studio</div>
+        </a>
+
+        <nav class="nd-nav">
+            <a href="analytics.php" class="nd-nav-item active">
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#section-prompts" class="nd-nav-item">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Top Prompts</span>
+            </a>
+            <a href="#section-blogs" class="nd-nav-item">
+                <i class="fa-solid fa-newspaper"></i>
+                <span>Blog Insights</span>
+            </a>
+            <a href="#section-users" class="nd-nav-item">
+                <i class="fa-solid fa-users"></i>
+                <span>Users & Retention</span>
+            </a>
+            <a href="manage_prompts.php" class="nd-nav-item">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Manage Prompts</span>
+            </a>
+            <a href="blog_admin.php" class="nd-nav-item">
+                <i class="fa-solid fa-pen-nib"></i>
+                <span>Blog Admin</span>
+            </a>
+            <a href="dashboard.php" class="nd-nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="nd-sidebar-user">
+            <div class="nd-user-info">
+                <img src="<?= htmlspecialchars($admin_avatar) ?>" class="nd-user-avatar" alt="Admin">
+                <div>
+                    <div class="nd-user-name"><?= htmlspecialchars($admin_name) ?></div>
+                    <div class="nd-user-role">Super Admin</div>
+                </div>
+            </div>
+            <a href="logout.php" class="nd-btn-logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ── Main Dashboard Workspace ── -->
+    <main class="nd-main">
+
+        <!-- Top Bar Header -->
+        <header class="nd-topbar">
+            <div>
+                <h1 class="nd-page-title">Dashboard</h1>
+                <div class="nd-page-subtitle"><?= date('l, jS F Y') ?> &bull; Live Intelligence & Study Engine</div>
+            </div>
+
+            <div class="nd-top-actions">
+                <!-- Date Range Filter Selector -->
+                <div class="nd-pill-group">
+                    <a href="analytics.php?range=7" class="nd-pill-btn <?= $range_days === 7 ? 'active' : '' ?>">7 Days</a>
+                    <a href="analytics.php?range=14" class="nd-pill-btn <?= $range_days === 14 ? 'active' : '' ?>">14 Days</a>
+                    <a href="analytics.php?range=30" class="nd-pill-btn <?= $range_days === 30 ? 'active' : '' ?>">30 Days</a>
+                    <a href="analytics.php?range=90" class="nd-pill-btn <?= $range_days === 90 ? 'active' : '' ?>">90 Days</a>
+                    <a href="analytics.php?range=365" class="nd-pill-btn <?= $range_days === 365 ? 'active' : '' ?>">Year</a>
+                </div>
+
+                <a href="analytics_report.php?format=csv&period=<?= $range_days <= 7 ? 'weekly' : 'monthly' ?>" class="nd-btn-lime" title="Download Complete CSV Report">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    <span>Export CSV</span>
+                </a>
+
+                <a href="dashboard.php" class="nd-icon-btn" title="Admin Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- ── 4 Top KPI Highlights Cards ── -->
+        <section class="nd-kpi-grid">
+            
+            <!-- Card 1: Total Prompts (Soft Lavender) -->
+            <div class="nd-kpi-card nd-kpi-purple">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Prompts Library</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= number_format($total_prompts) ?></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-regular fa-eye"></i> <?= number_format($total_views) ?> views &bull; +<?= $weekly_p ?> this week
+                </div>
+            </div>
+
+            <!-- Card 2: Prompt Unlocks (Soft Baby Blue) -->
+            <div class="nd-kpi-card nd-kpi-blue">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Total Unlocks</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= number_format($total_unlocks) ?></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-regular fa-copy"></i> <?= number_format($total_copies) ?> copies &bull; +<?= $weekly_un ?> this week
+                </div>
+            </div>
+
+            <!-- Card 3: Conversion & Users (Soft Mint Green) -->
+            <div class="nd-kpi-card nd-kpi-green">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Unlock Rate / Conversion</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= $conv_rate ?>%</div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-users"></i> <?= number_format($total_users) ?> users (+<?= $weekly_u ?> new)
+                </div>
+            </div>
+
+            <!-- Card 4: Platform Health Pro Card (Emerald Teal Gradient) -->
+            <div class="nd-kpi-card nd-kpi-teal">
+                <div>
+                    <div class="nd-kpi-header" style="color:#d4f938;">
+                        <span class="nd-kpi-dot" style="background:#d4f938;"></span>
+                        <span>Platform Engine</span>
+                    </div>
+                    <div class="nd-kpi-val" style="font-size:1.55rem;"><?= number_format($total_likes) ?> Likes</div>
+                    <div class="nd-kpi-sub" style="color:rgba(255,255,255,0.85);">
+                        D7 Retention: <?= $ret_d7 ?>% &bull; <?= $total_blogs ?> Published Blogs
+                    </div>
+                </div>
+                <a href="analytics_report.php?format=print&period=monthly" target="_blank" class="nd-btn-kpi-cta">
+                    <i class="fa-solid fa-chart-pie"></i> Print Full Report
+                </a>
+            </div>
+
+        </section>
+
+        <!-- ── Middle Section: Main Chart & Action Breakdowns ── -->
+        <section class="nd-grid-chart">
+            
+            <!-- Left Chart Card: Activity Trends -->
+            <div class="nd-card">
+                <div class="nd-card-head">
+                    <div>
+                        <div class="nd-card-title">
+                            <span>Activity Trends (Last <?= $range_days ?> Days)</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--nd-text-muted); margin-top:2px;">
+                            Comparing User Signups vs Prompt Unlocks daily
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.75rem; font-weight:700; color:#5b21b6;"><i class="fa-solid fa-square" style="color:#a78bfa;"></i> Signups</span>
+                        <span style="font-size:0.75rem; font-weight:700; color:#065f46;"><i class="fa-solid fa-square" style="color:#34d399;"></i> Unlocks</span>
+                        <a href="analytics_report.php?format=csv&period=<?= $range_days <= 7 ? 'weekly' : 'monthly' ?>" class="nd-btn-outline" style="padding:4px 10px; font-size:0.74rem;">Export</a>
+                    </div>
+                </div>
+
+                <div style="height: 280px; position: relative;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Quick Breakdown Card -->
+            <div class="nd-card">
+                <div class="nd-card-head">
+                    <div class="nd-card-title">
+                        <span>Category Share</span>
+                    </div>
+                    <span style="font-size:0.75rem; font-weight:700; color:var(--nd-text-muted);"><?= count($type_breakdown) ?> Types</span>
+                </div>
+
+                <div style="height: 180px; position: relative; margin-bottom: 14px;">
+                    <canvas id="categoryDoughnut"></canvas>
+                </div>
+
+                <div class="nd-action-list">
+                    <?php 
+                    $top_type = $type_breakdown[0] ?? ['ptype' => 'General', 'cnt' => 0];
+                    $type_pct = $total_prompts > 0 ? round(($top_type['cnt'] / $total_prompts) * 100, 1) : 0;
+                    ?>
+                    <div class="nd-action-item">
+                        <div class="nd-action-item-left">
+                            <div class="nd-action-icon"><i class="fa-solid fa-fire" style="color:#f59e0b;"></i></div>
+                            <div>
+                                <div class="nd-action-title">Top: <?= htmlspecialchars($top_type['ptype']) ?></div>
+                                <div class="nd-action-desc"><?= number_format($top_type['cnt']) ?> prompts (<?= $type_pct ?>% share)</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="font-size:0.75rem; color:var(--nd-text-muted);"></i>
+                    </div>
+
+                    <div class="nd-action-item">
+                        <div class="nd-action-item-left">
+                            <div class="nd-action-icon"><i class="fa-solid fa-bookmark" style="color:#3b82f6;"></i></div>
+                            <div>
+                                <div class="nd-action-title">Saved to Bookmarks</div>
+                                <div class="nd-action-desc"><?= number_format($total_saves) ?> prompts bookmarked</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="font-size:0.75rem; color:var(--nd-text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ── Section: Comprehensive Top Prompts Table with Live Filter & Search ── -->
+        <section class="nd-card" id="section-prompts">
+            <div class="nd-card-head">
+                <div>
+                    <div class="nd-card-title">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color:#3b82f6;"></i>
+                        <span>Prompts Performance & Intelligence</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--nd-text-muted); margin-top:2px;">
+                        Interactive table with live search, category filters, and performance metrics
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <a href="upload_prompt.php" class="nd-btn-lime">
+                        <i class="fa-solid fa-plus"></i> New Prompt
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table Filter Toolbar -->
+            <div class="nd-filter-bar">
+                <input type="text" id="promptSearchInput" class="nd-search-input" placeholder="🔍 Search prompts by title or keyword..." onkeyup="filterPromptsTable()">
+                
+                <select id="promptTypeFilter" class="nd-select-filter" onchange="filterPromptsTable()">
+                    <option value="">All Categories / Types</option>
+                    <?php foreach ($type_breakdown as $t): ?>
+                        <option value="<?= htmlspecialchars(strtolower($t['ptype'])) ?>"><?= htmlspecialchars($t['ptype']) ?> (<?= $t['cnt'] ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+
+                <select id="promptSortFilter" class="nd-select-filter" onchange="sortPromptsTable()">
+                    <option value="unlocks">Sort by Most Unlocked</option>
+                    <option value="views">Sort by Most Viewed</option>
+                    <option value="likes">Sort by Most Liked</option>
+                    <option value="copies">Sort by Most Copied</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="nd-table-wrap">
+                <table class="nd-table" id="promptsDataTable">
+                    <thead>
+                        <tr>
+                            <th>Prompt Title</th>
+                            <th>Category</th>
+                            <th>Views</th>
+                            <th>Copies</th>
+                            <th>Likes</th>
+                            <th>Unlocks</th>
+                            <th>Conversion</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($all_prompts as $p): 
+                            $p_conv = $p['view_count'] > 0 ? round(($p['unlock_count'] / $p['view_count']) * 100, 1) : 0;
+                            $thumb = !empty($p['image_path']) ? $p['image_path'] : 'toplogo/logo01.webp';
+                        ?>
+                        <tr data-title="<?= htmlspecialchars(strtolower($p['title'])) ?>"
+                            data-type="<?= htmlspecialchars(strtolower($p['prompt_type'] ?: 'general')) ?>"
+                            data-unlocks="<?= (int)$p['unlock_count'] ?>"
+                            data-views="<?= (int)$p['view_count'] ?>"
+                            data-likes="<?= (int)$p['likes_count'] ?>"
+                            data-copies="<?= (int)$p['copy_count'] ?>">
+                            
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <img src="<?= htmlspecialchars($thumb) ?>" class="nd-prompt-thumb" alt="" onerror="this.src='toplogo/logo01.webp'">
+                                    <div>
+                                        <div style="font-weight:700; color:var(--nd-text-main); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="<?= htmlspecialchars($p['title']) ?>">
+                                            <?= htmlspecialchars($p['title']) ?>
+                                        </div>
+                                        <div style="font-size:0.72rem; color:var(--nd-text-muted);">
+                                            <?= date('M j, Y', strtotime($p['created_at'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="nd-tag-pill"><?= htmlspecialchars($p['prompt_type'] ?: 'General') ?></span>
+                            </td>
+                            <td><?= number_format($p['view_count']) ?></td>
+                            <td><?= number_format($p['copy_count']) ?></td>
+                            <td><?= number_format($p['likes_count']) ?></td>
+                            <td>
+                                <span style="font-weight:700; color:#059669;"><?= number_format($p['unlock_count']) ?></span>
+                            </td>
+                            <td>
+                                <span style="font-weight:700; color:<?= $p_conv >= 10 ? '#059669' : ($p_conv >= 3 ? '#d97706' : '#94a3b8') ?>;">
+                                    <?= $p_conv ?>%
+                                </span>
+                            </td>
+                            <td>
+                                <a href="edit_prompt.php?id=<?= $p['id'] ?>" class="nd-btn-outline" style="padding:4px 8px; font-size:0.72rem;" title="Edit Prompt">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ── Section: Blog Insights & Power Users (2-Columns) ── -->
+        <section style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;" id="section-blogs">
+            
+            <!-- Blog Performance Table -->
+            <div class="nd-card">
+                <div class="nd-card-head">
+                    <div class="nd-card-title">
+                        <i class="fa-solid fa-newspaper" style="color:#8b5cf6;"></i>
+                        <span>Blog Reads & Views</span>
+                    </div>
+                    <a href="blog_create.php" class="nd-btn-outline" style="padding:4px 10px; font-size:0.74rem;">
+                        <i class="fa-solid fa-plus"></i> Write Post
+                    </a>
+                </div>
+
+                <div class="nd-filter-bar">
+                    <input type="text" id="blogSearchInput" class="nd-search-input" placeholder="🔍 Filter blogs by title..." onkeyup="filterBlogsTable()">
+                </div>
+
+                <div class="nd-table-wrap">
+                    <table class="nd-table" id="blogsDataTable">
+                        <thead>
+                            <tr>
+                                <th>Article Title</th>
+                                <th>Reads</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($top_blogs as $b): ?>
+                            <tr data-title="<?= htmlspecialchars(strtolower($b['title'])) ?>">
+                                <td>
+                                    <div style="font-weight:700; color:var(--nd-text-main); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        <?= htmlspecialchars($b['title']) ?>
+                                    </div>
+                                    <div style="font-size:0.7rem; color:var(--nd-text-muted);">
+                                        <?= date('M j, Y', strtotime($b['created_at'])) ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-weight:700; color:#5b21b6;"><?= number_format($b['view_count']) ?></span>
+                                </td>
+                                <td>
+                                    <a href="blog_edit.php?id=<?= $b['id'] ?>" class="nd-btn-outline" style="padding:4px 8px; font-size:0.72rem;">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <?php if (!empty($b['slug'])): ?>
+                                        <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" target="_blank" class="nd-btn-outline" style="padding:4px 8px; font-size:0.72rem;">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Power Users & Retention Leaderboard -->
+            <div class="nd-card" id="section-users">
+                <div class="nd-card-head">
+                    <div class="nd-card-title">
+                        <i class="fa-solid fa-users" style="color:#10b981;"></i>
+                        <span>Active Power Users</span>
+                    </div>
+                    <a href="user_management.php" class="nd-btn-outline" style="padding:4px 10px; font-size:0.74rem;">
+                        View All Users
+                    </a>
+                </div>
+
+                <div class="nd-filter-bar">
+                    <input type="text" id="userSearchInput" class="nd-search-input" placeholder="🔍 Search users by username or email..." onkeyup="filterUsersTable()">
+                </div>
+
+                <div class="nd-table-wrap">
+                    <table class="nd-table" id="usersDataTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Unlocks</th>
+                                <th>Streak</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($power_users as $u): 
+                                $u_av = !empty($u['profile_image']) ? $u['profile_image'] : 'toplogo/logo01.webp';
+                            ?>
+                            <tr data-name="<?= htmlspecialchars(strtolower($u['username'] . ' ' . $u['email'])) ?>">
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <img src="<?= htmlspecialchars($u_av) ?>" style="width:28px; height:28px; border-radius:50%; object-fit:cover;" onerror="this.src='toplogo/logo01.webp'" alt="">
+                                        <div>
+                                            <div style="font-weight:700; font-size:0.82rem;"><?= htmlspecialchars($u['username']) ?></div>
+                                            <div style="font-size:0.7rem; color:var(--nd-text-muted);"><?= htmlspecialchars($u['email'] ?: 'No email') ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-weight:700; color:#059669;"><?= number_format($u['unlock_cnt']) ?></span>
+                                </td>
+                                <td>
+                                    <span style="font-weight:600; color:#f59e0b;"><i class="fa-solid fa-fire"></i> <?= (int)$u['streak_count'] ?>d</span>
+                                </td>
+                                <td>
+                                    <span style="font-size:0.74rem; color:var(--nd-text-muted);">
+                                        <?= !empty($u['last_active']) ? date('d M', strtotime($u['last_active'])) : 'Recent' ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ── Section: Optimization Hub (Dead Prompts & Churn Risk) ── -->
+        <section style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;">
+            
+            <!-- Churn Risk Users -->
+            <div class="nd-card">
+                <div class="nd-card-head">
+                    <div class="nd-card-title">
+                        <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>
+                        <span>Churn Risk Users (Inactive 7-30 Days)</span>
+                    </div>
+                </div>
+                <div class="nd-table-wrap">
+                    <table class="nd-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($churn_users)): ?>
+                                <tr><td colspan="3" style="text-align:center; color:var(--nd-text-muted);">No churn risk detected! 🎉</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($churn_users as $cu): ?>
+                                <tr>
+                                    <td style="font-weight:700;"><?= htmlspecialchars($cu['username']) ?></td>
+                                    <td style="color:var(--nd-text-muted);"><?= htmlspecialchars($cu['email'] ?: '-') ?></td>
+                                    <td style="color:#ef4444; font-weight:600;"><?= !empty($cu['last_active']) ? date('M j, Y', strtotime($cu['last_active'])) : '-' ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Zero-Unlock Prompts to Optimize -->
+            <div class="nd-card">
+                <div class="nd-card-head">
+                    <div class="nd-card-title">
+                        <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                        <span>Zero Unlocks (Optimization Queue)</span>
+                    </div>
+                </div>
+                <div class="nd-table-wrap">
+                    <table class="nd-table">
+                        <thead>
+                            <tr>
+                                <th>Prompt Title</th>
+                                <th>Views</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($dead_prompts)): ?>
+                                <tr><td colspan="4" style="text-align:center; color:var(--nd-text-muted);">All prompts active! 🚀</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($dead_prompts as $dp): ?>
+                                <tr>
+                                    <td style="font-weight:700; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        <?= htmlspecialchars($dp['title']) ?>
+                                    </td>
+                                    <td><?= number_format($dp['view_count']) ?></td>
+                                    <td><span class="nd-tag-pill"><?= htmlspecialchars($dp['prompt_type'] ?: 'General') ?></span></td>
+                                    <td>
+                                        <a href="edit_prompt.php?id=<?= $dp['id'] ?>" class="nd-btn-outline" style="padding:3px 7px; font-size:0.72rem;">
+                                            Optimize
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ── Interactive JavaScript Charts & Live Table Filters ── -->
+    <script>
+    // --- 1. Activity Trends Chart (Double Bars / Smooth) ----------------------
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    const trendLabels = <?= json_encode($trend_users['labels']) ?>;
+    const userSignups = <?= json_encode($trend_users['values']) ?>;
+    const promptUnlocks = <?= json_encode($trend_unlocks['values']) ?>;
+
+    new Chart(trendCtx, {
+        type: 'bar',
+        data: {
+            labels: trendLabels,
+            datasets: [
+                {
+                    label: 'User Signups',
+                    data: userSignups,
+                    backgroundColor: '#a78bfa',
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8
+                },
+                {
+                    label: 'Prompt Unlocks',
+                    data: promptUnlocks,
+                    backgroundColor: '#34d399',
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    padding: 10,
+                    cornerRadius: 8,
+                    titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: '700' },
+                    bodyFont: { family: 'Inter', size: 12 }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#94a3b8' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#94a3b8', precision: 0 }
+                }
+            }
+        }
+    });
+
+    // --- 2. Category Doughnut Chart ------------------------------------------
+    const catCtx = document.getElementById('categoryDoughnut').getContext('2d');
+    const typeLabels = <?= json_encode(array_column($type_breakdown, 'ptype')) ?>;
+    const typeData = <?= json_encode(array_column($type_breakdown, 'cnt')) ?>;
+    const chartColors = ['#a78bfa', '#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#cbd5e1'];
+
+    new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+            labels: typeLabels,
+            datasets: [{
+                data: typeData,
+                backgroundColor: chartColors.slice(0, typeLabels.length),
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    padding: 8,
+                    cornerRadius: 8,
+                    bodyFont: { family: 'Plus Jakarta Sans', size: 11 }
+                }
+            }
+        }
+    });
+
+    // --- 3. Live Client-Side Filtering for Prompts Table --------------------
+    function filterPromptsTable() {
+        const query = document.getElementById('promptSearchInput').value.toLowerCase().trim();
+        const typeFilter = document.getElementById('promptTypeFilter').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#promptsDataTable tbody tr');
+
+        rows.forEach(row => {
+            const title = row.getAttribute('data-title') || '';
+            const type = row.getAttribute('data-type') || '';
+            
+            const matchesQuery = query === '' || title.includes(query);
+            const matchesType = typeFilter === '' || type === typeFilter;
+
+            if (matchesQuery && matchesType) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function sortPromptsTable() {
+        const sortBy = document.getElementById('promptSortFilter').value;
+        const tbody = document.querySelector('#promptsDataTable tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            let valA = parseInt(a.getAttribute('data-' + sortBy) || 0, 10);
+            let valB = parseInt(b.getAttribute('data-' + sortBy) || 0, 10);
+            return valB - valA;
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // --- 4. Live Filtering for Blogs Table -----------------------------------
+    function filterBlogsTable() {
+        const query = document.getElementById('blogSearchInput').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#blogsDataTable tbody tr');
+        rows.forEach(row => {
+            const title = row.getAttribute('data-title') || '';
+            row.style.display = (query === '' || title.includes(query)) ? '' : 'none';
+        });
+    }
+
+    // --- 5. Live Filtering for Users Table -----------------------------------
+    function filterUsersTable() {
+        const query = document.getElementById('userSearchInput').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#usersDataTable tbody tr');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            row.style.display = (query === '' || name.includes(query)) ? '' : 'none';
+        });
+    }
+    </script>
+</body>
 </html>
-
-

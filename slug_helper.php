@@ -20,13 +20,13 @@ function uniqueSlug(PDO $pdo, string $title, ?int $excludeId = null): string {
     return $slug;
 }
 
-function uniqueNotMineSlug(PDO $pdo, string $title, ?int $excludeId = null): string
+function uniqueCuratedSlug(PDO $pdo, string $title, ?int $excludeId = null): string
 {
     $base = makeSlug($title);
     $slug = $base;
     $i = 2;
     while (true) {
-        $sql = "SELECT id FROM not_mine_prompts WHERE slug = ?" . ($excludeId !== null ? " AND id != ?" : "");
+        $sql = "SELECT id FROM curated_prompts WHERE slug = ?" . ($excludeId !== null ? " AND id != ?" : "");
         $q = $pdo->prepare($sql);
         $q->execute($excludeId !== null ? [$slug, $excludeId] : [$slug]);
         if (!$q->fetch()) {
@@ -35,6 +35,12 @@ function uniqueNotMineSlug(PDO $pdo, string $title, ?int $excludeId = null): str
         $slug = $base . '-' . $i++;
     }
     return $slug;
+}
+
+/** Alias so leftover live Not Mine admin code cannot fatal after sync. */
+function uniqueNotMineSlug(PDO $pdo, string $title, ?int $excludeId = null): string
+{
+    return uniqueCuratedSlug($pdo, $title, $excludeId);
 }
 
 function nm_is_local(): bool
@@ -55,27 +61,34 @@ function nm_local_base(): string
     return '/Arigato%20Development%20Site';
 }
 
-/** Public path for Not Mine prompt links (not-mine only — does not affect /prompts/). */
+/** Public folder/path for Curated AI Prompts (does not affect /prompts/). */
+function nm_url_prefix(): string
+{
+    return 'curated-ai-prompts';
+}
+
+/** Public path for Curated AI Prompt links only — does not affect /prompts/. */
 function nm_prompt_url(array $p): string
 {
     $slug = trim($p['slug'] ?? '');
     if ($slug === '') {
-        return 'not_mine_prompt.php?id=' . (int) ($p['id'] ?? 0);
+        return 'curated_prompt.php?id=' . (int) ($p['id'] ?? 0);
     }
+    $path = '/' . nm_url_prefix() . '/' . rawurlencode($slug);
     if (nm_is_local()) {
-        return nm_local_base() . '/not-mine/' . rawurlencode($slug);
+        return nm_local_base() . $path;
     }
-    return '/not-mine/' . rawurlencode($slug);
+    return $path;
 }
 
-/** Canonical URL for Not Mine prompt pages only. */
+/** Canonical URL for Curated AI Prompt pages only. */
 function nm_prompt_canonical(array $p): string
 {
     $slug = trim($p['slug'] ?? '');
     if ($slug === '') {
-        return 'https://arigatodevan.com/not_mine_prompt.php?id=' . (int) ($p['id'] ?? 0);
+        return 'https://arigatodevan.com/curated_prompt.php?id=' . (int) ($p['id'] ?? 0);
     }
-    return 'https://arigatodevan.com/not-mine/' . rawurlencode($slug);
+    return 'https://arigatodevan.com/' . nm_url_prefix() . '/' . rawurlencode($slug);
 }
 
 /** Full shareable URL (for admin copy — uses current host). */
@@ -85,7 +98,7 @@ function nm_prompt_share_url(array $p): string
     $host = $_SERVER['HTTP_HOST'] ?? 'arigatodevan.com';
     $slug = trim($p['slug'] ?? '');
     if ($slug === '') {
-        return $scheme . '://' . $host . '/not_mine_prompt.php?id=' . (int) ($p['id'] ?? 0);
+        return $scheme . '://' . $host . '/curated_prompt.php?id=' . (int) ($p['id'] ?? 0);
     }
     return $scheme . '://' . $host . nm_prompt_url($p);
 }

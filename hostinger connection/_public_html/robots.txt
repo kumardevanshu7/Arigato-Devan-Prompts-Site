@@ -58,9 +58,14 @@ Disallow: /profiledp/
 Disallow: /toplogo/
 Disallow: /private/
 Disallow: /gallery.php?page=
+Disallow: /curated_admin.php
+Disallow: /curated_manage.php
+Disallow: /curated_links.php
+Disallow: /curated_prompt.php
 Disallow: /not_mine_admin.php
 Disallow: /not_mine_manage.php
 Disallow: /not_mine_links.php
+# Public pages stay crawlable: /curated_ai_prompts.php and /curated-ai-prompts/{slug}
 Disallow: /heroine_admin.php
 Disallow: /heroine_orbit_editor.php
 Disallow: /happy_users_admin.php

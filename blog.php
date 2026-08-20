@@ -54,13 +54,14 @@ $comments = $comments->fetchAll(PDO::FETCH_ASSOC);
 $word_count = str_word_count(strip_tags($blog["content"] ?? ""));
 $read_time = max(1, (int)ceil($word_count / 200));
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-nogoda">
 <head>
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars($blog["meta_title"] ?? $blog["title"]) ?> &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
+<?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
@@ -190,7 +191,7 @@ html.no-scroll, body.no-scroll {
 }
 
 /* Override Header to be stunningly premium & clean (0% comic, 100% professional) */
-header {
+header:not(.store-header) {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -328,7 +329,7 @@ header .admin-avatar {
     header .header-right.desktop-only {
         display: none !important; /* Force hide desktop-only items with absolute authority */
     }
-    header {
+    header:not(.store-header) {
         padding: 0 16px !important; /* Center elements vertically inside a 64px capsule */
         margin: 15px 12px 0 !important;
         border-radius: 20px !important;
@@ -459,13 +460,14 @@ header .comic-btn:hover {
 }
 @media (max-width: 768px) {
     .blog-detail-wrap {
-        padding: 80px 16px 60px; /* Mobile responsive padding */
+        padding: 72px 12px 48px;
     }
+}
 }
 
 /* Robust responsive floating header styling for mobile */
 @media (max-width: 768px) {
-    header {
+    header:not(.store-header) {
         padding: 8px 16px !important;
         margin: 10px 12px 0 !important;
         border-radius: 16px !important;
@@ -524,13 +526,13 @@ header .comic-btn:hover {
     }
 }
 .blog-detail-title {
-    font-size: clamp(2.2rem, 5vw, 3.2rem);
-    font-weight: 900;
-    line-height: 1.2;
+    font-size: clamp(1.2rem, 0.7rem + 2.4vw, 2.85rem);
+    font-weight: 800;
+    line-height: 1.22;
     margin-top: 5px;
     margin-bottom: 22px;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    letter-spacing: -1.5px;
+    letter-spacing: -0.04em;
     color: #0f172a;
 }
 .blog-detail-meta {
@@ -605,8 +607,29 @@ header .comic-btn:hover {
 }
 @media (max-width: 640px) {
     .blog-paper {
-        padding: 30px 20px !important;
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+        margin-top: 8px !important;
     }
+    .blog-detail-title {
+        font-size: 1.42rem;
+        letter-spacing: -0.6px;
+        margin-bottom: 12px;
+        line-height: 1.25;
+    }
+    .blog-detail-meta { margin-bottom: 14px; gap: 10px; }
+    .blog-author-avatar { width: 36px; height: 36px; }
+    .blog-author-name { font-size: 0.88rem; }
+    .blog-detail-date { font-size: 0.75rem; }
+    .blog-meta-pills { margin-bottom: 16px; gap: 6px; }
+    .meta-pill { padding: 5px 12px; font-size: 0.7rem; }
+    .blog-content { font-size: 0.95rem; line-height: 1.68; }
+    .blog-content p { margin-bottom: 14px; }
+    .blog-content h1 { font-size: 1.28rem; margin-top: 22px; }
+    .blog-content h2 { font-size: 1.14rem; margin-top: 22px; }
+    .blog-content h3 { font-size: 1.02rem; margin-top: 18px; }
+    .blog-content ul, .blog-content ol { padding-left: 18px; margin-bottom: 14px; }
+    .blog-content li { margin-bottom: 6px; }
 }
 
 /* Premium Typography matching Pic 1 article view */
@@ -633,6 +656,69 @@ header .comic-btn:hover {
 .blog-content li { margin-bottom: 12px; }
 .blog-content strong { font-weight: 700; color: #0f172a; }
 .blog-content em { font-style: italic; }
+.blog-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.25em 0;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+.blog-content table {
+    width: 100%;
+    min-width: 280px;
+    border-collapse: collapse;
+    font-size: 0.92em;
+    line-height: 1.45;
+    margin: 0;
+}
+.blog-content th,
+.blog-content td {
+    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+.blog-content th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+}
+.blog-content tr:nth-child(even) td { background: #fafbfc; }
+.read-size-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+}
+.read-size-bar span { margin-right: 4px; letter-spacing: .04em; text-transform: uppercase; }
+.read-size-btn {
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #475569;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+}
+.read-size-btn.is-on {
+    background: #0f172a;
+    color: #fff;
+    border-color: #0f172a;
+}
+html.blog-read-little .blog-content { font-size: 1.12rem; line-height: 1.8; }
+html.blog-read-medium .blog-content { font-size: 1.28rem; line-height: 1.85; }
+@media (max-width: 640px) {
+    html.blog-read-little .blog-content { font-size: 1.05rem; }
+    html.blog-read-medium .blog-content { font-size: 1.18rem; }
+    .blog-content th, .blog-content td { padding: 8px 9px; font-size: 0.88em; }
+}
 .blog-content blockquote {
     border-left: 4px solid #6366f1;
     padding: 20px 24px;
@@ -1013,6 +1099,75 @@ footer .footer-links a:hover {
 .blog-meta-pills {
     margin-bottom: 0 !important;
 }
+
+/* Final article polish — must sit last so mobile sizes actually win */
+.blog-content table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+.blog-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 18px 0;
+    border: 1px solid #e8edf3;
+    border-radius: 14px;
+    background: #fff;
+}
+.blog-content th,
+.blog-content td {
+    border-bottom: 1px solid #eef2f6;
+    border-right: 1px solid #eef2f6;
+    padding: 11px 14px;
+}
+.blog-content tr:last-child td { border-bottom: 0; }
+.blog-content th:last-child,
+.blog-content td:last-child { border-right: 0; }
+.blog-content th {
+    background: #f7f8fb;
+    font-size: 0.78rem;
+    letter-spacing: .04em;
+    text-transform: none;
+    white-space: normal;
+}
+@media (max-width: 720px) {
+    .blog-detail-wrap { padding: 64px 10px 40px !important; }
+    .blog-paper {
+        padding: 16px 14px 18px !important;
+        border-radius: 14px !important;
+        margin-top: 4px !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,.04) !important;
+    }
+    .blog-detail-title {
+        font-size: 1.22rem !important;
+        letter-spacing: -0.4px !important;
+        margin: 0 0 10px !important;
+        line-height: 1.28 !important;
+        font-weight: 800 !important;
+    }
+    .blog-detail-meta { margin-bottom: 10px !important; gap: 8px !important; }
+    .blog-author-avatar { width: 32px !important; height: 32px !important; }
+    .blog-author-name { font-size: 0.82rem !important; }
+    .blog-detail-date { font-size: 0.72rem !important; }
+    .blog-meta-pills { margin-bottom: 12px !important; gap: 6px !important; }
+    .meta-pill { padding: 4px 10px !important; font-size: 0.68rem !important; }
+    .read-size-bar { margin: 0 0 0 auto; }
+    .blog-content {
+        font-size: 0.92rem !important;
+        line-height: 1.62 !important;
+    }
+    .blog-content p { margin-bottom: 11px !important; }
+    .blog-content h1 { font-size: 1.12rem !important; margin-top: 18px !important; margin-bottom: 8px !important; }
+    .blog-content h2 { font-size: 1.05rem !important; margin-top: 18px !important; margin-bottom: 8px !important; padding-bottom: 0 !important; border-bottom: 0 !important; }
+    .blog-content h3 { font-size: 0.98rem !important; margin-top: 14px !important; }
+    .blog-content ul, .blog-content ol { padding-left: 16px !important; margin-bottom: 10px !important; }
+    .blog-content li { margin-bottom: 5px !important; }
+    .blog-content blockquote { padding: 10px 12px !important; margin: 14px 0 !important; font-size: 0.9rem !important; }
+    .blog-content th, .blog-content td { padding: 8px 10px !important; font-size: 0.8rem !important; }
+    html.blog-read-little .blog-content { font-size: 1.02rem !important; line-height: 1.7 !important; }
+    html.blog-read-medium .blog-content { font-size: 1.12rem !important; line-height: 1.75 !important; }
+}
 </style>
 <link rel="stylesheet" href="css/blog-header-logo.css?v=20260758">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -1044,8 +1199,132 @@ footer .footer-links a:hover {
 ) ?>"}]}
     </script>
     <?php include_once "gtag.php"; ?>
+<style id="blog-article-mobile">
+.blog-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #64748b;
+    text-decoration: none;
+    margin: 0 0 18px;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
+.blog-back-link:hover { color: #0f172a; }
+.blog-byline { min-width: 0; flex: 1; }
+.blog-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
+.read-size-bar {
+    margin: 0 0 0 auto;
+    flex-shrink: 0;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+}
+.read-size-btn {
+    border: 0;
+    background: transparent;
+    min-width: 32px;
+    padding: 5px 8px;
+}
+.read-size-btn.is-on {
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(15,23,42,.08);
+}
+
+@media (max-width: 720px) {
+    body.page-store.theme-nogoda { background: #fff !important; }
+    .aurora-bg, .back-glow { display: none !important; }
+    .blog-detail-wrap {
+        max-width: none !important;
+        padding: 72px 0 48px !important;
+    }
+    .blog-back-link { margin: 0 20px 10px; }
+    .blog-detail-hero-img {
+        border-radius: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        margin: 0 0 4px !important;
+        max-height: 280px !important;
+    }
+    .blog-paper {
+        background: #fff !important;
+        padding: 8px 20px 36px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+    h1.blog-detail-title {
+        font-size: 1.55rem !important;
+        line-height: 1.22 !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.035em !important;
+        margin: 12px 0 16px !important;
+    }
+    .blog-detail-meta {
+        display: grid !important;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "avatar byline"
+            "size size";
+        gap: 10px 12px !important;
+        align-items: center !important;
+        margin: 0 0 18px !important;
+        padding-bottom: 16px !important;
+        border-bottom: 1px solid #eef2f6;
+        flex-wrap: unset !important;
+    }
+    .blog-author-avatar {
+        grid-area: avatar;
+        width: 40px !important;
+        height: 40px !important;
+        border: 0 !important;
+    }
+    .blog-byline { grid-area: byline; }
+    .blog-author-name { font-size: 0.92rem !important; font-weight: 700 !important; }
+    .blog-detail-date { font-size: 0.78rem !important; font-weight: 500 !important; margin-top: 1px !important; color: #64748b !important; }
+    .read-size-bar {
+        grid-area: size;
+        margin: 0 !important;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .blog-meta-pills { margin: 0 0 16px !important; gap: 6px !important; }
+    .meta-pill { padding: 4px 10px !important; font-size: 0.68rem !important; }
+    .blog-content {
+        font-size: 1.05rem !important;
+        line-height: 1.75 !important;
+        color: #1e293b !important;
+    }
+    .blog-content p { margin-bottom: 1.05em !important; }
+    .blog-content h2 { font-size: 1.2rem !important; margin: 1.4em 0 0.55em !important; border: 0 !important; padding: 0 !important; }
+    .blog-content h3 { font-size: 1.08rem !important; margin: 1.2em 0 0.4em !important; }
+    .blog-content ul, .blog-content ol { padding-left: 1.15em !important; margin-bottom: 1em !important; }
+    .blog-content li { margin-bottom: 0.4em !important; }
+    .blog-content blockquote {
+        margin: 1.2em 0 !important;
+        padding: 4px 0 4px 14px !important;
+        font-size: 1.02rem !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        border-left: 3px solid #c4b5fd !important;
+        color: #475569 !important;
+    }
+    html.blog-read-little .blog-content { font-size: 1.14rem !important; line-height: 1.8 !important; }
+    html.blog-read-medium .blog-content { font-size: 1.24rem !important; line-height: 1.82 !important; }
+}
+</style>
 </head>
-<body>
+<body class="page-store theme-nogoda">
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -1070,90 +1349,10 @@ footer .footer-links a:hover {
         <div class="bg-layer" style="background-image: url('https://i.pinimg.com/736x/a5/15/6a/a5156a264e06ebb47997cf59e66bee31.jpg')"></div>
         <div class="bg-creamy-overlay"></div>
     </div>
-<header>
-  <div class="header-top-row">
-    <div class="logo-area" id="logo-container" style="cursor:pointer">
-      <div class="logo-flipper">
-        <div class="logo-front"><img src="toplogo/logo01.webp" alt="Logo" id="profile-logo"></div>
-        <div class="logo-back"><img loading="lazy" src="toplogo/logo02.webp" alt=""></div>
-      </div>
-      <div class="logo-text">arigato.<span class="blog-brand-suffix">blog</span></div>
-    </div>
-    
-    <nav class="nav-links desktop-only">
-      <a href="digital_store/index.php" class="shop-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> SHOP</a>
-      <a href="gallery.php">GALLERY</a>
-      <a href="blogs.php" class="active">BLOGS</a>
-      <a href="progress.php" title="Our Journey" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-chart-line nav-progress-icon"></i></a>
-      <a href="faq.php" title="FAQ" style="padding:8px 10px;display:flex;align-items:center;"><i class="fa-solid fa-circle-question" style="font-size:1.2rem;"></i></a>
-      <div class="nav-dropdown">
-          <button class="nav-dropdown-btn"><i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down dd-arrow"></i></button>
-          <?php $curPage = basename($_SERVER["PHP_SELF"]); ?>
-          <div class="nav-dropdown-menu">
-              <a href="secret_code.php" <?= $curPage == "secret_code.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-lock"></i> Secret Code Reels <?= empty($nav_counts["secret_code"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "secret_code.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="unreleased.php" <?= $curPage == "unreleased.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-star"></i> Unreleased Reels <?= empty($nav_counts["unreleased"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "unreleased.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="insta_viral.php" <?= $curPage == "insta_viral.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-brands fa-instagram"></i> Insta Viral Reels <?= empty($nav_counts["insta_viral"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "insta_viral.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-              <a href="already_uploaded.php" <?= $curPage == "already_uploaded.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="bx bx-history"></i> Already Uploaded <?= empty($nav_counts["already_uploaded"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "already_uploaded.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-                    <a href="direct_prompts.php" <?= $curPage == "direct_prompts.php" ? 'style="background:var(--primary-color)"' : "" ?>><i class="fa-solid fa-hand-pointer"></i> Direct Prompts <?= empty($nav_counts["direct"]) ? '<span class="dd-tag soon">SOON</span>' : ($curPage == "direct_prompts.php" ? '<span class="dd-tag">ACTIVE</span>' : "") ?></a>
-                </div>
-      </div>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-family:var(--font-main);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <span style="font-weight:600;">@arigato.devan</span>
-        <span class="pulse-dot"></span>
-        <span style="font-weight:800;font-size:1.1rem;">16K+</span>
-      </a>
-    </nav>
-    
-    <div class="header-right desktop-only">
-      <div class="header-divider"></div>
-      <?php if (isset($_SESSION["user_id"])): ?>
-        <?php if ($_SESSION["role"] === "admin"): ?>
-          <div style="display:flex; align-items:center; gap:8px;"><a href="profile.php" title="Edit Profile"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Admin", 'style="transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1) rotate(-5deg)\'" onmouseout="this.style.transform=\'\'"') ?></a><a href="dashboard.php" style="color:var(--text-color); font-weight:800;">ADMIN</a></div>
-        <?php else: ?>
-          <a href="profile.php" style="color:var(--text-color)"><?= renderAvatar($_SESSION["profile_image"] ?? "", "admin-avatar", "Profile") ?></a>
-        <?php endif; ?>
-        <a href="login.php?logout=1" class="logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> LOGOUT</a>
-      <?php else: ?>
-        <a href="login.php" class="comic-btn" style="font-size:.85rem;padding:9px 18px;text-decoration:none;color:var(--text-color);background:var(--primary-color);">LOGIN</a>
-      <?php endif; ?>
-    </div>
-
-    <!-- macOS style 3-dot mobile toggle -->
-    <button class="dots-menu-toggle" id="mobile-dots-toggle" type="button" aria-label="Toggle Menu">
-      <span class="dot red"></span>
-      <span class="dot yellow"></span>
-      <span class="dot green"></span>
-    </button>
-  </div>
-
-  <!-- Mobile Sliding Menu Drawer -->
-  <div class="mobile-menu-drawer">
-    <nav class="mobile-nav-links">
-      <a href="index.php"><i class="fa-solid fa-house"></i> HOME</a>
-      <a href="gallery.php"><i class="fa-solid fa-images"></i> GALLERY</a>
-      <a href="blogs.php" class="active"><i class="fa-solid fa-feather"></i> BLOGS</a>
-      <a href="progress.php"><i class="fa-solid fa-chart-line"></i> OUR JOURNEY</a>
-      <a href="faq.php"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-      <a href="https://www.instagram.com/arigato.devan/" target="_blank"><i class="fa-brands fa-instagram"></i> INSTAGRAM (16K+)</a>
-      <div style="width:100%; height:1px; background:#f1f5f9; margin:4px 0;"></div>
-      <?php if (isset($_SESSION["user_id"])): ?>
-        <?php if ($_SESSION["role"] === "admin"): ?>
-          <a href="dashboard.php"><i class="fa-solid fa-lock"></i> ADMIN DASHBOARD</a>
-        <?php else: ?>
-          <a href="profile.php"><i class="fa-solid fa-user"></i> MY PROFILE</a>
-        <?php endif; ?>
-        <a href="login.php?logout=1" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</a>
-      <?php else: ?>
-        <a href="login.php" style="color:#6366f1; background:rgba(99,102,241,0.05);"><i class="fa-solid fa-right-to-bracket"></i> LOGIN</a>
-      <?php endif; ?>
-    </nav>
-  </div>
-</header>
+<?php $nav_active = 'blogs'; include 'includes/site_nav.php'; ?>
 
 <div class="blog-detail-wrap">
-  <!-- Back link -->
-  <a href="blogs.php" style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--text-color);text-decoration:none;margin-bottom:28px;font-size:.9rem;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><i class="fa-solid fa-arrow-left"></i> Back to Blogs</a>
+  <a href="blogs.php" class="blog-back-link"><i class="fa-solid fa-arrow-left"></i> Blogs</a>
 
   <!-- Hero image (Fully responsive, rounded with outline border) -->
   <?php if ($blog["image_path"]): 
@@ -1163,34 +1362,32 @@ footer .footer-links a:hover {
   <?php endif; ?>
 
   <div class="blog-paper">
-    <!-- Title of the Post -->
     <h1 class="blog-detail-title"><?= htmlspecialchars($blog["title"]) ?></h1>
 
-    <!-- Author & Date Meta Section -->
     <div class="blog-detail-meta">
       <img loading="lazy" src="<?= htmlspecialchars(
           !empty($blog["author_avatar"])
               ? $blog["author_avatar"]
               : "https://api.dicebear.com/7.x/avataaars/svg?seed=" . urlencode($blog["author_name"] ?? "Admin"),
       ) ?>" class="blog-author-avatar" alt="" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($blog["author_name"] ?? "Admin") ?>'">
-      <div>
-        <div class="blog-author-name">Written by <?= htmlspecialchars($blog["author_name"] ?? "Admin") ?></div>
-        <div class="blog-detail-date"><?= date("M d, Y", strtotime($blog["created_at"])) ?></div>
+      <div class="blog-byline">
+        <div class="blog-author-name"><?= htmlspecialchars($blog["author_name"] ?? "Admin") ?></div>
+        <div class="blog-detail-date"><?= date("M j, Y", strtotime($blog["created_at"])) ?> · <?= $read_time ?> min read</div>
+      </div>
+      <div class="read-size-bar" role="group" aria-label="Reading size">
+        <button type="button" class="read-size-btn is-on" data-size="default" title="Default size">A</button>
+        <button type="button" class="read-size-btn" data-size="little" title="Larger">A+</button>
+        <button type="button" class="read-size-btn" data-size="medium" title="Largest">A++</button>
       </div>
     </div>
 
-    <!-- Metadata Horizontal Pills (Category tags & Read time) -->
+    <?php if ($blog["tags"]): ?>
     <div class="blog-meta-pills">
-      <!-- Reading Time Pill -->
-      <span class="meta-pill read-pill"><i class="fa-regular fa-clock"></i> <?= $read_time ?> min read</span>
-      
-      <!-- Category Tags Pills -->
-      <?php if ($blog["tags"]): ?>
         <?php foreach (array_filter(array_map("trim", explode(",", $blog["tags"]))) as $tag): ?>
-          <span class="meta-pill tag-pill"><i class="fa-solid fa-hashtag"></i> <?= htmlspecialchars($tag) ?></span>
+          <span class="meta-pill tag-pill"><?= htmlspecialchars($tag) ?></span>
         <?php endforeach; ?>
-      <?php endif; ?>
     </div>
+    <?php endif; ?>
 
     <?php if(!empty($blog["content_hindi"])): ?>
     <!-- Language Toggle -->
@@ -1202,7 +1399,6 @@ footer .footer-links a:hover {
     </div>
     <?php endif; ?>
 
-    <!-- Content of the Blog Post -->
     <div class="blog-content" id="blog-content-en"><?= $blog["content"] ?></div>
     <?php if(!empty($blog["content_hindi"])): ?>
     <div class="blog-content" id="blog-content-hi" style="display:none;"><?= $blog["content_hindi"] ?></div>
@@ -1472,6 +1668,32 @@ if (dotsToggle && header) {
 if (typeof gtag !== 'undefined') {
     gtag('event', 'blog_read', { blog_slug: '<?= addslashes($blog["slug"]) ?>', blog_title: '<?= addslashes($blog["title"] ?? "") ?>' });
 }
+
+document.querySelectorAll('.blog-content table').forEach(function(table) {
+    if (table.parentElement && table.parentElement.classList.contains('blog-table-wrap')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'blog-table-wrap';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+});
+
+(function() {
+    var key = 'blogReadSize';
+    var saved = localStorage.getItem(key) || 'default';
+    function applySize(size) {
+        document.documentElement.classList.remove('blog-read-little', 'blog-read-medium');
+        if (size === 'little') document.documentElement.classList.add('blog-read-little');
+        if (size === 'medium') document.documentElement.classList.add('blog-read-medium');
+        document.querySelectorAll('.read-size-btn').forEach(function(btn) {
+            btn.classList.toggle('is-on', btn.getAttribute('data-size') === size);
+        });
+        localStorage.setItem(key, size);
+    }
+    document.querySelectorAll('.read-size-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { applySize(btn.getAttribute('data-size')); });
+    });
+    applySize(saved);
+})();
 </script>
 </body></html>
 
