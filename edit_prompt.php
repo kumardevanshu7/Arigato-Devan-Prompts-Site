@@ -317,16 +317,15 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 .bwi-btn input[type=radio]{display:none}
 .bwi-banana-opt.bwi-selected{background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.4);color:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,0.1)}
 .bwi-chatgpt-opt.bwi-selected{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.35);color:var(--adm-green);box-shadow:0 0 12px rgba(74,222,128,0.1)}
-.type-selector{display:flex;gap:8px;flex-wrap:wrap}
-.e-type-card{flex:1;min-width:100px;border:1px solid var(--adm-border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:700;font-size:.82rem;transition:all .2s;background:rgba(255,255,255,0.03);color:var(--adm-muted);position:relative}
-.e-type-card:hover{border-color:var(--adm-accent);color:var(--adm-text);transform:translateY(-2px)}
+.type-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:4px}
+.e-type-card{border:1px solid var(--adm-border);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--adm-muted)}
+.e-type-card:hover{border-color:rgba(139,92,246,0.3);color:var(--adm-text);transform:translateY(-2px)}
 .e-type-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
-.e-type-card.sel-secret{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.4);color:var(--adm-red)}
-.e-type-card.sel-unreleased{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35);color:#fbbf24}
-.e-type-card.sel-viral{background:rgba(34,211,238,0.07);border-color:rgba(34,211,238,0.3);color:#22d3ee}
-.e-type-card.sel-uploaded{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.3);color:var(--adm-green)}
-.e-type-card.sel-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e}
-.e-type-card.sel-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:#4ade80}
+.e-type-card.sel-secret{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.4);color:var(--adm-red);box-shadow:0 0 0 2px rgba(248,113,113,0.1)}
+.e-type-card.sel-unreleased{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35);color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,0.08)}
+.e-type-card.sel-uploaded{background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.3);color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,0.07)}
+.e-type-card.sel-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.07)}
+.e-type-card.sel-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:#4ade80;box-shadow:0 0 0 2px rgba(74,222,128,0.08)}
 .tap-card{border:1px solid var(--adm-border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(255,255,255,0.03);position:relative;color:var(--adm-muted);flex:1;min-width:60px;}
 .tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--adm-text);}
 .tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
@@ -351,6 +350,7 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 /* RESPONSIVE */
 @media(max-width:900px){.sidebar{width:58px}.sb-uname,.sb-role,.sb-sec,.sb-link span,.sb-brand span{display:none}.sb-admin{padding:10px;justify-content:center}.sb-link{padding:10px;justify-content:center}.main{margin-left:58px}}
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px 14px 80px}.mob-topbar{display:flex!important}}
+@media(max-width:700px){.type-selector{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:18px 14px}}
 body::before, body::after { display: none !important; background-image: none !important; }
 </style>
@@ -488,15 +488,6 @@ body::before, body::after { display: none !important; background-image: none !im
                 ? "checked"
                 : "" ?> onchange="onEditTypeChange('unreleased')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-star"></i></span><span>Unreleased</span>
-          </label>
-          <label class="e-type-card <?= $current_prompt_type === "insta_viral"
-              ? "sel-viral"
-              : "" ?>" id="e-card-viral">
-            <input type="radio" name="prompt_type" value="insta_viral" <?= $current_prompt_type ===
-            "insta_viral"
-                ? "checked"
-                : "" ?> onchange="onEditTypeChange('insta_viral')">
-            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-brands fa-instagram"></i></span><span>Insta Viral</span>
           </label>
           <label class="e-type-card <?= $current_prompt_type ===
           "already_uploaded"
@@ -862,9 +853,9 @@ body::before, body::after { display: none !important; background-image: none !im
         });
 
         function onEditTypeChange(type) {
-            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct',solo:'sel-solo'};
-            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct',solo:'e-card-solo'};
-            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct','e-card-solo'].forEach(id => {
+            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',already_uploaded:'sel-uploaded',direct:'sel-direct',solo:'sel-solo'};
+            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',already_uploaded:'e-card-uploaded',direct:'e-card-direct',solo:'e-card-solo'};
+            ['e-card-secret','e-card-unreleased','e-card-uploaded','e-card-direct','e-card-solo'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.className = 'e-type-card';
             });
