@@ -10,12 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $on = (int)$_POST['slider'] ? 1 : 0;
             $pdo->prepare("UPDATE blogs SET in_slider=? WHERE id=?")->execute([$on, $id]);
             $_SESSION['success_msg'] = $on
-                ? '<i class="fa-solid fa-check"></i> Added to homepage slider.'
-                : '<i class="fa-solid fa-check"></i> Removed from homepage slider.';
+                ? 'Added to homepage slider.'
+                : 'Removed from homepage slider.';
         } else {
             $status = (int)($_POST['status'] ?? 0);
             $pdo->prepare("UPDATE blogs SET is_published=? WHERE id=?")->execute([$status, $id]);
-            $_SESSION['success_msg'] = $status ? '<i class="fa-solid fa-check"></i> Blog published!' : '<i class="fa-solid fa-check"></i> Blog unpublished.';
+            $_SESSION['success_msg'] = $status ? 'Blog published successfully!' : 'Blog unpublished successfully!';
         }
     }
 }

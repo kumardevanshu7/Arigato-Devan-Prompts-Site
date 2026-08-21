@@ -172,8 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $id,
     ]);
 
-    $_SESSION["success_msg"] =
-        '<i class="fa-solid fa-check"></i> Prompt updated!';
+    $_SESSION["success_msg"] = "Prompt updated successfully!";
     header("Location: dashboard.php");
     exit();
 }

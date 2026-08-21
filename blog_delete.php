@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM blog_likes WHERE blog_id=?")->execute([$id]);
         $pdo->prepare("DELETE FROM blog_comments WHERE blog_id=?")->execute([$id]);
         $pdo->prepare("DELETE FROM blogs WHERE id=?")->execute([$id]);
-        $_SESSION['success_msg'] = '<i class="fa-solid fa-check"></i> Blog deleted.';
+        $_SESSION['success_msg'] = 'Blog deleted successfully!';
     }
 }
 header("Location: blog_admin.php"); exit();
