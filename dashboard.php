@@ -452,6 +452,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="d-link"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="premium_links.php" class="d-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> Premium Links</a>
     <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <a href="gallery_carousel_manager.php" class="d-link"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
@@ -468,6 +469,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
+    <a href="premium.php" class="d-link" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> View Premium</a>
     <a href="index.php" class="d-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
   <div class="drawer-bottom">
@@ -500,6 +502,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="premium_links.php" class="sb-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>Premium Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
@@ -516,6 +519,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
+    <a href="premium.php" class="sb-link" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>View Premium</span></a>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>
   <div class="sb-bottom">
@@ -660,7 +664,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-upload"></i></div><div><div class="ac-t">Upload Prompt</div><div class="ac-d">Add a new AI prompt to the platform</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
     <a href="manage_prompts.php" class="acard ac-pk"><div class="ac-icon ai-pk"><i class="fa-solid fa-list-check"></i></div><div><div class="ac-t">Manage Prompts</div><div class="ac-d">Edit, delete, review all <?= $total_prompts ?> prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
     <a href="prompt_links.php" class="acard ac-c"><div class="ac-icon ai-c"><i class="fa-solid fa-link"></i></div><div><div class="ac-t">Prompt Share Links</div><div class="ac-d">Copy direct links to share prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-    <a href="potd_manager.php" class="acard ac-y"><div class="ac-icon ai-y"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="premium_links.php" class="acard ac-y"><div class="ac-icon ai-y"><i class="fa-solid fa-crown"></i></div><div><div class="ac-t">Premium VIP Links</div><div class="ac-d">Copy exclusive VIP links for Premium prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="potd_manager.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
   </div>
 
   <div class="card">

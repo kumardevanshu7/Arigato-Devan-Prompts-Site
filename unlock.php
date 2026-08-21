@@ -261,13 +261,17 @@ if ($action === "already_uploaded") {
     exit();
 }
 
-if ($action === "direct" || $action === "solo") {
+if ($action === "direct" || $action === "solo" || $action === "premium") {
     if ($prompt_id <= 0) {
         echo json_encode(["success" => false, "message" => "Missing data"]);
         exit();
     }
 
-    $required_type = $action === "solo" ? "solo" : "direct";
+    $required_type = match($action) {
+        "solo"    => "solo",
+        "premium" => "premium",
+        default   => "direct"
+    };
     $stmt = $pdo->prepare("SELECT prompt_text, extra_prompts FROM prompts WHERE id = ? AND prompt_type = ?");
     $stmt->execute([$prompt_id, $required_type]);
     $prompt = $stmt->fetch(PDO::FETCH_ASSOC);

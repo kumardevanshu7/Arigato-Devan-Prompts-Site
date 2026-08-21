@@ -55,7 +55,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 textarea.form-input{resize:vertical;min-height:100px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 /* TYPE SELECTOR */
-.type-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:4px}
+.type-selector{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:4px}
 .type-card{border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--muted)}
 .type-card:hover{transform:translateY(-2px);border-color:rgba(139,92,246,0.3);color:var(--text)}
 .type-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
@@ -66,6 +66,7 @@ textarea.form-input{resize:vertical;min-height:100px}
 .type-card.selected-uploaded{background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.3);color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,0.07)}
 .type-card.selected-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e;box-shadow:0 0 0 2px rgba(244,63,94,0.07)}
 .type-card.selected-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:var(--green);box-shadow:0 0 0 2px rgba(74,222,128,0.08)}
+.type-card.selected-premium{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.45);color:var(--yellow);box-shadow:0 0 0 2px rgba(251,191,36,0.12)}
 .tap-card{border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(15,13,30,0.6);position:relative;color:var(--muted);flex:1;min-width:60px;}
 .tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--text);}
 .tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
@@ -190,6 +191,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="d-link2 active"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link2 "><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link2 "><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="premium_links.php" class="d-link2 "><i class="fa-solid fa-crown" style="color:#fbbf24"></i> Premium Links</a>
     <a href="potd_manager.php" class="d-link2 "><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link2"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <a href="gallery_carousel_manager.php" class="d-link2"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
@@ -199,6 +201,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="d-sec2">Users</div>
     <a href="user_management.php" class="d-link2 "><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec2">Tools</div>
+    <a href="premium.php" class="d-link2" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> View Premium</a>
     <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
   <div class="drawer-bot"><a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div>
@@ -237,6 +240,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="sb-link active"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="premium_links.php" class="sb-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>Premium Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
@@ -294,6 +298,10 @@ body::before, body::after { display: none !important; background-image: none !im
         <label class="type-card" id="card-solo">
           <input type="radio" name="prompt_type" value="solo" onchange="onTypeChange('solo')">
           <i class="fa-solid fa-user type-icon"></i> SOLO
+        </label>
+        <label class="type-card" id="card-premium">
+          <input type="radio" name="prompt_type" value="premium" onchange="onTypeChange('premium')">
+          <i class="fa-solid fa-crown type-icon"></i> Premium
         </label>
       </div>
     </div>
@@ -581,19 +589,36 @@ let tags=[];
 function onTypeChange(type){
   document.querySelectorAll('.type-card').forEach(c=>c.className='type-card');
   const isSolo=type==='solo';
+  const isPrem=type==='premium';
   soloMediaCard.style.display=isSolo?'block':'none';
   standardCoverRow.style.display=isSolo?'none':'grid';
   soloBeforeInput.required=isSolo;
   soloAfterInput.required=isSolo;
   standardCoverInput.required=!isSolo;
-  uploadSubmitBtn.innerHTML=isSolo
-    ? '<i class="fa-solid fa-floppy-disk"></i> Save SOLO Prompt'
-    : '<i class="fa-solid fa-upload"></i> Upload Prompt';
+  if(isSolo){
+    uploadSubmitBtn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save SOLO Prompt';
+  } else if(isPrem){
+    uploadSubmitBtn.innerHTML='<i class="fa-solid fa-crown"></i> Upload Premium Prompt';
+  } else {
+    uploadSubmitBtn.innerHTML='<i class="fa-solid fa-upload"></i> Upload Prompt';
+  }
+  
+  const trialCb = document.getElementById('is_trial');
+  const trialLabel = document.getElementById('trial-toggle-label');
+  const wasChecked = trialCb ? trialCb.checked : false;
+  if(isPrem){
+    trialLabel.innerHTML = '<input type="checkbox" name="is_trial" id="is_trial" onchange="toggleTrialUI(this)" ' + (wasChecked ? 'checked' : '') + '> <i class="fa-solid fa-crown"></i> Premium Hidden';
+  } else {
+    trialLabel.innerHTML = '<input type="checkbox" name="is_trial" id="is_trial" onchange="toggleTrialUI(this)" ' + (wasChecked ? 'checked' : '') + '> <i class="fa-solid fa-eye-slash"></i> Trial Reel Mode';
+  }
+  toggleTrialUI(document.getElementById('is_trial'));
+
   if(type==='secret'){document.getElementById('card-secret').className='type-card selected-secret';codeGroup.style.display='block';codeInput.required=true;reelLinkGroup.style.display='block';reelLinkInput.required=true;if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='unreleased'){document.getElementById('card-unreleased').className='type-card selected-unreleased';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='already_uploaded'){document.getElementById('card-uploaded').className='type-card selected-uploaded';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='none';}
   else if(type==='direct'){document.getElementById('card-direct').className='type-card selected-direct';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
   else if(type==='solo'){document.getElementById('card-solo').className='type-card selected-solo';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
+  else if(type==='premium'){document.getElementById('card-premium').className='type-card selected-premium';codeGroup.style.display='none';codeInput.required=false;codeInput.value='';reelLinkGroup.style.display='none';reelLinkInput.required=false;reelLinkInput.value='';if(directTapsGroup)directTapsGroup.style.display='block';}
 }
 
 function onTapChange(val){
@@ -753,9 +778,27 @@ function renumberSoloExamples(){
   document.getElementById('solo-add-example').disabled=items.length>=5;
 }
 function toggleTrialUI(cb){
+  if(!cb) return;
   const label=document.getElementById('trial-toggle-label');const info=document.getElementById('trial-info-box');
-  if(cb.checked){label.style.background='rgba(249,115,22,0.1)';label.style.borderColor='rgba(249,115,22,0.3)';label.style.color='var(--orange)';info.innerHTML='<i class="fa-solid fa-eye-slash" style="color:var(--orange)"></i> <strong style="color:var(--orange)">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';}
-  else{label.style.background='rgba(139,92,246,0.05)';label.style.borderColor='rgba(139,92,246,0.2)';label.style.color='var(--accent2)';info.innerHTML='<i class="fa-solid fa-eye" style="color:var(--green)"></i> <strong style="color:var(--green)">Visible</strong> &mdash; Prompt will appear normally on the site.';}
+  if(!label || !info) return;
+  const currentType = document.querySelector('input[name="prompt_type"]:checked')?.value;
+  if(currentType === 'premium'){
+    if(cb.checked){
+      label.style.background='rgba(251,191,36,0.12)';label.style.borderColor='rgba(251,191,36,0.4)';label.style.color='#fbbf24';
+      info.innerHTML='<i class="fa-solid fa-eye-slash" style="color:#fbbf24"></i> <strong style="color:#fbbf24">Premium Hidden ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct VIP link from Premium Links.';
+    } else {
+      label.style.background='rgba(251,191,36,0.05)';label.style.borderColor='rgba(251,191,36,0.2)';label.style.color='#fbbf24';
+      info.innerHTML='<i class="fa-solid fa-eye" style="color:var(--green)"></i> <strong style="color:var(--green)">Visible</strong> &mdash; Prompt will appear normally on the site.';
+    }
+  } else {
+    if(cb.checked){
+      label.style.background='rgba(249,115,22,0.1)';label.style.borderColor='rgba(249,115,22,0.3)';label.style.color='var(--orange)';
+      info.innerHTML='<i class="fa-solid fa-eye-slash" style="color:var(--orange)"></i> <strong style="color:var(--orange)">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+    } else {
+      label.style.background='rgba(139,92,246,0.05)';label.style.borderColor='rgba(139,92,246,0.2)';label.style.color='var(--accent2)';
+      info.innerHTML='<i class="fa-solid fa-eye" style="color:var(--green)"></i> <strong style="color:var(--green)">Visible</strong> &mdash; Prompt will appear normally on the site.';
+    }
+  }
 }
 function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
 function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}

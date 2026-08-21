@@ -62,6 +62,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .tb-urp{background:rgba(251,191,36,0.08);color:var(--yellow);border-color:rgba(251,191,36,0.22)}
 .tb-ivp{background:rgba(34,211,238,0.06);color:var(--cyan);border-color:rgba(34,211,238,0.18)}
 .tb-aup{background:rgba(96,165,250,0.06);color:#60a5fa;border-color:rgba(96,165,250,0.18)}
+.tb-prm{background:rgba(251,191,36,0.12);color:var(--yellow);border-color:rgba(251,191,36,0.35)}
 .tb-trial{background:rgba(74,222,128,0.08);color:var(--green);border-color:rgba(74,222,128,0.2)}
 .copy-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:9px;font-size:.73rem;font-weight:800;border:1px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.07);color:var(--accent2);cursor:pointer;transition:all .2s;font-family:var(--font)}
 .copy-btn:hover{background:rgba(139,92,246,0.15)}
@@ -123,6 +124,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="d-link2 "><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link2 "><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link2 active"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="premium_links.php" class="d-link2 "><i class="fa-solid fa-crown" style="color:#fbbf24"></i> Premium Links</a>
     <a href="potd_manager.php" class="d-link2 "><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link2"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <div class="d-sec2">Blog</div>
@@ -131,6 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="d-sec2">Users</div>
     <a href="user_management.php" class="d-link2 "><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec2">Tools</div>
+    <a href="premium.php" class="d-link2" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> View Premium</a>
     <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
   <div class="drawer-bot"><a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div>
@@ -169,6 +172,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link active"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="premium_links.php" class="sb-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>Premium Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
@@ -200,7 +204,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
       <thead><tr><th>#</th><th>Cover</th><th>Title</th><th>Type</th><th>Likes</th><th>Copy Link</th></tr></thead>
       <tbody>
       <?php
-      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO']];
+      $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO'],'premium'=>['cls'=>'tb-prm','lbl'=>'PREMIUM']];
       foreach($prompts as $idx=>$p):
         $ptype=$p['prompt_type']??'secret';
         $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];

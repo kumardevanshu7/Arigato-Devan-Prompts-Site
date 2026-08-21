@@ -62,12 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $prompt_type = trim($_POST["prompt_type"] ?? "secret");
-    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct", "solo"];
+    $valid_types = ["secret", "unreleased", "insta_viral", "already_uploaded", "direct", "solo", "premium"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
     $is_secret = $prompt_type === "secret";
-    $is_direct = $prompt_type === "direct" || $prompt_type === "solo";
+    $is_direct = $prompt_type === "direct" || $prompt_type === "solo" || $prompt_type === "premium";
     $is_trial = isset($_POST['is_trial']) ? 1 : 0;
 
     // Validate codes based on type
@@ -327,6 +327,7 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 .e-type-card.sel-uploaded{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.3);color:var(--adm-green)}
 .e-type-card.sel-direct{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.3);color:#f43f5e}
 .e-type-card.sel-solo{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:#4ade80}
+.e-type-card.sel-premium{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.45);color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,0.12)}
 .tap-card{border:1px solid var(--adm-border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;font-family:var(--adm-font);font-weight:800;font-size:.8rem;transition:all .2s;background:rgba(255,255,255,0.03);position:relative;color:var(--adm-muted);flex:1;min-width:60px;}
 .tap-card:hover{transform:translateY(-2px);border-color:rgba(244,63,94,0.3);color:var(--adm-text);}
 .tap-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
@@ -378,6 +379,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="d-link"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link active"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="premium_links.php" class="d-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> Premium Links</a>
     <a href="potd_manager.php" class="d-link"><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <div class="d-sec">Blog</div>
@@ -391,6 +393,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
+    <a href="premium.php" class="d-link" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> View Premium</a>
     <a href="index.php" class="d-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
   <div class="drawer-bottom">
@@ -423,12 +426,13 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link active"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="premium_links.php" class="sb-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>Premium Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
     <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
     <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
-    <div class="sb-sec">Community</div>
+    <div class="d-sec">Community</div>
     <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
     <div class="sb-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
@@ -436,6 +440,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
+    <a href="premium.php" class="sb-link" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>View Premium</span></a>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>
   <div class="sb-bottom">
@@ -512,25 +517,27 @@ body::before, body::after { display: none !important; background-image: none !im
             <input type="radio" name="prompt_type" value="direct" <?= $current_prompt_type === "direct" ? "checked" : "" ?> onchange="onEditTypeChange('direct')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-hand-pointer"></i></span><span>Direct Prompt</span>
           </label>
-          <?php if ($current_prompt_type === "solo"): ?>
-          <label class="e-type-card sel-solo" id="e-card-solo">
+          <label class="e-type-card <?= $current_prompt_type === "solo" ? "sel-solo" : "" ?>" id="e-card-solo">
             <input type="radio" name="prompt_type" value="solo" <?= $current_prompt_type === "solo" ? "checked" : "" ?> onchange="onEditTypeChange('solo')">
             <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-user"></i></span><span>SOLO</span>
           </label>
-          <?php endif; ?>
+          <label class="e-type-card <?= $current_prompt_type === "premium" ? "sel-premium" : "" ?>" id="e-card-premium">
+            <input type="radio" name="prompt_type" value="premium" <?= $current_prompt_type === "premium" ? "checked" : "" ?> onchange="onEditTypeChange('premium')">
+            <span style="font-size:1.4rem;display:block;margin-bottom:4px;"><i class="fa-solid fa-crown"></i></span><span>Premium</span>
+          </label>
         </div>
       </div>
 
-      <!-- Trial Reel Mode Toggle -->
+      <!-- Trial Reel Mode / Premium Hidden Toggle -->
       <div class="form-group" style="margin-top:4px;">
-        <label style="display:block;font-weight:800;margin-bottom:7px;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;">Trial Reel Mode</label>
+        <label id="trial-mode-title" style="display:block;font-weight:800;margin-bottom:7px;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;"><?= $current_prompt_type === "premium" ? "Premium Hidden" : "Trial Reel Mode" ?></label>
         <label class="assets-toggle-label" id="trial-toggle-label" style="background:<?= ($p['is_trial'] ?? 0) ? 'rgba(251,191,36,0.12)' : 'rgba(34,211,238,0.05)' ?>;border-color:<?= ($p['is_trial'] ?? 0) ? 'rgba(251,191,36,0.4)' : 'rgba(34,211,238,0.3)' ?>;color:<?= ($p['is_trial'] ?? 0) ? '#fbbf24' : '#22d3ee' ?>;">
           <input type="checkbox" name="is_trial" id="is_trial" value="1" onchange="toggleTrialUI(this)" <?= ($p['is_trial'] ?? 0) ? 'checked' : '' ?>>
-          <span><i class="fa-solid fa-flask"></i> Trial Mode &mdash; Hidden from site, direct link only</span>
+          <span id="trial-toggle-span"><?= $current_prompt_type === "premium" ? '<i class="fa-solid fa-crown"></i> Premium Hidden — Hidden from site, direct link only' : '<i class="fa-solid fa-flask"></i> Trial Mode — Hidden from site, direct link only' ?></span>
         </label>
         <div style="margin-top:8px;font-size:.78rem;font-weight:600;padding:8px 12px;background:var(--card-bg);border-radius:8px;border:1px dashed var(--border-color);" id="trial-info-box">
           <?php if ($p['is_trial'] ?? 0): ?>
-          <i class="fa-solid fa-eye-slash" style="color:#f97316;"></i> <strong style="color:#c2410c;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.
+          <i class="fa-solid fa-eye-slash" style="color:#fbbf24;"></i> <strong style="color:#fbbf24;"><?= $current_prompt_type === "premium" ? "Premium Hidden ON" : "Trial Mode ON" ?></strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from <?= $current_prompt_type === "premium" ? "Premium Links" : "Prompt Links" ?>.
           <?php else: ?>
           <i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Appears normally on the site.
           <?php endif; ?>
@@ -864,14 +871,25 @@ body::before, body::after { display: none !important; background-image: none !im
         });
 
         function onEditTypeChange(type) {
-            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct',solo:'sel-solo'};
-            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct',solo:'e-card-solo'};
-            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct','e-card-solo'].forEach(id => {
+            const classMap = {secret:'sel-secret',unreleased:'sel-unreleased',insta_viral:'sel-viral',already_uploaded:'sel-uploaded',direct:'sel-direct',solo:'sel-solo',premium:'sel-premium'};
+            const idMap = {secret:'e-card-secret',unreleased:'e-card-unreleased',insta_viral:'e-card-viral',already_uploaded:'e-card-uploaded',direct:'e-card-direct',solo:'e-card-solo',premium:'e-card-premium'};
+            ['e-card-secret','e-card-unreleased','e-card-viral','e-card-uploaded','e-card-direct','e-card-solo','e-card-premium'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.className = 'e-type-card';
             });
             const card = document.getElementById(idMap[type]);
             if (card) card.classList.add(classMap[type]);
+            
+            const titleEl = document.getElementById('trial-mode-title');
+            const spanEl = document.getElementById('trial-toggle-span');
+            if (type === 'premium') {
+                if (titleEl) titleEl.textContent = 'Premium Hidden';
+                if (spanEl) spanEl.innerHTML = '<i class="fa-solid fa-crown"></i> Premium Hidden &mdash; Hidden from site, direct link only';
+            } else {
+                if (titleEl) titleEl.textContent = 'Trial Reel Mode';
+                if (spanEl) spanEl.innerHTML = '<i class="fa-solid fa-flask"></i> Trial Mode &mdash; Hidden from site, direct link only';
+            }
+            toggleTrialUI(document.getElementById('is_trial'));
             checkSecretTag();
             if (type !== 'secret') {
                 reelLinkInput.value = '';
@@ -894,7 +912,7 @@ body::before, body::after { display: none !important; background-image: none !im
                 reelLinkInput.required = false;
             }
             if (directTapsGroup) {
-                directTapsGroup.style.display = (selectedType === 'direct' || selectedType === 'solo') ? 'block' : 'none';
+                directTapsGroup.style.display = (selectedType === 'direct' || selectedType === 'solo' || selectedType === 'premium') ? 'block' : 'none';
             }
         }
 
@@ -978,18 +996,35 @@ body::before, body::after { display: none !important; background-image: none !im
         }
 
         function toggleTrialUI(cb) {
+            if (!cb) return;
             const label = document.getElementById('trial-toggle-label');
             const info = document.getElementById('trial-info-box');
-            if (cb.checked) {
-                label.style.background = 'rgba(251,191,36,0.12)';
-                label.style.borderColor = 'rgba(251,191,36,0.4)';
-                label.style.color = '#fbbf24';
-                info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#fbbf24;"></i> <strong style="color:#fbbf24;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+            if (!label || !info) return;
+            const currentType = document.querySelector('input[name="prompt_type"]:checked')?.value;
+            if (currentType === 'premium') {
+                if (cb.checked) {
+                    label.style.background = 'rgba(251,191,36,0.12)';
+                    label.style.borderColor = 'rgba(251,191,36,0.4)';
+                    label.style.color = '#fbbf24';
+                    info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#fbbf24;"></i> <strong style="color:#fbbf24;">Premium Hidden ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct VIP link from Premium Links.';
+                } else {
+                    label.style.background = 'rgba(251,191,36,0.05)';
+                    label.style.borderColor = 'rgba(251,191,36,0.2)';
+                    label.style.color = '#fbbf24';
+                    info.innerHTML = '<i class="fa-solid fa-eye" style="color:#22c55e;"></i> <strong style="color:#15803d;">Visible</strong> &mdash; Appears normally on the site.';
+                }
             } else {
-                label.style.background = 'rgba(34,211,238,0.05)';
-                label.style.borderColor = 'rgba(34,211,238,0.3)';
-                label.style.color = '#22d3ee';
-                info.innerHTML = '<i class="fa-solid fa-eye" style="color:#4ade80;"></i> <strong style="color:#4ade80;">Visible</strong> &mdash; Appears normally on the site.';
+                if (cb.checked) {
+                    label.style.background = 'rgba(251,191,36,0.12)';
+                    label.style.borderColor = 'rgba(251,191,36,0.4)';
+                    label.style.color = '#fbbf24';
+                    info.innerHTML = '<i class="fa-solid fa-eye-slash" style="color:#fbbf24;"></i> <strong style="color:#fbbf24;">Trial Mode ON</strong> &mdash; Hidden from gallery &amp; listings. Share via direct link from Prompt Links.';
+                } else {
+                    label.style.background = 'rgba(34,211,238,0.05)';
+                    label.style.borderColor = 'rgba(34,211,238,0.3)';
+                    label.style.color = '#22d3ee';
+                    info.innerHTML = '<i class="fa-solid fa-eye" style="color:#4ade80;"></i> <strong style="color:#4ade80;">Visible</strong> &mdash; Appears normally on the site.';
+                }
             }
         }
 

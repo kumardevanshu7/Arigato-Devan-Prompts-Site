@@ -163,7 +163,8 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arigato Devan &mdash; AI Couple Prompts for Instagram Reels</title>
-    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts &mdash; use instantly on ChatGPT. Only on Arigato Devan.">
+    <meta name="description" content="Explore premium AI couple prompts for Instagram Reels. Unlock secret, viral &amp; unreleased prompts &mdash; use instantly on ChatGPT and Gemini. Only on Arigato Devan.">
+    <meta name="keywords" content="couple prompt for gemini ai, couple prompt, couple prompt gemini, trending couple prompt, gemini couple prompt, couple prompt for gemini, couple prompt chatgpt, romantic couple prompt, couple prompt chatgpt indian, chatgpt couple prompt, couple prompt generator, ai couple prompts, arigato devan">
     <!-- Open Graph & Twitter Card -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Arigato Devan Prompts">

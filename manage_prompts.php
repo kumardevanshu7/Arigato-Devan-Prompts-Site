@@ -141,6 +141,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .tb-ivp{background:rgba(34,211,238,0.08);color:var(--cyan);border-color:rgba(34,211,238,0.2)}
 .tb-aup{background:rgba(96,165,250,0.08);color:#60a5fa;border-color:rgba(96,165,250,0.2)}
 .tb-drp{background:rgba(244,63,94,0.08);color:#f43f5e;border-color:rgba(244,63,94,0.2)}
+.tb-prm{background:rgba(251,191,36,0.12);color:var(--yellow);border-color:rgba(251,191,36,0.35)}
 .tb-trial{background:rgba(74,222,128,0.1);color:var(--green);border-color:rgba(74,222,128,0.22)}
 .p-tag-pill{padding:2px 8px;background:rgba(139,92,246,0.08);border:1px solid var(--border2);border-radius:100px;font-size:.6rem;font-weight:700;color:var(--muted)}
 .p-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
@@ -175,6 +176,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .bt-aup.sel{background:rgba(96,165,250,0.08)}
 .bt-drp{color:#f43f5e;border-color:rgba(244,63,94,0.25)}
 .bt-drp.sel{background:rgba(244,63,94,0.08)}
+.bt-prm{color:var(--yellow);border-color:rgba(251,191,36,0.35)}
+.bt-prm.sel{background:rgba(251,191,36,0.12)}
 .bt-all{color:var(--muted);border-color:var(--border2)}
 .bt-all:hover{color:var(--text);border-color:var(--border)}
 .bulk-list{max-height:300px;overflow-y:auto;border:1px solid var(--border2);border-radius:12px;padding:8px}
@@ -266,6 +269,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="d-link2"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link2 active"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
     <a href="prompt_links.php" class="d-link2"><i class="fa-solid fa-link"></i> Prompt Links</a>
+    <a href="premium_links.php" class="d-link2"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> Premium Links</a>
     <a href="potd_manager.php" class="d-link2"><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link2"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <div class="d-sec2">Blog</div>
@@ -274,6 +278,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="d-sec2">Users</div>
     <a href="user_management.php" class="d-link2"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec2">Tools</div>
+    <a href="premium.php" class="d-link2" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> View Premium</a>
     <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
   </nav>
   <div class="drawer-bot">
@@ -303,6 +308,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link active"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
     <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
+    <a href="premium_links.php" class="sb-link"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>Premium Links</span></a>
     <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <div class="sb-sec">Blog</div>
@@ -311,7 +317,7 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
-    
+    <a href="premium.php" class="sb-link" target="_blank"><i class="fa-solid fa-crown" style="color:#fbbf24"></i> <span>View Premium</span></a>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>
   <div class="sb-bottom"><a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></div>
@@ -338,7 +344,7 @@ body::before, body::after { display: none !important; background-image: none !im
     </div>
     <div id="prompts-list">
     <?php
-    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO']];
+    $type_badge_map=['secret'=>['cls'=>'tb-scp','lbl'=>'SCP'],'unreleased'=>['cls'=>'tb-urp','lbl'=>'URP'],'insta_viral'=>['cls'=>'tb-ivp','lbl'=>'IVP'],'already_uploaded'=>['cls'=>'tb-aup','lbl'=>'AUP'],'direct'=>['cls'=>'tb-drp','lbl'=>'DP'],'solo'=>['cls'=>'tb-drp','lbl'=>'SOLO'],'premium'=>['cls'=>'tb-prm','lbl'=>'PREMIUM']];
     foreach($prompts as $p):
       $ptype=$p['prompt_type']??'secret';
       $binfo=$type_badge_map[$ptype]??$type_badge_map['secret'];

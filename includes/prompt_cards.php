@@ -14,6 +14,8 @@ function prompt_resolve_type(string $db_type): array {
         $ptype = 'direct';
     } elseif ($db_type === 'solo') {
         $ptype = 'solo';
+    } elseif ($db_type === 'premium') {
+        $ptype = 'premium';
     } else {
         $ptype = 'secret_code';
     }
@@ -24,6 +26,7 @@ function prompt_resolve_type(string $db_type): array {
         'already_uploaded' => ['label' => 'UPLOADED',  'cls' => 'aup'],
         'direct'           => ['label' => 'DIRECT',    'cls' => 'dir'],
         'solo'             => ['label' => 'SOLO',      'cls' => 'sol'],
+        'premium'          => ['label' => 'PREMIUM',   'cls' => 'prm'],
     ];
     $tinfo = $labels[$ptype] ?? $labels['secret_code'];
     return ['ptype' => $ptype, 'label' => $tinfo['label'], 'cls' => $tinfo['cls']];
@@ -99,6 +102,7 @@ function render_trending_row(array $prompts, array $opts = []): void {
         'aup' => 'Uploaded',
         'dir' => 'Direct',
         'sol' => 'Solo',
+        'prm' => 'Premium',
     ];
     ?>
     <section class="gal-trending-section" id="gal-trending">

@@ -225,16 +225,19 @@
         <p>New prompts are added every week, existing ones are updated as Gemini and ChatGPT's image models improve, and nothing is left stale. You can copy any prompt for free without logging in — an account is only needed if you want to save your favourites, unlock premium prompts faster, or comment on our blog posts. That's the whole idea: a genuinely useful, constantly-updated <strong>couple prompt</strong> resource, not a one-time list that goes out of date in a month.</p>
 
         <div class="home-seo-tags" aria-label="Popular searches">
-            <span>couple prompts for ai</span>
-            <span>couple prompts for gemini ai</span>
-            <span>couple prompts for chatgpt</span>
-            <span>best couple prompts for gemini</span>
+            <span>couple prompt for gemini ai</span>
+            <span>couple prompt</span>
+            <span>couple prompt gemini</span>
+            <span>trending couple prompt</span>
+            <span>gemini couple prompt</span>
+            <span>couple prompt for gemini</span>
+            <span>couple prompt chatgpt</span>
+            <span>romantic couple prompt</span>
+            <span>couple prompt chatgpt indian</span>
+            <span>chatgpt couple prompt</span>
+            <span>couple prompt generator</span>
             <span>ai couple prompts</span>
             <span>indian wedding couple prompts</span>
-            <span>chat gpt couple prompts</span>
-            <span>couple prompts ai</span>
-            <span>ai couple prompts with name</span>
-            <span>navratri couple prompts for gemini</span>
         </div>
     </section>
 </section>

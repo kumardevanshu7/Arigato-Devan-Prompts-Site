@@ -39,6 +39,7 @@ $ptype    = match($db_type) {
     "already_uploaded"=> "already_uploaded",
     "direct"          => "direct",
     "solo"            => "solo",
+    "premium"         => "premium",
     default           => "secret_code"
 };
 $tinfo = [
@@ -48,6 +49,7 @@ $tinfo = [
     "already_uploaded" => ["label" => "ALREADY UPLOADED",   "bg" => "#e6f2ff", "color" => "#00509e"],
     "direct"           => ["label" => "DIRECT PROMPT",      "bg" => "#ffe4e6", "color" => "#be123c"],
     "solo"             => ["label" => "SOLO",               "bg" => "#dcfce7", "color" => "#166534"],
+    "premium"          => ["label" => "PREMIUM",            "bg" => "#fef3c7", "color" => "#b45309"],
 ][$ptype];
 
 $rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path, likes_count, prompt_type FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
@@ -83,8 +85,9 @@ $type_page    = match($ptype) {
     'insta_viral'      => 'curated_ai_prompts.php',
     'unreleased'       => 'unreleased.php',
     'already_uploaded' => 'already_uploaded.php',
-    'direct'           => 'gallery.php', // Assuming there's no direct.php list page yet
-    'solo'             => 'gallery.php',
+    'direct'           => 'gallery.php',
+    'solo'             => 'solo_prompts.php',
+    'premium'          => 'premium.php',
     default            => 'gallery.php',
 };
 $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], true);
@@ -145,7 +148,21 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
 <div class="nogoda-mesh" aria-hidden="true"></div>
     <div class="pp-wrap">
   
+        <?php if ($ptype === 'premium' && !$is_unlocked): ?>
+        <style>
+        /* Premium golden colours only */
+        .pp-love-btn-gold { color: #f59e0b !important; filter: drop-shadow(0 4px 14px rgba(245,158,11,0.4)) !important; }
+        .pp-progress-gold { background: linear-gradient(90deg,#fbbf24,#f59e0b) !important; }
+        .pp-task-icon-gold { background: rgba(251,191,36,0.15) !important; color: #d97706 !important; }
+        .pp-badge-gold {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 14px rgba(245,158,11,0.45) !important;
+        }
+        </style>
+        <?php endif; ?>
         <div class="pp-layout">
+
             <!-- Image Column -->
             <div class="pp-img-col <?= ($ptype === 'unreleased' && !$is_unlocked) ? 'blurred' : '' ?> <?= $ptype === 'solo' ? 'pp-solo-img-col' : '' ?>" id="pp-img-col">
                 <?php if ($ptype === 'solo' && $solo_before_image !== ''): ?>
@@ -163,7 +180,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 <?php else: ?>
                 <div class="pp-img-frame">
                     <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
-                    <span class="pp-badge"><?= $tinfo['label'] ?></span>
+                    <span class="pp-badge <?= $ptype === 'premium' ? 'pp-badge-gold' : '' ?>"><?= $tinfo['label'] ?></span>
                 </div>
                 <?php endif; ?>
                 <div class="pp-img-meta">
@@ -190,6 +207,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
 
                 <!-- -- TASK SECTION (shown when locked) -- -->
                 <?php if (!$is_unlocked): ?>
+
                 <div id="pp-task" class="pp-task-card">
                     <?php if ($ptype === 'secret_code'): ?>
                         <div class="pp-task-icon"><i class="fa-solid fa-lock"></i></div>
@@ -237,14 +255,14 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
                         </div>
 
-                    <?php elseif ($ptype === 'direct' || $ptype === 'solo'): ?>
+                    <?php elseif ($ptype === 'direct' || $ptype === 'solo' || $ptype === 'premium'): ?>
                         <?php $req_taps = (int)($p['unlock_code'] ?: 9); ?>
-                        <div class="pp-task-icon"><i class="fa-solid fa-hand-pointer" style="color:#f43f5e"></i></div>
-                        <h3><?= $ptype === 'solo' ? 'Unlock This SOLO Prompt!' : 'Direct Unlock!' ?></h3>
+                        <div class="pp-task-icon <?= $ptype === 'premium' ? 'pp-task-icon-gold' : '' ?>"><i class="fa-solid fa-heart"></i></div>
+                        <h3>Show Some Love!</h3>
                         <p>Tap the heart <strong><?= $req_taps ?> times</strong> to unlock this prompt!</p>
-                        <div class="pp-love-area">
-                            <button id="pp-love-btn-dir" class="pp-love-btn" style="color:#f43f5e;border-color:#f43f5e"><i class="fa-solid fa-heart"></i></button>
-                            <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-dir" style="width:0%;background:#f43f5e"></div></div>
+                        <div class="pp-love-area <?= $ptype === 'premium' ? 'pp-love-area-premium' : '' ?>">
+                            <button id="pp-love-btn-dir" class="pp-love-btn <?= $ptype === 'premium' ? 'pp-love-btn-gold' : '' ?>"><i class="fa-solid fa-heart"></i></button>
+                            <div class="pp-progress-bar"><div class="pp-progress-fill <?= $ptype === 'premium' ? 'pp-progress-gold' : '' ?>" id="pp-progress-fill-dir" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-dir">0</span> / <?= $req_taps ?></div>
                             <script>const DIR_REQ_TAPS = <?= $req_taps ?>;</script>
                         </div>
@@ -557,7 +575,8 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             setTimeout(() => this.style.transform = '', 120);
             if (tapCountDir >= TAPS_DIR) {
                 this.disabled = true;
-                const fd = new FormData(); fd.append('action', ptype === 'solo' ? 'solo' : 'direct'); fd.append('prompt_id', promptId);
+                const reqAction = ptype === 'solo' ? 'solo' : (ptype === 'premium' ? 'premium' : 'direct');
+                const fd = new FormData(); fd.append('action', reqAction); fd.append('prompt_id', promptId);
                 const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
                 if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
                 else { tapCountDir = 0; document.getElementById('pp-tap-count-dir').textContent = '0'; document.getElementById('pp-progress-fill-dir').style.width = '0%'; this.disabled = false; showError(res.message); }

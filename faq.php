@@ -88,10 +88,18 @@ if (isset($_SESSION['user_id'])) {
 
                 <div class="faq-card">
                     <button class="faq-question">
-                        What is the Already Uploaded section?
+                        What prompt to give Gemini for couple photo?
                         <i class="fa-solid fa-plus faq-icon"></i>
                     </button>
-                    <div class="faq-answer"><div class="faq-answer-inner">Before this site existed, prompts were shared via <strong>Notion and Instagram Reels</strong>. This section is the complete archive — every old prompt, all in one place. New prompts won't come here; they go straight to the main sections.</div></div>
+                    <div class="faq-answer"><div class="faq-answer-inner">Specify realistic photography details such as: <em>"Cinematic 35mm portrait of a stylish young couple, natural smiling chemistry, golden hour backlighting, soft focal blur, authentic skin textures, 8k resolution"</em>. You can copy full tested versions directly from our site.</div></div>
+                </div>
+
+                <div class="faq-card">
+                    <button class="faq-question">
+                        How to create couple images with Gemini AI prompt generator?
+                        <i class="fa-solid fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer"><div class="faq-answer-inner">Use our prompt collections as your generator template: choose your favorite mood (romantic, aesthetic cafe, festive, or travel), copy the formula, customize outfit colors or background location, and run in Google Gemini for instant high-quality results.</div></div>
                 </div>
             </div>
 
@@ -141,10 +149,34 @@ if (isset($_SESSION['user_id'])) {
 
                 <div class="faq-card">
                     <button class="faq-question">
-                        Why does the same prompt give different results?
+                        What is the prompt for a couple photo in Gemini &amp; how to make one?
                         <i class="fa-solid fa-plus faq-icon"></i>
                     </button>
-                    <div class="faq-answer"><div class="faq-answer-inner">AI tools generate images using <strong>probability and creativity</strong> — even the same prompt produces a unique output every single time. This is a <strong>feature, not a bug!</strong> Try 2–3 times and pick your favourite result.</div></div>
+                    <div class="faq-answer"><div class="faq-answer-inner">A Gemini couple prompt is a detailed description specifying the couple's poses, outfits, facial expressions, and cinematic lighting (like golden-hour glow or soft studio rim light). To make one: <strong>1.</strong> Copy any couple prompt from our gallery. <strong>2.</strong> Open Google Gemini. <strong>3.</strong> Paste the prompt and tap generate for instant realistic couple portraits.</div></div>
+                </div>
+
+                <div class="faq-card">
+                    <button class="faq-question">
+                        How to create or edit a couple photo in Gemini prompt?
+                        <i class="fa-solid fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer"><div class="faq-answer-inner"><strong>To create:</strong> Simply paste our prompt into Gemini with desired aesthetics (e.g. romantic cafe, sunset terrace, or festive Indian styles).<br><strong>To edit:</strong> Upload your reference couple photo in Gemini and prompt: <em>"Maintain the facial identity and natural pose of this couple, but enhance the lighting to 8K cinematic warm aesthetic."</em></div></div>
+                </div>
+
+                <div class="faq-card">
+                    <button class="faq-question">
+                        How to make a couple photo in ChatGPT prompt?
+                        <i class="fa-solid fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer"><div class="faq-answer-inner">When prompting ChatGPT (DALL-E 3) for couple photos, focus on descriptive atmospheric words like <em>"affectionate candid pose"</em>, <em>"soft golden ambient light"</em>, and detailed attire descriptions (e.g., <em>"modern Indian couple in elegant ethnic attire"</em>) to achieve clean, high-aesthetic outputs without policy triggers.</div></div>
+                </div>
+
+                <div class="faq-card">
+                    <button class="faq-question">
+                        What is the 👑 Premium Romantic category?
+                        <i class="fa-solid fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer"><div class="faq-answer-inner">Premium Prompts are our curated, high-end romantic couple concepts kept in <strong>Hidden Mode</strong>. They are available directly through our official Instagram profile (<a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">@arigato.devan</a>) bio and broadcast channel Notion hub.</div></div>
                 </div>
             </div>
         </div>
