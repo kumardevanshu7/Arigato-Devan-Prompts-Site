@@ -17,7 +17,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 }
 
 $period = (($_GET['period'] ?? 'weekly') === 'monthly') ? 'monthly' : 'weekly';
-$format = (($_GET['format'] ?? 'print') === 'csv') ? 'csv' : 'print';
+$format = in_array(strtolower($_GET['format'] ?? 'print'), ['excel', 'xls', 'csv'], true) ? 'excel' : 'print';
 $days   = ($period === 'monthly') ? 30 : 7;   // whitelisted int, safe to interpolate
 $prev   = $days * 2;
 
@@ -155,72 +155,186 @@ $generated = date('d M Y, g:i A');
 $filename  = 'arigato-' . $period . '-report-' . date('Y-m-d');
 
 // =====================================================================
-// CSV
+// RICH FORMATTED EXCEL / CSV EXPORT
 // =====================================================================
-if ($format === 'csv') {
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+if ($format === 'excel' || $format === 'csv') {
+    header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
     header('Cache-Control: no-store, no-cache, must-revalidate');
     header('Pragma: no-cache');
 
-    $out = fopen('php://output', 'w');
-    fwrite($out, "\xEF\xBB\xBF"); // BOM so Excel reads UTF-8 correctly
+    echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' . "\n";
+    echo '<head>' . "\n";
+    echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' . "\n";
+    echo '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>' . htmlspecialchars($period_label) . ' Analytics</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' . "\n";
+    echo '<style>' . "\n";
+    echo 'body, table, td, th { font-family: Calibri, "Segoe UI", Arial, sans-serif; font-size: 10pt; color: #1e293b; }' . "\n";
+    echo '.title-banner { background-color: #6d28d9; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: left; height: 36pt; vertical-align: middle; padding: 10px; }' . "\n";
+    echo '.meta-cell { background-color: #f5f3ff; color: #5b21b6; font-size: 9.5pt; height: 20pt; vertical-align: middle; padding: 6px; }' . "\n";
+    echo '.section-hdr { background-color: #0f172a; color: #ffffff; font-size: 11pt; font-weight: bold; height: 26pt; vertical-align: middle; padding: 6px 10px; }' . "\n";
+    echo '.tbl-th { background-color: #f1f5f9; color: #334155; font-size: 9.5pt; font-weight: bold; border: 0.5pt solid #cbd5e1; height: 22pt; vertical-align: middle; text-align: left; padding: 6px 10px; }' . "\n";
+    echo '.tbl-th-num { background-color: #f1f5f9; color: #334155; font-size: 9.5pt; font-weight: bold; border: 0.5pt solid #cbd5e1; height: 22pt; vertical-align: middle; text-align: right; padding: 6px 10px; }' . "\n";
+    echo '.tbl-td { border: 0.5pt solid #e2e8f0; height: 20pt; vertical-align: middle; padding: 6px 10px; mso-number-format: "\@"; }' . "\n";
+    echo '.tbl-td-num { border: 0.5pt solid #e2e8f0; height: 20pt; vertical-align: middle; text-align: right; padding: 6px 10px; mso-number-format: "#,##0"; }' . "\n";
+    echo '.tbl-td-date { border: 0.5pt solid #e2e8f0; height: 20pt; vertical-align: middle; text-align: left; padding: 6px 10px; mso-number-format: "\@"; font-weight: 600; color: #334155; }' . "\n";
+    echo '.zebra { background-color: #f8fafc; }' . "\n";
+    echo '.up { color: #15803d; font-weight: bold; }' . "\n";
+    echo '.down { color: #b91c1c; font-weight: bold; }' . "\n";
+    echo '.flat { color: #64748b; font-weight: 600; }' . "\n";
+    echo '.foot-note { font-size: 8.5pt; color: #64748b; font-style: italic; }' . "\n";
+    echo '</style>' . "\n";
+    echo '</head>' . "\n";
+    echo '<body>' . "\n";
+    echo '<table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; width:100%;">' . "\n";
+    
+    // Column widths to prevent Excel ### overflows
+    echo '<colgroup>' . "\n";
+    echo '<col style="width: 220pt;">' . "\n";
+    echo '<col style="width: 120pt;">' . "\n";
+    echo '<col style="width: 120pt;">' . "\n";
+    echo '<col style="width: 100pt;">' . "\n";
+    echo '<col style="width: 100pt;">' . "\n";
+    echo '</colgroup>' . "\n";
 
-    fputcsv($out, ['Arigato Devan — ' . $period_label . ' Analytics Report']);
-    fputcsv($out, ['Generated', $generated . ' IST']);
-    fputcsv($out, ['Period', 'Last ' . $days . ' days (' . $range_from . ' to ' . $range_to . ')']);
-    fputcsv($out, []);
+    // Header Banner
+    echo '<tr><td colspan="5" class="title-banner">ARIGATO LABS &mdash; ' . strtoupper($period_label) . ' ANALYTICS REPORT</td></tr>' . "\n";
+    echo '<tr><td colspan="5" class="meta-cell">Period: Last ' . $days . ' Days (' . date('d M Y', strtotime($range_from)) . ' to ' . date('d M Y', strtotime($range_to)) . ') &nbsp;|&nbsp; Generated: ' . $generated . ' IST &nbsp;|&nbsp; Licensed from Arigato Labs</td></tr>' . "\n";
+    echo '<tr><td colspan="5" style="height:12pt;"></td></tr>' . "\n";
 
-    fputcsv($out, ['SUMMARY']);
-    fputcsv($out, ['Metric', 'This period', 'Previous ' . $days . ' days', 'Change']);
+    // 1. SUMMARY SECTION
+    echo '<tr><td colspan="5" class="section-hdr">1. EXECUTIVE SUMMARY</td></tr>' . "\n";
+    echo '<tr>' . "\n";
+    echo '<th class="tbl-th">Metric KPI</th>' . "\n";
+    echo '<th class="tbl-th-num">Current (' . $days . 'd)</th>' . "\n";
+    echo '<th class="tbl-th-num">Previous (' . $days . 'd)</th>' . "\n";
+    echo '<th class="tbl-th-num">Growth / Change</th>' . "\n";
+    echo '<th class="tbl-th">Status</th>' . "\n";
+    echo '</tr>' . "\n";
+
+    $i = 0;
     foreach ($metrics as $label => $m) {
-        fputcsv($out, [$label, $m['now'], $m['prev'], fmtChange($m['pct'])]);
-    }
-    fputcsv($out, ['Returning users active in period', $returning, '', '']);
-    if ($best_day) fputcsv($out, ['Busiest day (by unlocks)', $best_day['label'], $best_day['unlocks'] . ' unlocks', '']);
-    fputcsv($out, []);
+        $z = ($i++ % 2 === 1) ? ' zebra' : '';
+        $cls = 'flat';
+        $status_txt = 'Neutral';
+        if ($m['pct'] !== null && $m['pct'] > 0) { $cls = 'up'; $status_txt = 'Growth'; }
+        elseif ($m['pct'] !== null && $m['pct'] < 0) { $cls = 'down'; $status_txt = 'Decline'; }
 
-    fputcsv($out, ['DAILY BREAKDOWN']);
-    fputcsv($out, ['Date', 'New signups', 'New prompts', 'Unlocks', 'Saves']);
+        echo '<tr>' . "\n";
+        echo '<td class="tbl-td' . $z . '" style="font-weight:600;">' . htmlspecialchars($label) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '">' . number_format($m['now']) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '">' . number_format($m['prev']) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . ' ' . $cls . '">' . htmlspecialchars(fmtChange($m['pct'])) . '</td>' . "\n";
+        echo '<td class="tbl-td' . $z . ' ' . $cls . '">' . $status_txt . '</td>' . "\n";
+        echo '</tr>' . "\n";
+    }
+    echo '<tr>' . "\n";
+    echo '<td class="tbl-td" style="font-weight:600;">Returning users active in period</td>' . "\n";
+    echo '<td class="tbl-td-num">' . number_format($returning) . '</td>' . "\n";
+    echo '<td class="tbl-td-num" style="color:#94a3b8;">&mdash;</td>' . "\n";
+    echo '<td class="tbl-td-num" style="color:#94a3b8;">&mdash;</td>' . "\n";
+    echo '<td class="tbl-td" style="color:#64748b;">Active Users</td>' . "\n";
+    echo '</tr>' . "\n";
+    if ($best_day && $best_day['unlocks'] > 0) {
+        echo '<tr>' . "\n";
+        echo '<td class="tbl-td zebra" style="font-weight:600;">Peak Performance Day</td>' . "\n";
+        echo '<td colspan="4" class="tbl-td zebra" style="font-weight:700; color:#5b21b6;">' . htmlspecialchars($best_day['label']) . ' (' . number_format($best_day['unlocks']) . ' prompt unlocks)</td>' . "\n";
+        echo '</tr>' . "\n";
+    }
+    echo '<tr><td colspan="5" style="height:14pt;"></td></tr>' . "\n";
+
+    // 2. DAILY BREAKDOWN
+    echo '<tr><td colspan="5" class="section-hdr">2. DAILY ACTIVITY BREAKDOWN</td></tr>' . "\n";
+    echo '<tr>' . "\n";
+    echo '<th class="tbl-th">Date</th>' . "\n";
+    echo '<th class="tbl-th-num">New Signups</th>' . "\n";
+    echo '<th class="tbl-th-num">New Prompts</th>' . "\n";
+    echo '<th class="tbl-th-num">Prompt Unlocks</th>' . "\n";
+    echo '<th class="tbl-th-num">Bookmarks / Saves</th>' . "\n";
+    echo '</tr>' . "\n";
+
+    $i = 0;
     foreach ($daily as $r) {
-        fputcsv($out, [$r['date'], $r['users'], $r['prompts'], $r['unlocks'], $r['saves']]);
+        $z = ($i++ % 2 === 1) ? ' zebra' : '';
+        echo '<tr>' . "\n";
+        echo '<td class="tbl-td-date' . $z . '">' . htmlspecialchars($r['label']) . ' (' . htmlspecialchars($r['date']) . ')</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '">' . number_format($r['users']) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '">' . number_format($r['prompts']) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '" style="font-weight:700; color:#047857;">' . number_format($r['unlocks']) . '</td>' . "\n";
+        echo '<td class="tbl-td-num' . $z . '">' . number_format($r['saves']) . '</td>' . "\n";
+        echo '</tr>' . "\n";
     }
-    fputcsv($out, []);
+    echo '<tr><td colspan="5" style="height:14pt;"></td></tr>' . "\n";
 
-    fputcsv($out, ['TOP PROMPTS BY UNLOCKS (THIS PERIOD)']);
-    fputcsv($out, ['Rank', 'Prompt', 'Unlocks']);
-    if (!$top_unlocked) fputcsv($out, ['—', 'No unlocks recorded in this period', 0]);
-    foreach ($top_unlocked as $i => $r) {
-        fputcsv($out, [$i + 1, $r['title'], $r['c']]);
+    // 3. TOP PROMPTS
+    echo '<tr><td colspan="5" class="section-hdr">3. TOP PERFORMING PROMPTS BY UNLOCKS</td></tr>' . "\n";
+    echo '<tr>' . "\n";
+    echo '<th class="tbl-th" style="width:50pt;">Rank</th>' . "\n";
+    echo '<th colspan="3" class="tbl-th">Prompt Title</th>' . "\n";
+    echo '<th class="tbl-th-num">Unlocks</th>' . "\n";
+    echo '</tr>' . "\n";
+
+    if (empty($top_unlocked)) {
+        echo '<tr><td colspan="5" class="tbl-td" style="color:#64748b; font-style:italic;">No prompt unlocks recorded in this period.</td></tr>' . "\n";
+    } else {
+        foreach ($top_unlocked as $idx => $r) {
+            $z = ($idx % 2 === 1) ? ' zebra' : '';
+            echo '<tr>' . "\n";
+            echo '<td class="tbl-td' . $z . '" style="font-weight:700; color:#64748b; text-align:center;">#' . ($idx + 1) . '</td>' . "\n";
+            echo '<td colspan="3" class="tbl-td' . $z . '" style="font-weight:600;">' . htmlspecialchars($r['title']) . '</td>' . "\n";
+            echo '<td class="tbl-td-num' . $z . '" style="font-weight:700; color:#047857;">' . number_format($r['c']) . '</td>' . "\n";
+            echo '</tr>' . "\n";
+        }
     }
-    fputcsv($out, []);
+    echo '<tr><td colspan="5" style="height:14pt;"></td></tr>' . "\n";
 
-    fputcsv($out, ['NEW PROMPTS PUBLISHED (THIS PERIOD)']);
-    fputcsv($out, ['Title', 'Type', 'Published', 'Likes']);
-    if (!$new_prompts) fputcsv($out, ['No prompts published in this period', '', '', '']);
-    foreach ($new_prompts as $r) {
-        fputcsv($out, [$r['title'], $r['prompt_type'], date('Y-m-d', strtotime($r['created_at'])), $r['likes']]);
+    // 4. NEW PROMPTS PUBLISHED
+    echo '<tr><td colspan="5" class="section-hdr">4. NEW PROMPTS PUBLISHED IN PERIOD</td></tr>' . "\n";
+    echo '<tr>' . "\n";
+    echo '<th colspan="2" class="tbl-th">Prompt Title</th>' . "\n";
+    echo '<th class="tbl-th">Category / Type</th>' . "\n";
+    echo '<th class="tbl-th-num">Publish Date</th>' . "\n";
+    echo '<th class="tbl-th-num">Likes Count</th>' . "\n";
+    echo '</tr>' . "\n";
+
+    if (empty($new_prompts)) {
+        echo '<tr><td colspan="5" class="tbl-td" style="color:#64748b; font-style:italic;">No new prompts were published in this period.</td></tr>' . "\n";
+    } else {
+        foreach ($new_prompts as $idx => $r) {
+            $z = ($idx % 2 === 1) ? ' zebra' : '';
+            echo '<tr>' . "\n";
+            echo '<td colspan="2" class="tbl-td' . $z . '">' . htmlspecialchars($r['title']) . '</td>' . "\n";
+            echo '<td class="tbl-td' . $z . '"><span style="font-weight:600;">' . htmlspecialchars($r['prompt_type']) . '</span></td>' . "\n";
+            echo '<td class="tbl-td-date' . $z . '">' . date('d M Y', strtotime($r['created_at'])) . '</td>' . "\n";
+            echo '<td class="tbl-td-num' . $z . '" style="color:#e11d48; font-weight:700;">' . number_format($r['likes']) . '</td>' . "\n";
+            echo '</tr>' . "\n";
+        }
     }
-    fputcsv($out, []);
+    echo '<tr><td colspan="5" style="height:14pt;"></td></tr>' . "\n";
 
-    fputcsv($out, ['PROMPT TYPE SPLIT (PUBLISHED THIS PERIOD)']);
-    fputcsv($out, ['Type', 'Count']);
-    foreach ($type_split as $r) fputcsv($out, [$r['prompt_type'], $r['cnt']]);
-    fputcsv($out, []);
+    // 5. ALL-TIME SNAPSHOT
+    echo '<tr><td colspan="5" class="section-hdr">5. ALL-TIME LIFETIME PLATFORM TOTALS</td></tr>' . "\n";
+    echo '<tr>' . "\n";
+    echo '<th colspan="3" class="tbl-th">All-Time Platform Metric</th>' . "\n";
+    echo '<th colspan="2" class="tbl-th-num">Lifetime Count</th>' . "\n";
+    echo '</tr>' . "\n";
 
-    fputcsv($out, ['MOST ACTIVE USERS (THIS PERIOD)']);
-    fputcsv($out, ['Username', 'Email', 'Unlocks']);
-    if (!$active_users) fputcsv($out, ['No logged-in user activity in this period', '', 0]);
-    foreach ($active_users as $r) {
-        fputcsv($out, [$r['username'], $r['email'], $r['c']]);
+    $i = 0;
+    foreach ($snapshot as $label => $val) {
+        $z = ($i++ % 2 === 1) ? ' zebra' : '';
+        echo '<tr>' . "\n";
+        echo '<td colspan="3" class="tbl-td' . $z . '" style="font-weight:600;">' . htmlspecialchars($label) . '</td>' . "\n";
+        echo '<td colspan="2" class="tbl-td-num' . $z . '" style="font-weight:700; color:#5b21b6;">' . number_format($val) . '</td>' . "\n";
+        echo '</tr>' . "\n";
     }
-    fputcsv($out, []);
+    echo '<tr><td colspan="5" class="foot-note" style="padding-top:6px;">* All-time snapshot metrics represent continuous platform cumulative counters.</td></tr>' . "\n";
+    echo '<tr><td colspan="5" style="height:14pt;"></td></tr>' . "\n";
 
-    fputcsv($out, ['ALL-TIME SNAPSHOT (lifetime totals, not limited to this period)']);
-    fputcsv($out, ['Metric', 'Value']);
-    foreach ($snapshot as $label => $val) fputcsv($out, [$label, $val]);
+    // Footer signature
+    echo '<tr><td colspan="5" style="background:#f8fafc; border:0.5pt solid #cbd5e1; padding:8px 12px; font-size:8.5pt; color:#475569; text-align:center;">Licensed PDF &amp; Spreadsheet Report &bull; Arigato Labs &bull; Official Platform Analytics &bull; arigatodevan.com</td></tr>' . "\n";
 
-    fclose($out);
+    echo '</table>' . "\n";
+    echo '</body>' . "\n";
+    echo '</html>' . "\n";
     exit();
 }
 
@@ -234,8 +348,12 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= h($period_label) ?> Report — <?= h($range_to) ?> — Arigato Devan</title>
+<title><?= h($period_label) ?> Analytics Report — Licensed from Arigato Labs</title>
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   *{box-sizing:border-box}
   body{margin:0;padding:34px 30px 60px;background:#f4f5f7;color:#14161c;
@@ -300,16 +418,21 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 <div class="bar">
   <a href="analytics.php" class="btn">&larr; Back to Analytics</a>
-  <a href="analytics_report.php?period=<?= h($period) ?>&amp;format=csv" class="btn">Download CSV</a>
-  <button type="button" class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+  <a href="analytics_report.php?period=<?= h($period) ?>&amp;format=excel" class="btn" style="background:#f0fdf4; border-color:#86efac; color:#15803d; font-weight:700;"><i class="fa-solid fa-file-excel"></i> Download Excel Sheet</a>
+  <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save as PDF</button>
 </div>
 
 <div class="sheet">
 
   <div class="rep-head">
-    <div class="brand">Arigato Devan &middot; Admin Report</div>
-    <div class="rep-title"><?= h($period_label) ?> Analytics Report</div>
-    <div class="rep-meta">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <img src="favicon/apple-touch-icon.png" alt="Arigato Devan Logo" style="width:40px; height:40px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1); flex-shrink:0;">
+      <div>
+        <div class="brand">Licensed PDF Report &middot; Arigato Labs</div>
+        <div class="rep-title" style="margin:2px 0 0;"><?= h($period_label) ?> Analytics Report</div>
+      </div>
+    </div>
+    <div class="rep-meta" style="margin-top:8px;">
       <?= h(date('d M Y', strtotime($range_from))) ?> &ndash; <?= h(date('d M Y', strtotime($range_to))) ?>
       &nbsp;&middot;&nbsp; last <?= (int)$days ?> days<br>
       Generated <?= h($generated) ?> IST
@@ -435,7 +558,10 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   <p class="note">These are lifetime totals, not this period's. Likes, views, copies and shares are stored as running counters without a timestamp, so they cannot be broken down by date.</p>
 
   <div class="foot">
-    arigatodevan.com &middot; Internal report &middot; Generated <?= h($generated) ?> IST
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+      <span style="font-weight:700; color:#475569;"><i class="fa-solid fa-shield-halved" style="color:#6d28d9;"></i> Licensed PDF Report from Arigato Labs</span>
+      <span>arigatodevan.com &bull; Generated <?= h($generated) ?> IST</span>
+    </div>
   </div>
 
 </div>
