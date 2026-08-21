@@ -36,8 +36,7 @@ if (!isset($nav_counts) && isset($pdo)) {
             SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
             SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
             SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct,
-            SUM(CASE WHEN prompt_type = 'solo' THEN 1 ELSE 0 END) as solo,
-            SUM(CASE WHEN prompt_type = 'premium' THEN 1 ELSE 0 END) as premium
+            SUM(CASE WHEN prompt_type = 'solo' THEN 1 ELSE 0 END) as solo
         FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)")->fetch(PDO::FETCH_ASSOC);
         $nav_counts = $nc ?: [];
     } catch (Exception $e) {
@@ -60,9 +59,6 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
 
             <nav class="store-nav">
                 <a href="<?= $nb('gallery.php') ?>" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
-                <a href="<?= $nb('premium.php') ?>" class="<?= $nav_active === 'premium' ? 'gal-nav-active' : '' ?>" style="color:#d97706;font-weight:700;">
-                    <i class="fa-solid fa-crown" style="color:#d97706;font-size:0.82rem;margin-right:2px;"></i> Premium
-                </a>
                 <a href="<?= $nb('blogs.php') ?>" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
                 <a href="<?= $nb('progress.php') ?>" class="gal-icon-link" title="Our Journey">
                     <i class="fa-solid fa-chart-line"></i>
@@ -94,10 +90,6 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
                             <i class="fa-solid fa-user"></i> Solo Prompts
                             <?= empty($nav_counts['solo']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'solo_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
                         </a>
-                        <a href="<?= $nb('premium.php') ?>">
-                            <i class="fa-solid fa-crown" style="color:#d97706"></i> Premium Prompts
-                            <?= $curPage === 'premium.php' ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
-                        </a>
                         <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link">
                             <i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span>
                         </a>
@@ -112,7 +104,7 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
                     <i class="fa-brands fa-instagram"></i>
                     @arigato.devan
                     <span class="pulse-dot"></span>
-                    <span class="gal-insta-count">16K+</span>
+                    <span class="gal-insta-count">17K+</span>
                 </a>
             </nav>
 
@@ -151,7 +143,6 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
     </div>
     <nav class="gal-mobile-nav">
         <a href="<?= $nb('gallery.php') ?>"><i class="fa-solid fa-images"></i> Gallery</a>
-        <a href="<?= $nb('premium.php') ?>" style="color:#d97706;font-weight:700;"><i class="fa-solid fa-crown" style="color:#d97706"></i> Premium Prompts</a>
         <a href="<?= $nb('blogs.php') ?>"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
         <a href="<?= $nb('progress.php') ?>"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
         <button type="button" class="gal-mobile-section-btn" id="galMobileReelsBtn">
@@ -163,7 +154,6 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             <a href="<?= $nb('already_uploaded.php') ?>">Already Uploaded</a>
             <a href="<?= $nb('direct_prompts.php') ?>">Direct Prompts</a>
             <a href="<?= $nb('solo_prompts.php') ?>">Solo Prompts</a>
-            <a href="<?= $nb('premium.php') ?>"><i class="fa-solid fa-crown" style="color:#d97706;"></i> Premium Prompts</a>
             <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link"><i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span></a>
             <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
         </div>

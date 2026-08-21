@@ -170,14 +170,6 @@ if (isset($_SESSION['user_id'])) {
                     </button>
                     <div class="faq-answer"><div class="faq-answer-inner">When prompting ChatGPT (DALL-E 3) for couple photos, focus on descriptive atmospheric words like <em>"affectionate candid pose"</em>, <em>"soft golden ambient light"</em>, and detailed attire descriptions (e.g., <em>"modern Indian couple in elegant ethnic attire"</em>) to achieve clean, high-aesthetic outputs without policy triggers.</div></div>
                 </div>
-
-                <div class="faq-card">
-                    <button class="faq-question">
-                        What is the 👑 Premium Romantic category?
-                        <i class="fa-solid fa-plus faq-icon"></i>
-                    </button>
-                    <div class="faq-answer"><div class="faq-answer-inner">Premium Prompts are our curated, high-end romantic couple concepts kept in <strong>Hidden Mode</strong>. They are available directly through our official Instagram profile (<a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">@arigato.devan</a>) bio and broadcast channel Notion hub.</div></div>
-                </div>
             </div>
         </div>
 </main>

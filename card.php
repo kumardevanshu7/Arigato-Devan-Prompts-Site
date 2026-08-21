@@ -54,7 +54,6 @@ $type_labels = [
     'already_uploaded' => 'Already Uploaded',
     'direct'           => 'Direct Prompt',
     'solo'             => 'SOLO',
-    'premium'          => 'Premium Romantic',
 ];
 $type_label = $type_labels[$p['prompt_type']] ?? 'Prompt';
 

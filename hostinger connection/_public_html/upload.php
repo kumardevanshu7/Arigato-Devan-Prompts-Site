@@ -132,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $solo_examples_json = null;
 
     // Validate prompt_type
-    $valid_types = ["secret", "unreleased", "already_uploaded", "direct", "solo", "premium"];
+    $valid_types = ["secret", "unreleased", "already_uploaded", "direct", "solo"];
     if (!in_array($prompt_type, $valid_types)) {
         $prompt_type = "secret";
     }
@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: upload_prompt.php");
             exit();
         }
-    } else if ($prompt_type === "direct" || $prompt_type === "solo" || $prompt_type === "premium") {
+    } else if ($prompt_type === "direct" || $prompt_type === "solo") {
         $allowed_taps = ["09", "11", "19", "21", "37", "77"];
         $requested_taps = str_pad((string)(int)($_POST["direct_taps"] ?? "09"), 2, "0", STR_PAD_LEFT);
         $unlock_code = in_array($requested_taps, $allowed_taps, true) ? $requested_taps : "09";
@@ -400,7 +400,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 require_once __DIR__ . '/fcm_notify.php';
                 $fcm_body = match($prompt_type) {
                     'solo'    => 'A new SOLO AI photo prompt just dropped! Tap to see the transformation.',
-                    'premium' => '👑 A new exclusive Premium Romantic prompt just dropped! Check it out.',
                     default   => 'A new AI couple prompt just dropped! Tap to check it out. 💫'
                 };
                 @sendFCMNotification(

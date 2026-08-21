@@ -660,7 +660,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="upload_prompt.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-upload"></i></div><div><div class="ac-t">Upload Prompt</div><div class="ac-d">Add a new AI prompt to the platform</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
     <a href="manage_prompts.php" class="acard ac-pk"><div class="ac-icon ai-pk"><i class="fa-solid fa-list-check"></i></div><div><div class="ac-t">Manage Prompts</div><div class="ac-d">Edit, delete, review all <?= $total_prompts ?> prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
     <a href="prompt_links.php" class="acard ac-c"><div class="ac-icon ai-c"><i class="fa-solid fa-link"></i></div><div><div class="ac-t">Prompt Share Links</div><div class="ac-d">Copy direct links to share prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-    <a href="potd_manager.php" class="acard ac-y"><div class="ac-icon ai-y"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
+    <a href="potd_manager.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
   </div>
 
   <div class="card">
