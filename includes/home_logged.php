@@ -18,7 +18,7 @@ if ($user_gender === 'female' || $user_gender === 'f') {
 $secret_sub_tags = [];
 foreach ($prompts as $sp) {
     foreach (array_map('trim', explode(',', strtolower($sp['tag']))) as $t) {
-        if (!empty($t) && $t !== 'secret') {
+        if (!empty($t) && $t !== 'secret' && $t !== 'direct') {
             $secret_sub_tags[] = $t;
         }
     }
@@ -139,19 +139,23 @@ sort($secret_sub_tags);
         <?php if (count($prompts) === 0): ?>
             <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:60px 20px;">No content yet! Check back soon.</p>
         <?php else: foreach ($prompts as $index => $p):
-            $db_type = $p['prompt_type'] ?? 'secret';
+            $db_type = $p['prompt_type'] ?? 'direct';
             if ($db_type === 'insta_viral') { $ptype = 'insta_viral'; }
             elseif ($db_type === 'unreleased') { $ptype = 'unreleased'; }
             elseif ($db_type === 'already_uploaded') { $ptype = 'already_uploaded'; }
+            elseif ($db_type === 'solo') { $ptype = 'solo'; }
+            elseif ($db_type === 'direct') { $ptype = 'direct'; }
             else { $ptype = 'secret_code'; }
             $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
             $type_labels = [
+                'direct' => ['label' => 'DIRECT', 'cls' => 'dir'],
                 'secret_code' => ['label' => 'SECRET', 'cls' => 'scp'],
                 'unreleased' => ['label' => 'UNRELEASED', 'cls' => 'urp'],
                 'insta_viral' => ['label' => 'VIRAL', 'cls' => 'ivp'],
                 'already_uploaded' => ['label' => 'UPLOADED', 'cls' => 'aup'],
+                'solo' => ['label' => 'SOLO', 'cls' => 'sol'],
             ];
-            $tinfo = $type_labels[$ptype] ?? $type_labels['secret_code'];
+            $tinfo = $type_labels[$ptype] ?? $type_labels['direct'];
             $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter:blur(5px);transform:scale(1.05);' : '';
         ?>
         <div class="product-card prompt-card card skeleton"

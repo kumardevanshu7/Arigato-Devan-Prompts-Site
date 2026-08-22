@@ -447,7 +447,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <nav class="drawer-nav">
     <div class="d-sec">Overview</div>
     <a href="dashboard.php" class="d-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="analytics.php" class="d-link"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <a href="analytics.php" class="d-link"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
     <div class="d-sec">Content</div>
     <a href="upload_prompt.php" class="d-link"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
@@ -456,15 +456,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="trending_settings.php" class="d-link"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
     <a href="gallery_carousel_manager.php" class="d-link"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
     <div class="d-sec">Blog</div>
-    <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib"></i> Blog Admin</a>
-    <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus"></i> New Post</a>
+    <a href="blog_admin.php" class="d-link"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
+    <a href="blog_create.php" class="d-link"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
     <div class="d-sec">Community</div>
-    <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments"></i> Feedbacks</a>
+    <a href="feedback_admin.php" class="d-link"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
     <div class="d-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="d-link"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
     <a href="happy_users_admin.php?tab=manage" class="d-link"><i class="fa-solid fa-images"></i> Manage Pics</a>
     <div class="d-sec nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="d-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles"></i> Curated AI Prompts</a>
+    <a href="curated_admin.php" class="d-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
     <div class="d-sec">Users</div>
     <a href="user_management.php" class="d-link"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec">Tools</div>
@@ -495,7 +495,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <nav class="sb-nav">
     <div class="sb-sec">Overview</div>
     <a href="dashboard.php" class="sb-link active"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
-    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
+    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
     <div class="sb-sec">Content</div>
     <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
@@ -504,15 +504,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
     <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
     <div class="sb-sec">Blog</div>
-    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib"></i> <span>Blog Admin</span></a>
-    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus"></i> <span>New Post</span></a>
+    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
+    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
     <div class="sb-sec">Community</div>
-    <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments"></i> <span>Feedbacks</span></a>
+    <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
     <div class="sb-sec">Happy Users</div>
     <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
     <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
     <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Curated AI Prompts</span></a>
+    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>
@@ -590,52 +590,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <?php if(!empty($achieved)): ?><div class="ms-achieved"><?php foreach($achieved as $ag): ?><span class="ms-badge"><i class="fa-solid fa-check" style="font-size:.5rem"></i> <?= $ag ?></span><?php endforeach; ?></div><?php endif; ?>
   </div>
 
-  <div class="dual-grid">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-clock"></i> Hourly Signup Heatmap</div><span style="font-size:.65rem;color:var(--muted)">Hover for count</span></div>
-      <div class="hm-grid">
-        <?php foreach($hourly_data as $hr=>$cnt):
-          $intensity=$hourly_max>0?$cnt/$hourly_max:0;
-          $a=0.07+$intensity*0.78;
-        ?>
-        <div class="hm-cell" style="background:rgba(139,92,246,<?= $a ?>);border:1px solid rgba(139,92,246,0.08)" data-tip="<?= $hr ?>:00 — <?= $cnt ?> users"></div>
-        <?php endforeach; ?>
-      </div>
-      <div class="hm-labels"><?php for($h=0;$h<24;$h++): ?><div class="hm-lbl"><?= $h%6===0?$h:'' ?></div><?php endfor; ?></div>
-    </div>
-
-    <div class="card" style="margin-bottom:0">
-      <div class="card-head"><div class="card-title"><i class="fa-solid fa-chart-pie"></i> Platform + Leaderboard</div></div>
-      <?php $plat_total=$mobile_count+$desktop_count; ?>
-      <?php if($plat_total>0): $mob_pct=round($mobile_count/$plat_total*100);$desk_pct=100-$mob_pct; ?>
-      <div class="plat-bar"><div class="plat-m" style="width:<?= $mob_pct ?>%"></div><div class="plat-d" style="width:<?= $desk_pct ?>%"></div></div>
-      <div style="display:flex;gap:16px;font-size:.74rem;font-weight:700;margin-bottom:14px">
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:middle"></span><i class="fa-solid fa-mobile-screen" style="color:var(--accent2)"></i> Mobile <?= $mob_pct ?>% (<?= $mobile_count ?>)</span>
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--cyan);margin-right:5px;vertical-align:middle"></span><i class="fa-solid fa-desktop" style="color:var(--cyan)"></i> Desktop <?= $desk_pct ?>% (<?= $desktop_count ?>)</span>
-      </div>
-      <?php else: ?><div style="color:var(--muted);font-size:.8rem;text-align:center;padding:10px 0 14px"><i class="fa-solid fa-circle-info"></i> Data will show after users log in</div><?php endif; ?>
-      <div style="padding-top:12px;border-top:1px solid var(--border2)">
-        <div style="font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px"><i class="fa-solid fa-crown" style="color:var(--yellow)"></i> Top 3 Most Active Users</div>
-        <?php if(empty($top3_users)): ?><div style="color:var(--muted);font-size:.8rem;text-align:center;padding:10px 0">No activity data yet.</div>
-        <?php else: ?>
-        <div class="top3-grid" style="grid-template-columns:repeat(<?= count($top3_users) ?>,1fr)">
-          <?php $cr=['<i class="fa-solid fa-crown" style="color:var(--yellow)"></i>','<i class="fa-solid fa-crown" style="color:var(--muted)"></i>','<i class="fa-solid fa-crown" style="color:var(--orange)"></i>']; ?>
-          <?php foreach($top3_users as $i=>$tu): $g=strtolower($tu['gender']??''); ?>
-          <div class="t3card">
-            <div style="font-size:1.2rem;margin-bottom:5px"><?= $cr[$i]??($i+1) ?></div>
-            <div style="font-size:.65rem;margin-bottom:5px" class="<?= $g==='male'?'gi-m':($g==='female'?'gi-f':'gi-a') ?>"><i class="fa-solid fa-<?= $g==='male'?'mars':($g==='female'?'venus':'user-astronaut') ?>"></i></div>
-            <?php if(!empty($tu['avatar'])): ?><img class="t3-av" src="<?= htmlspecialchars($tu['avatar']) ?>" alt="">
-            <?php else: ?><div class="t3-ph"><?= strtoupper(substr($tu['username']??'U',0,1)) ?></div><?php endif; ?>
-            <div class="t3-name"><?= htmlspecialchars($tu['username']??'User') ?></div>
-            <div class="t3-score"><?= $tu['score'] ?> pts</div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-
   <?php if(!empty($ghost_users)): ?>
   <div class="card">
     <div class="card-head">
@@ -654,14 +608,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     </a>
   </div>
   <?php endif; ?>
-
-  <div style="font-size:.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px"><i class="fa-solid fa-bolt" style="color:var(--yellow)"></i> Quick Actions</div>
-  <div class="action-grid">
-    <a href="upload_prompt.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-upload"></i></div><div><div class="ac-t">Upload Prompt</div><div class="ac-d">Add a new AI prompt to the platform</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-    <a href="manage_prompts.php" class="acard ac-pk"><div class="ac-icon ai-pk"><i class="fa-solid fa-list-check"></i></div><div><div class="ac-t">Manage Prompts</div><div class="ac-d">Edit, delete, review all <?= $total_prompts ?> prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-    <a href="prompt_links.php" class="acard ac-c"><div class="ac-icon ai-c"><i class="fa-solid fa-link"></i></div><div><div class="ac-t">Prompt Share Links</div><div class="ac-d">Copy direct links to share prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-    <a href="potd_manager.php" class="acard ac-p"><div class="ac-icon ai-p"><i class="fa-solid fa-sun"></i></div><div><div class="ac-t">Prompt of the Day</div><div class="ac-d">Manage featured daily prompts</div></div><div class="ac-arr"><i class="fa-solid fa-arrow-right"></i></div></a>
-  </div>
 
   <div class="card">
     <div class="card-head">

@@ -15,7 +15,7 @@ if (!in_array($range_days, [7, 14, 30, 90, 365])) {
 
 // Active tab routing (default: dashboard)
 $active_tab = isset($_GET['tab']) ? trim($_GET['tab']) : 'dashboard';
-if (!in_array($active_tab, ['dashboard', 'prompts', 'blogs', 'seo', 'gsc', 'users'], true)) {
+if (!in_array($active_tab, ['dashboard', 'prompts', 'blogs', 'seo', 'gsc', 'tags', 'users', 'leaderboard', 'achievements'], true)) {
     $active_tab = 'dashboard';
 }
 
@@ -187,10 +187,54 @@ $seo_full_cnt = 0;
 $seo_partial_cnt = 0;
 $seo_zero_cnt = 0;
 
+// GSC Helper functions
+if (!function_exists('nd_gsc_parse_status')) {
+    function nd_gsc_parse_status($status_str) {
+        $status_str = trim((string)$status_str);
+        if (empty($status_str) || $status_str === 'pending') {
+            return ['type' => 'pending', 'attempt' => 1];
+        }
+        if ($status_str === 'already_indexed_2nd' || $status_str === 'already_indexed_2') {
+            return ['type' => 'already_indexed', 'attempt' => 2];
+        }
+        if (preg_match('/^already_indexed_(\d+)$/', $status_str, $m)) {
+            return ['type' => 'already_indexed', 'attempt' => max(1, (int)$m[1])];
+        }
+        if ($status_str === 'already_indexed') {
+            return ['type' => 'already_indexed', 'attempt' => 1];
+        }
+        if ($status_str === 'indexed_now_2nd' || $status_str === 'indexed_now_2') {
+            return ['type' => 'indexed_now', 'attempt' => 2];
+        }
+        if (preg_match('/^indexed_now_(\d+)$/', $status_str, $m)) {
+            return ['type' => 'indexed_now', 'attempt' => max(1, (int)$m[1])];
+        }
+        if ($status_str === 'indexed_now') {
+            return ['type' => 'indexed_now', 'attempt' => 1];
+        }
+        if ($status_str === 'retry_needed_2' || $status_str === 'retry_needed') {
+            return ['type' => 'retry_needed', 'attempt' => 2];
+        }
+        if (preg_match('/^retry_needed_(\d+)$/', $status_str, $m)) {
+            return ['type' => 'retry_needed', 'attempt' => max(2, (int)$m[1])];
+        }
+        return ['type' => 'pending', 'attempt' => 1];
+    }
+}
+
+if (!function_exists('nd_gsc_ordinal')) {
+    function nd_gsc_ordinal($n) {
+        $ends = ['th','st','nd','rd','th','th','th','th','th','th'];
+        if ((($n % 100) >= 11) && (($n % 100) <= 13)) return $n . 'th';
+        return $n . $ends[$n % 10];
+    }
+}
+
 // GSC Checklist Counters
 $gsc_pending_cnt = 0;
 $gsc_already_cnt = 0;
 $gsc_now_cnt = 0;
+$gsc_retry_cnt = 0;
 
 $seo_prompt_list = [];
 foreach ($seo_raw_prompts as $sp) {
@@ -233,13 +277,49 @@ foreach ($seo_raw_prompts as $sp) {
         $status_type = 'zero';
     }
 
-    // GSC counting
-    if ($gsc_st === 'already_indexed') {
+    // Universal GSC counting & dynamic attempt computation
+    $gsc_parsed = nd_gsc_parse_status($gsc_st);
+    $gsc_attempt = $gsc_parsed['attempt'];
+    $gsc_type = $gsc_parsed['type'];
+    $gsc_ordinal_str = nd_gsc_ordinal($gsc_attempt);
+    $gsc_time_left_str = '';
+    $gsc_days_left = 0;
+    $gsc_hours_left = 0;
+    $gsc_state = 'pending';
+
+    if ($gsc_type === 'already_indexed') {
         $gsc_already_cnt++;
-    } elseif ($gsc_st === 'indexed_now') {
+        $gsc_state = 'already_indexed';
+    } elseif ($gsc_type === 'indexed_now') {
         $gsc_now_cnt++;
+        $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
+        $elapsed = time() - $created_ts;
+        $four_days = 4 * 86400; // 4 days in seconds
+        if ($elapsed < $four_days) {
+            $gsc_state = 'indexed_timer_running';
+            $remaining = $four_days - $elapsed;
+            $gsc_days_left = ceil($remaining / 86400);
+            $gsc_hours_left = ceil($remaining / 3600);
+            $gsc_time_left_str = $gsc_days_left > 1 ? "{$gsc_days_left}d left" : "{$gsc_hours_left}h left";
+        } else {
+            $gsc_state = 'indexed_ready_to_verify';
+        }
+    } elseif ($gsc_type === 'retry_needed') {
+        $gsc_retry_cnt++;
+        $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
+        $elapsed = time() - $created_ts;
+        $one_day = 86400; // 24 hours in seconds
+        if ($elapsed < $one_day) {
+            $gsc_state = 'retry_wait_running';
+            $remaining = $one_day - $elapsed;
+            $gsc_hours_left = ceil($remaining / 3600);
+            $gsc_time_left_str = "{$gsc_hours_left}h left";
+        } else {
+            $gsc_state = 'retry_ready';
+        }
     } else {
         $gsc_pending_cnt++;
+        $gsc_state = 'pending';
     }
 
     // Compute live canonical URL for GSC
@@ -276,6 +356,12 @@ foreach ($seo_raw_prompts as $sp) {
         'canonical_url' => $canonical_url,
         'gsc_inspect_url' => $gsc_inspect_url,
         'gsc_status' => $gsc_st,
+        'gsc_state' => $gsc_state,
+        'gsc_attempt' => $gsc_attempt,
+        'gsc_ordinal' => $gsc_ordinal_str,
+        'gsc_time_left_str' => $gsc_time_left_str,
+        'gsc_days_left' => $gsc_days_left,
+        'gsc_hours_left' => $gsc_hours_left,
         'gsc_indexed_at' => $gsc_at,
         'gsc_date_formatted' => !empty($gsc_at) ? date('M j, Y \a\t g:i A', strtotime($gsc_at)) : ''
     ];
@@ -289,6 +375,96 @@ $seo_bwi_pct = $seo_total_count > 0 ? round(($seo_bwi_cnt / $seo_total_count) * 
 
 $gsc_checked_cnt = $gsc_already_cnt + $gsc_now_cnt;
 $gsc_checked_pct = $seo_total_count > 0 ? round(($gsc_checked_cnt / $seo_total_count) * 100, 1) : 0;
+
+// --- TAGS AGGREGATION & AUDIT DATA ---
+$all_prompts_tags_raw = sqAll($pdo, "
+    SELECT id, title, slug, prompt_type, image_path, tag, view_count, copy_count, likes_count, created_at,
+           (SELECT COUNT(*) FROM unlocked_prompts WHERE prompt_id = prompts.id) as unlock_count
+    FROM prompts
+    ORDER BY id DESC
+");
+
+$tags_map = [];
+$total_tagged_prompts = 0;
+$total_tag_instances = 0;
+
+foreach ($all_prompts_tags_raw as $tp) {
+    $raw_tag_str = trim((string)($tp['tag'] ?? ''));
+    if ($raw_tag_str === '') continue;
+    $tags_list = array_filter(array_map('trim', explode(',', $raw_tag_str)));
+    if (!empty($tags_list)) {
+        $total_tagged_prompts++;
+    }
+    foreach ($tags_list as $t) {
+        if ($t === '') continue;
+        $lower_key = mb_strtolower($t);
+        if (!isset($tags_map[$lower_key])) {
+            $tags_map[$lower_key] = [
+                'display_tag' => $t,
+                'clean_key' => $lower_key,
+                'count' => 0,
+                'total_views' => 0,
+                'total_copies' => 0,
+                'total_likes' => 0,
+                'total_unlocks' => 0,
+                'prompts' => []
+            ];
+        }
+        $tags_map[$lower_key]['count']++;
+        $tags_map[$lower_key]['total_views'] += (int)($tp['view_count'] ?? 0);
+        $tags_map[$lower_key]['total_copies'] += (int)($tp['copy_count'] ?? 0);
+        $tags_map[$lower_key]['total_likes'] += (int)($tp['likes_count'] ?? 0);
+        $tags_map[$lower_key]['total_unlocks'] += (int)($tp['unlock_count'] ?? 0);
+        $tags_map[$lower_key]['prompts'][] = [
+            'id' => (int)$tp['id'],
+            'title' => $tp['title'] ?? 'Untitled',
+            'slug' => $tp['slug'] ?? '',
+            'prompt_type' => $tp['prompt_type'] ?? 'direct',
+            'image_path' => $tp['image_path'] ?? '',
+            'views' => (int)($tp['view_count'] ?? 0),
+            'likes' => (int)($tp['likes_count'] ?? 0),
+            'unlocks' => (int)($tp['unlock_count'] ?? 0)
+        ];
+        $total_tag_instances++;
+    }
+}
+
+// Sort tags by prompt count descending by default
+uasort($tags_map, function($a, $b) {
+    if ($b['count'] === $a['count']) {
+        return strcasecmp($a['display_tag'], $b['display_tag']);
+    }
+    return $b['count'] <=> $a['count'];
+});
+
+$total_unique_tags = count($tags_map);
+$first_tag_entry = !empty($tags_map) ? reset($tags_map) : null;
+$most_popular_tag = $first_tag_entry ? $first_tag_entry['display_tag'] : 'None';
+$most_popular_count = $first_tag_entry ? $first_tag_entry['count'] : 0;
+$avg_tags_per_prompt = $total_tagged_prompts > 0 ? round($total_tag_instances / $total_tagged_prompts, 1) : 0;
+
+// --- Leaderboard Top 20 Users Query ---
+$top20_leaderboard = sqAll($pdo, "
+    SELECT u.id, u.username, u.email, u.avatar, u.profile_image, u.gender, u.role, u.streak_count, u.last_active, u.created_at,
+           COALESCE((SELECT COUNT(*) FROM unlocked_prompts up WHERE up.user_id = u.id), 0) as unlock_count,
+           COALESCE((SELECT COUNT(*) FROM saved_prompts sp WHERE sp.user_id = u.id), 0) as save_count,
+           COALESCE((SELECT COUNT(*) FROM likes l WHERE l.user_id = u.id), 0) as like_count,
+           ((COALESCE((SELECT COUNT(*) FROM unlocked_prompts up WHERE up.user_id = u.id), 0) * 10) + 
+            (COALESCE(u.streak_count, 0) * 5) + 
+            (COALESCE((SELECT COUNT(*) FROM likes l WHERE l.user_id = u.id), 0) * 2) + 
+            (COALESCE((SELECT COUNT(*) FROM saved_prompts sp WHERE sp.user_id = u.id), 0) * 2)) as total_score
+    FROM users u
+    ORDER BY total_score DESC, unlock_count DESC, id ASC
+    LIMIT 20
+");
+
+// --- 100 Gamified Platform Achievements Engine ---
+require_once __DIR__ . '/includes/achievements_data.php';
+$achievements_package = get_100_platform_achievements($pdo);
+$achievements_list = $achievements_package['list'];
+$achievements_unlocked_types = $achievements_package['unlocked_types_count'];
+$achievements_total_completions = $achievements_package['total_completions'];
+$achievements_total_count = $achievements_package['total_count'];
 
 // Admin Info
 $admin_name = $_SESSION["username"] ?? "Admin";
@@ -1224,57 +1400,60 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             transform: translateY(-2px);
         }
-        /* ── Strict Container & Table Layout Fixed for 100% Elastic Shrink ── */
+        /* GSC Checklist Table Layout & Components */
         #gscDataTable {
-            width: 100% !important;
             table-layout: fixed !important;
             border-collapse: collapse !important;
+            width: 100% !important;
         }
         #gscDataTable th,
+        #gscDataTable {
+            width: 100%;
+            min-width: 840px;
+            table-layout: auto;
+        }
         #gscDataTable td {
             box-sizing: border-box;
             vertical-align: middle;
+            padding: 10px 12px;
         }
         #gscDataTable th:nth-child(1),
         #gscDataTable td:nth-child(1) {
-            width: auto;
-            min-width: 0;
+            width: 28%;
+            min-width: 180px;
+            max-width: 260px;
             overflow: hidden;
         }
         #gscDataTable th:nth-child(2),
         #gscDataTable td:nth-child(2) {
-            width: 50px;
+            width: 55px;
+            min-width: 55px;
             text-align: center;
             white-space: nowrap;
         }
         #gscDataTable th:nth-child(3),
         #gscDataTable td:nth-child(3) {
-            width: 36%;
-            min-width: 0;
-            overflow: hidden;
+            width: 38%;
+            min-width: 260px;
+            max-width: 320px;
         }
         #gscDataTable th:nth-child(4),
         #gscDataTable td:nth-child(4) {
-            width: 135px;
+            width: 30%;
+            min-width: 240px;
             text-align: right;
             white-space: nowrap;
-        }
-        @media (min-width: 1400px) {
-            #gscDataTable th:nth-child(4),
-            #gscDataTable td:nth-child(4) {
-                width: 250px;
-            }
         }
         .nd-gsc-url-box {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 4px 8px;
+            padding: 4px 7px;
             width: 100%;
-            max-width: 100%;
+            max-width: 300px;
             min-width: 0;
             box-sizing: border-box;
         }
@@ -1285,14 +1464,14 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            flex: 1;
+            flex: 1 1 0;
             min-width: 0;
         }
         .nd-gsc-btn-copy {
             background: #ffffff;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            padding: 3px 6px;
+            padding: 2px 5px;
             font-size: 0.67rem;
             font-weight: 700;
             color: #475569;
@@ -1303,6 +1482,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             transition: all 0.15s ease;
             flex-shrink: 0;
             white-space: nowrap;
+            text-decoration: none;
         }
         .nd-gsc-btn-copy:hover {
             background: #0f172a;
@@ -1310,55 +1490,33 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             border-color: #0f172a;
         }
         .nd-gsc-actions {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
             width: 100%;
+            max-width: 230px;
+            margin-left: auto;
             box-sizing: border-box;
-        }
-        @media (min-width: 1400px) {
-            .nd-gsc-actions {
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-                justify-content: flex-end;
-            }
         }
         .nd-gsc-label-full { display: inline; }
         .nd-gsc-label-short { display: none; }
-
-        @media (max-width: 1300px) {
-            .nd-gsc-label-full { display: none !important; }
-            .nd-gsc-label-short { display: inline !important; }
-            #gscDataTable th:nth-child(4),
-            #gscDataTable td:nth-child(4) {
-                width: 95px !important;
-            }
-            .nd-gsc-btn-already,
-            .nd-gsc-btn-now {
-                padding: 4px 6px !important;
-                font-size: 0.70rem !important;
-                gap: 4px !important;
-                width: 100% !important;
-            }
-        }
         .nd-gsc-btn-already {
-            background: #dcfce7;
+            background: #ecfdf5;
             color: #15803d;
             border: 1px solid #86efac;
             border-radius: 8px;
-            font-size: 0.69rem;
+            font-size: 0.71rem;
             font-weight: 700;
-            padding: 4px 6px;
+            padding: 5px 9px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
             white-space: nowrap;
-            flex-shrink: 0;
-            width: 100%;
+            flex: 1;
+            max-width: 115px;
             box-sizing: border-box;
             transition: all 0.15s ease;
         }
@@ -1366,24 +1524,25 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             background: #16a34a;
             color: #ffffff;
             border-color: #16a34a;
-            transform: scale(1.02);
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+            transform: translateY(-1px);
         }
         .nd-gsc-btn-now {
-            background: #ede9fe;
+            background: #f5f3ff;
             color: #6d28d9;
             border: 1px solid #c4b5fd;
             border-radius: 8px;
-            font-size: 0.69rem;
+            font-size: 0.71rem;
             font-weight: 700;
-            padding: 4px 6px;
+            padding: 5px 9px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
             white-space: nowrap;
-            flex-shrink: 0;
-            width: 100%;
+            flex: 1;
+            max-width: 115px;
             box-sizing: border-box;
             transition: all 0.15s ease;
         }
@@ -1391,7 +1550,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             background: #7c3aed;
             color: #ffffff;
             border-color: #7c3aed;
-            transform: scale(1.02);
+            box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);
+            transform: translateY(-1px);
         }
         .nd-gsc-locked-wrap {
             display: inline-flex;
@@ -1399,6 +1559,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             align-items: flex-end;
             gap: 3px;
             width: 100%;
+            max-width: 230px;
+            margin-left: auto;
             box-sizing: border-box;
             white-space: nowrap;
         }
@@ -1416,6 +1578,12 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             width: fit-content;
             white-space: nowrap;
         }
+        .nd-gsc-badge-2nd-indexed {
+            background: #ecfdf5 !important;
+            color: #047857 !important;
+            border: 1px solid #6ee7b7 !important;
+            box-shadow: 0 1px 4px rgba(4, 120, 87, 0.12);
+        }
         .nd-gsc-badge-now {
             display: inline-flex;
             align-items: center;
@@ -1429,6 +1597,125 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             padding: 3px 8px;
             width: fit-content;
             white-space: nowrap;
+        }
+        .nd-gsc-badge-timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            font-size: 0.67rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            white-space: nowrap;
+        }
+        .nd-gsc-timer-amber {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+        .nd-gsc-badge-retry {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            white-space: nowrap;
+        }
+        .nd-gsc-status-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            width: 100%;
+            max-width: 230px;
+            margin-left: auto;
+            box-sizing: border-box;
+        }
+        .nd-gsc-verify-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            width: 100%;
+            max-width: 230px;
+            margin-left: auto;
+            box-sizing: border-box;
+        }
+        .nd-gsc-verify-label {
+            font-size: 0.69rem;
+            font-weight: 700;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .nd-gsc-verify-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nd-gsc-btn-indexed {
+            background: #16a34a;
+            color: #ffffff;
+            border: 1px solid #15803d;
+            border-radius: 6px;
+            font-size: 0.69rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .nd-gsc-btn-indexed:hover {
+            background: #15803d;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+        }
+        .nd-gsc-btn-notindexed {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            font-size: 0.69rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .nd-gsc-btn-notindexed:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+        .nd-gsc-btn-verify-early {
+            background: transparent;
+            border: none;
+            color: #6d28d9;
+            font-size: 0.66rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .nd-gsc-btn-verify-early:hover {
+            color: #4c1d95;
         }
         .nd-gsc-timestamp {
             font-size: 0.66rem;
@@ -1445,11 +1732,531 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             }
         }
 
+        /* ── Pagination Styling for SEO & GSC Tables ── */
+        .nd-pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 14px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 0 0 16px 16px;
+        }
+        .nd-pagination-info {
+            font-size: 0.80rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .nd-pagination-info strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .nd-pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nd-page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .nd-page-btn:hover:not(:disabled):not(.active) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+        .nd-page-btn.active {
+            background: #6d28d9;
+            color: #ffffff;
+            border-color: #6d28d9;
+            box-shadow: 0 2px 6px rgba(109, 40, 217, 0.25);
+        }
+        .nd-page-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* ── Tags Intelligence & Manager Tab ── */
+        .nd-tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8fafc;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.80rem;
+            font-weight: 800;
+            padding: 4px 9px;
+            letter-spacing: -0.01em;
+        }
+        .nd-tag-badge i {
+            color: #6366f1;
+            font-size: 0.72rem;
+        }
+        .nd-tag-prompts-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            padding: 3px 9px;
+        }
+        .nd-tag-prompts-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 5px 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .nd-tag-prompts-pill:hover {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+            transform: translateY(-1px);
+        }
+        .nd-viewer-prompt-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 9px 12px;
+            transition: all 0.15s ease;
+        }
+        .nd-viewer-prompt-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+        .nd-viewer-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .nd-viewer-title-link {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 250px;
+            transition: all 0.15s ease;
+        }
+        .nd-viewer-title-link:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+        .nd-viewer-btn-action {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+        }
+        .nd-viewer-btn-action:hover {
+            background: #38bdf8;
+            color: #0b0f19;
+            box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+        .nd-viewer-btn-edit {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 8px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .nd-viewer-btn-edit:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .nd-viewer-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 3px;
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+        .nd-tag-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+        .nd-btn-tag-edit {
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+        .nd-btn-tag-edit:hover {
+            background: #6366f1;
+            color: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+        }
+        .nd-btn-tag-delete {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+        .nd-btn-tag-delete:hover {
+            background: #e11d48;
+            color: #ffffff;
+            border-color: #e11d48;
+            box-shadow: 0 2px 6px rgba(225, 29, 72, 0.25);
+        }
+        .nd-tag-expand-btn {
+            font-size: 0.71rem;
+            font-weight: 700;
+            color: #6366f1;
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 4px 8px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: fit-content;
+            transition: all 0.15s ease;
+        }
+        .nd-tag-expand-btn:hover {
+            background: #ede9fe;
+            border-color: #c4b5fd;
+        }
+        .nd-mobile-tag-card {
+            background: #ffffff;
+            border: 1px solid var(--nd-border);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+        }
+
+        /* ── Custom Sleek Modals (Dark Glow Aesthetic) ── */
+        .nd-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 11, 20, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nd-modal-overlay.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .nd-modal-box {
+            background: #111022;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nd-modal-overlay.is-active .nd-modal-box {
+            transform: scale(1) translateY(0);
+        }
+        .nd-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .nd-modal-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nd-modal-close {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+        }
+        .nd-modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+        .nd-modal-sub {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            line-height: 1.45;
+            margin-bottom: 18px;
+        }
+        .nd-modal-input-wrap {
+            margin-bottom: 20px;
+        }
+        .nd-modal-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+        }
+        .nd-modal-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+        }
+        .nd-modal-input:focus {
+            border-color: #a855f7;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+        }
+        .nd-modal-foot {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .nd-modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            font-size: 0.84rem;
+            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .nd-modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+        .nd-modal-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .nd-modal-page-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .nd-modal-page-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .nd-modal-page-btn.active {
+            background: #38bdf8;
+            color: #0b0f19;
+            border-color: #38bdf8;
+            font-weight: 800;
+        }
+        .nd-modal-page-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .nd-modal-btn-primary {
+            background: #a855f7;
+            border: 1px solid #c084fc;
+            color: #ffffff;
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+        }
+        .nd-modal-btn-primary:hover {
+            background: #9333ea;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45);
+            transform: translateY(-1px);
+        }
+        .nd-modal-btn-danger {
+            background: #e11d48;
+            border: 1px solid #fb7185;
+            color: #ffffff;
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+        }
+        .nd-modal-btn-danger:hover {
+            background: #be123c;
+            box-shadow: 0 6px 20px rgba(225, 29, 72, 0.45);
+            transform: translateY(-1px);
+        }
+
+        /* ── Custom Floating Toast ── */
+        .nd-toast-wrap {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .nd-toast-item {
+            pointer-events: auto;
+            background: #111022;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            font-size: 0.86rem;
+            font-weight: 700;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nd-toast-item.is-visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .nd-toast-item.toast-success {
+            border-color: rgba(52, 211, 153, 0.4);
+        }
+        .nd-toast-item.toast-success i {
+            color: #34d399;
+            font-size: 1.1rem;
+        }
+        .nd-toast-item.toast-error {
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+        .nd-toast-item.toast-error i {
+            color: #f43f5e;
+            font-size: 1.1rem;
+        }
+
         /* ── Display Visibility Helpers ── */
-        .nd-desktop-only { display: block; }
-        .nd-mobile-only { display: none; }
-        .nd-desktop-widescreen-only { display: block; }
-        .nd-desktop-notice { display: none; }
+        .nd-desktop-only { display: block !important; }
+        .nd-mobile-only { display: none !important; }
+        .nd-desktop-widescreen-only { display: block !important; }
+        .nd-desktop-notice { display: none !important; }
 
         /* ── Mobile Feed Cards (Clean App-Like Experience) ── */
         .nd-mobile-cards-wrap {
@@ -1602,6 +2409,315 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             margin-bottom: 8px;
         }
 
+        /* ── 13. Leaderboard Podium & Top 20 Ranks Styles ── */
+        .nd-podium-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: flex-end;
+        }
+        .nd-podium-card {
+            background: #ffffff;
+            border: 1px solid var(--nd-border);
+            border-radius: 20px;
+            padding: 24px 18px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-shadow: var(--nd-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .nd-podium-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.08);
+        }
+        .nd-podium-1 {
+            border: 2px solid #f59e0b;
+            background: linear-gradient(180deg, #fffbeb 0%, #ffffff 40%);
+            order: 2;
+            padding-top: 32px;
+        }
+        .nd-podium-2 {
+            border: 1.5px solid #94a3b8;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%);
+            order: 1;
+        }
+        .nd-podium-3 {
+            border: 1.5px solid #d97706;
+            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%);
+            order: 3;
+        }
+        .nd-podium-crown {
+            font-size: 2rem;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+        }
+        .nd-podium-av-wrap {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin-bottom: 12px;
+        }
+        .nd-podium-1 .nd-podium-av-wrap { width: 84px; height: 84px; }
+        .nd-podium-av {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .nd-podium-rank-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+        }
+        .nd-podium-1 .nd-podium-rank-badge { background: #f59e0b; }
+        .nd-podium-2 .nd-podium-rank-badge { background: #64748b; }
+        .nd-podium-3 .nd-podium-rank-badge { background: #d97706; }
+        .nd-podium-name {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 2px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .nd-podium-score {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 6px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nd-podium-score span {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--nd-text-sec);
+            text-transform: uppercase;
+        }
+        .nd-podium-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--nd-text-sec);
+            width: 100%;
+            padding-top: 10px;
+            border-top: 1px solid var(--nd-border);
+        }
+        .nd-lb-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-width: 48px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+        .nd-lb-rank.rank-1 {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-color: #fcd34d;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.18);
+        }
+        .nd-lb-rank.rank-2 {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #334155;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 6px rgba(100, 116, 139, 0.15);
+        }
+        .nd-lb-rank.rank-3 {
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+            color: #9a3412;
+            border-color: #fdba74;
+            box-shadow: 0 2px 6px rgba(234, 88, 12, 0.15);
+        }
+        .nd-streak-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #ffedd5;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+        .nd-score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #d4f938;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+        .nd-user-avatar-sm {
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px !important;
+            min-height: 38px !important;
+            max-width: 38px !important;
+            max-height: 38px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            flex-shrink: 0 !important;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+            display: inline-block;
+        }
+
+        /* ── 14. 100 Gamified Achievements Matrix Styles ── */
+        .nd-achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .nd-achievement-card {
+            background: #ffffff;
+            border: 1.5px solid var(--nd-border);
+            border-radius: 18px;
+            padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
+            transition: all 0.2s ease;
+        }
+        .nd-achievement-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+        }
+        .nd-achievement-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .nd-achievement-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .nd-achievement-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.25;
+            margin-bottom: 3px;
+        }
+        .nd-achievement-desc {
+            font-size: 0.78rem;
+            color: var(--nd-text-sec);
+            line-height: 1.4;
+        }
+        .nd-achievement-foot {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--nd-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .nd-badge-repeat {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #fae8ff;
+            color: #a855f7;
+            font-size: 0.68rem;
+            font-weight: 800;
+            border: 1px solid #f0abfc;
+        }
+        .nd-badge-repeat-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+        
+        /* Tier Accents */
+        .tier-bronze .nd-achievement-icon-box { background: rgba(205, 127, 50, 0.12); color: #cd7f32; border: 1px solid rgba(205, 127, 50, 0.25); }
+        .tier-bronze.is-unlocked { border-color: rgba(205, 127, 50, 0.4); }
+        
+        .tier-silver .nd-achievement-icon-box { background: rgba(148, 163, 184, 0.15); color: #64748b; border: 1px solid rgba(148, 163, 184, 0.3); }
+        .tier-silver.is-unlocked { border-color: rgba(148, 163, 184, 0.5); }
+        
+        .tier-gold .nd-achievement-icon-box { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .tier-gold.is-unlocked { border-color: rgba(245, 158, 11, 0.5); background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%); }
+        
+        .tier-platinum .nd-achievement-icon-box { background: rgba(56, 189, 248, 0.15); color: #0284c7; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tier-platinum.is-unlocked { border-color: rgba(56, 189, 248, 0.5); background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%); }
+        
+        .tier-diamond .nd-achievement-icon-box { background: rgba(168, 85, 247, 0.15); color: #9333ea; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tier-diamond.is-unlocked { border-color: rgba(168, 85, 247, 0.5); background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%); }
+        
+        .tier-legendary .nd-achievement-icon-box { background: rgba(236, 72, 153, 0.15); color: #db2777; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .tier-legendary.is-unlocked { border-color: rgba(236, 72, 153, 0.5); background: linear-gradient(180deg, #ffffff 0%, #fdf2f8 100%); }
+
+        .tier-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .tier-tag-bronze { background: #fef3c7; color: #b45309; }
+        .tier-tag-silver { background: #f1f5f9; color: #475569; }
+        .tier-tag-gold { background: #fef08a; color: #854d0e; }
+        .tier-tag-platinum { background: #bae6fd; color: #0369a1; }
+        .tier-tag-diamond { background: #e9d5ff; color: #6b21a8; }
+        .tier-tag-legendary { background: #fbcfe8; color: #9d174d; }
+
         /* ── Responsive Layout ── */
         @media (max-width: 1200px) {
             .nd-kpi-grid {
@@ -1650,6 +2766,37 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             }
             .nd-back-dash span { display: none; }
             .nd-back-dash { padding: 10px; }
+
+            /* Tablet Leaderboard & Achievements */
+            .nd-podium-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            .nd-podium-card {
+                padding: 18px 12px 16px;
+            }
+            .nd-podium-av-wrap {
+                width: 60px;
+                height: 60px;
+            }
+            .nd-podium-1 .nd-podium-av-wrap {
+                width: 72px;
+                height: 72px;
+            }
+            .nd-podium-name {
+                font-size: 0.95rem;
+            }
+            .nd-podium-score {
+                font-size: 1.15rem;
+            }
+            .nd-podium-stats {
+                font-size: 0.72rem;
+                gap: 8px;
+            }
+            .nd-achievement-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
         }
 
         /* Widescreen Notice for SEO & GSC on Mobile/Tablet */
@@ -1921,6 +3068,79 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             .nd-prompt-thumb { width: 32px; height: 32px; }
             .nd-action-item { padding: 12px; }
             .nd-action-desc { display: none; }
+            
+            /* Mobile Podium Layout */
+            .nd-podium-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            .nd-podium-card {
+                padding: 16px 14px !important;
+                border-radius: 16px !important;
+            }
+            .nd-podium-1 {
+                order: 1 !important;
+                padding-top: 20px !important;
+            }
+            .nd-podium-2 {
+                order: 2 !important;
+            }
+            .nd-podium-3 {
+                order: 3 !important;
+            }
+            .nd-podium-crown {
+                font-size: 1.5rem !important;
+                margin-bottom: 4px !important;
+            }
+            .nd-podium-av-wrap {
+                width: 60px !important;
+                height: 60px !important;
+                min-width: 60px !important;
+                min-height: 60px !important;
+                margin-bottom: 8px !important;
+            }
+            .nd-podium-1 .nd-podium-av-wrap {
+                width: 68px !important;
+                height: 68px !important;
+                min-width: 68px !important;
+                min-height: 68px !important;
+            }
+            .nd-podium-name {
+                font-size: 0.95rem !important;
+            }
+            .nd-podium-score {
+                font-size: 1.15rem !important;
+                margin: 4px 0 8px !important;
+            }
+            .nd-podium-stats {
+                font-size: 0.72rem !important;
+                gap: 8px !important;
+                padding-top: 8px !important;
+            }
+
+            /* Mobile Achievements Grid */
+            .nd-achievement-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .nd-achievement-card {
+                padding: 14px 12px !important;
+                border-radius: 14px !important;
+            }
+            .nd-achievement-icon-box {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 1.1rem !important;
+                border-radius: 10px !important;
+            }
+            .nd-achievement-title {
+                font-size: 0.88rem !important;
+            }
+            .nd-achievement-desc {
+                font-size: 0.75rem !important;
+            }
+
             .nd-back-dash { margin: 4px 0 10px; }
             .nd-back-dash-top span { display: none; }
             .nd-back-dash-top { width: 36px; height: 36px; padding: 0; border-radius: 50%; }
@@ -2077,10 +3297,25 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <span class="nd-nav-full">GSC Checklist</span>
                 <span class="nd-nav-short">GSC</span>
             </a>
+            <a href="analytics.php?tab=tags" class="nd-nav-item <?= $active_tab === 'tags' ? 'active' : '' ?>" title="Prompt Tags & Taxonomies">
+                <i class="fa-solid fa-tags"></i>
+                <span class="nd-nav-full">Prompt Tags</span>
+                <span class="nd-nav-short">Tags</span>
+            </a>
             <a href="analytics.php?tab=users" class="nd-nav-item <?= $active_tab === 'users' ? 'active' : '' ?>" title="Users & Retention">
                 <i class="fa-solid fa-users"></i>
-                <span class="nd-nav-full">Users & Retention</span>
+                <span class="nd-nav-full">Users &amp; Retention</span>
                 <span class="nd-nav-short">Users</span>
+            </a>
+            <a href="analytics.php?tab=leaderboard" class="nd-nav-item <?= $active_tab === 'leaderboard' ? 'active' : '' ?>" title="Top 20 Leaderboard">
+                <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i>
+                <span class="nd-nav-full">Leaderboard</span>
+                <span class="nd-nav-short">Ranks</span>
+            </a>
+            <a href="analytics.php?tab=achievements" class="nd-nav-item <?= $active_tab === 'achievements' ? 'active' : '' ?>" title="100 Gamified Achievements">
+                <i class="fa-solid fa-medal" style="color:#ec4899;"></i>
+                <span class="nd-nav-full">Achievements</span>
+                <span class="nd-nav-short">Badges</span>
             </a>
         </nav>
         <a href="dashboard.php" class="nd-back-dash" title="Back to old dashboard">
@@ -2539,6 +3774,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 </div>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Pagination Bar for Top Prompts -->
+            <div id="promptsPagination" class="nd-pagination-bar"></div>
         </section>
 
         <?php elseif ($active_tab === 'blogs'): ?>
@@ -2898,6 +4136,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         </tbody>
                     </table>
                 </div>
+                <div id="seoPagination" class="nd-pagination-bar"></div>
             </section>
         </div>
 
@@ -2938,8 +4177,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 
         <!-- Desktop Widescreen Container -->
         <div class="nd-desktop-widescreen-only">
-            <!-- 3 GSC KPI Metric Cards -->
-            <div class="nd-gsc-kpi-grid">
+            <!-- 4 GSC KPI Metric Cards -->
+            <div class="nd-gsc-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="nd-gsc-kpi-card" style="background:#fffbeb; border-color:#fde68a;">
                     <div class="nd-seo-kpi-head">
                         <div class="nd-seo-kpi-title" style="color:#b45309;"><i class="fa-solid fa-hourglass-half"></i> Pending Check</div>
@@ -2949,7 +4188,31 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     <div class="nd-seo-progress-bg">
                         <div class="nd-seo-progress-fill" id="gscPendingProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_pending_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#f59e0b;"></div>
                     </div>
-                    <div class="nd-seo-kpi-sub">Needs inspection in Search Console</div>
+                    <div class="nd-seo-kpi-sub">Needs inspection in GSC</div>
+                </div>
+
+                <div class="nd-gsc-kpi-card" style="background:#f5f3ff; border-color:#ddd6fe;">
+                    <div class="nd-seo-kpi-head">
+                        <div class="nd-seo-kpi-title" style="color:#6d28d9;"><i class="fa-solid fa-rocket"></i> In 4-Day Check</div>
+                        <div class="nd-seo-kpi-badge" id="gscNowBadge" style="background:#ede9fe; color:#5b21b6;"><?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                    </div>
+                    <div class="nd-seo-kpi-val" style="color:#5b21b6;" id="gscNowVal"><?= $gsc_now_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-progress-bg">
+                        <div class="nd-seo-progress-fill" id="gscNowProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#8b5cf6;"></div>
+                    </div>
+                    <div class="nd-seo-kpi-sub">Requested, waiting verification</div>
+                </div>
+
+                <div class="nd-gsc-kpi-card" style="background:#fff1f2; border-color:#fecdd3;">
+                    <div class="nd-seo-kpi-head">
+                        <div class="nd-seo-kpi-title" style="color:#be123c;"><i class="fa-solid fa-rotate-right"></i> 2nd Try Needed</div>
+                        <div class="nd-seo-kpi-badge" id="gscRetryBadge" style="background:#ffe4e6; color:#9f1239;"><?= $seo_total_count > 0 ? round(($gsc_retry_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                    </div>
+                    <div class="nd-seo-kpi-val" style="color:#9f1239;" id="gscRetryVal"><?= $gsc_retry_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-progress-bg">
+                        <div class="nd-seo-progress-fill" id="gscRetryProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_retry_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#f43f5e;"></div>
+                    </div>
+                    <div class="nd-seo-kpi-sub">Not indexed, 24h wait cycle</div>
                 </div>
 
                 <div class="nd-gsc-kpi-card" style="background:#ecfdf5; border-color:#a7f3d0;">
@@ -2963,18 +4226,6 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     </div>
                     <div class="nd-seo-kpi-sub">Verified live in Google SERP</div>
                 </div>
-
-                <div class="nd-gsc-kpi-card" style="background:#f5f3ff; border-color:#ddd6fe;">
-                    <div class="nd-seo-kpi-head">
-                        <div class="nd-seo-kpi-title" style="color:#6d28d9;"><i class="fa-solid fa-rocket"></i> Requested Indexing</div>
-                        <div class="nd-seo-kpi-badge" id="gscNowBadge" style="background:#ede9fe; color:#5b21b6;"><?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
-                    </div>
-                    <div class="nd-seo-kpi-val" style="color:#5b21b6;" id="gscNowVal"><?= $gsc_now_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
-                    <div class="nd-seo-progress-bg">
-                        <div class="nd-seo-progress-fill" id="gscNowProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#8b5cf6;"></div>
-                    </div>
-                    <div class="nd-seo-kpi-sub">Submitted manually in Search Console</div>
-                </div>
             </div>
 
             <!-- GSC Checklist Table Card -->
@@ -2987,8 +4238,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <select id="gscStatusFilter" class="nd-select-filter" onchange="filterGscTable()">
                             <option value="">All GSC Status (<?= $seo_total_count ?>)</option>
                             <option value="pending">Pending Check (<?= $gsc_pending_cnt ?>)</option>
+                            <option value="indexed_now">In 4-Day Check (<?= $gsc_now_cnt ?>)</option>
+                            <option value="retry_needed">2nd Try Needed (<?= $gsc_retry_cnt ?>)</option>
                             <option value="already_indexed">Already Indexed (<?= $gsc_already_cnt ?>)</option>
-                            <option value="indexed_now">Requested Indexing (<?= $gsc_now_cnt ?>)</option>
                         </select>
 
                         <select id="gscTypeFilter" class="nd-select-filter" onchange="filterGscTable()">
@@ -3016,8 +4268,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <tbody>
                             <?php foreach ($seo_prompt_list as $sp):
                                 $g_status = $sp['gsc_status'];
-                                $g_is_locked = in_array($g_status, ['already_indexed', 'indexed_now'], true);
-                                $row_filter_status = $g_is_locked ? $g_status : 'pending';
+                                $row_filter_status = !empty($g_status) ? $g_status : 'pending';
                             ?>
                             <tr id="gsc-row-<?= $sp['id'] ?>"
                                 data-title="<?= htmlspecialchars(strtolower($sp['title'] . ' ' . $sp['canonical_url'])) ?>"
@@ -3048,42 +4299,104 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 </td>
                                 <td>
                                     <div class="nd-gsc-url-box">
+                                        <i class="fa-solid fa-link" style="color:#94a3b8; font-size:0.72rem; flex-shrink:0;"></i>
                                         <span class="nd-gsc-url-text" title="<?= htmlspecialchars($sp['canonical_url']) ?>">
                                             <?= htmlspecialchars($sp['canonical_url']) ?>
                                         </span>
-                                        <button type="button" class="nd-gsc-btn-copy" onclick="copyPromptUrl('<?= htmlspecialchars($sp['canonical_url'], ENT_QUOTES) ?>', this)" title="Copy full URL to clipboard">
-                                            <i class="fa-solid fa-copy"></i> <span>Copy</span>
-                                        </button>
+                                        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                                            <button type="button" class="nd-gsc-btn-copy" onclick="copyPromptUrl('<?= htmlspecialchars($sp['canonical_url'], ENT_QUOTES) ?>', this)" title="Copy full URL to clipboard">
+                                                <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                                            </button>
+                                            <a href="<?= htmlspecialchars($sp['canonical_url']) ?>" target="_blank" class="nd-gsc-btn-copy" title="Open page in new tab">
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </td>
                                 <td id="gsc-action-cell-<?= $sp['id'] ?>">
-                                    <?php if ($g_is_locked): ?>
+                                    <?php
+                                        $att = (int)($sp['gsc_attempt'] ?? 1);
+                                        $ord = $sp['gsc_ordinal'] ?? ($att . 'th');
+                                    ?>
+                                    <?php if ($sp['gsc_state'] === 'already_indexed'): ?>
                                         <div class="nd-gsc-locked-wrap">
-                                            <?php if ($g_status === 'already_indexed'): ?>
-                                                <span class="nd-gsc-badge-already">
-                                                    <i class="fa-solid fa-circle-check"></i>
-                                                    <span class="nd-gsc-label-full">Already Indexed</span>
-                                                    <span class="nd-gsc-label-short">Indexed</span>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="nd-gsc-badge-now">
-                                                    <i class="fa-solid fa-rocket"></i>
-                                                    <span class="nd-gsc-label-full">Requested Indexing</span>
-                                                    <span class="nd-gsc-label-short">Requested</span>
-                                                </span>
-                                            <?php endif; ?>
+                                            <span class="nd-gsc-badge-already <?= $att > 1 ? 'nd-gsc-badge-2nd-indexed' : '' ?>">
+                                                <i class="fa-solid fa-circle-check" <?= $att > 1 ? 'style="color:#059669;"' : '' ?>></i>
+                                                <span class="nd-gsc-label-full"><?= $att > 1 ? "Indexed ({$ord} Try)" : 'Already Indexed' ?></span>
+                                                <span class="nd-gsc-label-short"><?= $att > 1 ? "{$ord} Try" : 'Indexed' ?></span>
+                                            </span>
                                             <div class="nd-gsc-timestamp">
                                                 <i class="fa-regular fa-calendar-check"></i> <?= htmlspecialchars($sp['gsc_date_formatted']) ?>
                                             </div>
                                         </div>
+                                    <?php elseif ($sp['gsc_state'] === 'indexed_timer_running'): ?>
+                                        <div class="nd-gsc-status-block">
+                                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+                                                <span class="nd-gsc-badge-now" <?= $att > 1 ? 'style="background:#fce7f3; color:#be185d; border-color:#fbcfe8;"' : '' ?> title="<?= $att > 1 ? "{$ord} Try Requested" : 'Requested' ?> on <?= htmlspecialchars($sp['gsc_date_formatted']) ?>">
+                                                    <i class="fa-solid fa-rocket"></i>
+                                                    <span><?= $att > 1 ? "{$ord} Try" : 'Requested' ?></span>
+                                                </span>
+                                                <span class="nd-gsc-badge-timer" title="4-day verification countdown">
+                                                    <i class="fa-regular fa-clock"></i> Check in <?= htmlspecialchars($sp['gsc_time_left_str']) ?>
+                                                </span>
+                                            </div>
+                                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
+                                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus(<?= $sp['id'] ?>, 'trigger_verify', <?= $att ?>, this)" title="Check now without waiting 4 days">
+                                                    <i class="fa-solid fa-clipboard-check"></i> Verify Early
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <?php elseif ($sp['gsc_state'] === 'indexed_ready_to_verify'): ?>
+                                        <div class="nd-gsc-verify-box">
+                                            <div class="nd-gsc-verify-label">
+                                                <i class="fa-solid fa-circle-question" style="color:#f59e0b;"></i> <?= $att > 1 ? "{$ord} Try: Is it indexed?" : '4d passed: Is it indexed?' ?>
+                                            </div>
+                                            <div class="nd-gsc-verify-actions">
+                                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed_<?= $att ?>', <?= $att ?>, this)" title="Yes, page is indexed in Google">
+                                                    <i class="fa-solid fa-check"></i> <?= $att > 1 ? "Indexed ({$ord} Try)" : 'Indexed' ?>
+                                                </button>
+                                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus(<?= $sp['id'] ?>, 'retry_needed', <?= $att ?>, this)" title="No, page is not indexed -> move to next try">
+                                                    <i class="fa-solid fa-xmark"></i> Not Indexed
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <?php elseif ($sp['gsc_state'] === 'retry_wait_running'): ?>
+                                        <div class="nd-gsc-status-block">
+                                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+                                                <span class="nd-gsc-badge-retry">
+                                                    <i class="fa-solid fa-rotate-right"></i> <?= $ord ?> Try
+                                                </span>
+                                                <span class="nd-gsc-badge-timer nd-gsc-timer-amber" title="Wait 24h before re-submitting in GSC">
+                                                    <i class="fa-regular fa-clock"></i> Wait <?= htmlspecialchars($sp['gsc_time_left_str']) ?>
+                                                </span>
+                                            </div>
+                                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
+                                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', <?= $att ?>, this)">
+                                                    <i class="fa-solid fa-paper-plane"></i> Re-Index Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <?php elseif ($sp['gsc_state'] === 'retry_ready'): ?>
+                                        <div class="nd-gsc-actions">
+                                            <span class="nd-gsc-badge-retry" style="margin-right:2px;">
+                                                <i class="fa-solid fa-rotate-right"></i> <?= $ord ?> Try
+                                            </span>
+                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', <?= $att ?>, this)" title="Re-submit URL to GSC (Restarts 4-day cycle)">
+                                                <i class="fa-solid fa-rocket"></i>
+                                                <span>Re-Index</span>
+                                            </button>
+                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed_<?= $att ?>', <?= $att ?>, this)" title="Mark as indexed on <?= $ord ?> try">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </div>
                                     <?php else: ?>
                                         <div class="nd-gsc-actions">
-                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed', this)">
+                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed', 1, this)">
                                                 <i class="fa-solid fa-circle-check"></i>
                                                 <span class="nd-gsc-label-full">Already Indexed</span>
                                                 <span class="nd-gsc-label-short">Indexed</span>
                                             </button>
-                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', this)">
+                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', 1, this)">
                                                 <i class="fa-solid fa-rocket"></i>
                                                 <span class="nd-gsc-label-full">I Indexed Now</span>
                                                 <span class="nd-gsc-label-short">Request</span>
@@ -3096,8 +4409,250 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         </tbody>
                     </table>
                 </div>
+                <div id="gscPagination" class="nd-pagination-bar"></div>
             </section>
         </div>
+
+        <?php elseif ($active_tab === 'tags'): ?>
+        <!-- ========================================== -->
+        <!-- TAB 7: PROMPT TAGS & TAXONOMIES            -->
+        <!-- ========================================== -->
+        <header class="nd-topbar">
+            <div class="nd-topbar-lead">
+                <div>
+                    <h1 class="nd-page-title">Prompt Tags &amp; Taxonomies</h1>
+                    <div class="nd-page-subtitle"><?= $total_unique_tags ?> Unique Tags &bull; <?= $total_tagged_prompts ?> Tagged Prompts &bull; <?= $total_tag_instances ?> Total Usages</div>
+                </div>
+            </div>
+            <div class="nd-topbar-tools">
+                <a href="manage_prompts.php" class="nd-btn-outline">
+                    <i class="fa-solid fa-list-check"></i> Manage Prompts
+                </a>
+                <a href="upload_prompt.php" class="nd-btn-lime">
+                    <i class="fa-solid fa-upload"></i> Upload Prompt
+                </a>
+            </div>
+        </header>
+
+        <!-- KPI Cards Grid -->
+        <section class="nd-kpi-grid">
+            <div class="nd-kpi-card nd-kpi-purple">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Unique Tags</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= number_format($total_unique_tags) ?></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-tags"></i> Active platform taxonomy
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-green">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Tagged Prompts</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= number_format($total_tagged_prompts) ?></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-layer-group"></i> Out of <?= count($all_prompts_tags_raw) ?> total prompts
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-amber">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Top Linked Tag</span>
+                    </div>
+                    <div class="nd-kpi-val" style="font-size:1.4rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="#<?= htmlspecialchars($most_popular_tag) ?>">
+                        #<?= htmlspecialchars($most_popular_tag) ?>
+                    </div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-link"></i> <?= $most_popular_count ?> prompts linked
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-teal">
+                <div>
+                    <div class="nd-kpi-header" style="color:#d4f938;">
+                        <span class="nd-kpi-dot" style="background:#d4f938;"></span>
+                        <span>Taxonomy Density</span>
+                    </div>
+                    <div class="nd-kpi-val" style="font-size:1.6rem;"><?= $avg_tags_per_prompt ?> / prompt</div>
+                    <div class="nd-kpi-sub" style="color:rgba(255,255,255,0.85);">
+                        <?= $total_tag_instances ?> total tag assignments
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tags Manager Section -->
+        <section class="nd-card">
+            <div class="nd-card-head">
+                <div class="nd-card-title">
+                    <i class="fa-solid fa-tags" style="color:#6366f1;"></i>
+                    <span>All Tags Intelligence &amp; Global Manager</span>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="nd-filter-bar" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="tagSearchInput" class="nd-search-input" style="flex:2; min-width:200px;" placeholder="Search tag name or prompt title..." onkeyup="filterTagsTable()">
+                <select id="tagSortFilter" class="nd-select-filter" onchange="sortTagsTable()">
+                    <option value="prompts">Sort: Most Prompts (Default)</option>
+                    <option value="views">Sort: Most Views</option>
+                    <option value="likes">Sort: Most Likes</option>
+                    <option value="unlocks">Sort: Most Unlocks</option>
+                    <option value="alpha">Sort: Tag Name (A-Z)</option>
+                </select>
+                <select id="tagUsageFilter" class="nd-select-filter" onchange="filterTagsTable()">
+                    <option value="">All Usage (<?= $total_unique_tags ?>)</option>
+                    <option value="multi">Multiple Prompts (2+)</option>
+                    <option value="single">Single Use (1 prompt)</option>
+                </select>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="nd-table-wrap nd-desktop-only">
+                <table class="nd-table" id="tagsDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width:25%;">Tag Name</th>
+                            <th style="width:18%;">Linked Prompts</th>
+                            <th style="width:14%;">Views</th>
+                            <th style="width:13%;">Likes</th>
+                            <th style="width:13%;">Unlocks</th>
+                            <th style="width:17%; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($tags_map)): ?>
+                        <tr><td colspan="6" style="text-align:center; color:var(--nd-text-muted); padding:32px 0;">No tags found in any prompt.</td></tr>
+                        <?php else: ?>
+                        <?php foreach ($tags_map as $tkey => $tdata): 
+                            $prompt_titles_str = implode(' ', array_map(function($p) { return $p['title']; }, $tdata['prompts']));
+                        ?>
+                        <tr id="tag-row-<?= htmlspecialchars($tkey) ?>"
+                            data-tag="<?= htmlspecialchars(strtolower($tdata['display_tag'])) ?>"
+                            data-search="<?= htmlspecialchars(strtolower($tdata['display_tag'] . ' ' . $prompt_titles_str)) ?>"
+                            data-prompts="<?= $tdata['count'] ?>"
+                            data-views="<?= $tdata['total_views'] ?>"
+                            data-likes="<?= $tdata['total_likes'] ?>"
+                            data-unlocks="<?= $tdata['total_unlocks'] ?>"
+                            data-usage="<?= $tdata['count'] > 1 ? 'multi' : 'single' ?>">
+                            
+                            <!-- Tag Name -->
+                            <td>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="nd-tag-badge" id="tag-badge-<?= htmlspecialchars($tkey) ?>">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        <span class="nd-tag-text"><?= htmlspecialchars($tdata['display_tag']) ?></span>
+                                    </span>
+                                </div>
+                            </td>
+
+                            <!-- Prompts Count (Clickable Pill opens prompts viewer modal) -->
+                            <td>
+                                <button type="button" class="nd-tag-prompts-pill" onclick="openTagPromptsViewer('<?= htmlspecialchars($tkey) ?>')" title="Click to view all <?= $tdata['count'] ?> linked prompts">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    <span><?= $tdata['count'] ?> Prompt<?= $tdata['count'] > 1 ? 's' : '' ?></span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.64rem; opacity:0.75;"></i>
+                                </button>
+                            </td>
+
+                            <!-- Views -->
+                            <td>
+                                <span style="font-weight:700; color:#334155; font-size:0.82rem;">
+                                    <i class="fa-regular fa-eye" style="color:#64748b; font-size:0.76rem; margin-right:3px;"></i>
+                                    <?= number_format($tdata['total_views']) ?>
+                                </span>
+                            </td>
+
+                            <!-- Likes -->
+                            <td>
+                                <span style="font-weight:700; color:#e11d48; font-size:0.82rem;">
+                                    <i class="fa-regular fa-heart" style="font-size:0.76rem; margin-right:3px;"></i>
+                                    <?= number_format($tdata['total_likes']) ?>
+                                </span>
+                            </td>
+
+                            <!-- Unlocks -->
+                            <td>
+                                <span style="font-weight:800; color:#059669; font-size:0.82rem; background:#ecfdf5; border:1px solid #a7f3d0; padding:2px 8px; border-radius:999px; display:inline-flex; align-items:center; gap:4px;">
+                                    <i class="fa-solid fa-lock-open" style="font-size:0.68rem;"></i>
+                                    <?= number_format($tdata['total_unlocks']) ?>
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+                                <div class="nd-tag-actions">
+                                    <button type="button" class="nd-btn-tag-edit" onclick="openRenameModal('<?= htmlspecialchars(addslashes($tdata['display_tag'])) ?>', '<?= htmlspecialchars($tkey) ?>')">
+                                        <i class="fa-solid fa-pen-to-square"></i> Rename
+                                    </button>
+                                    <button type="button" class="nd-btn-tag-delete" onclick="openDeleteModal('<?= htmlspecialchars(addslashes($tdata['display_tag'])) ?>', '<?= htmlspecialchars($tkey) ?>', <?= $tdata['count'] ?>)">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Feed Cards View -->
+            <div class="nd-mobile-cards-wrap nd-mobile-only" id="tagsMobileCards">
+                <?php foreach ($tags_map as $tkey => $tdata): 
+                    $prompt_titles_str = implode(' ', array_map(function($p) { return $p['title']; }, $tdata['prompts']));
+                ?>
+                <div class="nd-mobile-tag-card" id="mob-tag-row-<?= htmlspecialchars($tkey) ?>"
+                    data-tag="<?= htmlspecialchars(strtolower($tdata['display_tag'])) ?>"
+                    data-search="<?= htmlspecialchars(strtolower($tdata['display_tag'] . ' ' . $prompt_titles_str)) ?>"
+                    data-prompts="<?= $tdata['count'] ?>"
+                    data-views="<?= $tdata['total_views'] ?>"
+                    data-likes="<?= $tdata['total_likes'] ?>"
+                    data-unlocks="<?= $tdata['total_unlocks'] ?>"
+                    data-usage="<?= $tdata['count'] > 1 ? 'multi' : 'single' ?>">
+                    
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                        <span class="nd-tag-badge" id="mob-tag-badge-<?= htmlspecialchars($tkey) ?>">
+                            <i class="fa-solid fa-hashtag"></i>
+                            <span class="nd-tag-text"><?= htmlspecialchars($tdata['display_tag']) ?></span>
+                        </span>
+                        <button type="button" class="nd-tag-prompts-pill" onclick="openTagPromptsViewer('<?= htmlspecialchars($tkey) ?>')">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span><?= $tdata['count'] ?> Prompt<?= $tdata['count'] > 1 ? 's' : '' ?> ↗</span>
+                        </button>
+                    </div>
+
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.75rem; background:#f8fafc; padding:8px 12px; border-radius:10px; border:1px solid #e2e8f0;">
+                        <span style="color:var(--nd-text-muted);"><i class="fa-regular fa-eye"></i> <?= number_format($tdata['total_views']) ?> views</span>
+                        <span style="color:#e11d48;"><i class="fa-regular fa-heart"></i> <?= number_format($tdata['total_likes']) ?> likes</span>
+                        <span style="color:#059669; font-weight:700;"><i class="fa-solid fa-lock-open"></i> <?= number_format($tdata['total_unlocks']) ?> unlocks</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; border-top:1px solid #f1f5f9; padding-top:10px;">
+                        <button type="button" class="nd-btn-tag-edit" style="flex:1; justify-content:center; padding:7px 12px;" onclick="openRenameModal('<?= htmlspecialchars(addslashes($tdata['display_tag'])) ?>', '<?= htmlspecialchars($tkey) ?>')">
+                            <i class="fa-solid fa-pen-to-square"></i> Rename Tag
+                        </button>
+                        <button type="button" class="nd-btn-tag-delete" style="padding:7px 12px;" onclick="openDeleteModal('<?= htmlspecialchars(addslashes($tdata['display_tag'])) ?>', '<?= htmlspecialchars($tkey) ?>', <?= $tdata['count'] ?>)">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Pagination Bar for Tags -->
+            <div id="tagsPagination" class="nd-pagination-bar"></div>
+        </section>
 
         <?php elseif ($active_tab === 'users'): ?>
         <!-- ========================================== -->
@@ -3332,9 +4887,545 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             </div>
         </section>
 
+        <?php elseif ($active_tab === 'leaderboard'): ?>
+        <!-- ========================================== -->
+        <!-- TAB 8: TOP 20 PLATFORM LEADERBOARD         -->
+        <!-- ========================================== -->
+        <header class="nd-topbar">
+            <div class="nd-topbar-lead">
+                <div>
+                    <h1 class="nd-page-title">Platform Leaderboard</h1>
+                    <p class="nd-page-subtitle">Top 20 most active and high-scoring platform members ranked in real-time.</p>
+                </div>
+            </div>
+            <div class="nd-topbar-tools">
+                <span class="nd-tag-pill" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">
+                    <i class="fa-solid fa-trophy"></i> Top 20 Elite Rankers
+                </span>
+                <span class="nd-tag-pill" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;">
+                    <i class="fa-solid fa-users"></i> <?= count($top20_leaderboard) ?> Total Listed
+                </span>
+            </div>
+        </header>
+
+        <?php
+        $podium_1 = $top20_leaderboard[0] ?? null;
+        $podium_2 = $top20_leaderboard[1] ?? null;
+        $podium_3 = $top20_leaderboard[2] ?? null;
+        ?>
+
+        <!-- Top 3 Podium View -->
+        <?php if (!empty($top20_leaderboard)): ?>
+        <div class="nd-podium-grid">
+            <!-- Rank 2: Silver -->
+            <?php if ($podium_2):
+                $p2_avatar = !empty($podium_2['avatar']) ? $podium_2['avatar'] : (!empty($podium_2['profile_image']) ? $podium_2['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($podium_2['email'] ?: '2'));
+                $p2_g = strtolower($podium_2['gender'] ?? '');
+            ?>
+            <div class="nd-podium-card nd-podium-2">
+                <div class="nd-podium-crown"><i class="fa-solid fa-crown" style="color:#94a3b8;"></i></div>
+                <div class="nd-podium-av-wrap">
+                    <img src="<?= htmlspecialchars($p2_avatar) ?>" alt="<?= htmlspecialchars($podium_2['username']) ?>" class="nd-podium-av" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($podium_2['username']) ?>';">
+                    <div class="nd-podium-rank-badge">2</div>
+                </div>
+                <div class="nd-podium-name" title="<?= htmlspecialchars($podium_2['username']) ?>"><?= htmlspecialchars($podium_2['username']) ?></div>
+                <div style="font-size:0.75rem; color:var(--nd-text-sec); margin-bottom:4px;">
+                    <span class="<?= $p2_g === 'male' ? 'gi-m' : ($p2_g === 'female' ? 'gi-f' : 'gi-a') ?>">
+                        <i class="fa-solid fa-<?= $p2_g === 'male' ? 'mars' : ($p2_g === 'female' ? 'venus' : 'user-astronaut') ?>"></i> <?= $p2_g ? ucfirst($p2_g) : 'Creator' ?>
+                    </span>
+                </div>
+                <div class="nd-podium-score">
+                    <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                    <span><?= number_format($podium_2['total_score']) ?></span>
+                    <span>pts</span>
+                </div>
+                <div class="nd-podium-stats">
+                    <span><i class="fa-solid fa-lock-open" style="color:#38bdf8;"></i> <?= (int)$podium_2['unlock_count'] ?> Unlocks</span>
+                    <span><i class="fa-solid fa-fire" style="color:#ea580c;"></i> <?= (int)$podium_2['streak_count'] ?>d Streak</span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Rank 1: Gold Champion -->
+            <?php if ($podium_1):
+                $p1_avatar = !empty($podium_1['avatar']) ? $podium_1['avatar'] : (!empty($podium_1['profile_image']) ? $podium_1['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($podium_1['email'] ?: '1'));
+                $p1_g = strtolower($podium_1['gender'] ?? '');
+            ?>
+            <div class="nd-podium-card nd-podium-1">
+                <div class="nd-podium-crown"><i class="fa-solid fa-crown" style="color:#f59e0b;"></i></div>
+                <div class="nd-podium-av-wrap">
+                    <img src="<?= htmlspecialchars($p1_avatar) ?>" alt="<?= htmlspecialchars($podium_1['username']) ?>" class="nd-podium-av" style="width:100%; height:100%; object-fit:cover; border-radius:50%; border-color:#fef08a;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($podium_1['username']) ?>';">
+                    <div class="nd-podium-rank-badge">1</div>
+                </div>
+                <div class="nd-podium-name" title="<?= htmlspecialchars($podium_1['username']) ?>"><?= htmlspecialchars($podium_1['username']) ?></div>
+                <div style="font-size:0.75rem; color:var(--nd-text-sec); margin-bottom:4px;">
+                    <span class="<?= $p1_g === 'male' ? 'gi-m' : ($p1_g === 'female' ? 'gi-f' : 'gi-a') ?>">
+                        <i class="fa-solid fa-<?= $p1_g === 'male' ? 'mars' : ($p1_g === 'female' ? 'venus' : 'user-astronaut') ?>"></i> <?= $p1_g ? ucfirst($p1_g) : 'Champion' ?>
+                    </span>
+                    <span class="nd-tag nd-tag-amber" style="font-size:0.6rem; padding:1px 6px; border-radius:4px; margin-left:4px;">APEX #1</span>
+                </div>
+                <div class="nd-podium-score" style="font-size:1.45rem;">
+                    <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                    <span><?= number_format($podium_1['total_score']) ?></span>
+                    <span>pts</span>
+                </div>
+                <div class="nd-podium-stats">
+                    <span><i class="fa-solid fa-lock-open" style="color:#38bdf8;"></i> <?= (int)$podium_1['unlock_count'] ?> Unlocks</span>
+                    <span><i class="fa-solid fa-fire" style="color:#ea580c;"></i> <?= (int)$podium_1['streak_count'] ?>d Streak</span>
+                    <span><i class="fa-solid fa-heart" style="color:#f43f5e;"></i> <?= (int)$podium_1['like_count'] ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Rank 3: Bronze -->
+            <?php if ($podium_3):
+                $p3_avatar = !empty($podium_3['avatar']) ? $podium_3['avatar'] : (!empty($podium_3['profile_image']) ? $podium_3['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($podium_3['email'] ?: '3'));
+                $p3_g = strtolower($podium_3['gender'] ?? '');
+            ?>
+            <div class="nd-podium-card nd-podium-3">
+                <div class="nd-podium-crown"><i class="fa-solid fa-crown" style="color:#d97706;"></i></div>
+                <div class="nd-podium-av-wrap">
+                    <img src="<?= htmlspecialchars($p3_avatar) ?>" alt="<?= htmlspecialchars($podium_3['username']) ?>" class="nd-podium-av" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($podium_3['username']) ?>';">
+                    <div class="nd-podium-rank-badge">3</div>
+                </div>
+                <div class="nd-podium-name" title="<?= htmlspecialchars($podium_3['username']) ?>"><?= htmlspecialchars($podium_3['username']) ?></div>
+                <div style="font-size:0.75rem; color:var(--nd-text-sec); margin-bottom:4px;">
+                    <span class="<?= $p3_g === 'male' ? 'gi-m' : ($p3_g === 'female' ? 'gi-f' : 'gi-a') ?>">
+                        <i class="fa-solid fa-<?= $p3_g === 'male' ? 'mars' : ($p3_g === 'female' ? 'venus' : 'user-astronaut') ?>"></i> <?= $p3_g ? ucfirst($p3_g) : 'Creator' ?>
+                    </span>
+                </div>
+                <div class="nd-podium-score">
+                    <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                    <span><?= number_format($podium_3['total_score']) ?></span>
+                    <span>pts</span>
+                </div>
+                <div class="nd-podium-stats">
+                    <span><i class="fa-solid fa-lock-open" style="color:#38bdf8;"></i> <?= (int)$podium_3['unlock_count'] ?> Unlocks</span>
+                    <span><i class="fa-solid fa-fire" style="color:#ea580c;"></i> <?= (int)$podium_3['streak_count'] ?>d Streak</span>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <!-- Full Leaderboard Table (Top 20) -->
+        <section class="nd-card" style="margin-top:20px;">
+            <div class="nd-card-head">
+                <div>
+                    <h2 class="nd-card-title"><i class="fa-solid fa-list-ol"></i> Leaderboard Standings (Top 20)</h2>
+                    <p style="font-size:0.75rem; color:var(--nd-text-muted); margin-top:2px;">Points formula: <code>(Unlocks &times; 10) + (Streak &times; 5) + (Likes &times; 2) + (Saves &times; 2)</code></p>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="nd-filter-bar">
+                <input type="text" id="leaderboardSearchInput" class="nd-search-input" placeholder="Search user by name or email..." onkeyup="filterLeaderboardTable()" autocomplete="off">
+                <select id="leaderboardSortSelect" class="nd-select-filter" onchange="sortLeaderboardTable()">
+                    <option value="score">Sort: Total Activity Score (High to Low)</option>
+                    <option value="unlocks">Sort: Total Unlocks</option>
+                    <option value="streak">Sort: Daily Streak</option>
+                    <option value="likes">Sort: Likes Given</option>
+                </select>
+            </div>
+
+            <!-- Desktop Leaderboard Table (Hidden on Mobile) -->
+            <div class="nd-table-wrap nd-desktop-only">
+                <table class="nd-table" id="leaderboardDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width:70px;">Rank</th>
+                            <th>User Profile</th>
+                            <th>Gender</th>
+                            <th style="text-align:center;">Streak</th>
+                            <th style="text-align:center;">Unlocks</th>
+                            <th style="text-align:center;">Saves</th>
+                            <th style="text-align:center;">Likes</th>
+                            <th style="text-align:right;">Total Score</th>
+                            <th class="nd-hide-sm" style="text-align:right;">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($top20_leaderboard)): ?>
+                        <tr><td colspan="9" style="text-align:center; color:var(--nd-text-muted); padding:32px 0;">No active users recorded yet.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($top20_leaderboard as $rank_idx => $u):
+                                $u_rank = $rank_idx + 1;
+                                $u_avatar = !empty($u['avatar']) ? $u['avatar'] : (!empty($u['profile_image']) ? $u['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($u['email'] ?: $u['username']));
+                                $ug = strtolower($u['gender'] ?? '');
+                                $search_blob = mb_strtolower(($u['username'] ?? '') . ' ' . ($u['email'] ?? ''));
+                            ?>
+                            <tr data-search="<?= htmlspecialchars($search_blob) ?>"
+                                data-score="<?= (int)$u['total_score'] ?>"
+                                data-unlocks="<?= (int)$u['unlock_count'] ?>"
+                                data-streak="<?= (int)$u['streak_count'] ?>"
+                                data-likes="<?= (int)$u['like_count'] ?>">
+                                <td>
+                                    <?php if ($u_rank === 1): ?>
+                                        <span class="nd-lb-rank rank-1">🥇 #1</span>
+                                    <?php elseif ($u_rank === 2): ?>
+                                        <span class="nd-lb-rank rank-2">🥈 #2</span>
+                                    <?php elseif ($u_rank === 3): ?>
+                                        <span class="nd-lb-rank rank-3">🥉 #3</span>
+                                    <?php else: ?>
+                                        <span class="nd-lb-rank">#<?= $u_rank ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <img src="<?= htmlspecialchars($u_avatar) ?>" class="nd-user-avatar-sm" style="width:38px; height:38px; min-width:38px; min-height:38px; border-radius:50%; object-fit:cover; display:block;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($u['username']) ?>';" alt="">
+                                        <div style="min-width:0;">
+                                            <div style="font-weight:800; font-size:0.86rem; color:#0f172a;"><?= htmlspecialchars($u['username']) ?></div>
+                                            <div style="font-size:0.72rem; color:var(--nd-text-muted);"><?= htmlspecialchars($u['email'] ?: 'No email') ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="<?= $ug === 'male' ? 'gi-m' : ($ug === 'female' ? 'gi-f' : 'gi-a') ?>" style="font-size:0.75rem; font-weight:700;">
+                                        <i class="fa-solid fa-<?= $ug === 'male' ? 'mars' : ($ug === 'female' ? 'venus' : 'user-astronaut') ?>"></i> <?= $ug ? ucfirst($ug) : 'Alien' ?>
+                                    </span>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span class="nd-streak-pill">
+                                        <i class="fa-solid fa-fire"></i> <?= (int)$u['streak_count'] ?>d
+                                    </span>
+                                </td>
+                                <td style="text-align:center; font-weight:700; color:#0f172a;">
+                                    <i class="fa-solid fa-lock-open" style="color:#38bdf8; font-size:0.75rem;"></i> <?= number_format($u['unlock_count']) ?>
+                                </td>
+                                <td style="text-align:center; font-weight:600; color:var(--nd-text-sec);">
+                                    <i class="fa-regular fa-bookmark" style="color:#a855f7; font-size:0.75rem;"></i> <?= number_format($u['save_count']) ?>
+                                </td>
+                                <td style="text-align:center; font-weight:600; color:var(--nd-text-sec);">
+                                    <i class="fa-regular fa-heart" style="color:#f43f5e; font-size:0.75rem;"></i> <?= number_format($u['like_count']) ?>
+                                </td>
+                                <td style="text-align:right;">
+                                    <span class="nd-score-pill">
+                                        <i class="fa-solid fa-bolt"></i> <?= number_format($u['total_score']) ?>
+                                    </span>
+                                </td>
+                                <td class="nd-hide-sm" style="text-align:right; font-size:0.75rem; color:var(--nd-text-muted);">
+                                    <?= !empty($u['created_at']) ? date('M j, Y', strtotime($u['created_at'])) : '-' ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Leaderboard Feed (Shown Only on Mobile) -->
+            <div id="leaderboardMobileCards" class="nd-mobile-only" style="flex-direction:column; gap:10px;">
+                <?php foreach ($top20_leaderboard as $rank_idx => $u):
+                    $u_rank = $rank_idx + 1;
+                    $u_avatar = !empty($u['avatar']) ? $u['avatar'] : (!empty($u['profile_image']) ? $u['profile_image'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($u['email'] ?: $u['username']));
+                    $ug = strtolower($u['gender'] ?? '');
+                    $search_blob = mb_strtolower(($u['username'] ?? '') . ' ' . ($u['email'] ?? ''));
+                ?>
+                <div class="nd-mobile-user-card"
+                     data-search="<?= htmlspecialchars($search_blob) ?>"
+                     data-score="<?= (int)$u['total_score'] ?>"
+                     data-unlocks="<?= (int)$u['unlock_count'] ?>"
+                     data-streak="<?= (int)$u['streak_count'] ?>"
+                     data-likes="<?= (int)$u['like_count'] ?>">
+                    <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+                        <?php if ($u_rank === 1): ?>
+                            <span class="nd-lb-rank rank-1" style="flex-shrink:0;">🥇 #1</span>
+                        <?php elseif ($u_rank === 2): ?>
+                            <span class="nd-lb-rank rank-2" style="flex-shrink:0;">🥈 #2</span>
+                        <?php elseif ($u_rank === 3): ?>
+                            <span class="nd-lb-rank rank-3" style="flex-shrink:0;">🥉 #3</span>
+                        <?php else: ?>
+                            <span class="nd-lb-rank" style="flex-shrink:0;">#<?= $u_rank ?></span>
+                        <?php endif; ?>
+                        <img src="<?= htmlspecialchars($u_avatar) ?>" class="nd-user-avatar-sm" style="width:38px; height:38px; min-width:38px; min-height:38px; border-radius:50%; object-fit:cover; display:block;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=<?= urlencode($u['username']) ?>';" alt="">
+                        <div style="min-width:0;">
+                            <div style="font-weight:800; font-size:0.86rem; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><?= htmlspecialchars($u['username']) ?></div>
+                            <div style="font-size:0.72rem; color:var(--nd-text-muted); display:flex; align-items:center; gap:8px; margin-top:2px;">
+                                <span><i class="fa-solid fa-lock-open" style="color:#38bdf8;"></i> <?= (int)$u['unlock_count'] ?></span>
+                                <span><i class="fa-solid fa-fire" style="color:#ea580c;"></i> <?= (int)$u['streak_count'] ?>d</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <span class="nd-score-pill"><i class="fa-solid fa-bolt"></i> <?= number_format($u['total_score']) ?></span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <?php elseif ($active_tab === 'achievements'): ?>
+        <!-- ========================================== -->
+        <!-- TAB 9: 100 GAMIFIED ACHIEVEMENTS MATRIX    -->
+        <!-- ========================================== -->
+        <header class="nd-topbar">
+            <div class="nd-topbar-lead">
+                <div>
+                    <h1 class="nd-page-title">100 Platform Achievements</h1>
+                    <p class="nd-page-subtitle">Complete milestone catalog spanning Starter, Unlocks, Streaks, Community, and Grandmaster tiers.</p>
+                </div>
+            </div>
+            <div class="nd-topbar-tools">
+                <span class="nd-tag-pill" style="background:#fae8ff; color:#a855f7; border:1px solid #f0abfc;">
+                    <i class="fa-solid fa-medal"></i> 100 Gamified Badges
+                </span>
+                <span class="nd-tag-pill" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd;">
+                    <i class="fa-solid fa-arrows-rotate"></i> Multi-Completion Enabled
+                </span>
+            </div>
+        </header>
+
+        <!-- 4 Top KPI Highlights Cards -->
+        <section class="nd-kpi-grid">
+            <div class="nd-kpi-card nd-kpi-purple">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Total Achievements</span>
+                    </div>
+                    <div class="nd-kpi-val">100</div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-award"></i> 5 Rarity Tiers across Platform
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-green">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Active / Unlocked</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= $achievements_unlocked_types ?> <span style="font-size:0.9rem; font-weight:700;">/ 100</span></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-circle-check"></i> <?= round(($achievements_unlocked_types / 100) * 100) ?>% of badges claimed
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-blue">
+                <div>
+                    <div class="nd-kpi-header">
+                        <span class="nd-kpi-dot"></span>
+                        <span>Total Completions</span>
+                    </div>
+                    <div class="nd-kpi-val"><?= number_format($achievements_total_completions) ?></div>
+                </div>
+                <div class="nd-kpi-sub">
+                    <i class="fa-solid fa-repeat"></i> Including repeat unlocks
+                </div>
+            </div>
+
+            <div class="nd-kpi-card nd-kpi-teal">
+                <div>
+                    <div class="nd-kpi-header" style="color:#d4f938;">
+                        <span class="nd-kpi-dot" style="background:#d4f938;"></span>
+                        <span>Gamified Engine</span>
+                    </div>
+                    <div class="nd-kpi-val" style="font-size:1.55rem;">Repeat 🔁 Multi</div>
+                </div>
+                <div class="nd-kpi-sub" style="color:rgba(255,255,255,0.85);">
+                    <i class="fa-solid fa-bolt"></i> Dynamic multipliers active
+                </div>
+            </div>
+        </section>
+
+        <!-- 100 Achievements Catalog Section -->
+        <section class="nd-card" style="margin-top:20px;">
+            <div class="nd-card-head">
+                <div>
+                    <h2 class="nd-card-title"><i class="fa-solid fa-cubes-stacked"></i> Achievements Catalog (100 Badges)</h2>
+                    <p style="font-size:0.75rem; color:var(--nd-text-muted); margin-top:2px;">Filter by category, rarity tier, or search badge criteria.</p>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="nd-filter-bar">
+                <input type="text" id="achievementSearchInput" class="nd-search-input" placeholder="Search 100 achievements by title, description or tier..." onkeyup="filterAchievementsGrid()" autocomplete="off">
+                <select id="achievementCatSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
+                    <option value="">Category: All (100)</option>
+                    <option value="starter">Starter &amp; Onboarding (15)</option>
+                    <option value="unlocks">Prompt Unlocks &amp; Discoveries (35)</option>
+                    <option value="streaks">Streaks &amp; Consistency (20)</option>
+                    <option value="community">Community &amp; Engagement (15)</option>
+                    <option value="mastery">Grandmaster &amp; Mastery (15)</option>
+                </select>
+                <select id="achievementTierSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
+                    <option value="">Tier: All Tiers (100)</option>
+                    <option value="bronze">Bronze Tier (30)</option>
+                    <option value="silver">Silver Tier (30)</option>
+                    <option value="gold">Gold Tier (20)</option>
+                    <option value="platinum">Platinum Tier (10)</option>
+                    <option value="diamond">Diamond Tier (5)</option>
+                    <option value="legendary">Legendary Tier (5)</option>
+                </select>
+                <select id="achievementStatusSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
+                    <option value="">Status: All Badges (100)</option>
+                    <option value="unlocked">Unlocked by Users (<?= $achievements_unlocked_types ?>)</option>
+                    <option value="locked">Currently Locked (<?= 100 - $achievements_unlocked_types ?>)</option>
+                    <option value="repeatable">Repeatable Only (18)</option>
+                </select>
+            </div>
+
+            <!-- Achievement Cards Grid (Paginated 12 per page) -->
+            <div id="achievementsCardsGrid" class="nd-achievement-grid">
+                <?php foreach ($achievements_list as $a):
+                    $tier_cls = 'tier-' . $a['tier'];
+                    $search_blob = mb_strtolower($a['title'] . ' ' . $a['desc'] . ' ' . $a['category'] . ' ' . $a['tier']);
+                    $status_val = $a['is_unlocked'] ? 'unlocked' : 'locked';
+                    $rep_val = $a['repeatable'] ? 'repeatable' : 'single';
+                ?>
+                <div class="nd-achievement-card <?= $tier_cls ?> <?= $a['is_unlocked'] ? 'is-unlocked' : '' ?>"
+                     data-search="<?= htmlspecialchars($search_blob) ?>"
+                     data-cat="<?= htmlspecialchars($a['category']) ?>"
+                     data-tier="<?= htmlspecialchars($a['tier']) ?>"
+                     data-status="<?= $status_val ?>"
+                     data-rep="<?= $rep_val ?>">
+                    <div class="nd-achievement-top">
+                        <div class="nd-achievement-icon-box">
+                            <i class="<?= htmlspecialchars($a['icon']) ?>"></i>
+                        </div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:2px;">
+                                <span class="tier-tag tier-tag-<?= htmlspecialchars($a['tier']) ?>">
+                                    <?= ucfirst($a['tier']) ?>
+                                </span>
+                                <?php if ($a['repeatable']): ?>
+                                    <span class="nd-badge-repeat" title="Can be completed multiple times">
+                                        <i class="fa-solid fa-repeat"></i> <?= $a['total_completions'] > 0 ? ($a['total_completions'] . 'x') : 'Multi' ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <h3 class="nd-achievement-title">#<?= $a['id'] ?> <?= htmlspecialchars($a['title']) ?></h3>
+                            <p class="nd-achievement-desc"><?= htmlspecialchars($a['desc']) ?></p>
+                        </div>
+                    </div>
+                    <div class="nd-achievement-foot">
+                        <div>
+                            <?php if ($a['is_unlocked']): ?>
+                                <span style="color:#15803d; font-weight:800;">
+                                    <i class="fa-solid fa-circle-check"></i> <?= $a['unlocked_users_count'] ?> User<?= $a['unlocked_users_count'] > 1 ? 's' : '' ?> Unlocked
+                                </span>
+                            <?php else: ?>
+                                <span style="color:var(--nd-text-muted);">
+                                    <i class="fa-solid fa-lock"></i> Locked
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <?php if ($a['repeatable'] && $a['total_completions'] > 0): ?>
+                                <span class="nd-badge-repeat-info">
+                                    <i class="fa-solid fa-fire"></i> <?= $a['total_completions'] ?> completions
+                                </span>
+                            <?php else: ?>
+                                <span style="color:var(--nd-text-muted); font-size:0.68rem;">
+                                    <?= $a['unlocked_pct'] ?>% of users
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Achievements Pagination Controls (12 per page) -->
+            <div id="achievementsPagination" class="nd-pagination-bar"></div>
+        </section>
+
         <?php endif; ?>
 
     </main>
+
+    <!-- ── Custom Rename Tag Modal ── -->
+    <div class="nd-modal-overlay" id="ndTagRenameModal" onclick="closeNdModal(event, 'ndTagRenameModal')">
+        <div class="nd-modal-box" onclick="event.stopPropagation()">
+            <div class="nd-modal-head">
+                <div class="nd-modal-title">
+                    <i class="fa-solid fa-pen-to-square" style="color:#a855f7;"></i>
+                    <span>Rename Tag</span>
+                </div>
+                <button type="button" class="nd-modal-close" onclick="closeNdModalDirect('ndTagRenameModal')" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="nd-modal-sub">
+                Renaming will instantly update this tag across all assigned platform prompts.
+            </div>
+            <div class="nd-modal-input-wrap">
+                <label class="nd-modal-label" for="ndCustomTagInput">Tag Name</label>
+                <input type="text" id="ndCustomTagInput" class="nd-modal-input" placeholder="Enter new tag name..." autocomplete="off">
+                <input type="hidden" id="ndOldTagHidden" value="">
+                <input type="hidden" id="ndTagKeyHidden" value="">
+            </div>
+            <div class="nd-modal-foot">
+                <button type="button" class="nd-modal-btn-cancel" onclick="closeNdModalDirect('ndTagRenameModal')">Cancel</button>
+                <button type="button" class="nd-modal-btn-primary" id="ndBtnSubmitRename" onclick="submitCustomTagRename()">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Custom Delete Tag Confirmation Modal ── -->
+    <div class="nd-modal-overlay" id="ndTagDeleteModal" onclick="closeNdModal(event, 'ndTagDeleteModal')">
+        <div class="nd-modal-box" onclick="event.stopPropagation()">
+            <div class="nd-modal-head">
+                <div class="nd-modal-title" style="color:#f43f5e;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:#f43f5e;"></i>
+                    <span>Delete Tag</span>
+                </div>
+                <button type="button" class="nd-modal-close" onclick="closeNdModalDirect('ndTagDeleteModal')" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="nd-modal-sub" id="ndDeleteModalSubText">
+                Are you sure you want to permanently delete this tag? It will be removed from all linked prompts.
+            </div>
+            <input type="hidden" id="ndDeleteTagNameHidden" value="">
+            <input type="hidden" id="ndDeleteTagKeyHidden" value="">
+            <div class="nd-modal-foot">
+                <button type="button" class="nd-modal-btn-cancel" onclick="closeNdModalDirect('ndTagDeleteModal')">Cancel</button>
+                <button type="button" class="nd-modal-btn-danger" id="ndBtnSubmitDelete" onclick="submitCustomTagDelete()">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Delete Permanently</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Custom Tag Prompts Viewer Modal ── -->
+    <div class="nd-modal-overlay" id="ndTagPromptsViewerModal" onclick="closeNdModal(event, 'ndTagPromptsViewerModal')">
+        <div class="nd-modal-box" style="max-width:540px;" onclick="event.stopPropagation()">
+            <div class="nd-modal-head">
+                <div class="nd-modal-title">
+                    <i class="fa-solid fa-layer-group" style="color:#38bdf8;"></i>
+                    <span>Linked Prompts: <span id="ndViewerTagName" style="color:#d4f938;">#tag</span></span>
+                </div>
+                <button type="button" class="nd-modal-close" onclick="closeNdModalDirect('ndTagPromptsViewerModal')" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="nd-modal-sub" id="ndViewerSubtitle">
+                Showing all prompts currently carrying this tag:
+            </div>
+            <div style="margin-bottom:14px;">
+                <input type="text" id="ndViewerSearchInput" class="nd-modal-input" placeholder="Quick search within these prompts..." onkeyup="filterViewerPrompts()" autocomplete="off">
+            </div>
+            <div id="ndViewerPromptsGrid" style="max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
+                <!-- Rendered dynamically by JS -->
+            </div>
+            <!-- Modal Internal Pagination -->
+            <div id="ndViewerPagination" class="nd-modal-pagination"></div>
+
+            <div class="nd-modal-foot" style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+                <button type="button" class="nd-modal-btn-cancel" onclick="closeNdModalDirect('ndTagPromptsViewerModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Custom Floating Toast Container ── -->
+    <div class="nd-toast-wrap" id="ndToastWrap"></div>
 
     <!-- ── Interactive JavaScript Charts & Live Table Filters ── -->
     <script>
@@ -3433,29 +5524,65 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         });
     }
 
-    // --- 3. Live Client-Side Filtering for Prompts Table & Cards -----------
-    function filterPromptsTable() {
+    // --- 3. Live Client-Side Filtering & Pagination for Prompts Table & Cards (12 per page) -----------
+    let currentPromptsPage = 1;
+    const PROMPTS_PAGE_SIZE = 12;
+
+    function filterPromptsTable(resetPage = true) {
+        if (resetPage) currentPromptsPage = 1;
         const query = (document.getElementById('promptSearchInput')?.value || '').toLowerCase().trim();
         const typeFilter = (document.getElementById('promptTypeFilter')?.value || '').toLowerCase().trim();
         
         // Filter desktop table rows
-        const rows = document.querySelectorAll('#promptsDataTable tbody tr');
+        const rows = Array.from(document.querySelectorAll('#promptsDataTable tbody tr'));
+        const matchingRows = [];
         rows.forEach(row => {
             const title = row.getAttribute('data-title') || '';
             const type = row.getAttribute('data-type') || '';
             const matchesQuery = query === '' || title.includes(query);
             const matchesType = typeFilter === '' || type === typeFilter;
-            row.style.display = (matchesQuery && matchesType) ? '' : 'none';
+            if (matchesQuery && matchesType) {
+                matchingRows.push(row);
+            } else {
+                row.style.display = 'none';
+            }
         });
 
         // Filter mobile feed cards
-        const cards = document.querySelectorAll('#promptsMobileCards .nd-mobile-prompt-card');
+        const cards = Array.from(document.querySelectorAll('#promptsMobileCards .nd-mobile-prompt-card'));
+        const matchingCards = [];
         cards.forEach(card => {
             const title = card.getAttribute('data-title') || '';
             const type = card.getAttribute('data-type') || '';
             const matchesQuery = query === '' || title.includes(query);
             const matchesType = typeFilter === '' || type === typeFilter;
-            card.style.display = (matchesQuery && matchesType) ? '' : 'none';
+            if (matchesQuery && matchesType) {
+                matchingCards.push(card);
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const totalItems = Math.max(matchingRows.length, matchingCards.length);
+        const totalPages = Math.ceil(totalItems / PROMPTS_PAGE_SIZE) || 1;
+        if (currentPromptsPage > totalPages) currentPromptsPage = totalPages;
+        if (currentPromptsPage < 1) currentPromptsPage = 1;
+
+        const startIdx = (currentPromptsPage - 1) * PROMPTS_PAGE_SIZE;
+        const endIdx = startIdx + PROMPTS_PAGE_SIZE;
+
+        matchingRows.forEach((row, idx) => {
+            row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        matchingCards.forEach((card, idx) => {
+            card.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        renderPaginationControls('promptsPagination', totalItems, currentPromptsPage, totalPages, (newPage) => {
+            currentPromptsPage = newPage;
+            filterPromptsTable(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 
@@ -3485,6 +5612,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             });
             cards.forEach(card => cardsWrap.appendChild(card));
         }
+
+        filterPromptsTable(true);
     }
 
     // --- 4. Live Filtering for Blogs Table & Cards ---------------------------
@@ -3525,14 +5654,19 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         });
     }
 
-    // --- 6. Live Filtering for SEO Table -----------------------------------
-    function filterSeoTable() {
+    // --- 6. Pagination & Filtering for SEO Table (12 per page) -------------
+    let currentSeoPage = 1;
+    const SEO_PAGE_SIZE = 12;
+
+    function filterSeoTable(resetPage = true) {
+        if (resetPage) currentSeoPage = 1;
         const query = (document.getElementById('seoSearchInput')?.value || '').toLowerCase().trim();
         const status = document.getElementById('seoStatusFilter')?.value || '';
         const bwi = document.getElementById('seoBwiFilter')?.value || '';
         const type = document.getElementById('seoTypeFilter')?.value || '';
-        const rows = document.querySelectorAll('#seoDataTable tbody tr');
+        const rows = Array.from(document.querySelectorAll('#seoDataTable tbody tr'));
 
+        const matchingRows = [];
         rows.forEach(row => {
             const title = row.getAttribute('data-title') || '';
             const rowStatus = row.getAttribute('data-status') || '';
@@ -3544,7 +5678,28 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             const matchesBwi = (bwi === '' || rowBwi === bwi);
             const matchesType = (type === '' || rowType === type);
 
-            row.style.display = (matchesQuery && matchesStatus && matchesBwi && matchesType) ? '' : 'none';
+            if (matchesQuery && matchesStatus && matchesBwi && matchesType) {
+                matchingRows.push(row);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const totalItems = matchingRows.length;
+        const totalPages = Math.ceil(totalItems / SEO_PAGE_SIZE) || 1;
+        if (currentSeoPage > totalPages) currentSeoPage = totalPages;
+        if (currentSeoPage < 1) currentSeoPage = 1;
+
+        const startIdx = (currentSeoPage - 1) * SEO_PAGE_SIZE;
+        const endIdx = startIdx + SEO_PAGE_SIZE;
+
+        matchingRows.forEach((row, idx) => {
+            row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        renderPaginationControls('seoPagination', totalItems, currentSeoPage, totalPages, (newPage) => {
+            currentSeoPage = newPage;
+            filterSeoTable(false);
         });
     }
 
@@ -3566,6 +5721,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         });
 
         rows.forEach(row => tbody.appendChild(row));
+        filterSeoTable(false);
     }
 
     // --- 8. Copy Prompt URL to Clipboard ----------------------------------
@@ -3599,20 +5755,21 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         }
     }
 
-    // --- 9. Mark GSC Status (Already Indexed / I Indexed Now) -------------
-    async function markGscStatus(promptId, status, btn) {
+    // --- 9. Mark GSC Status (Dynamic Multi-stage 4-Day Timer & N-th Retry) -------------
+    async function markGscStatus(promptId, status, attempt, btn) {
         if (!promptId || !status) return;
         const cell = document.getElementById('gsc-action-cell-' + promptId);
         if (!cell) return;
 
         const originalBtnHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
         try {
             const fd = new FormData();
             fd.append('prompt_id', promptId);
             fd.append('status', status);
+            if (attempt) fd.append('attempt', attempt);
 
             const res = await fetch('update_gsc_status.php', {
                 method: 'POST',
@@ -3620,46 +5777,94 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             }).then(r => r.json());
 
             if (res.success) {
-                const isAlready = (res.status === 'already_indexed');
-                const badgeClass = isAlready ? 'nd-gsc-badge-already' : 'nd-gsc-badge-now';
-                const badgeFull = isAlready ? 'Already Indexed' : 'Requested Indexing';
-                const badgeShort = isAlready ? 'Indexed' : 'Requested';
                 const dateFormatted = res.indexed_at_formatted || 'Just now';
+                const curAtt = parseInt(res.attempt, 10) || 1;
+                const ord = res.ordinal || (curAtt + 'th');
 
-                cell.innerHTML = `
-                    <div class="nd-gsc-locked-wrap">
-                        <span class="${badgeClass}">
-                            <i class="${badgeIcon}"></i>
-                            <span class="nd-gsc-label-full">${badgeFull}</span>
-                            <span class="nd-gsc-label-short">${badgeShort}</span>
-                        </span>
-                        <div class="nd-gsc-timestamp">
-                            <i class="fa-regular fa-calendar-check"></i> ${dateFormatted}
+                if (res.status.startsWith('already_indexed')) {
+                    const isMulti = curAtt > 1;
+                    const badgeClass = isMulti ? 'nd-gsc-badge-already nd-gsc-badge-2nd-indexed' : 'nd-gsc-badge-already';
+                    const iconStyle = isMulti ? 'style="color:#059669;"' : '';
+                    const fullLabel = isMulti ? `Indexed (${ord} Try)` : 'Already Indexed';
+                    const shortLabel = isMulti ? `${ord} Try` : 'Indexed';
+
+                    cell.innerHTML = `
+                        <div class="nd-gsc-locked-wrap">
+                            <span class="${badgeClass}">
+                                <i class="fa-solid fa-circle-check" ${iconStyle}></i>
+                                <span class="nd-gsc-label-full">${fullLabel}</span>
+                                <span class="nd-gsc-label-short">${shortLabel}</span>
+                            </span>
+                            <div class="nd-gsc-timestamp">
+                                <i class="fa-regular fa-calendar-check"></i> ${dateFormatted}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else if (res.is_verify_mode === true) {
+                    const promptQ = curAtt > 1 ? `${ord} Try: Is it indexed?` : '4d passed: Is it indexed?';
+                    const idxAction = `already_indexed_${curAtt}`;
+                    const idxLabel = curAtt > 1 ? `Indexed (${ord} Try)` : 'Indexed';
+                    cell.innerHTML = `
+                        <div class="nd-gsc-verify-box">
+                            <div class="nd-gsc-verify-label">
+                                <i class="fa-solid fa-circle-question" style="color:#f59e0b;"></i> ${promptQ}
+                            </div>
+                            <div class="nd-gsc-verify-actions">
+                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus(${promptId}, '${idxAction}', ${curAtt}, this)" title="Yes, page is indexed">
+                                    <i class="fa-solid fa-check"></i> ${idxLabel}
+                                </button>
+                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus(${promptId}, 'retry_needed', ${curAtt}, this)" title="No, page is not indexed -> move to next try">
+                                    <i class="fa-solid fa-xmark"></i> Not Indexed
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (res.status.startsWith('indexed_now')) {
+                    const isMulti = curAtt > 1;
+                    const reqTag = isMulti ? `${ord} Try` : 'Requested';
+                    const reqBg = isMulti ? 'background:#fce7f3; color:#be185d; border-color:#fbcfe8;' : '';
+                    cell.innerHTML = `
+                        <div class="nd-gsc-status-block">
+                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+                                <span class="nd-gsc-badge-now" style="${reqBg}" title="${reqTag} on ${dateFormatted}">
+                                    <i class="fa-solid fa-rocket"></i>
+                                    <span>${reqTag}</span>
+                                </span>
+                                <span class="nd-gsc-badge-timer" title="4-day verification countdown">
+                                    <i class="fa-regular fa-clock"></i> Check in 4d left
+                                </span>
+                            </div>
+                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
+                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus(${promptId}, 'trigger_verify', ${curAtt}, this)" title="Check now without waiting 4 days">
+                                    <i class="fa-solid fa-clipboard-check"></i> Verify Early
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (res.status.startsWith('retry_needed')) {
+                    cell.innerHTML = `
+                        <div class="nd-gsc-status-block">
+                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+                                <span class="nd-gsc-badge-retry">
+                                    <i class="fa-solid fa-rotate-right"></i> ${ord} Try
+                                </span>
+                                <span class="nd-gsc-badge-timer nd-gsc-timer-amber" title="Wait 24h before re-submitting in GSC">
+                                    <i class="fa-regular fa-clock"></i> Wait 24h left
+                                </span>
+                            </div>
+                            <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
+                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus(${promptId}, 'indexed_now', ${curAtt}, this)">
+                                    <i class="fa-solid fa-paper-plane"></i> Re-Index Now
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
 
-                // Update row data-status
+                // Update row data-status attribute for filter
                 const row = document.getElementById('gsc-row-' + promptId);
                 if (row) {
                     row.setAttribute('data-status', res.status);
-                }
-
-                // Dynamically update counter KPI badges if present
-                const pendingEl = document.getElementById('gscPendingVal');
-                const alreadyEl = document.getElementById('gscAlreadyVal');
-                const nowEl = document.getElementById('gscNowVal');
-                
-                if (pendingEl) {
-                    let pVal = parseInt(pendingEl.textContent, 10) || 0;
-                    if (pVal > 0) pendingEl.innerHTML = (pVal - 1) + '<span class="nd-seo-kpi-total">/<?= (int)$seo_total_count ?></span>';
-                }
-                if (isAlready && alreadyEl) {
-                    let aVal = parseInt(alreadyEl.textContent, 10) || 0;
-                    alreadyEl.innerHTML = (aVal + 1) + '<span class="nd-seo-kpi-total">/<?= (int)$seo_total_count ?></span>';
-                } else if (!isAlready && nowEl) {
-                    let nVal = parseInt(nowEl.textContent, 10) || 0;
-                    nowEl.innerHTML = (nVal + 1) + '<span class="nd-seo-kpi-total">/<?= (int)$seo_total_count ?></span>';
                 }
             } else {
                 alert(res.message || 'Could not update GSC status.');
@@ -3673,13 +5878,18 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         }
     }
 
-    // --- 10. Live Filtering for GSC Table ----------------------------------
-    function filterGscTable() {
+    // --- 10. Pagination & Filtering for GSC Table (12 per page) -------------
+    let currentGscPage = 1;
+    const GSC_PAGE_SIZE = 12;
+
+    function filterGscTable(resetPage = true) {
+        if (resetPage) currentGscPage = 1;
         const query = (document.getElementById('gscSearchInput')?.value || '').toLowerCase().trim();
         const status = document.getElementById('gscStatusFilter')?.value || '';
         const type = document.getElementById('gscTypeFilter')?.value || '';
-        const rows = document.querySelectorAll('#gscDataTable tbody tr');
+        const rows = Array.from(document.querySelectorAll('#gscDataTable tbody tr'));
 
+        const matchingRows = [];
         rows.forEach(row => {
             const title = row.getAttribute('data-title') || '';
             const rowStatus = row.getAttribute('data-status') || '';
@@ -3689,9 +5899,593 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             const matchesStatus = (status === '' || rowStatus === status);
             const matchesType = (type === '' || rowType === type);
 
-            row.style.display = (matchesQuery && matchesStatus && matchesType) ? '' : 'none';
+            if (matchesQuery && matchesStatus && matchesType) {
+                matchingRows.push(row);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const totalItems = matchingRows.length;
+        const totalPages = Math.ceil(totalItems / GSC_PAGE_SIZE) || 1;
+        if (currentGscPage > totalPages) currentGscPage = totalPages;
+        if (currentGscPage < 1) currentGscPage = 1;
+
+        const startIdx = (currentGscPage - 1) * GSC_PAGE_SIZE;
+        const endIdx = startIdx + GSC_PAGE_SIZE;
+
+        matchingRows.forEach((row, idx) => {
+            row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        renderPaginationControls('gscPagination', totalItems, currentGscPage, totalPages, (newPage) => {
+            currentGscPage = newPage;
+            filterGscTable(false);
         });
     }
+
+    // --- 11. Tags Intelligence & Global Manager Pagination (10 per page) -----
+    let currentTagsPage = 1;
+    const TAGS_PAGE_SIZE = 10;
+
+    function filterTagsTable(resetPage = true) {
+        if (resetPage) currentTagsPage = 1;
+        const query = (document.getElementById('tagSearchInput')?.value || '').toLowerCase().trim();
+        const usageFilter = document.getElementById('tagUsageFilter')?.value || '';
+
+        // Desktop table rows
+        const rows = Array.from(document.querySelectorAll('#tagsDataTable tbody tr'));
+        const matchingRows = [];
+        rows.forEach(row => {
+            const searchData = row.getAttribute('data-search') || '';
+            const usageData = row.getAttribute('data-usage') || '';
+            const matchesQuery = query === '' || searchData.includes(query);
+            const matchesUsage = usageFilter === '' || usageData === usageFilter;
+            if (matchesQuery && matchesUsage) {
+                matchingRows.push(row);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Mobile cards
+        const cards = Array.from(document.querySelectorAll('#tagsMobileCards .nd-mobile-tag-card'));
+        const matchingCards = [];
+        cards.forEach(card => {
+            const searchData = card.getAttribute('data-search') || '';
+            const usageData = card.getAttribute('data-usage') || '';
+            const matchesQuery = query === '' || searchData.includes(query);
+            const matchesUsage = usageFilter === '' || usageData === usageFilter;
+            if (matchesQuery && matchesUsage) {
+                matchingCards.push(card);
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const totalItems = Math.max(matchingRows.length, matchingCards.length);
+        const totalPages = Math.ceil(totalItems / TAGS_PAGE_SIZE) || 1;
+        if (currentTagsPage > totalPages) currentTagsPage = totalPages;
+        if (currentTagsPage < 1) currentTagsPage = 1;
+
+        const startIdx = (currentTagsPage - 1) * TAGS_PAGE_SIZE;
+        const endIdx = startIdx + TAGS_PAGE_SIZE;
+
+        matchingRows.forEach((row, idx) => {
+            row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        matchingCards.forEach((card, idx) => {
+            card.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+        });
+
+        renderPaginationControls('tagsPagination', totalItems, currentTagsPage, totalPages, (newPage) => {
+            currentTagsPage = newPage;
+            filterTagsTable(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, TAGS_PAGE_SIZE);
+    }
+
+    function sortTagsTable() {
+        const sortBy = document.getElementById('tagSortFilter')?.value || 'prompts';
+        
+        // Sort desktop table
+        const tbody = document.querySelector('#tagsDataTable tbody');
+        if (tbody) {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                if (sortBy === 'alpha') {
+                    return (a.getAttribute('data-tag') || '').localeCompare(b.getAttribute('data-tag') || '');
+                }
+                let valA = parseInt(a.getAttribute('data-' + sortBy) || 0, 10);
+                let valB = parseInt(b.getAttribute('data-' + sortBy) || 0, 10);
+                return valB - valA;
+            });
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Sort mobile feed cards
+        const cardsWrap = document.getElementById('tagsMobileCards');
+        if (cardsWrap) {
+            const cards = Array.from(cardsWrap.querySelectorAll('.nd-mobile-tag-card'));
+            cards.sort((a, b) => {
+                if (sortBy === 'alpha') {
+                    return (a.getAttribute('data-tag') || '').localeCompare(b.getAttribute('data-tag') || '');
+                }
+                let valA = parseInt(a.getAttribute('data-' + sortBy) || 0, 10);
+                let valB = parseInt(b.getAttribute('data-' + sortBy) || 0, 10);
+                return valB - valA;
+            });
+            cards.forEach(card => cardsWrap.appendChild(card));
+        }
+
+        filterTagsTable(true);
+    }
+
+    // --- 12. Custom Modals & Floating Toast System ----------------------------
+    const tagsMapData = <?= !empty($tags_map) ? json_encode($tags_map) : '{}' ?>;
+    let activeViewerTagKey = null;
+    let currentModalPrompts = [];
+    let currentModalPage = 1;
+    const MODAL_PROMPTS_PAGE_SIZE = 5;
+
+    function openTagPromptsViewer(tagKey) {
+        activeViewerTagKey = tagKey;
+        const tagData = tagsMapData[tagKey];
+        if (!tagData) return;
+
+        document.getElementById('ndViewerTagName').textContent = '#' + tagData.display_tag;
+        document.getElementById('ndViewerSubtitle').textContent = `Total ${tagData.count} prompt(s) currently tagged with #${tagData.display_tag}:`;
+        const searchInp = document.getElementById('ndViewerSearchInput');
+        if (searchInp) searchInp.value = '';
+
+        currentModalPrompts = tagData.prompts || [];
+        currentModalPage = 1;
+        renderViewerPromptsPage();
+
+        const modal = document.getElementById('ndTagPromptsViewerModal');
+        if (modal) modal.classList.add('is-active');
+    }
+
+    function filterViewerPrompts() {
+        if (!activeViewerTagKey || !tagsMapData[activeViewerTagKey]) return;
+        const q = (document.getElementById('ndViewerSearchInput')?.value || '').toLowerCase().trim();
+        const allPrompts = tagsMapData[activeViewerTagKey].prompts || [];
+        currentModalPrompts = allPrompts.filter(p => (p.title || '').toLowerCase().includes(q));
+        currentModalPage = 1;
+        renderViewerPromptsPage();
+    }
+
+    function renderViewerPromptsPage() {
+        const grid = document.getElementById('ndViewerPromptsGrid');
+        const pagWrap = document.getElementById('ndViewerPagination');
+        if (!grid) return;
+
+        const totalItems = currentModalPrompts.length;
+        if (totalItems === 0) {
+            grid.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:28px 0; font-size:0.82rem;">No matching prompts found.</div>`;
+            if (pagWrap) pagWrap.innerHTML = '';
+            return;
+        }
+
+        const totalPages = Math.ceil(totalItems / MODAL_PROMPTS_PAGE_SIZE) || 1;
+        if (currentModalPage > totalPages) currentModalPage = totalPages;
+        if (currentModalPage < 1) currentModalPage = 1;
+
+        const startIdx = (currentModalPage - 1) * MODAL_PROMPTS_PAGE_SIZE;
+        const endIdx = startIdx + MODAL_PROMPTS_PAGE_SIZE;
+        const pagePrompts = currentModalPrompts.slice(startIdx, endIdx);
+
+        let html = '';
+        pagePrompts.forEach(p => {
+            const thumbHtml = p.image_path ? `<img src="${p.image_path}" class="nd-viewer-thumb" alt="">` : `<div class="nd-viewer-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;color:#94a3b8;background:rgba(255,255,255,0.06);">AI</div>`;
+            
+            let typeBadgeCls = 'nd-tag-sky';
+            let typeName = 'Already Uploaded';
+            if (p.prompt_type === 'insta_viral') { typeBadgeCls = 'nd-tag-pink'; typeName = 'Insta Viral'; }
+            else if (p.prompt_type === 'unreleased') { typeBadgeCls = 'nd-tag-amber'; typeName = 'Unreleased'; }
+            else if (p.prompt_type === 'secret') { typeBadgeCls = 'nd-tag-violet'; typeName = 'Secret'; }
+            else if (p.prompt_type === 'solo') { typeBadgeCls = 'nd-tag-emerald'; typeName = 'Solo'; }
+            else if (p.prompt_type === 'direct') { typeBadgeCls = 'nd-tag-sky'; typeName = 'Direct'; }
+
+            const promptUrl = p.slug ? ('prompts/' + encodeURIComponent(p.slug)) : ('prompt.php?id=' + p.id);
+
+            html += `
+                <div class="nd-viewer-prompt-item" data-title="${(p.title || '').toLowerCase()}">
+                    <a href="${promptUrl}" target="_blank" title="View prompt public page" style="display:flex; flex-shrink:0;">
+                        ${thumbHtml}
+                    </a>
+                    <div style="min-width:0; flex:1;">
+                        <div>
+                            <a href="${promptUrl}" target="_blank" class="nd-viewer-title-link" title="${p.title || ''}">
+                                <span>${p.title || 'Untitled'}</span>
+                            </a>
+                        </div>
+                        <div class="nd-viewer-meta">
+                            <span class="nd-tag ${typeBadgeCls}" style="font-size:0.6rem; padding:1px 6px; border-radius:4px; font-weight:700;">${typeName}</span>
+                            <span><i class="fa-regular fa-eye"></i> ${(p.views || 0).toLocaleString()} views</span>
+                            <span style="color:#f43f5e;"><i class="fa-regular fa-heart"></i> ${(p.likes || 0).toLocaleString()}</span>
+                            <span style="color:#34d399; font-weight:700;"><i class="fa-solid fa-lock-open"></i> ${(p.unlocks || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                        <a href="${promptUrl}" target="_blank" class="nd-viewer-btn-action" title="Open prompt public page in new tab">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>View</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+
+        // Render Modal Pagination Controls
+        if (pagWrap) {
+            const startItem = startIdx + 1;
+            const endItem = Math.min(endIdx, totalItems);
+            let pagHtml = `<div>Showing <strong style="color:#ffffff;">${startItem}&ndash;${endItem}</strong> of <strong style="color:#ffffff;">${totalItems}</strong></div>`;
+            if (totalPages > 1) {
+                pagHtml += `<div style="display:flex; align-items:center; gap:4px;">`;
+                pagHtml += `<button type="button" class="nd-modal-page-btn" ${currentModalPage === 1 ? 'disabled' : ''} onclick="changeModalPage(${currentModalPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+                for (let p = 1; p <= totalPages; p++) {
+                    pagHtml += `<button type="button" class="nd-modal-page-btn ${p === currentModalPage ? 'active' : ''}" onclick="changeModalPage(${p})">${p}</button>`;
+                }
+                pagHtml += `<button type="button" class="nd-modal-page-btn" ${currentModalPage === totalPages ? 'disabled' : ''} onclick="changeModalPage(${currentModalPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+                pagHtml += `</div>`;
+            }
+            pagWrap.innerHTML = pagHtml;
+        }
+    }
+
+    function changeModalPage(newPage) {
+        currentModalPage = newPage;
+        renderViewerPromptsPage();
+    }
+
+    function showNdToast(message, type = 'success') {
+        const wrap = document.getElementById('ndToastWrap');
+        if (!wrap) return;
+
+        const toast = document.createElement('div');
+        toast.className = `nd-toast-item toast-${type}`;
+        const icon = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+        toast.innerHTML = `<i class="${icon}"></i><span>${message}</span>`;
+        wrap.appendChild(toast);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            toast.classList.add('is-visible');
+        });
+
+        // Remove after 3.5s
+        setTimeout(() => {
+            toast.classList.remove('is-visible');
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    function openRenameModal(oldTag, tagKey) {
+        document.getElementById('ndOldTagHidden').value = oldTag;
+        document.getElementById('ndTagKeyHidden').value = tagKey;
+        const input = document.getElementById('ndCustomTagInput');
+        input.value = oldTag;
+        const modal = document.getElementById('ndTagRenameModal');
+        modal.classList.add('is-active');
+        setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 80);
+    }
+
+    function openDeleteModal(tagName, tagKey, count) {
+        document.getElementById('ndDeleteTagNameHidden').value = tagName;
+        document.getElementById('ndDeleteTagKeyHidden').value = tagKey;
+        const sub = document.getElementById('ndDeleteModalSubText');
+        if (sub) {
+            sub.innerHTML = `Are you sure you want to permanently delete the tag <strong style="color:#ffffff;">#${tagName}</strong>? It will be removed from all <strong style="color:#ffffff;">${count}</strong> linked prompt(s).`;
+        }
+        const modal = document.getElementById('ndTagDeleteModal');
+        modal.classList.add('is-active');
+    }
+
+    function closeNdModal(e, modalId) {
+        if (e.target.classList.contains('nd-modal-overlay')) {
+            closeNdModalDirect(modalId);
+        }
+    }
+
+    function closeNdModalDirect(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('is-active');
+    }
+
+    // Enter key submit in rename input
+    document.addEventListener('DOMContentLoaded', () => {
+        const renameInp = document.getElementById('ndCustomTagInput');
+        if (renameInp) {
+            renameInp.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitCustomTagRename();
+                }
+            });
+        }
+    });
+
+    async function submitCustomTagRename() {
+        const oldTag = document.getElementById('ndOldTagHidden').value.trim();
+        const tagKey = document.getElementById('ndTagKeyHidden').value.trim();
+        const newTag = document.getElementById('ndCustomTagInput').value.trim();
+        const btn = document.getElementById('ndBtnSubmitRename');
+
+        if (!newTag) {
+            showNdToast('Tag name cannot be empty.', 'error');
+            return;
+        }
+        if (newTag === oldTag) {
+            closeNdModalDirect('ndTagRenameModal');
+            return;
+        }
+
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'rename_tag');
+            formData.append('old_tag', oldTag);
+            formData.append('new_tag', newTag);
+
+            const res = await fetch('update_tag.php', {
+                method: 'POST',
+                body: formData
+            }).then(r => r.json());
+
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+
+            if (res.success) {
+                closeNdModalDirect('ndTagRenameModal');
+                showNdToast(res.message, 'success');
+                // Dynamically update tag badge in DOM
+                const badge = document.getElementById('tag-badge-' + tagKey);
+                if (badge) {
+                    const span = badge.querySelector('.nd-tag-text');
+                    if (span) span.textContent = res.new_tag;
+                }
+                const mobBadge = document.getElementById('mob-tag-badge-' + tagKey);
+                if (mobBadge) {
+                    const span = mobBadge.querySelector('.nd-tag-text');
+                    if (span) span.textContent = res.new_tag;
+                }
+                // Reload smoothly to sync filters and full lists
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                showNdToast(res.message || 'Error renaming tag.', 'error');
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+            showNdToast('Network error while renaming tag.', 'error');
+        }
+    }
+
+    async function submitCustomTagDelete() {
+        const tagName = document.getElementById('ndDeleteTagNameHidden').value.trim();
+        const tagKey = document.getElementById('ndDeleteTagKeyHidden').value.trim();
+        const btn = document.getElementById('ndBtnSubmitDelete');
+
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_tag');
+            formData.append('tag_name', tagName);
+
+            const res = await fetch('update_tag.php', {
+                method: 'POST',
+                body: formData
+            }).then(r => r.json());
+
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+
+            if (res.success) {
+                closeNdModalDirect('ndTagDeleteModal');
+                showNdToast(res.message, 'success');
+                const row = document.getElementById('tag-row-' + tagKey);
+                if (row) {
+                    row.style.transition = 'all 0.3s ease';
+                    row.style.opacity = '0';
+                    row.style.transform = 'scale(0.95)';
+                    setTimeout(() => row.remove(), 300);
+                }
+                const mobCard = document.getElementById('mob-tag-row-' + tagKey);
+                if (mobCard) {
+                    mobCard.style.transition = 'all 0.3s ease';
+                    mobCard.style.opacity = '0';
+                    setTimeout(() => mobCard.remove(), 300);
+                }
+                setTimeout(() => filterTagsTable(false), 350);
+            } else {
+                showNdToast(res.message || 'Error deleting tag.', 'error');
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+            showNdToast('Network error while deleting tag.', 'error');
+        }
+    }
+
+    // --- 13. Leaderboard Filtering & Sorting ----------------------------------
+    function filterLeaderboardTable() {
+        const query = (document.getElementById('leaderboardSearchInput')?.value || '').toLowerCase().trim();
+        const rows = Array.from(document.querySelectorAll('#leaderboardDataTable tbody tr'));
+        rows.forEach(row => {
+            const searchData = row.getAttribute('data-search') || '';
+            row.style.display = (query === '' || searchData.includes(query)) ? '' : 'none';
+        });
+
+        const cards = Array.from(document.querySelectorAll('#leaderboardMobileCards .nd-mobile-user-card'));
+        cards.forEach(card => {
+            const searchData = card.getAttribute('data-search') || '';
+            card.style.display = (query === '' || searchData.includes(query)) ? 'flex' : 'none';
+        });
+    }
+
+    function sortLeaderboardTable() {
+        const sortBy = document.getElementById('leaderboardSortSelect')?.value || 'score';
+        
+        // Sort desktop table
+        const tbody = document.querySelector('#leaderboardDataTable tbody');
+        if (tbody) {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                let valA = parseInt(a.getAttribute('data-' + sortBy) || 0, 10);
+                let valB = parseInt(b.getAttribute('data-' + sortBy) || 0, 10);
+                return valB - valA;
+            });
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Sort mobile cards
+        const cardsWrap = document.getElementById('leaderboardMobileCards');
+        if (cardsWrap) {
+            const cards = Array.from(cardsWrap.querySelectorAll('.nd-mobile-user-card'));
+            cards.sort((a, b) => {
+                let valA = parseInt(a.getAttribute('data-' + sortBy) || 0, 10);
+                let valB = parseInt(b.getAttribute('data-' + sortBy) || 0, 10);
+                return valB - valA;
+            });
+            cards.forEach(card => cardsWrap.appendChild(card));
+        }
+
+        filterLeaderboardTable();
+    }
+
+    // --- 14. 100 Gamified Achievements Filtering & Pagination ----------------
+    let currentAchievementsPage = 1;
+    const ACHIEVEMENTS_PAGE_SIZE = 12;
+
+    function filterAchievementsGrid(resetPage = true) {
+        if (resetPage) currentAchievementsPage = 1;
+        const q = (document.getElementById('achievementSearchInput')?.value || '').toLowerCase().trim();
+        const catFilter = document.getElementById('achievementCatSelect')?.value || '';
+        const tierFilter = document.getElementById('achievementTierSelect')?.value || '';
+        const statusFilter = document.getElementById('achievementStatusSelect')?.value || '';
+
+        const cards = Array.from(document.querySelectorAll('#achievementsCardsGrid .nd-achievement-card'));
+        const matchingCards = [];
+
+        cards.forEach(card => {
+            const searchData = card.getAttribute('data-search') || '';
+            const catData = card.getAttribute('data-cat') || '';
+            const tierData = card.getAttribute('data-tier') || '';
+            const statusData = card.getAttribute('data-status') || '';
+            const repData = card.getAttribute('data-rep') || '';
+
+            const matchesQuery = q === '' || searchData.includes(q);
+            const matchesCat = catFilter === '' || catData === catFilter;
+            const matchesTier = tierFilter === '' || tierData === tierFilter;
+            let matchesStatus = true;
+            if (statusFilter === 'unlocked') matchesStatus = (statusData === 'unlocked');
+            else if (statusFilter === 'locked') matchesStatus = (statusData === 'locked');
+            else if (statusFilter === 'repeatable') matchesStatus = (repData === 'repeatable');
+
+            if (matchesQuery && matchesCat && matchesTier && matchesStatus) {
+                matchingCards.push(card);
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const totalItems = matchingCards.length;
+        const totalPages = Math.ceil(totalItems / ACHIEVEMENTS_PAGE_SIZE) || 1;
+        if (currentAchievementsPage > totalPages) currentAchievementsPage = totalPages;
+        if (currentAchievementsPage < 1) currentAchievementsPage = 1;
+
+        const startIdx = (currentAchievementsPage - 1) * ACHIEVEMENTS_PAGE_SIZE;
+        const endIdx = startIdx + ACHIEVEMENTS_PAGE_SIZE;
+
+        matchingCards.forEach((card, idx) => {
+            card.style.display = (idx >= startIdx && idx < endIdx) ? 'flex' : 'none';
+        });
+
+        renderPaginationControls('achievementsPagination', totalItems, currentAchievementsPage, totalPages, (newPage) => {
+            currentAchievementsPage = newPage;
+            filterAchievementsGrid(false);
+            const gridEl = document.getElementById('achievementsCardsGrid');
+            if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, ACHIEVEMENTS_PAGE_SIZE);
+    }
+
+    // Universal Pagination Controls Renderer
+    function renderPaginationControls(containerId, totalItems, currentPage, totalPages, onPageChange, pageSize = 12) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (totalItems === 0) {
+            container.innerHTML = `<div class="nd-pagination-info">No items match your filters</div>`;
+            return;
+        }
+
+        const startItem = (currentPage - 1) * pageSize + 1;
+        const endItem = Math.min(currentPage * pageSize, totalItems);
+
+        let html = `
+            <div class="nd-pagination-info">
+                Showing <strong>${startItem}&ndash;${endItem}</strong> of <strong>${totalItems}</strong> items
+            </div>
+        `;
+
+        if (totalPages > 1) {
+            html += `<div class="nd-pagination-controls">`;
+            
+            // Prev button
+            html += `<button type="button" class="nd-page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="window.__paginate_${containerId}(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+
+            for (let p = 1; p <= totalPages; p++) {
+                if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                    html += `<button type="button" class="nd-page-btn ${p === currentPage ? 'active' : ''}" onclick="window.__paginate_${containerId}(${p})">${p}</button>`;
+                } else if (p === currentPage - 2 || p === currentPage + 2) {
+                    html += `<span style="color:#94a3b8; font-size:0.8rem; padding:0 3px;">&hellip;</span>`;
+                }
+            }
+
+            // Next button
+            html += `<button type="button" class="nd-page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.__paginate_${containerId}(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+            
+            html += `</div>`;
+        }
+
+        container.innerHTML = html;
+        window['__paginate_' + containerId] = onPageChange;
+    }
+
+    // Auto-init pagination on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        if (document.getElementById('promptsDataTable') || document.getElementById('promptsMobileCards')) {
+            filterPromptsTable(true);
+        }
+        if (document.getElementById('seoDataTable')) {
+            filterSeoTable(true);
+        }
+        if (document.getElementById('gscDataTable')) {
+            filterGscTable(true);
+        }
+        if (document.getElementById('tagsDataTable') || document.getElementById('tagsMobileCards')) {
+            filterTagsTable(true);
+        }
+        if (document.getElementById('leaderboardDataTable') || document.getElementById('leaderboardMobileCards')) {
+            filterLeaderboardTable();
+        }
+        if (document.getElementById('achievementsCardsGrid')) {
+            filterAchievementsGrid(true);
+        }
+    });
     </script>
 <script>
 (function () {
