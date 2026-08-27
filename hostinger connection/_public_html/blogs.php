@@ -915,7 +915,7 @@ footer .footer-links a:hover {
     font-size: 1.1rem;
 }
 </style>
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260827e">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260827f">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">

@@ -940,3 +940,39 @@ html, body.bm-list {
     right: 12px !important;
   }
 }
+
+/* Permanent Google Translate banner suppression */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+iframe.skiptranslate,
+iframe[class*="skiptranslate"],
+iframe[id*=":1.container"],
+iframe[id*=":2.container"],
+.VIpgJd-ZVi9I-OR9QNe-HandL,
+.VIpgJd-yAWNEb-L7lbkb,
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-te-balloon-frame {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+html, body {
+    top: 0px !important;
+    position: static !important;
+}
+body.translated-ltr,
+body.translated-rtl {
+    top: 0px !important;
+    margin-top: 0px !important;
+}
+#google_translate_element { display: none !important; }
+.goog-tooltip, .goog-tooltip:hover { display: none !important; }
+.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
+font[style] { background: transparent !important; box-shadow: none !important; }
+

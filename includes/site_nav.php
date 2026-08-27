@@ -109,6 +109,21 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             </nav>
 
             <div class="store-header-right">
+                <!-- Custom Multi-Language Switcher Dropdown (Never translate the menu itself) -->
+                <div class="gal-lang-dropdown notranslate" translate="no" id="galLangDropdown">
+                    <button type="button" class="gal-lang-btn notranslate" translate="no" id="galLangBtn" aria-label="Switch Language" aria-expanded="false" title="Translate Website">
+                        <i class="fa-solid fa-globe notranslate" translate="no"></i>
+                        <span class="gal-lang-current notranslate" translate="no" id="galLangCurrent">EN</span>
+                        <i class="fa-solid fa-chevron-down notranslate" translate="no" style="font-size:0.55rem;opacity:0.7;"></i>
+                    </button>
+                    <div class="gal-lang-menu notranslate" translate="no" id="galLangMenu">
+                        <div class="gal-lang-menu-head notranslate" translate="no">Language</div>
+                        <button type="button" class="gal-lang-opt notranslate is-active" translate="no" data-lang="en"><span class="lang-flag">🇺🇸</span> English <span class="lang-code">EN</span></button>
+                        <button type="button" class="gal-lang-opt notranslate" translate="no" data-lang="es"><span class="lang-flag">🇪🇸</span> Español <span class="lang-code">ES</span></button>
+                        <button type="button" class="gal-lang-opt notranslate" translate="no" data-lang="hi"><span class="lang-flag">🇮🇳</span> Hindi (हिन्दी) <span class="lang-code">HI</span></button>
+                    </div>
+                </div>
+
                 <button type="button" class="gal-mobile-menu-btn" id="galMobileMenuBtn" aria-label="Open menu">
                     <i class="fa-solid fa-bars"></i>
                 </button>
@@ -160,6 +175,14 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
         <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">
             <i class="fa-brands fa-instagram"></i> @arigato.devan
         </a>
+        <div class="gal-mobile-lang-box notranslate" translate="no">
+            <div class="gal-mobile-lang-title notranslate" translate="no"><i class="fa-solid fa-globe"></i> Select Language</div>
+            <div class="gal-mobile-lang-grid notranslate" translate="no">
+                <button type="button" class="gal-m-lang-btn notranslate is-active" translate="no" data-lang="en">🇺🇸 English</button>
+                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="es">🇪🇸 Español</button>
+                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="hi">🇮🇳 Hindi</button>
+            </div>
+        </div>
         <?php if (isset($_SESSION['user_id'])): ?>
         <a href="<?= $nb('profile.php') ?>"><i class="fa-solid fa-user"></i> Profile</a>
         <a href="<?= $nb('login.php?logout=1') ?>" style="color:#e11d48;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -300,5 +323,143 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+
+    /* Multi-Language Auto-Translate Logic (EN, ES, HI) */
+    (function() {
+        function getSavedLang() {
+            var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([a-z]{2})/i);
+            return m ? m[1].toLowerCase() : 'en';
+        }
+
+        function updateLangUI(lang) {
+            var label = (lang === 'es' ? 'ES' : (lang === 'hi' ? 'HI' : 'EN'));
+            var cur = document.getElementById('galLangCurrent');
+            if (cur) cur.textContent = label;
+            document.querySelectorAll('.gal-lang-opt').forEach(function(el) {
+                el.classList.toggle('is-active', el.getAttribute('data-lang') === lang);
+            });
+            document.querySelectorAll('.gal-m-lang-btn').forEach(function(el) {
+                el.classList.toggle('is-active', el.getAttribute('data-lang') === lang);
+            });
+        }
+
+        function switchLanguage(lang) {
+            lang = (lang || 'en').toLowerCase();
+            var host = window.location.hostname;
+            if (lang === 'en') {
+                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + host;
+                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+                document.cookie = "googtrans=/en/en; path=/; domain=" + host;
+                document.cookie = "googtrans=/en/en; path=/";
+            } else {
+                var val = '/en/' + lang;
+                document.cookie = "googtrans=" + val + "; path=/; domain=" + host;
+                document.cookie = "googtrans=" + val + "; path=/";
+            }
+            var combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+            } else {
+                window.location.reload();
+            }
+            updateLangUI(lang);
+        }
+
+        var langDropdown = document.getElementById('galLangDropdown');
+        var langBtn = document.getElementById('galLangBtn');
+        if (langBtn && langDropdown) {
+            langBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = langDropdown.classList.toggle('active');
+                langBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+            document.addEventListener('click', function(e) {
+                if (!langDropdown.contains(e.target)) {
+                    langDropdown.classList.remove('active');
+                    langBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+        document.querySelectorAll('.gal-lang-opt, .gal-m-lang-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var lang = btn.getAttribute('data-lang');
+                switchLanguage(lang);
+                if (langDropdown) {
+                    langDropdown.classList.remove('active');
+                    if (langBtn) langBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        // Actively suppress Google Translate top bar and enforce 0px body top
+        function suppressGoogleBanner() {
+            var frames = document.querySelectorAll('iframe.skiptranslate, iframe.goog-te-banner-frame, .VIpgJd-ZVi9I-OR9QNe-HandL');
+            frames.forEach(function(el) {
+                el.style.setProperty('display', 'none', 'important');
+                el.style.setProperty('visibility', 'hidden', 'important');
+                el.style.setProperty('height', '0', 'important');
+            });
+            if (document.body.style.top && document.body.style.top !== '0px') {
+                document.body.style.setProperty('top', '0px', 'important');
+            }
+            if (document.documentElement.style.top && document.documentElement.style.top !== '0px') {
+                document.documentElement.style.setProperty('top', '0px', 'important');
+            }
+        }
+        setInterval(suppressGoogleBanner, 200);
+        updateLangUI(getSavedLang());
+    })();
 })();
 </script>
+
+<style>
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+iframe.skiptranslate,
+iframe[class*="skiptranslate"],
+iframe[id*=":1.container"],
+iframe[id*=":2.container"],
+.VIpgJd-ZVi9I-OR9QNe-HandL,
+.VIpgJd-yAWNEb-L7lbkb,
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-te-balloon-frame {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+html, body {
+    top: 0px !important;
+    position: static !important;
+}
+body.translated-ltr,
+body.translated-rtl {
+    top: 0px !important;
+    margin-top: 0px !important;
+}
+#google_translate_element { display: none !important; }
+.goog-tooltip, .goog-tooltip:hover { display: none !important; }
+.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
+font[style] { background: transparent !important; box-shadow: none !important; }
+</style>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+    if (window.google && google.translate) {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,es,hi',
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+}
+</script>
+<script type="text/javascript" defer src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
