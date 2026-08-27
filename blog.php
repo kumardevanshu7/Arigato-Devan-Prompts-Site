@@ -94,8 +94,10 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
                     ? 'https://arigatodevan.com/' . ltrim($og_file, '/')
                     : 'https://arigatodevan.com/landingpics/lan9.webp';
     $blog_og_desc = htmlspecialchars($blog['meta_description'] ?? ($blog['description'] ?? substr(strip_tags($blog['content'] ?? ''), 0, 155)));
-    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' � Arigato Devan');
+    $blog_og_title = htmlspecialchars(($blog['meta_title'] ?? $blog['title']) . ' – Arigato Devan');
 ?>
+<link rel="canonical" href="<?= htmlspecialchars($blog_url) ?>">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <!-- Favicon -->
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -785,11 +787,462 @@ html.blog-read-medium .blog-content { font-size: 1.28rem; line-height: 1.85; }
 
 /* Font styles inside editor content */
 .blog-content .font-serif { font-family: Georgia, serif; }
-.blog-content img { max-width: 100%; height: auto; border-radius: 12px; }
+.blog-content img,
+.ba-content img {
+    max-width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    object-fit: unset !important;
+    border-radius: 12px;
+}
+.blog-content img.img-border,
+.ba-content img.img-border {
+    border: 1px solid #000000;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+}
 .blog-content .font-mono { font-family: monospace; font-size: 0.95rem; background: #faf9ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #dbdae5; }
 .blog-content .font-bold { font-weight: 900; }
 .blog-content .font-light { font-weight: 400; color: #6a6775; }
-.blog-content .font-highlight { background: #FFF1B8; padding: 2px 8px; border-radius: 6px; border: 1px solid #cbd5e1; }
+.blog-content .font-highlight,
+.blog-content mark {
+    background: #fef08a !important;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0f172a;
+}
+.blog-content a {
+    color: #2563eb;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.blog-content a:hover {
+    color: #1d4ed8;
+    text-decoration-color: #1d4ed8;
+}
+
+/* Smooth Jump Scroll for Table of Contents */
+html { scroll-behavior: smooth; }
+.blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4,
+.ba-content h1, .ba-content h2, .ba-content h3, .ba-content h4 {
+    scroll-margin-top: 100px;
+}
+
+/* 1. Grey Disclaimer / Callout Box & Prompt Showcase */
+.blog-grey-box, .ba-grey-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #94a3b8;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin: 1.8em 0;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    box-sizing: border-box;
+}
+.blog-grey-box p, .ba-grey-box p {
+    margin: 0 !important;
+    color: inherit;
+}
+/* Single Unified Prompt Card (No nested boxes) */
+.blog-prompt-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px 20px 14px;
+    margin: 1.8em 0;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+.blog-prompt-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+}
+.bpc-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.bpc-item + .bpc-item {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #e2e8f0;
+}
+.bpc-thumb {
+    width: 58px;
+    height: 58px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+.bpc-thumb img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+}
+.bpc-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.bpc-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0284c7;
+    line-height: 1.2;
+}
+.bpc-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #0f172a !important;
+    line-height: 1.3;
+    margin: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bpc-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bpc-action {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.bpc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0f172a;
+    color: #ffffff !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+.bpc-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+.bpc-note {
+    margin: 12px 0 0 !important;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.84rem !important;
+    color: #64748b !important;
+    line-height: 1.55 !important;
+    font-style: italic;
+}
+@media (max-width: 520px) {
+    .bpc-item {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .bpc-action {
+        width: 100%;
+        margin-left: 0;
+    }
+    .bpc-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* 2. Image Caption */
+figcaption, .img-caption {
+    font-size: 0.86rem;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 6px;
+    margin-bottom: 1.2em;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* 3. Table of Contents (TOC) Box - 3 Configurable Sizes */
+.blog-toc-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #0284c7;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+.blog-toc-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0369a1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.blog-toc-toggle {
+    background: #e0f2fe;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    color: #0284c7;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.blog-toc-toggle:hover {
+    background: #bae6fd;
+    color: #0369a1;
+}
+.blog-toc-box ol {
+    margin: 0;
+}
+.blog-toc-box li {
+    color: #0284c7;
+}
+.blog-toc-box a {
+    color: #0369a1 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+.blog-toc-box a:hover {
+    color: #0284c7 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+}
+
+/* SIZE 1: SMALL / COMPACT (Default) */
+.blog-toc-box.blog-toc-sm, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) {
+    padding: 10px 14px;
+    margin: 1.1em 0 1.4em;
+    border-radius: 10px;
+}
+.blog-toc-sm .blog-toc-title, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) .blog-toc-title {
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+}
+.blog-toc-sm .blog-toc-toggle, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) .blog-toc-toggle {
+    padding: 2px 8px;
+    font-size: 0.72rem;
+}
+.blog-toc-sm ol, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) ol {
+    padding-left: 18px;
+    font-size: 0.80rem;
+    line-height: 1.36;
+}
+.blog-toc-sm li, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) li {
+    margin-bottom: 3px;
+}
+@media (min-width: 640px) {
+    .blog-toc-sm ol, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) ol {
+        columns: 2;
+        column-gap: 24px;
+    }
+    .blog-toc-sm li, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) li {
+        break-inside: avoid;
+        margin-bottom: 4px;
+    }
+}
+
+/* SIZE 2: MEDIUM / STANDARD */
+.blog-toc-box.blog-toc-md {
+    padding: 14px 18px;
+    margin: 1.4em 0 1.8em;
+    border-radius: 12px;
+}
+.blog-toc-md .blog-toc-title {
+    font-size: 0.92rem;
+    margin-bottom: 9px;
+}
+.blog-toc-md .blog-toc-toggle {
+    padding: 3px 10px;
+    font-size: 0.76rem;
+}
+.blog-toc-md ol {
+    padding-left: 20px;
+    font-size: 0.88rem;
+    line-height: 1.48;
+}
+.blog-toc-md li {
+    margin-bottom: 5px;
+}
+@media (min-width: 640px) {
+    .blog-toc-md ol {
+        columns: 2;
+        column-gap: 28px;
+    }
+    .blog-toc-md li {
+        break-inside: avoid;
+        margin-bottom: 5px;
+    }
+}
+
+/* SIZE 3: LARGE / SPACIOUS */
+.blog-toc-box.blog-toc-lg {
+    padding: 18px 24px;
+    margin: 1.8em 0 2.2em;
+    border-radius: 14px;
+}
+.blog-toc-lg .blog-toc-title {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+}
+.blog-toc-lg .blog-toc-toggle {
+    padding: 4px 12px;
+    font-size: 0.80rem;
+}
+.blog-toc-lg ol {
+    padding-left: 22px;
+    font-size: 0.95rem;
+    line-height: 1.62;
+}
+.blog-toc-lg li {
+    margin-bottom: 7px;
+}
+@media (min-width: 640px) {
+    .blog-toc-lg ol {
+        columns: 2;
+        column-gap: 32px;
+    }
+    .blog-toc-lg li {
+        break-inside: avoid;
+        margin-bottom: 7px;
+    }
+}
+
+/* 4. CTA Color Box (3 Nogoda Themes) */
+.blog-cta-box {
+    border-radius: 20px;
+    padding: 34px 28px;
+    margin: 2.2em 0;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+.blog-cta-box h3, .blog-cta-title {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 1.55rem !important;
+    line-height: 1.3 !important;
+    margin: 0 0 12px !important;
+    color: #ffffff !important;
+}
+.blog-cta-box p, .blog-cta-desc {
+    font-size: 1.05rem !important;
+    line-height: 1.6 !important;
+    margin: 0 auto 22px !important;
+    max-width: 680px;
+    opacity: 0.95;
+    color: #f1f5f9 !important;
+}
+.blog-cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+.blog-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    cursor: pointer;
+}
+.blog-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+/* Theme 1: Nogoda Electric Violet (Default) */
+.blog-cta-violet {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #9333ea 100%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.blog-cta-violet .blog-cta-btn-primary {
+    background: #f43f5e;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+}
+.blog-cta-violet .blog-cta-btn-secondary {
+    background: #ffffff;
+    color: #4f46e5 !important;
+}
+.blog-cta-violet .blog-cta-btn-ghost {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+}
+/* Theme 2: Nogoda Deep Navy & Sky */
+.blog-cta-navy {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2F4156 100%);
+    border: 1px solid rgba(200, 217, 230, 0.22);
+}
+.blog-cta-navy .blog-cta-btn-primary {
+    background: #38bdf8;
+    color: #0f172a !important;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+.blog-cta-navy .blog-cta-btn-secondary {
+    background: #ffffff;
+    color: #0f172a !important;
+}
+.blog-cta-navy .blog-cta-btn-ghost {
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+/* Theme 3: Nogoda Sunset Rose */
+.blog-cta-rose {
+    background: linear-gradient(135deg, #9f1239 0%, #e11d48 55%, #f43f5e 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.blog-cta-rose .blog-cta-btn-primary {
+    background: #fbbf24;
+    color: #881337 !important;
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
+}
+.blog-cta-rose .blog-cta-btn-secondary {
+    background: #ffffff;
+    color: #be123c !important;
+}
+.blog-cta-rose .blog-cta-btn-ghost {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
 
 /* Like + Share bar */
 .blog-action-bar {
@@ -1461,7 +1914,21 @@ footer .footer-links a:hover {
     <?php endif; ?>
 
     <div class="ba-hero-copy">
-      <a href="blogs.php" class="ba-kicker"><i class="fa-solid fa-arrow-left"></i> Blogs</a>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+        <a href="blogs.php" class="ba-kicker" style="margin-bottom:0;"><i class="fa-solid fa-arrow-left"></i> Blogs</a>
+        <?php 
+        $blog_cats = !empty($blog['category']) ? array_filter(array_map('trim', explode(',', $blog['category']))) : [];
+        foreach ($blog_cats as $bcat):
+          if ($bcat !== 'Uncategorized'):
+        ?>
+          <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; background:#e0f2fe; color:#0284c7; padding:3px 10px; border-radius:9999px; border:1px solid #bae6fd; display:inline-flex; align-items:center; gap:5px;">
+            <i class="fa-solid fa-folder-open" style="font-size:0.68rem;"></i> <?= htmlspecialchars($bcat) ?>
+          </span>
+        <?php 
+          endif;
+        endforeach; 
+        ?>
+      </div>
       <div class="ba-head">
         <h1><?= htmlspecialchars($blog["title"]) ?></h1>
         <div class="ba-tools ba-tools-desk">
@@ -1512,6 +1979,9 @@ footer .footer-links a:hover {
       <div class="ba-panel">
         <h3>Highlights</h3>
         <ul class="ba-hl">
+          <?php if (!empty($blog['category']) && $blog['category'] !== 'Uncategorized'): ?>
+          <li><i class="fa-solid fa-folder" style="color:#0284c7;"></i> Category: <?= htmlspecialchars($blog['category']) ?></li>
+          <?php endif; ?>
           <li><i class="fa-solid fa-check"></i> <?= $read_time ?> minute read</li>
           <li><i class="fa-solid fa-check"></i> <?= (int)($blog["view_count"] ?? 0) ?> views</li>
           <?php foreach (array_slice($tags_list, 0, 5) as $tag): ?>
@@ -1809,6 +2279,26 @@ document.querySelectorAll('.blog-content table').forEach(function(table) {
     });
     applySize(saved);
 })();
+
+// Auto-attach [Hide / Show] toggle button to Table of Contents
+document.querySelectorAll('.blog-toc-box').forEach(function(box) {
+    var title = box.querySelector('.blog-toc-title');
+    var list = box.querySelector('ol, ul');
+    if (title && list && !box.querySelector('.blog-toc-toggle')) {
+        var toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'blog-toc-toggle';
+        toggleBtn.innerHTML = '<span class="toc-toggle-text">Hide</span> <i class="fa-solid fa-chevron-up" style="font-size:0.7rem;"></i>';
+        toggleBtn.onclick = function() {
+            var isHidden = list.style.display === 'none';
+            list.style.display = isHidden ? '' : 'none';
+            toggleBtn.querySelector('.toc-toggle-text').textContent = isHidden ? 'Hide' : 'Show';
+            var icon = toggleBtn.querySelector('i');
+            if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+        };
+        title.appendChild(toggleBtn);
+    }
+});
 </script>
 </body></html>
 

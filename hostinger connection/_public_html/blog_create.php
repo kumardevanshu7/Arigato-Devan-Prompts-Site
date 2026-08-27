@@ -12,6 +12,25 @@ $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     verify_csrf();
+
+    // Handle AJAX Add Category request
+    if (isset($_POST['action']) && $_POST['action'] === 'add_category') {
+        header('Content-Type: application/json');
+        $cat_name = trim($_POST['category_name'] ?? '');
+        if ($cat_name !== '') {
+            try {
+                $stmt_cat = $pdo->prepare("INSERT IGNORE INTO blog_categories (name) VALUES (?)");
+                $stmt_cat->execute([$cat_name]);
+                echo json_encode(['success' => true, 'name' => $cat_name]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Category name cannot be empty']);
+        }
+        exit();
+    }
+
     $title = trim($_POST["title"] ?? "");
     $description = trim($_POST["description"] ?? "");
     $content = $_POST["content"] ?? "";
@@ -19,6 +38,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $meta_title = trim($_POST["meta_title"] ?? "");
     $meta_desc = trim($_POST["meta_description"] ?? "");
     $tags = trim($_POST["tags"] ?? "");
+
+    // Process selected categories
+    $selected_cats = isset($_POST['categories']) && is_array($_POST['categories']) ? array_filter(array_map('trim', $_POST['categories'])) : [];
+    if (empty($selected_cats)) {
+        $category_str = 'Uncategorized';
+    } else {
+        $category_str = implode(', ', $selected_cats);
+    }
+    foreach ($selected_cats as $sc) {
+        try {
+            $pdo->prepare("INSERT IGNORE INTO blog_categories (name) VALUES (?)")->execute([$sc]);
+        } catch (Exception $e) {}
+    }
+
     $image_ratio = trim($_POST["image_ratio"] ?? "16:9");
     $publish = isset($_POST["publish"]) && $_POST["publish"] == "1" ? 1 : 0;
 
@@ -101,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (empty($error)) {
             $author_id = $_SESSION["user_id"] ?? 1;
             $stmt = $pdo->prepare(
-                "INSERT INTO blogs (title, slug, description, content, content_hindi, image_path, image_path_landscape, image_ratio, meta_title, meta_description, tags, is_published, author_id, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())"
+                "INSERT INTO blogs (title, slug, description, content, content_hindi, image_path, image_path_landscape, image_ratio, meta_title, meta_description, tags, category, is_published, author_id, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())"
             );
             $stmt->execute([
                 $title,
@@ -115,6 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $meta_title,
                 $meta_desc,
                 $tags,
+                $category_str,
                 $publish,
                 $author_id,
             ]);
@@ -130,6 +164,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 // Author info
 $author_name = $_SESSION["username"] ?? "Admin";
 $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
+// Fetch site prompts for quick embedding in callout box
+$site_prompts_list = [];
+try {
+    $stmt_spl = $pdo->query("SELECT id, title, image_path, slug FROM prompts ORDER BY id DESC LIMIT 50");
+    $site_prompts_list = $stmt_spl->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {}
+
+// Fetch all blog categories for sidebar
+$all_blog_categories = [];
+try {
+    $all_blog_categories = $pdo->query("SELECT name FROM blog_categories ORDER BY name ASC")->fetchAll(PDO::FETCH_COLUMN);
+} catch (Exception $e) {}
+if (empty($all_blog_categories)) {
+    $all_blog_categories = ['Uncategorized', 'AI Prompts', 'ChatGPT & Gemini', 'Guides & Tutorials', 'Midjourney & Image AI', 'Product Updates'];
+}
+$current_blog_categories = ['Uncategorized'];
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -428,75 +478,103 @@ $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--be-border);
-            border-radius: var(--be-radius-sm);
-            padding: 5px 8px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 6px 8px;
             margin-bottom: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 6px;
             flex-wrap: wrap;
         }
-        .be-tb-row {
-            display: contents;
+        .be-tb-group {
+            display: inline-flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2px 3px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .be-tb-group-accent {
+            background: #f0f9ff;
+            border-color: #bae6fd;
         }
         .be-editor-wrap {
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 400px;
+            min-height: 680px;
             min-width: 0;
             max-width: 100%;
+        }
+        body.be-wide-mode .be-layout {
+            grid-template-columns: 1fr !important;
+            max-width: 100% !important;
+        }
+        body.be-wide-mode .be-panel {
+            display: none !important;
+        }
+        body.be-wide-mode .be-paper {
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            width: 100% !important;
         }
 
         .be-tb-btn {
             background: transparent;
             border: none;
-            color: var(--be-text-sec);
-            padding: 5px 8px;
-            border-radius: 4px;
+            color: #475569;
+            padding: 0;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.82rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 28px;
+            width: 28px;
             height: 28px;
-            transition: all 0.12s;
+            transition: all 0.12s ease;
         }
         .be-tb-btn:hover {
-            background: #f1f5f9;
-            color: var(--be-primary);
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .be-tb-divider {
-            width: 1px;
-            height: 16px;
-            background: var(--be-border);
-            margin: 0 3px;
+            display: none;
         }
 
         .be-tb-select {
             border: 1px solid transparent;
             background: transparent;
-            color: var(--be-text-sec);
+            color: #334155;
             font-family: inherit;
             font-size: 0.78rem;
             font-weight: 600;
-            padding: 4px 6px;
-            border-radius: 4px;
+            padding: 3px 6px;
+            border-radius: 6px;
             cursor: pointer;
             outline: none;
-            transition: all 0.12s;
+            height: 28px;
+            transition: all 0.12s ease;
         }
         .be-tb-select:hover, .be-tb-select:focus {
-            background: #f1f5f9;
-            border-color: var(--be-border);
-            color: var(--be-text-main);
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .be-tb-select-mini {
+            padding: 2px 4px;
+            font-size: 0.75rem;
+            color: #0284c7;
+            font-weight: 700;
         }
 
         /* Inspector Compact Sections */
@@ -1024,6 +1102,10 @@ $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         </div>
 
         <div class="be-header-right">
+            <button type="button" class="be-btn-sec" onclick="toggleWideWritingMode()" id="wideModeBtn" title="Toggle Spacious Writing Canvas">
+                <i class="fa-solid fa-expand"></i>
+                <span id="wideBtnLabel">Spacious View</span>
+            </button>
             <div class="be-status-pill be-status-draft" id="statusIndicatorBadge">
                 <span class="be-dot"></span>
                 <span id="statusIndicatorText">Draft</span>
@@ -1074,40 +1156,90 @@ $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <span id="metaReadTime"><i class="fa-regular fa-clock"></i> ~0 min read</span>
             </div>
 
-            <!-- Sleek Toolbar -->
+            <!-- Sleek Minimalist Formatting Toolbar -->
             <div class="be-toolbar">
-                <div class="be-tb-row be-tb-row-selects">
-                    <select class="be-tb-select" onchange="fmtBlock(this.value); this.selectedIndex=0;" title="Headings">
+                <!-- Group: Style & Font -->
+                <div class="be-tb-group">
+                    <select class="be-tb-select" onchange="fmtBlock(this.value); this.selectedIndex=0;" title="Headings & Callouts">
                         <option value="">Style</option>
                         <option value="p">Paragraph</option>
                         <option value="h1">Heading 1</option>
                         <option value="h2">Heading 2</option>
                         <option value="h3">Heading 3</option>
-                        <option value="blockquote">Quote</option>
+                        <option value="blockquote">Quote Callout</option>
+                        <option value="greybox">Grey Note Box</option>
                     </select>
                     <select class="be-tb-select" onchange="applyFontFamily(this.value); this.selectedIndex=0;" title="Font Family">
                         <option value="">Font</option>
-                        <option value="Lora, Georgia, serif">Editorial Serif (Lora)</option>
-                        <option value="'Playfair Display', serif">Display Serif (Playfair)</option>
-                        <option value="'Plus Jakarta Sans', sans-serif">Modern Bold (Jakarta)</option>
-                        <option value="'Inter', sans-serif">Clean Sans (Inter)</option>
-                        <option value="'JetBrains Mono', monospace">Monospace (Code)</option>
+                        <option value="Lora, Georgia, serif">Editorial Serif</option>
+                        <option value="'Playfair Display', serif">Display Serif</option>
+                        <option value="'Plus Jakarta Sans', sans-serif">Modern Bold</option>
+                        <option value="'Inter', sans-serif">Clean Sans</option>
+                        <option value="'JetBrains Mono', monospace">Monospace</option>
                     </select>
                 </div>
-                <div class="be-tb-row be-tb-row-format">
+
+                <!-- Group: Basic Text Formats -->
+                <div class="be-tb-group">
                     <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
+                </div>
+
+                <!-- Group: Alignment -->
+                <div class="be-tb-group">
                     <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+                </div>
+
+                <!-- Group: Lists -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+                </div>
+
+                <!-- Group: Links -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('unlink')" title="Remove Link"><i class="fa-solid fa-link-slash"></i></button>
+                </div>
+
+                <!-- Group: Special Arigato Blocks (Note, TOC, CTA) -->
+                <div class="be-tb-group be-tb-group-accent">
+                    <button type="button" class="be-tb-btn" onclick="openNoteBoxModal()" title="Insert Note Box / Featured Prompt Cards"><i class="fa-regular fa-note-sticky" style="color:#475569;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Insert Table of Contents"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
+                    <select class="be-tb-select be-tb-select-mini" onchange="setTocSize(this.value); this.selectedIndex=0;" title="Table of Contents Size">
+                        <option value="">Size</option>
+                        <option value="sm">Small (Compact)</option>
+                        <option value="md">Medium (Standard)</option>
+                        <option value="lg">Large (Spacious)</option>
+                    </select>
+                    <button type="button" class="be-tb-btn" onclick="openCtaModal()" title="Insert Nogoda CTA Color Box with Buttons"><i class="fa-solid fa-bullhorn" style="color:#7c3aed;"></i></button>
+                </div>
+
+                <!-- Group: Media & Inserts -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="document.getElementById('editor-inline-img').click()" title="Insert Image into Content"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="toggleSelectedImageCaption()" title="Add / Edit Image Caption"><i class="fa-solid fa-closed-captioning" style="color:#475569;"></i></button>
+                    <select class="be-tb-select be-tb-select-mini" onchange="setSelectedImageBorder(this.value); this.selectedIndex=0;" title="Picture Border">
+                        <option value="">Border</option>
+                        <option value="0">None</option>
+                        <option value="1">1px</option>
+                        <option value="2">2px</option>
+                        <option value="3">3px</option>
+                        <option value="4">4px</option>
+                        <option value="custom">Custom...</option>
+                    </select>
                     <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
                     <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="document.getElementById('editor-inline-img').click()" title="Insert Image into Content"><i class="fa-regular fa-image"></i></button>
                     <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
+                </div>
+
+                <!-- Group: Utilities -->
+                <div class="be-tb-group">
                     <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
                 </div>
             </div>
@@ -1143,6 +1275,51 @@ $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     <div style="display:flex; align-items:center; gap:8px; padding:6px 10px; background:#f8fafc; border:1px solid var(--be-border); border-radius:var(--be-radius-sm);">
                         <img src="<?= htmlspecialchars($author_avatar) ?>" alt="Author" style="width:22px; height:22px; border-radius:50%; object-fit:cover;">
                         <span style="font-size:0.82rem; font-weight:600; color:var(--be-text-main);"><?= htmlspecialchars($author_name) ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="be-sec-divider"></div>
+
+            <!-- Section: Categories (WordPress-Style) -->
+            <div class="be-cat-section">
+                <div class="be-sec-title" style="display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; margin-bottom:10px;" onclick="toggleCategoryAccordion()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-folder-tree" style="color:var(--be-accent);"></i>
+                        <span style="font-weight:700;">Categories</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-up" id="catAccordionIcon" style="font-size:0.75rem; color:#94a3b8; transition:transform 0.2s ease;"></i>
+                </div>
+
+                <div id="catAccordionBody">
+                    <div class="be-cat-list" id="catListContainer" style="max-height:165px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; background:#f8fafc; display:flex; flex-direction:column; gap:8px;">
+                        <?php foreach ($all_blog_categories as $cat): 
+                            $isChecked = in_array($cat, $current_blog_categories);
+                        ?>
+                        <label style="display:flex; align-items:center; gap:9px; font-size:0.85rem; color:#1e293b; font-weight:600; cursor:pointer;">
+                            <input type="checkbox" name="categories[]" value="<?= htmlspecialchars($cat) ?>" <?= $isChecked ? 'checked' : '' ?> style="width:16px; height:16px; accent-color:#0284c7; cursor:pointer; border-radius:4px;">
+                            <span><?= htmlspecialchars($cat) ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- + Add Category Link & Inline Form -->
+                    <div style="margin-top:10px;">
+                        <button type="button" id="toggleAddCatBtn" onclick="toggleAddCategoryForm()" style="background:none; border:none; color:#0284c7; font-weight:700; font-size:0.82rem; cursor:pointer; padding:0; display:inline-flex; align-items:center; gap:5px; text-decoration:underline;">
+                            <i class="fa-solid fa-plus"></i> Add Category
+                        </button>
+                        
+                        <div id="addCatForm" style="display:none; margin-top:8px; background:#f1f5f9; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                            <input type="text" id="newCatInput" placeholder="New category name..." style="width:100%; box-sizing:border-box; padding:7px 10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.84rem; margin-bottom:8px; font-family:inherit;" onkeydown="if(event.key==='Enter'){event.preventDefault();addNewCategory();}">
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" onclick="addNewCategory()" style="padding:6px 14px; background:#0284c7; color:#fff; border:none; border-radius:7px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+                                    Add
+                                </button>
+                                <button type="button" onclick="toggleAddCategoryForm()" style="padding:6px 12px; background:#e2e8f0; color:#475569; border:none; border-radius:7px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1399,6 +1576,32 @@ function ensureWriteSpaceAroundImages(editor) {
         }
     }
 }
+function setImageBorderWidth(editor, img, width) {
+    if (!img || img.nodeName !== 'IMG') return;
+    width = parseInt(width, 10);
+    if (isNaN(width) || width <= 0) {
+        editor.dom.removeClass(img, 'img-border');
+        editor.dom.setStyle(img, 'border', '');
+        editor.dom.setStyle(img, 'box-sizing', '');
+        img.removeAttribute('data-border-width');
+    } else {
+        editor.dom.addClass(img, 'img-border');
+        editor.dom.setStyle(img, 'border', width + 'px solid #000000');
+        editor.dom.setStyle(img, 'border-radius', '12px');
+        editor.dom.setStyle(img, 'box-sizing', 'border-box');
+        img.setAttribute('data-border-width', width);
+    }
+    editor.nodeChanged();
+}
+function toggleImageBorder(editor, img) {
+    if (!img || img.nodeName !== 'IMG') return;
+    var currentW = parseInt(img.getAttribute('data-border-width'), 10) || 0;
+    if (currentW > 0) {
+        setImageBorderWidth(editor, img, 0);
+    } else {
+        setImageBorderWidth(editor, img, 1);
+    }
+}
 function registerImageWriteButtons(editor) {
     editor.ui.registry.addButton('writebefore', {
         text: 'Write before',
@@ -1437,6 +1640,82 @@ function registerImageWriteButtons(editor) {
         onAction: function () {
             var img = currentImg();
             if (img) setImageAlign(editor, img, 'right');
+        }
+    });
+    editor.ui.registry.addMenuButton('imgborder', {
+        text: 'Border',
+        tooltip: 'Border line thickness (Black)',
+        fetch: function (callback) {
+            var img = currentImg();
+            var currentW = 0;
+            if (img) {
+                var declaredW = img.getAttribute('data-border-width');
+                if (declaredW) {
+                    currentW = parseInt(declaredW, 10);
+                } else if (img.style.border && img.style.border !== 'none') {
+                    var match = img.style.border.match(/(\d+)px/);
+                    if (match) currentW = parseInt(match[1], 10);
+                    else currentW = 1;
+                }
+            }
+            var items = [
+                {
+                    type: 'menuitem',
+                    text: (currentW === 0 ? '✓ ' : '   ') + 'No Border',
+                    onAction: function () {
+                        if (img) setImageBorderWidth(editor, img, 0);
+                    }
+                },
+                {
+                    type: 'menuitem',
+                    text: (currentW === 1 ? '✓ ' : '   ') + 'Thin (1px)',
+                    onAction: function () {
+                        if (img) setImageBorderWidth(editor, img, 1);
+                    }
+                },
+                {
+                    type: 'menuitem',
+                    text: (currentW === 2 ? '✓ ' : '   ') + 'Medium (2px)',
+                    onAction: function () {
+                        if (img) setImageBorderWidth(editor, img, 2);
+                    }
+                },
+                {
+                    type: 'menuitem',
+                    text: (currentW === 3 ? '✓ ' : '   ') + 'Thick (3px)',
+                    onAction: function () {
+                        if (img) setImageBorderWidth(editor, img, 3);
+                    }
+                },
+                {
+                    type: 'menuitem',
+                    text: (currentW === 4 ? '✓ ' : '   ') + 'Extra Thick (4px)',
+                    onAction: function () {
+                        if (img) setImageBorderWidth(editor, img, 4);
+                    }
+                },
+                {
+                    type: 'menuitem',
+                    text: 'Custom Width...',
+                    onAction: function () {
+                        if (!img) return;
+                        var val = window.prompt('Enter border width in pixels (e.g. 1, 2, 5):', currentW > 0 ? currentW : '2');
+                        if (val !== null && val.trim() !== '') {
+                            var num = parseInt(val, 10);
+                            setImageBorderWidth(editor, img, isNaN(num) ? 0 : num);
+                        }
+                    }
+                }
+            ];
+            callback(items);
+        }
+    });
+    editor.ui.registry.addButton('imgcaption', {
+        text: 'Caption',
+        tooltip: 'Add / Edit Image Caption',
+        onAction: function () {
+            var img = currentImg();
+            if (img) toggleImageCaption(editor, img);
         }
     });
     editor.on('click', function (e) {
@@ -1628,23 +1907,40 @@ function simplifyTinyImageDialog() {
 
 tinymce.init({
     selector: '#blog-editor',
-    min_height: window.matchMedia('(max-width: 768px)').matches ? 240 : 380,
-    height: window.matchMedia('(max-width: 768px)').matches ? 280 : 440,
+    height: Math.max(680, window.innerHeight - 280),
+    min_height: 520,
     menubar: false,
     statusbar: false,
     branding: false,
     promotion: false,
     toolbar: false,
     plugins: 'image link lists table code codesample charmap emoticons wordcount autosave visualblocks quickbars',
-    quickbars_selection_toolbar: 'bold italic underline | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
+    quickbars_selection_toolbar: 'bold italic underline | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
     quickbars_insert_toolbar: window.matchMedia('(max-width: 768px)').matches ? false : 'image link table codesample',
     table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
     paste_webkit_styles: 'all',
-    extended_valid_elements: 'img[class|src|alt|title|width|height|style|data-align],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width]',
+    extended_valid_elements: 'div[class|style|id|contenteditable],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],span[class|style|id|contenteditable],p[class|style|id|dir|contenteditable]',
+    formats: {
+        highlight: { inline: 'mark', classes: 'font-highlight', styles: { 'background-color': '#fef08a', 'padding': '2px 6px', 'border-radius': '4px', 'color': '#0f172a' } }
+    },
     font_family_formats: 'Editorial Serif=Lora, serif; Display Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Monospace=JetBrains Mono, monospace',
-    quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | editimage',
+    quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | imgborder | imgcaption | editimage',
+    link_assume_external_targets: 'https',
+    default_link_target: '_blank',
+    link_context_toolbar: true,
+    link_title: true,
+    target_list: [
+        { text: 'New window (External link)', value: '_blank' },
+        { text: 'Same window (Internal link)', value: '' }
+    ],
+    rel_list: [
+        { text: 'None / Normal', value: '' },
+        { text: 'No Referrer / Noopener (Safe External)', value: 'noopener noreferrer' },
+        { text: 'Nofollow (SEO nofollow)', value: 'nofollow' },
+        { text: 'Sponsored (Paid link)', value: 'sponsored' }
+    ],
     image_advtab: false,
     image_caption: false,
     image_dimensions: false,
@@ -1659,6 +1955,50 @@ tinymce.init({
     
     setup: function (editor) {
         registerImageWriteButtons(editor);
+
+        // ── Prompt Card Floating Context Toolbar & Handlers ──────────────────
+        editor.ui.registry.addButton('swapPromptCardBtn', {
+            text: '🔁 Change / Swap Prompt',
+            tooltip: 'Swap this card with another prompt from your site',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var card = editor.dom.getParent(node, '.blog-prompt-card');
+                if (card) {
+                    openNoteBoxModalForEdit(card);
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('removePromptCardBtn', {
+            text: '🗑️ Delete Card',
+            tooltip: 'Delete this card',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var card = editor.dom.getParent(node, '.blog-prompt-card');
+                if (card) {
+                    editor.dom.remove(card);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('promptCardToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, '.blog-prompt-card');
+            },
+            items: 'swapPromptCardBtn removePromptCardBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
+        editor.on('dblclick', function (e) {
+            var card = editor.dom.getParent(e.target, '.blog-prompt-card');
+            if (card) {
+                e.preventDefault();
+                openNoteBoxModalForEdit(card);
+            }
+        });
+
         editor.on('init', function () {
             editor.getContainer().style.border = 'none';
             editor.getContainer().style.boxShadow = 'none';
@@ -1681,12 +2021,22 @@ tinymce.init({
     
     content_style: `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        html, body {
+            overflow-y: auto !important;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         body {
             font-family: 'Lora', Georgia, serif;
             font-size: 1.12rem;
             line-height: 1.8;
             color: #1e293b;
-            padding: 6px 2px;
+            padding: 8px 6px;
             background: #ffffff;
         }
         h1, h2, h3, h4 {
@@ -1702,6 +2052,22 @@ tinymce.init({
         h3 { font-size: 1.2rem; }
         p {
             margin-bottom: 1.3em;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        a:hover {
+            color: #1d4ed8;
+        }
+        mark, .font-highlight {
+            background-color: #fef08a !important;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #0f172a;
         }
         blockquote {
             border-left: 4px solid #3b82f6;
@@ -1732,6 +2098,11 @@ tinymce.init({
             clear: both;
             cursor: pointer;
         }
+        img.img-border {
+            border: 1px solid #000000;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+        }
         img[data-align="left"], img.align-left {
             margin-left: 0 !important;
             margin-right: auto !important;
@@ -1760,6 +2131,235 @@ tinymce.init({
             vertical-align: top;
         }
         th { background: #f8fafc; font-weight: 700; }
+        .blog-grey-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #94a3b8;
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin: 1.8em 0;
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            box-sizing: border-box;
+        }
+        .blog-grey-box p { margin: 0 !important; }
+        /* Single Unified Prompt Card (No nested boxes) */
+        .blog-prompt-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 20px 14px;
+            margin: 1.8em 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+        .bpc-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .bpc-item + .bpc-item {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        .bpc-thumb {
+            width: 58px;
+            height: 58px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+        .bpc-thumb img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+        }
+        .bpc-details {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .bpc-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #0284c7;
+            line-height: 1.2;
+        }
+        .bpc-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: #0f172a !important;
+            line-height: 1.3;
+            margin: 0 !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bpc-desc {
+            font-size: 0.78rem;
+            color: #64748b;
+            line-height: 1.35;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bpc-action {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .bpc-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #0f172a;
+            color: #ffffff !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+        .bpc-note {
+            margin: 12px 0 0 !important;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.84rem !important;
+            color: #64748b !important;
+            line-height: 1.55 !important;
+            font-style: italic;
+        }
+        /* Editable cues inside the editor */
+        .blog-prompt-card, .blog-grey-box {
+            cursor: text;
+        }
+        .bpc-title:hover, .bpc-desc:hover, .bpc-badge:hover, .bpc-note:hover, .blog-grey-box:hover, .blog-grey-box p:hover {
+            outline: 1.5px dashed #94a3b8;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        .bpc-title:focus, .bpc-desc:focus, .bpc-badge:focus, .bpc-note:focus, .blog-grey-box:focus, .blog-grey-box p:focus {
+            outline: 2px solid #0284c7 !important;
+            outline-offset: 2px;
+            border-radius: 4px;
+            background: rgba(2, 132, 199, 0.04);
+        }
+        figcaption, .img-caption {
+            font-size: 0.86rem;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 6px;
+            margin-bottom: 1.2em;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .blog-toc-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0284c7;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+        .blog-toc-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .blog-toc-box ol { margin: 0; }
+        .blog-toc-box li { color: #0284c7; }
+        .blog-toc-box a { color: #0369a1; text-decoration: none; font-weight: 500; }
+
+        /* SIZE 1: SMALL / COMPACT */
+        .blog-toc-box.blog-toc-sm, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) {
+            padding: 10px 14px;
+            margin: 1.1em 0 1.4em;
+            border-radius: 10px;
+        }
+        .blog-toc-sm .blog-toc-title, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) .blog-toc-title {
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+        }
+        .blog-toc-sm ol, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) ol {
+            padding-left: 18px;
+            font-size: 0.80rem;
+            line-height: 1.36;
+            columns: 2;
+            column-gap: 24px;
+        }
+        .blog-toc-sm li, .blog-toc-box:not(.blog-toc-md):not(.blog-toc-lg) li {
+            margin-bottom: 3px;
+            break-inside: avoid;
+        }
+
+        /* SIZE 2: MEDIUM / STANDARD */
+        .blog-toc-box.blog-toc-md {
+            padding: 14px 18px;
+            margin: 1.4em 0 1.8em;
+            border-radius: 12px;
+        }
+        .blog-toc-md .blog-toc-title { font-size: 0.92rem; margin-bottom: 9px; }
+        .blog-toc-md ol { padding-left: 20px; font-size: 0.88rem; line-height: 1.48; columns: 2; column-gap: 28px; }
+        .blog-toc-md li { margin-bottom: 5px; break-inside: avoid; }
+
+        /* SIZE 3: LARGE / SPACIOUS */
+        .blog-toc-box.blog-toc-lg {
+            padding: 18px 24px;
+            margin: 1.8em 0 2.2em;
+            border-radius: 14px;
+        }
+        .blog-toc-lg .blog-toc-title { font-size: 1.05rem; margin-bottom: 12px; }
+        .blog-toc-lg ol { padding-left: 22px; font-size: 0.95rem; line-height: 1.62; columns: 2; column-gap: 32px; }
+        .blog-toc-lg li { margin-bottom: 7px; break-inside: avoid; }
+        .blog-cta-box {
+            border-radius: 20px;
+            padding: 30px 24px;
+            margin: 2em 0;
+            text-align: center;
+            color: #ffffff;
+        }
+        .blog-cta-title { font-size: 1.45rem; font-weight: 800; margin: 0 0 10px; color: #ffffff !important; }
+        .blog-cta-desc { font-size: 1rem; margin: 0 auto 20px; opacity: 0.95; color: #f1f5f9 !important; }
+        .blog-cta-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .blog-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 22px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none !important;
+        }
+        .blog-cta-violet { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #9333ea 100%); }
+        .blog-cta-violet .blog-cta-btn-primary { background: #f43f5e; color: #ffffff !important; }
+        .blog-cta-violet .blog-cta-btn-secondary { background: #ffffff; color: #4f46e5 !important; }
+        .blog-cta-violet .blog-cta-btn-ghost { background: rgba(255,255,255,0.2); color: #ffffff !important; }
+        .blog-cta-navy { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2F4156 100%); }
+        .blog-cta-navy .blog-cta-btn-primary { background: #38bdf8; color: #0f172a !important; }
+        .blog-cta-navy .blog-cta-btn-secondary { background: #ffffff; color: #0f172a !important; }
+        .blog-cta-navy .blog-cta-btn-ghost { background: rgba(255,255,255,0.15); color: #e2e8f0 !important; }
+        .blog-cta-rose { background: linear-gradient(135deg, #9f1239 0%, #e11d48 55%, #f43f5e 100%); }
+        .blog-cta-rose .blog-cta-btn-primary { background: #fbbf24; color: #881337 !important; }
+        .blog-cta-rose .blog-cta-btn-secondary { background: #ffffff; color: #be123c !important; }
+        .blog-cta-rose .blog-cta-btn-ghost { background: rgba(255,255,255,0.2); color: #ffffff !important; }
     `,
     
     images_upload_handler: function (blobInfo, progress) {
@@ -1782,16 +2382,470 @@ tinymce.init({
     }
 });
 
+function toggleWideWritingMode() {
+    document.body.classList.toggle('be-wide-mode');
+    var isWide = document.body.classList.contains('be-wide-mode');
+    localStorage.setItem('be_wide_mode', isWide ? '1' : '0');
+    var btn = document.getElementById('wideModeBtn');
+    if (btn) {
+        btn.innerHTML = isWide 
+            ? '<i class="fa-solid fa-compress"></i> <span>Normal View</span>' 
+            : '<i class="fa-solid fa-expand"></i> <span>Spacious View</span>';
+    }
+}
+if (localStorage.getItem('be_wide_mode') === '1') {
+    document.body.classList.add('be-wide-mode');
+    window.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('wideModeBtn');
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-compress"></i> <span>Normal View</span>';
+    });
+}
+
 function fmt(cmd) {
     if (tinymce.activeEditor) {
         tinymce.activeEditor.execCommand(cmd);
     }
 }
+function toggleHighlight() {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.focus();
+        tinymce.activeEditor.formatter.toggle('highlight');
+    }
+}
+function insertLink() {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.execCommand('mceLink');
+    }
+}
 function fmtBlock(tag) {
     if (!tag) return;
+    if (tag === 'greybox') {
+        insertGreyBox();
+        return;
+    }
     if (tinymce.activeEditor) {
         tinymce.activeEditor.execCommand('FormatBlock', false, tag);
     }
+}
+function insertGreyBox() {
+    if (!tinymce.activeEditor) return;
+    const html = `
+      <div class="blog-grey-box">
+        <p><em>We independently review every prompt and tool we recommend. When you use links on this page, we may earn an affiliate commission. <a href="#">Learn more</a>.</em></p>
+      </div>
+      <p><br></p>
+    `;
+    tinymce.activeEditor.execCommand('mceInsertContent', false, html);
+}
+
+// ── Featured Note Box & Prompt Showcase Modal ──────────────────────────────
+window.SITE_RECENT_PROMPTS = <?= json_encode($site_prompts_list) ?>;
+window.currentEditingCard = null;
+
+function openNoteBoxModal() {
+    if (tinymce.activeEditor) {
+        var node = tinymce.activeEditor.selection.getNode();
+        var card = tinymce.activeEditor.dom.getParent(node, '.blog-prompt-card');
+        if (card) {
+            openNoteBoxModalForEdit(card);
+            return;
+        }
+    }
+    window.currentEditingCard = null;
+    var modal = document.getElementById('noteBoxModal');
+    if (!modal) return;
+    var submitBtn = document.getElementById('nbModalSubmitBtn');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Insert Box into Blog';
+    var titleHeading = document.getElementById('nbModalTitleText');
+    if (titleHeading) titleHeading.textContent = 'Callout & Prompt Showcase Box';
+    
+    modal.style.display = 'flex';
+    var list = document.getElementById('nbModalCardsList');
+    if (list && list.children.length === 0) {
+        addNoteBoxPromptCardRow();
+    }
+}
+function openNoteBoxModalForEdit(cardEl) {
+    window.currentEditingCard = cardEl;
+    var modal = document.getElementById('noteBoxModal');
+    if (!modal) return;
+    setNoteBoxModalTab('cards');
+    modal.style.display = 'flex';
+    
+    var submitBtn = document.getElementById('nbModalSubmitBtn');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update / Swap Prompt in Blog';
+    var titleHeading = document.getElementById('nbModalTitleText');
+    if (titleHeading) titleHeading.textContent = '🔁 Edit / Swap Featured Prompt';
+    
+    var list = document.getElementById('nbModalCardsList');
+    if (list) {
+        list.innerHTML = '';
+        var items = cardEl.querySelectorAll('.bpc-item');
+        if (items.length > 0) {
+            items.forEach(function(item) {
+                var titleEl = item.querySelector('.bpc-title');
+                var descEl = item.querySelector('.bpc-desc');
+                var btnEl = item.querySelector('.bpc-btn');
+                var imgEl = item.querySelector('.bpc-thumb img');
+                
+                addNoteBoxPromptCardRow({
+                    title: titleEl ? titleEl.textContent.trim() : '',
+                    desc: descEl ? descEl.textContent.trim() : '',
+                    url: btnEl ? btnEl.getAttribute('href') : '',
+                    btn: btnEl ? btnEl.textContent.replace(/[↗\s]+/g, ' ').trim() : 'Go to page',
+                    img: imgEl ? imgEl.getAttribute('src') : ''
+                });
+            });
+        } else {
+            addNoteBoxPromptCardRow();
+        }
+    }
+    var noteEl = cardEl.querySelector('.bpc-note');
+    var bottomInput = document.getElementById('nbModalBottomText');
+    if (noteEl && bottomInput) {
+        bottomInput.value = noteEl.textContent.trim();
+    }
+}
+function closeNoteBoxModal() {
+    var modal = document.getElementById('noteBoxModal');
+    if (modal) modal.style.display = 'none';
+    window.currentEditingCard = null;
+}
+function setNoteBoxModalTab(tab) {
+    var cardsTab = document.getElementById('nbCardsTabContent');
+    var textTab = document.getElementById('nbTextTabContent');
+    var cardsBtn = document.getElementById('nbTabCardsBtn');
+    var textBtn = document.getElementById('nbTabTextBtn');
+    if (tab === 'cards') {
+        cardsTab.style.display = 'block';
+        textTab.style.display = 'none';
+        cardsBtn.style.background = '#ffffff';
+        cardsBtn.style.color = '#0f172a';
+        cardsBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+        textBtn.style.background = 'transparent';
+        textBtn.style.color = '#64748b';
+        textBtn.style.boxShadow = 'none';
+    } else {
+        cardsTab.style.display = 'none';
+        textTab.style.display = 'block';
+        textBtn.style.background = '#ffffff';
+        textBtn.style.color = '#0f172a';
+        textBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+        cardsBtn.style.background = 'transparent';
+        cardsBtn.style.color = '#64748b';
+        cardsBtn.style.boxShadow = 'none';
+    }
+}
+function addNoteBoxPromptCardRow(preset) {
+    var list = document.getElementById('nbModalCardsList');
+    if (!list) return;
+    var count = list.children.length;
+    if (count >= 4) {
+        alert('You can add up to 4 prompt cards in a single box.');
+        return;
+    }
+    var cardIndex = count + 1;
+    var row = document.createElement('div');
+    row.className = 'nb-card-row';
+    row.style.cssText = 'background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:14px; padding:14px 16px; position:relative; margin-bottom:10px;';
+    
+    var promptOptions = '<option value="">✨ Choose Prompt to Swap / Embed...</option>';
+    if (Array.isArray(window.SITE_RECENT_PROMPTS)) {
+        window.SITE_RECENT_PROMPTS.forEach(function(p) {
+            var isSelected = false;
+            if (preset && preset.title && (preset.title.toLowerCase() === p.title.toLowerCase() || (preset.url && (preset.url.indexOf(p.slug) !== -1 || preset.url.indexOf('id=' + p.id) !== -1)))) {
+                isSelected = true;
+            }
+            promptOptions += `<option value="${p.id}" data-title="${escapeHtml(p.title)}" data-img="${escapeHtml(p.image_path)}" data-slug="${escapeHtml(p.slug || '')}" ${isSelected ? 'selected' : ''}>#${p.id} &ndash; ${escapeHtml(p.title)}</option>`;
+        });
+    }
+
+    var defaultTitle = preset && preset.title ? preset.title : '';
+    var defaultUrl = preset && preset.url ? preset.url : '';
+    var defaultImg = preset && preset.img ? preset.img : 'toplogo/logo01.webp';
+    var defaultBtn = preset && preset.btn ? preset.btn : 'Go to page';
+    var defaultDesc = preset && preset.desc ? preset.desc : 'One-click unlock on Arigato Devan';
+
+    row.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.75rem; font-weight:800; color:#0284c7; text-transform:uppercase; background:#e0f2fe; padding:2px 8px; border-radius:6px;">Prompt Card #${cardIndex}</span>
+                <span style="font-size:0.75rem; color:#64748b;">(Select below to swap instantly)</span>
+            </div>
+            <button type="button" onclick="this.closest('.nb-card-row').remove()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.85rem;" title="Remove this card"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="display:block; font-size:0.8rem; font-weight:800; color:#0f172a; margin-bottom:5px;">
+                <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> Select Another Prompt (Instant Swap):
+            </label>
+            <select class="nb-prompt-picker" onchange="onNoteBoxPromptSelect(this)" style="width:100%; padding:9px 12px; border:2px solid #38bdf8; border-radius:10px; font-size:0.88rem; background:#ffffff; color:#0f172a; font-weight:700; cursor:pointer; box-shadow:0 1px 4px rgba(56,189,248,0.2);">
+                ${promptOptions}
+            </select>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; background:#ffffff; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:10px;">
+            <img class="nb-card-img-preview" src="${escapeHtml(defaultImg)}" alt="Preview" style="width:52px; height:52px; border-radius:8px; object-fit:cover; border:1px solid #cbd5e1; flex-shrink:0;">
+            <div style="flex:1; min-width:0;">
+                <input type="text" class="nb-card-title" value="${escapeHtml(defaultTitle)}" placeholder="Prompt Title" style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; font-weight:700; margin-bottom:4px;">
+                <input type="text" class="nb-card-desc" value="${escapeHtml(defaultDesc)}" placeholder="Short Subtitle / Tag" style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.8rem; color:#64748b;">
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:8px;">
+            <input type="text" class="nb-card-url" value="${escapeHtml(defaultUrl)}" placeholder="Target URL (e.g. prompts/...)" style="padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.8rem;">
+            <input type="text" class="nb-card-btn-text" value="${escapeHtml(defaultBtn)}" placeholder="Button Text (Go to page)" style="padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.8rem;">
+            <input type="hidden" class="nb-card-img" value="${escapeHtml(defaultImg)}">
+        </div>
+    `;
+    list.appendChild(row);
+}
+function onNoteBoxPromptSelect(selectEl) {
+    var opt = selectEl.options[selectEl.selectedIndex];
+    if (!opt || !opt.value) return;
+    var row = selectEl.closest('.nb-card-row');
+    if (!row) return;
+    var title = opt.getAttribute('data-title') || '';
+    var img = opt.getAttribute('data-img') || '';
+    var slug = opt.getAttribute('data-slug') || '';
+    var id = opt.value;
+    
+    var titleInput = row.querySelector('.nb-card-title');
+    var urlInput = row.querySelector('.nb-card-url');
+    var imgInput = row.querySelector('.nb-card-img');
+    var imgPreview = row.querySelector('.nb-card-img-preview');
+    
+    if (titleInput) titleInput.value = title;
+    if (urlInput) urlInput.value = slug ? ('prompts/' + encodeURIComponent(slug)) : ('prompt.php?id=' + id);
+    if (imgInput) imgInput.value = img;
+    if (imgPreview) imgPreview.src = img || 'toplogo/logo01.webp';
+}
+function insertNoteBoxFromModal() {
+    if (!tinymce.activeEditor) return;
+    var cardsTab = document.getElementById('nbCardsTabContent');
+    var isCardsMode = cardsTab && cardsTab.style.display !== 'none';
+    
+    if (!isCardsMode) {
+        var simpleText = (document.getElementById('nbModalSimpleText').value || '').trim();
+        var simpleHtml = `
+          <div class="blog-grey-box">
+            <p contenteditable="true"><em>${escapeHtml(simpleText) || 'We independently review every prompt and tool we recommend.'}</em></p>
+          </div>
+          <p><br></p>
+        `;
+        tinymce.activeEditor.execCommand('mceInsertContent', false, simpleHtml);
+        closeNoteBoxModal();
+        return;
+    }
+
+    var cardRows = document.querySelectorAll('#nbModalCardsList .nb-card-row');
+    var itemsHtml = [];
+    cardRows.forEach(function(row) {
+        var title = (row.querySelector('.nb-card-title').value || '').trim();
+        var url = (row.querySelector('.nb-card-url').value || '').trim() || '#';
+        var img = (row.querySelector('.nb-card-img').value || '').trim() || 'toplogo/logo01.webp';
+        var btnText = (row.querySelector('.nb-card-btn-text').value || '').trim() || 'Go to page';
+        var desc = (row.querySelector('.nb-card-desc').value || '').trim();
+
+        if (title) {
+            itemsHtml.push(`
+          <div class="bpc-item">
+            <div class="bpc-thumb">
+              <img src="${img}" alt="${escapeHtml(title)}">
+            </div>
+            <div class="bpc-details">
+              <div class="bpc-badge" contenteditable="true">Featured Prompt</div>
+              <h4 class="bpc-title" contenteditable="true">${escapeHtml(title)}</h4>
+              ${desc ? `<p class="bpc-desc" contenteditable="true">${escapeHtml(desc)}</p>` : ''}
+            </div>
+            <div class="bpc-action">
+              <a href="${url}" class="bpc-btn" target="_blank" rel="noopener noreferrer">${escapeHtml(btnText)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+          </div>`.trim());
+        }
+    });
+
+    var bottomText = (document.getElementById('nbModalBottomText').value || '').trim();
+    var boxHtml = `
+      <div class="blog-prompt-card">
+        ${itemsHtml.join('\n        ')}
+        ${bottomText ? `<p class="bpc-note" contenteditable="true"><em>${escapeHtml(bottomText)}</em></p>` : ''}
+      </div>
+      <p><br></p>
+    `;
+    if (window.currentEditingCard && window.currentEditingCard.parentNode) {
+        var tempDiv = tinymce.activeEditor.dom.create('div', {}, boxHtml);
+        var newCard = tempDiv.firstElementChild;
+        window.currentEditingCard.parentNode.replaceChild(newCard, window.currentEditingCard);
+        tinymce.activeEditor.selection.select(newCard);
+        tinymce.activeEditor.nodeChanged();
+    } else {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, boxHtml);
+    }
+    closeNoteBoxModal();
+}
+function setTocSize(size) {
+    if (!size || !tinymce.activeEditor) return;
+    var ed = tinymce.activeEditor;
+    var existingToc = ed.dom.select('.blog-toc-box');
+    if (existingToc && existingToc.length > 0) {
+        existingToc.forEach(function(el) {
+            el.classList.remove('blog-toc-sm', 'blog-toc-md', 'blog-toc-lg');
+            el.classList.add('blog-toc-' + size);
+            el.setAttribute('data-toc-size', size);
+        });
+        ed.nodeChanged();
+    } else {
+        insertTableOfContents(size);
+    }
+}
+function insertTableOfContents(size) {
+    if (!tinymce.activeEditor) return;
+    var ed = tinymce.activeEditor;
+    var tocSize = size || 'sm';
+    var headings = ed.dom.select('h2, h3');
+    headings = headings.filter(function(h) {
+        return !ed.dom.getParent(h, '.blog-cta-box') && !ed.dom.getParent(h, '.blog-toc-box');
+    });
+    if (!headings || headings.length === 0) {
+        var starter = `
+          <div class="blog-toc-box blog-toc-${tocSize}" data-toc-size="${tocSize}">
+            <div class="blog-toc-title"><i class="fa-solid fa-list-ol" style="margin-right:6px;"></i>Table of Contents</div>
+            <ol>
+              <li><a href="#section-1">1. Section 1 Title</a></li>
+              <li><a href="#section-2">2. Section 2 Title</a></li>
+            </ol>
+          </div>
+          <p><br></p>
+        `;
+        ed.execCommand('mceInsertContent', false, starter);
+        return;
+    }
+    var listItems = [];
+    headings.forEach(function(h, idx) {
+        var rawText = (h.textContent || '').replace(/\u00a0/g, ' ').trim();
+        if (!rawText) return;
+        var cleanId = h.getAttribute('id');
+        if (!cleanId) {
+            cleanId = 'toc-' + rawText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || ('section-' + (idx + 1));
+            h.setAttribute('id', cleanId);
+        }
+        var isSub = h.nodeName === 'H3';
+        listItems.push(`<li style="${isSub ? 'margin-left:16px; list-style-type:circle;' : 'margin-bottom:4px;'}"><a href="#${cleanId}">${escapeHtml(rawText)}</a></li>`);
+    });
+    var tocHtml = `
+      <div class="blog-toc-box blog-toc-${tocSize}" data-toc-size="${tocSize}">
+        <div class="blog-toc-title"><i class="fa-solid fa-list-ol" style="margin-right:6px;"></i>Table of Contents</div>
+        <ol>
+          ${listItems.join('\n          ')}
+        </ol>
+      </div>
+      <p><br></p>
+    `;
+    var existingToc = ed.dom.select('.blog-toc-box');
+    if (existingToc && existingToc.length > 0) {
+        ed.dom.setOuterHTML(existingToc[0], tocHtml);
+    } else {
+        ed.execCommand('mceInsertContent', false, tocHtml);
+    }
+}
+function toggleImageCaption(editor, img) {
+    if (!img || img.nodeName !== 'IMG') return;
+    var parent = img.parentNode;
+    if (parent && parent.nodeName === 'FIGURE') {
+        var existingCap = parent.querySelector('figcaption, .img-caption');
+        if (existingCap) {
+            editor.selection.select(existingCap);
+            return;
+        }
+        var newCap = editor.dom.create('figcaption', { class: 'img-caption' }, '(Image credit: Source name)');
+        parent.appendChild(newCap);
+        editor.selection.select(newCap);
+    } else {
+        var next = img.nextElementSibling;
+        if (!next && parent && (parent.nodeName === 'P' || parent.nodeName === 'DIV')) {
+            next = parent.nextElementSibling;
+        }
+        if (next && (next.classList.contains('img-caption') || next.nodeName === 'FIGCAPTION')) {
+            editor.selection.select(next);
+            return;
+        }
+        var capEl = editor.dom.create('p', { class: 'img-caption' }, '(Image credit: Source name)');
+        if (parent && (parent.nodeName === 'P' || parent.nodeName === 'DIV') && parent.childNodes.length === 1) {
+            parent.parentNode.insertBefore(capEl, parent.nextSibling);
+        } else {
+            img.parentNode.insertBefore(capEl, img.nextSibling);
+        }
+        editor.selection.select(capEl);
+    }
+    editor.nodeChanged();
+}
+function toggleSelectedImageCaption() {
+    if (!tinymce.activeEditor) return;
+    var ed = tinymce.activeEditor;
+    var node = ed.selection.getNode();
+    if (node && node.nodeName !== 'IMG') node = ed.dom.getParent(node, 'img');
+    if (node && node.nodeName === 'IMG') {
+        toggleImageCaption(ed, node);
+    } else {
+        alert('Please click on an image in the editor first to add or edit its caption.');
+    }
+}
+function openCtaModal() {
+    var modal = document.getElementById('ctaBoxModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closeCtaModal() {
+    var modal = document.getElementById('ctaBoxModal');
+    if (modal) modal.style.display = 'none';
+}
+function addCtaModalButtonRow() {
+    var list = document.getElementById('ctaModalBtnList');
+    if (!list) return;
+    var count = list.querySelectorAll('.cta-btn-input-row').length;
+    if (count >= 5) {
+        alert('You can add up to 5 buttons in the Color Box.');
+        return;
+    }
+    var row = document.createElement('div');
+    row.className = 'cta-btn-input-row';
+    row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+    row.innerHTML = `
+        <input type="text" class="cta-btn-text" placeholder="Button ${count + 1} Text" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+        <input type="text" class="cta-btn-url" placeholder="https://..." style="flex:1.5; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+        <select class="cta-btn-style" style="padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem;">
+            <option value="ghost">Ghost Glass</option>
+            <option value="primary">Accent Pill</option>
+            <option value="secondary">White Button</option>
+        </select>
+        <button type="button" onclick="this.parentNode.remove()" style="background:#fee2e2; border:none; color:#ef4444; width:28px; height:28px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Remove Button"><i class="fa-solid fa-trash-can" style="font-size:0.75rem;"></i></button>
+    `;
+    list.appendChild(row);
+}
+function insertCtaBoxFromModal() {
+    if (!tinymce.activeEditor) return;
+    var theme = document.getElementById('ctaModalTheme').value || 'violet';
+    var title = document.getElementById('ctaModalTitle').value.trim() || 'Unlock All Secret Code AI Prompts';
+    var desc = document.getElementById('ctaModalDesc').value.trim() || '';
+    var btnRows = document.querySelectorAll('#ctaModalBtnList .cta-btn-input-row');
+    var btnHtml = [];
+    btnRows.forEach(function(row) {
+        var text = (row.querySelector('.cta-btn-text').value || '').trim();
+        var url = (row.querySelector('.cta-btn-url').value || '').trim() || '#';
+        var style = row.querySelector('.cta-btn-style').value || 'primary';
+        if (text) {
+            btnHtml.push(`<a href="${url}" class="blog-cta-btn blog-cta-btn-${style}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`);
+        }
+    });
+    var boxHtml = `
+      <div class="blog-cta-box blog-cta-${theme}">
+        <h3 class="blog-cta-title">${escapeHtml(title)}</h3>
+        ${desc ? `<p class="blog-cta-desc">${escapeHtml(desc)}</p>` : ''}
+        <div class="blog-cta-buttons">
+          ${btnHtml.join('\n          ')}
+        </div>
+      </div>
+      <p><br></p>
+    `;
+    tinymce.activeEditor.execCommand('mceInsertContent', false, boxHtml);
+    closeCtaModal();
 }
 function applyFontFamily(family) {
     if (!family) return;
@@ -1832,6 +2886,40 @@ function uploadEditorImage(file) {
         }
     })
     .catch(err => alert('Upload error: ' + err.message));
+}
+
+function setSelectedImageBorder(val) {
+    if (val === '') return;
+    if (tinymce.activeEditor) {
+        var node = tinymce.activeEditor.selection.getNode();
+        if (node && node.nodeName !== 'IMG') node = tinymce.activeEditor.dom.getParent(node, 'img');
+        if (node && node.nodeName === 'IMG') {
+            if (val === 'custom') {
+                var currentW = parseInt(node.getAttribute('data-border-width'), 10) || 2;
+                var customVal = window.prompt('Enter border width in pixels (e.g. 1, 2, 5):', currentW);
+                if (customVal !== null && customVal.trim() !== '') {
+                    var num = parseInt(customVal, 10);
+                    setImageBorderWidth(tinymce.activeEditor, node, isNaN(num) ? 0 : num);
+                }
+            } else {
+                setImageBorderWidth(tinymce.activeEditor, node, parseInt(val, 10));
+            }
+        } else {
+            alert('Please select an image in the editor first to change its border.');
+        }
+    }
+}
+
+function toggleSelectedImageBorder() {
+    if (tinymce.activeEditor) {
+        var node = tinymce.activeEditor.selection.getNode();
+        if (node && node.nodeName !== 'IMG') node = tinymce.activeEditor.dom.getParent(node, 'img');
+        if (node && node.nodeName === 'IMG') {
+            toggleImageBorder(tinymce.activeEditor, node);
+        } else {
+            alert('Please select an image in the editor first to apply or remove the border.');
+        }
+    }
 }
 
 function updatePublishStatusBadge(isPublished) {
@@ -1904,6 +2992,85 @@ function escapeHtml(str) {
     });
 }
 renderTags();
+
+// ── Category Sidebar Accordion & Dynamic Add ──────────────────
+function toggleCategoryAccordion() {
+    var body = document.getElementById('catAccordionBody');
+    var icon = document.getElementById('catAccordionIcon');
+    if (!body) return;
+    var isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    if (icon) icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+function toggleAddCategoryForm() {
+    var form = document.getElementById('addCatForm');
+    if (!form) return;
+    var isHidden = form.style.display === 'none';
+    form.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+        var input = document.getElementById('newCatInput');
+        if (input) { input.value = ''; input.focus(); }
+    }
+}
+
+function addNewCategory() {
+    var input = document.getElementById('newCatInput');
+    if (!input) return;
+    var name = input.value.trim();
+    if (!name) {
+        alert('Please enter a category name.');
+        return;
+    }
+    
+    var listContainer = document.getElementById('catListContainer');
+    var existing = false;
+    listContainer.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+        if (cb.value.toLowerCase() === name.toLowerCase()) {
+            cb.checked = true;
+            existing = true;
+        }
+    });
+    
+    if (existing) {
+        input.value = '';
+        toggleAddCategoryForm();
+        return;
+    }
+    
+    var csrfToken = document.querySelector('input[name="csrf_token"]') ? document.querySelector('input[name="csrf_token"]').value : '';
+    var formData = new FormData();
+    formData.append('action', 'add_category');
+    formData.append('category_name', name);
+    formData.append('csrf_token', csrfToken);
+    
+    fetch('blog_create.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        appendCategoryCheckbox(name);
+    })
+    .catch(function(err) {
+        appendCategoryCheckbox(name);
+    });
+}
+
+function appendCategoryCheckbox(name) {
+    var listContainer = document.getElementById('catListContainer');
+    var label = document.createElement('label');
+    label.style.cssText = 'display:flex; align-items:center; gap:9px; font-size:0.85rem; color:#1e293b; font-weight:600; cursor:pointer;';
+    label.innerHTML = `
+        <input type="checkbox" name="categories[]" value="${escapeHtml(name)}" checked style="width:16px; height:16px; accent-color:#0284c7; cursor:pointer; border-radius:4px;">
+        <span>${escapeHtml(name)}</span>
+    `;
+    listContainer.appendChild(label);
+    listContainer.scrollTop = listContainer.scrollHeight;
+    var input = document.getElementById('newCatInput');
+    if (input) input.value = '';
+    toggleAddCategoryForm();
+}
 
 // Live SEO & Editorial Stats
 function updateEditorialStats() {
@@ -2022,5 +3189,145 @@ if (descTextarea) {
     descTextarea.style.height = (descTextarea.scrollHeight) + 'px';
 }
 </script>
+
+<!-- CTA Color Box Builder Modal -->
+<div id="ctaBoxModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:580px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1);">
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#ede9fe; color:#7c3aed; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Create CTA Color Box</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Custom callout banner matching Nogoda site theme</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeCtaModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div style="padding:22px 24px;">
+            <!-- Theme selection (3 Nogoda themes) -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Color Theme (Nogoda Palette)</label>
+                <select id="ctaModalTheme" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; background:#fff; font-weight:600; color:#0f172a;">
+                    <option value="violet">Nogoda Electric Violet (Default - Purple & Indigo Gradient)</option>
+                    <option value="navy">Nogoda Deep Navy & Sky (Rich Dark Slate & Sky Blue)</option>
+                    <option value="rose">Nogoda Sunset Rose (High-Energy Crimson Gradient)</option>
+                </select>
+            </div>
+            
+            <!-- Title -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Banner Title</label>
+                <input type="text" id="ctaModalTitle" value="Unlock All Secret Code AI Prompts" placeholder="e.g. Operate Multiple Accounts in Isolated Profiles" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.92rem; box-sizing:border-box;">
+            </div>
+            
+            <!-- Description -->
+            <div style="margin-bottom:18px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Description / Subtitle</label>
+                <textarea id="ctaModalDesc" rows="2" placeholder="Brief enticing description..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">Get instant copy-paste access to trending Gemini & ChatGPT prompts directly on Arigato Devan.</textarea>
+            </div>
+            
+            <!-- Buttons Section -->
+            <div style="margin-bottom:8px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <label style="font-size:0.85rem; font-weight:700; color:#334155;">Action Buttons (Up to 5)</label>
+                    <button type="button" onclick="addCtaModalButtonRow()" style="background:#f1f5f9; border:none; border-radius:6px; padding:5px 12px; font-size:0.78rem; font-weight:700; color:#475569; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Button</button>
+                </div>
+                <div id="ctaModalBtnList" style="display:flex; flex-direction:column; gap:10px;">
+                    <!-- Row 1 (Pre-filled Explore gallery) -->
+                    <div class="cta-btn-input-row" style="display:flex; gap:8px; align-items:center;">
+                        <input type="text" class="cta-btn-text" value="Explore Gallery" placeholder="Button Text" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+                        <input type="text" class="cta-btn-url" value="https://arigatodevan.com/gallery.php" placeholder="URL" style="flex:1.5; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+                        <select class="cta-btn-style" style="padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem;">
+                            <option value="primary">Accent Pill</option>
+                            <option value="secondary">White Button</option>
+                            <option value="ghost">Ghost Glass</option>
+                        </select>
+                    </div>
+                    <!-- Row 2 (Pre-filled Login) -->
+                    <div class="cta-btn-input-row" style="display:flex; gap:8px; align-items:center;">
+                        <input type="text" class="cta-btn-text" value="Login / Sign Up" placeholder="Button Text" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+                        <input type="text" class="cta-btn-url" value="https://arigatodevan.com/login.php" placeholder="URL" style="flex:1.5; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem;">
+                        <select class="cta-btn-style" style="padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem;">
+                            <option value="secondary">White Button</option>
+                            <option value="primary">Accent Pill</option>
+                            <option value="ghost">Ghost Glass</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding:16px 24px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:10px; border-radius:0 0 20px 20px;">
+            <button type="button" onclick="closeCtaModal()" style="padding:10px 18px; border:1px solid #cbd5e1; background:#fff; border-radius:10px; font-weight:700; font-size:0.88rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" onclick="insertCtaBoxFromModal()" style="padding:10px 22px; border:none; background:#7c3aed; color:#fff; border-radius:10px; font-weight:800; font-size:0.88rem; cursor:pointer; box-shadow:0 4px 12px rgba(124,58,237,0.3);"><i class="fa-solid fa-check" style="margin-right:6px;"></i> Insert Box</button>
+        </div>
+    </div>
+</div>
+
+<!-- Note Box & Prompt Showcase Builder Modal -->
+<div id="noteBoxModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:620px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1);">
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-regular fa-note-sticky"></i>
+                </div>
+                <div>
+                    <h3 id="nbModalTitleText" style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Callout & Prompt Showcase Box</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Grey container with linked prompt cards and bottom note</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeNoteBoxModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div style="padding:20px 24px;">
+            <!-- Tabs -->
+            <div style="display:flex; gap:8px; margin-bottom:18px; background:#f1f5f9; padding:4px; border-radius:10px;">
+                <button type="button" id="nbTabCardsBtn" onclick="setNoteBoxModalTab('cards')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-weight:700; font-size:0.84rem; cursor:pointer; background:#ffffff; color:#0f172a; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:all 0.15s;">
+                    <i class="fa-regular fa-images" style="color:#0284c7; margin-right:5px;"></i> Prompt Cards + Note
+                </button>
+                <button type="button" id="nbTabTextBtn" onclick="setNoteBoxModalTab('text')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-weight:700; font-size:0.84rem; cursor:pointer; background:transparent; color:#64748b; transition:all 0.15s;">
+                    <i class="fa-regular fa-file-lines" style="margin-right:5px;"></i> Simple Text Note Only
+                </button>
+            </div>
+
+            <!-- Tab 1: Prompt Cards + Bottom Note -->
+            <div id="nbCardsTabContent">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <label style="font-size:0.85rem; font-weight:700; color:#334155;">Prompt Cards (Top Section)</label>
+                    <button type="button" onclick="addNoteBoxPromptCardRow()" style="background:#f1f5f9; border:none; border-radius:6px; padding:5px 12px; font-size:0.78rem; font-weight:700; color:#0284c7; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Another Card</button>
+                </div>
+
+                <!-- Cards Container -->
+                <div id="nbModalCardsList" style="display:flex; flex-direction:column; gap:12px; margin-bottom:18px;">
+                </div>
+
+                <!-- Bottom Text -->
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Bottom Note / Disclaimer Text</label>
+                    <textarea id="nbModalBottomText" rows="2" placeholder="Write disclaimer, affiliate note, or instructions..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.88rem; box-sizing:border-box;">We independently review every prompt and tool we recommend. When you use links on this page, we may earn an affiliate commission.</textarea>
+                </div>
+            </div>
+
+            <!-- Tab 2: Simple Text Only -->
+            <div id="nbTextTabContent" style="display:none;">
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Note Content</label>
+                    <textarea id="nbModalSimpleText" rows="4" placeholder="Enter disclaimer, notice, or callout text..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">Please note: The prompts provided above are tested and verified on Gemini and ChatGPT. Follow the step-by-step instructions to get the exact output.</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding:16px 24px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:#f8fafc; border-radius:0 0 20px 20px;">
+            <button type="button" onclick="closeNoteBoxModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" id="nbModalSubmitBtn" onclick="insertNoteBoxFromModal()" style="padding:10px 22px; border:none; border-radius:10px; background:#0f172a; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-check"></i> Insert Box into Blog
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

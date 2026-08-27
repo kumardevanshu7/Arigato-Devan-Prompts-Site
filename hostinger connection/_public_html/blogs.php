@@ -19,19 +19,30 @@ $blogs = $pdo
     )
     ->fetchAll(PDO::FETCH_ASSOC);
 
-// Extract all unique tags for filter
-$all_tags = [];
+// Extract all unique categories for top filter bar (prioritizing categories over raw tags)
+$filter_categories = [];
 foreach ($blogs as $b) {
-    if ($b["tags"]) {
-        foreach (
-            array_filter(array_map("trim", explode(",", $b["tags"])))
-            as $tag
-        ) {
-            $all_tags[$tag] = ($all_tags[$tag] ?? 0) + 1;
+    if (!empty($b["category"])) {
+        foreach (array_filter(array_map("trim", explode(",", $b["category"]))) as $cat) {
+            if ($cat !== "" && strtolower($cat) !== "uncategorized") {
+                $filter_categories[$cat] = ($filter_categories[$cat] ?? 0) + 1;
+            }
         }
     }
 }
-arsort($all_tags);
+// Fallback to tags if no categories are assigned yet
+if (empty($filter_categories)) {
+    foreach ($blogs as $b) {
+        if (!empty($b["tags"])) {
+            foreach (array_filter(array_map("trim", explode(",", $b["tags"]))) as $tag) {
+                if ($tag !== "") {
+                    $filter_categories[$tag] = ($filter_categories[$tag] ?? 0) + 1;
+                }
+            }
+        }
+    }
+}
+arsort($filter_categories);
 
 function blog_list_cover_html(array $b, bool $wide = false): string {
     $p = trim((string) ($b['image_path'] ?? ''));
@@ -904,7 +915,7 @@ footer .footer-links a:hover {
     font-size: 1.1rem;
 }
 </style>
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260820p">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260827e">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -981,13 +992,13 @@ footer .footer-links a:hover {
   </div>
   <?php endif; ?>
 
-  <?php if (!empty($all_tags) || count($blogs) > 0): ?>
+  <?php if (!empty($filter_categories) || count($blogs) > 0): ?>
   <div class="bm-toolbar">
-    <?php if (!empty($all_tags)): ?>
+    <?php if (!empty($filter_categories)): ?>
     <div class="bm-tags" id="tag-filters">
       <button type="button" class="bm-tag is-on" data-tag="all" onclick="filterByTag('all', this)">All</button>
-      <?php foreach ($all_tags as $tag => $count): ?>
-      <button type="button" class="bm-tag" data-tag="<?= htmlspecialchars(strtolower($tag)) ?>" onclick="filterByTag('<?= htmlspecialchars(strtolower($tag)) ?>', this)"><?= htmlspecialchars($tag) ?> <span><?= (int)$count ?></span></button>
+      <?php foreach ($filter_categories as $catName => $count): ?>
+      <button type="button" class="bm-tag" data-tag="<?= htmlspecialchars(strtolower($catName)) ?>" onclick="filterByTag('<?= htmlspecialchars(strtolower($catName)) ?>', this)"><?= htmlspecialchars($catName) ?> <span><?= (int)$count ?></span></button>
       <?php endforeach; ?>
     </div>
     <?php else: ?>
@@ -996,28 +1007,32 @@ footer .footer-links a:hover {
   </div>
   <?php endif; ?>
 
-  <?php if ($rest): ?>
+  <?php if (!empty($blogs)): ?>
   <div class="bm-latest-head">
     <h2>Latest</h2>
     <div class="bm-views" role="group" aria-label="Latest layout">
-      <button type="button" class="bm-view" data-view="one" aria-label="One column"><i class="fa-solid fa-square"></i></button>
-      <button type="button" class="bm-view is-on" data-view="grid" aria-label="Two column grid"><i class="fa-solid fa-grip"></i></button>
-      <button type="button" class="bm-view" data-view="list" aria-label="List view"><i class="fa-solid fa-list"></i></button>
+      <button type="button" class="bm-view is-on" data-view="rect" title="Rectangle Cards" aria-label="Rectangle Cards"><i class="fa-solid fa-grip"></i></button>
+      <button type="button" class="bm-view" data-view="list" title="Portrait Cards" aria-label="Portrait Cards"><i class="fa-solid fa-list"></i></button>
     </div>
   </div>
 
   <div class="bm-grid" id="blogs-grid">
-    <?php foreach ($rest as $b):
+    <?php foreach ($blogs as $b):
       $preview = trim(preg_replace('/\s+/', ' ', strip_tags($b['description'] ?: ($b['content'] ?? ''))));
       $preview = mb_strlen($preview) > 140 ? mb_substr($preview, 0, 140) . '…' : $preview;
-      $tag0 = $b['tags'] ? trim(explode(',', $b['tags'])[0]) : '';
       $mins = max(1, (int) ceil(str_word_count(strip_tags($b['content'] ?? '')) / 200));
       $av = !empty($b['author_avatar']) ? $b['author_avatar'] : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($b['author_name'] ?? 'Admin');
+      $p_img = !empty($b['image_path']) ? $b['image_path'] : (!empty($b['image_path_landscape']) ? $b['image_path_landscape'] : '');
+      $l_img = !empty($b['image_path_landscape']) ? $b['image_path_landscape'] : (!empty($b['image_path']) ? $b['image_path'] : '');
     ?>
-    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-tags="<?= htmlspecialchars(strtolower($b['tags'] ?? '')) ?>">
+    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-tags="<?= htmlspecialchars(strtolower(($b['tags'] ?? '') . ' ' . ($b['category'] ?? ''))) ?>">
       <div class="bm-card-img">
-        <?= !empty($b['image_path']) || !empty($b['image_path_landscape']) ? blog_list_cover_html($b, true) : '' ?>
-        <?php if ($tag0): ?><span class="bm-chip"><?= htmlspecialchars($tag0) ?></span><?php endif; ?>
+        <?php if ($p_img || $l_img): ?>
+          <img class="bm-cover-rect" loading="lazy" src="<?= htmlspecialchars($l_img) ?>" alt="<?= htmlspecialchars($b['title']) ?>">
+          <img class="bm-cover-portrait" loading="lazy" src="<?= htmlspecialchars($p_img) ?>" alt="<?= htmlspecialchars($b['title']) ?>">
+        <?php else: ?>
+          <div class="bm-ph"><i class="fa-solid fa-image"></i></div>
+        <?php endif; ?>
       </div>
       <div class="bm-card-body">
         <h3><?= htmlspecialchars($b['title']) ?></h3>
@@ -1028,7 +1043,7 @@ footer .footer-links a:hover {
           <span>·</span>
           <span><?= date('M j, Y', strtotime($b['created_at'])) ?></span>
           <span>·</span>
-          <span><?= $mins ?> min</span>
+          <span><?= $mins ?> min read</span>
         </div>
       </div>
     </a>
@@ -1046,9 +1061,9 @@ footer .footer-links a:hover {
 function setBlogView(view) {
   var page = document.querySelector('.bm-page');
   if (!page) return;
-  if (view !== 'one' && view !== 'list' && view !== 'grid') view = 'grid';
-  page.classList.remove('is-list', 'is-grid', 'is-one');
-  page.classList.add(view === 'list' ? 'is-list' : (view === 'one' ? 'is-one' : 'is-grid'));
+  if (view !== 'list') view = 'rect';
+  page.classList.remove('is-list', 'is-grid', 'is-one', 'is-rect');
+  page.classList.add(view === 'list' ? 'is-list' : 'is-rect');
   document.querySelectorAll('.bm-view').forEach(function(btn) {
     btn.classList.toggle('is-on', btn.getAttribute('data-view') === view);
   });
@@ -1057,7 +1072,10 @@ function setBlogView(view) {
 document.querySelectorAll('.bm-view').forEach(function(btn) {
   btn.addEventListener('click', function() { setBlogView(btn.getAttribute('data-view')); });
 });
-try { setBlogView(localStorage.getItem('blogView') || 'grid'); } catch (e) {}
+try { 
+  var savedView = localStorage.getItem('blogView');
+  setBlogView(savedView === 'list' ? 'list' : 'rect'); 
+} catch (e) {}
 
 (function () {
   var el = document.getElementById('bm-type-text');
