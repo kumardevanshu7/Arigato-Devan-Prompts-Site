@@ -1207,9 +1207,10 @@ $current_blog_categories = ['Uncategorized'];
                     <button type="button" class="be-tb-btn" onclick="fmt('unlink')" title="Remove Link"><i class="fa-solid fa-link-slash"></i></button>
                 </div>
 
-                <!-- Group: Special Arigato Blocks (Note, TOC, CTA) -->
+                <!-- Group: Special Arigato Blocks (Note, FAQ, TOC, CTA) -->
                 <div class="be-tb-group be-tb-group-accent">
                     <button type="button" class="be-tb-btn" onclick="openNoteBoxModal()" title="Insert Note Box / Featured Prompt Cards"><i class="fa-regular fa-note-sticky" style="color:#475569;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="openFaqModal()" title="Insert Sleek Quick FAQ Section Box"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i></button>
                     <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Insert Table of Contents"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
                     <select class="be-tb-select be-tb-select-mini" onchange="setTocSize(this.value); this.selectedIndex=0;" title="Table of Contents Size">
                         <option value="">Size</option>
@@ -1915,8 +1916,10 @@ tinymce.init({
     promotion: false,
     toolbar: false,
     plugins: 'image link lists table code codesample charmap emoticons wordcount autosave visualblocks quickbars',
-    quickbars_selection_toolbar: 'bold italic underline | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
+    quickbars_selection_toolbar: 'bold italic underline caseTransform | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
     quickbars_insert_toolbar: window.matchMedia('(max-width: 768px)').matches ? false : 'image link table codesample',
+    content_css: ['default', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'],
+    contextmenu: 'link image table editFaqMenuItem',
     table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
@@ -1956,6 +1959,64 @@ tinymce.init({
     setup: function (editor) {
         registerImageWriteButtons(editor);
 
+        // ── Text Case Transformation Menu (Aa Capitalize & AA UPPERCASE) ─────
+        function applyCaseTransform(mode) {
+            var rawHtml = editor.selection.getContent();
+            if (!rawHtml) return;
+            var tmp = document.createElement('div');
+            tmp.innerHTML = rawHtml;
+            function walk(node) {
+                if (node.nodeType === 3) {
+                    var v = node.nodeValue;
+                    if (mode === 'upper') {
+                        node.nodeValue = v.toUpperCase();
+                    } else if (mode === 'lower') {
+                        node.nodeValue = v.toLowerCase();
+                    } else if (mode === 'title') {
+                        node.nodeValue = v.replace(/\b[a-zA-Z]/g, function(c) { return c.toUpperCase(); });
+                    } else if (mode === 'sentence') {
+                        node.nodeValue = v.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, function(c) { return c.toUpperCase(); });
+                    }
+                } else if (node.nodeType === 1) {
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        walk(node.childNodes[i]);
+                    }
+                }
+            }
+            walk(tmp);
+            editor.selection.setContent(tmp.innerHTML);
+            editor.nodeChanged();
+        }
+
+        editor.ui.registry.addMenuButton('caseTransform', {
+            text: 'aA',
+            tooltip: 'Change Case (Capitalize / UPPERCASE)',
+            fetch: function (callback) {
+                callback([
+                    {
+                        type: 'menuitem',
+                        text: 'Aa  First Letter Capitalize (Title Case)',
+                        onAction: function () { applyCaseTransform('title'); }
+                    },
+                    {
+                        type: 'menuitem',
+                        text: 'AA  FULL CAPITAL (UPPERCASE)',
+                        onAction: function () { applyCaseTransform('upper'); }
+                    },
+                    {
+                        type: 'menuitem',
+                        text: 'aa  all lowercase',
+                        onAction: function () { applyCaseTransform('lower'); }
+                    },
+                    {
+                        type: 'menuitem',
+                        text: 'A... Sentence case',
+                        onAction: function () { applyCaseTransform('sentence'); }
+                    }
+                ]);
+            }
+        });
+
         // ── Prompt Card Floating Context Toolbar & Handlers ──────────────────
         editor.ui.registry.addButton('swapPromptCardBtn', {
             text: '🔁 Change / Swap Prompt',
@@ -1991,11 +2052,72 @@ tinymce.init({
             scope: 'node'
         });
 
+        // ── FAQ Box Floating Context Toolbar & Handlers ──────────────────
+        editor.ui.registry.addButton('editFaqBtn', {
+            text: '✏️ Edit FAQ Section',
+            tooltip: 'Edit FAQ questions, answers, and theme in popup',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox) {
+                    openFaqModalForEdit(faqBox);
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('removeFaqBtn', {
+            text: '🗑️ Delete FAQ',
+            tooltip: 'Delete this FAQ section',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox) {
+                    editor.dom.remove(faqBox);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addMenuItem('editFaqMenuItem', {
+            text: '✏️ Edit FAQ Section...',
+            icon: 'edit-block',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox) {
+                    openFaqModalForEdit(faqBox);
+                }
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('faqBoxToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, '.blog-faq-box');
+            },
+            items: 'editFaqBtn removeFaqBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
         editor.on('dblclick', function (e) {
             var card = editor.dom.getParent(e.target, '.blog-prompt-card');
             if (card) {
                 e.preventDefault();
                 openNoteBoxModalForEdit(card);
+                return;
+            }
+            var faqBox = editor.dom.getParent(e.target, '.blog-faq-box');
+            if (faqBox) {
+                e.preventDefault();
+                openFaqModalForEdit(faqBox);
+                return;
+            }
+        });
+
+        editor.on('contextmenu', function (e) {
+            var faqBox = editor.dom.getParent(e.target, '.blog-faq-box');
+            if (faqBox) {
+                editor.selection.select(faqBox);
             }
         });
 
@@ -2133,17 +2255,43 @@ tinymce.init({
             padding: 8px 6px;
             background: #ffffff;
         }
-        h1, h2, h3, h4 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            color: #0f172a;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-            line-height: 1.35;
+        h1, h1 * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 2.35rem !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            line-height: 1.25 !important;
+            letter-spacing: -0.02em !important;
+            margin-top: 1.6em !important;
+            margin-bottom: 0.5em !important;
         }
-        h1 { font-size: 1.8rem; }
-        h2 { font-size: 1.45rem; }
-        h3 { font-size: 1.2rem; }
+        h2, h2 * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 1.8rem !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            line-height: 1.3 !important;
+            margin-top: 1.5em !important;
+            margin-bottom: 0.5em !important;
+        }
+        h3, h3 * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            line-height: 1.35 !important;
+            margin-top: 1.4em !important;
+            margin-bottom: 0.5em !important;
+        }
+        h4, h4 * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 1.2rem !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            line-height: 1.4 !important;
+            margin-top: 1.2em !important;
+            margin-bottom: 0.4em !important;
+        }
         p {
             margin-bottom: 1.3em;
         }
@@ -2280,19 +2428,265 @@ tinymce.init({
             vertical-align: top;
         }
         th { background: #f8fafc; font-weight: 700; }
+        /* ── Callout Boxes with 3 Themes ────────────────────────────── */
         .blog-grey-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #94a3b8;
+            border-left: 4px solid #0284c7;
             border-radius: 14px;
-            padding: 18px 22px;
+            padding: 16px 20px;
             margin: 1.8em 0;
-            color: #475569;
+            color: #334155;
             font-size: 0.95rem;
             line-height: 1.65;
             box-sizing: border-box;
         }
         .blog-grey-box p { margin: 0 !important; }
+        .blog-box-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .blog-box-header .box-icon { font-size: 1.15rem; line-height: 1; }
+        
+        /* 1. Bulb Theme (Extra Tip / Pro Tip) */
+        .blog-grey-box.blog-box-tip {
+            background: #fffdf5 !important;
+            border-color: #fef08a !important;
+            border-left: 4px solid #f59e0b !important;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.06);
+        }
+        .blog-grey-box.blog-box-tip .blog-box-header { color: #b45309 !important; }
+        .blog-grey-box.blog-box-tip p { color: #451a03 !important; }
+        
+        /* 2. Info Theme (Classic Slate / Blue) */
+        .blog-grey-box.blog-box-info {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            border-left: 4px solid #0284c7 !important;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.06);
+        }
+        .blog-grey-box.blog-box-info .blog-box-header { color: #0369a1 !important; }
+        .blog-grey-box.blog-box-info p { color: #334155 !important; }
+        
+        /* 3. Alert / Secret Code Theme (Rose / Coral) */
+        .blog-grey-box.blog-box-alert {
+            background: #fff5f6 !important;
+            border-color: #fecdd3 !important;
+            border-left: 4px solid #f43f5e !important;
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.06);
+        }
+        .blog-grey-box.blog-box-alert .blog-box-header { color: #be123c !important; }
+        .blog-grey-box.blog-box-alert p { color: #4c0519 !important; }
+
+        /* ── Sleek Quick FAQ Section Box with 5 Themes & Watermark ── */
+        .blog-faq-box {
+            position: relative !important;
+            border-radius: 18px !important;
+            padding: 24px 26px !important;
+            margin: 2.2em 0 !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            transition: all 0.2s ease !important;
+        }
+        .blog-faq-watermark {
+            position: absolute !important;
+            inset: 0 !important;
+            pointer-events: none !important;
+            user-select: none !important;
+            z-index: 0 !important;
+            background-repeat: repeat !important;
+            background-size: 140px 140px !important;
+            opacity: 0.9 !important;
+        }
+        .blog-faq-inner {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        .blog-faq-head {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding-bottom: 16px !important;
+            margin-bottom: 20px !important;
+            border-bottom: 1.5px solid rgba(0,0,0,0.06) !important;
+        }
+        .blog-faq-icon {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+        }
+        .blog-faq-icon svg {
+            width: 20px !important;
+            height: 20px !important;
+            stroke: currentColor !important;
+        }
+        .blog-faq-title {
+            font-size: 1.22rem !important;
+            font-weight: 800 !important;
+            margin: 0 !important;
+            letter-spacing: -0.02em !important;
+        }
+        .blog-faq-list {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
+        }
+        .blog-faq-item {
+            border-radius: 14px !important;
+            padding: 16px 18px !important;
+            box-sizing: border-box !important;
+            background: #ffffff !important;
+            transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+        }
+        .blog-faq-item:hover {
+            transform: translateY(-1px) !important;
+        }
+        .faq-q-row {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            margin-bottom: 8px !important;
+        }
+        .faq-num-badge {
+            width: 26px !important;
+            height: 26px !important;
+            border-radius: 8px !important;
+            font-size: 0.75rem !important;
+            font-weight: 800 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            margin-top: 1px !important;
+            letter-spacing: -0.02em !important;
+        }
+        .faq-q-text {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            line-height: 1.4 !important;
+            flex: 1 !important;
+        }
+        .faq-toggle-icon {
+            font-size: 0.85rem !important;
+            opacity: 0.6 !important;
+            margin-top: 4px !important;
+        }
+        .faq-a-row {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+        }
+        .faq-a-spacer {
+            width: 26px !important;
+            flex-shrink: 0 !important;
+        }
+        .faq-a-text {
+            font-size: 0.93rem !important;
+            margin: 0 !important;
+            line-height: 1.65 !important;
+            flex: 1 !important;
+        }
+
+        /* 1. Theme: Nogoda Electric Violet (Default) */
+        .faq-theme-nogoda {
+            background: linear-gradient(145deg, #ffffff 0%, #faf5ff 100%) !important;
+            border: 1.5px solid #ddd6fe !important;
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.08) !important;
+        }
+        .faq-theme-nogoda .blog-faq-watermark {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Ctext x='25' y='45' font-size='24' font-family='sans-serif' font-weight='800' fill='%237c3aed' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='95' y='110' font-size='36' font-family='sans-serif' font-weight='800' fill='%237c3aed' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='100' y='35' font-size='18' font-family='sans-serif' font-weight='800' fill='%237c3aed' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='35' y='125' font-size='20' font-family='sans-serif' font-weight='800' fill='%237c3aed' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3C/svg%3E") !important;
+        }
+        .faq-theme-nogoda .blog-faq-head { border-bottom-color: #ede9fe !important; }
+        .faq-theme-nogoda .blog-faq-icon { background: #ede9fe !important; color: #7c3aed !important; }
+        .faq-theme-nogoda .blog-faq-title { color: #4c1d95 !important; }
+        .faq-theme-nogoda .blog-faq-item { background: #ffffff !important; border: 1px solid #e9d5ff !important; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.04) !important; }
+        .faq-theme-nogoda .faq-num-badge { background: #f3e8ff !important; color: #7c3aed !important; }
+        .faq-theme-nogoda .faq-q-text { color: #1e1b4b !important; }
+        .faq-theme-nogoda .faq-a-text { color: #4b5563 !important; }
+        .faq-theme-nogoda .faq-toggle-icon { color: #7c3aed !important; }
+
+        /* 2. Theme: Modern Minimalist Sky (Sample Pic 2) */
+        .faq-theme-sky {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%) !important;
+            border: 1.5px solid #bae6fd !important;
+            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08) !important;
+        }
+        .faq-theme-sky .blog-faq-watermark {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Ctext x='25' y='45' font-size='24' font-family='sans-serif' font-weight='800' fill='%230284c7' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='95' y='110' font-size='36' font-family='sans-serif' font-weight='800' fill='%230284c7' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='100' y='35' font-size='18' font-family='sans-serif' font-weight='800' fill='%230284c7' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='35' y='125' font-size='20' font-family='sans-serif' font-weight='800' fill='%230284c7' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3C/svg%3E") !important;
+        }
+        .faq-theme-sky .blog-faq-head { border-bottom-color: #e0f2fe !important; }
+        .faq-theme-sky .blog-faq-icon { background: #e0f2fe !important; color: #0284c7 !important; }
+        .faq-theme-sky .blog-faq-title { color: #0369a1 !important; }
+        .faq-theme-sky .blog-faq-item { background: #ffffff !important; border: 1px solid #e0f2fe !important; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.04) !important; }
+        .faq-theme-sky .faq-num-badge { background: #e0f2fe !important; color: #0284c7 !important; }
+        .faq-theme-sky .faq-q-text { color: #0f172a !important; }
+        .faq-theme-sky .faq-a-text { color: #475569 !important; }
+        .faq-theme-sky .faq-toggle-icon { color: #0284c7 !important; }
+
+        /* 3. Theme: Executive Navy & Dark Slate */
+        .faq-theme-navy {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06) !important;
+        }
+        .faq-theme-navy .blog-faq-watermark {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Ctext x='25' y='45' font-size='24' font-family='sans-serif' font-weight='800' fill='%23334155' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='95' y='110' font-size='36' font-family='sans-serif' font-weight='800' fill='%23334155' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='100' y='35' font-size='18' font-family='sans-serif' font-weight='800' fill='%23334155' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='35' y='125' font-size='20' font-family='sans-serif' font-weight='800' fill='%23334155' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3C/svg%3E") !important;
+        }
+        .faq-theme-navy .blog-faq-head { border-bottom-color: #e2e8f0 !important; }
+        .faq-theme-navy .blog-faq-icon { background: #0f172a !important; color: #ffffff !important; }
+        .faq-theme-navy .blog-faq-title { color: #0f172a !important; }
+        .faq-theme-navy .blog-faq-item { background: #ffffff !important; border: 1px solid #e2e8f0 !important; }
+        .faq-theme-navy .faq-num-badge { background: #0f172a !important; color: #ffffff !important; }
+        .faq-theme-navy .faq-q-text { color: #0f172a !important; }
+        .faq-theme-navy .faq-a-text { color: #475569 !important; }
+        .faq-theme-navy .faq-toggle-icon { color: #64748b !important; }
+
+        /* 4. Theme: Warm Sunset Amber / Gold */
+        .faq-theme-amber {
+            background: linear-gradient(145deg, #ffffff 0%, #fffdf5 100%) !important;
+            border: 1.5px solid #fde68a !important;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.08) !important;
+        }
+        .faq-theme-amber .blog-faq-watermark {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Ctext x='25' y='45' font-size='24' font-family='sans-serif' font-weight='800' fill='%23f59e0b' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='95' y='110' font-size='36' font-family='sans-serif' font-weight='800' fill='%23f59e0b' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='100' y='35' font-size='18' font-family='sans-serif' font-weight='800' fill='%23f59e0b' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='35' y='125' font-size='20' font-family='sans-serif' font-weight='800' fill='%23f59e0b' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3C/svg%3E") !important;
+        }
+        .faq-theme-amber .blog-faq-head { border-bottom-color: #fef3c7 !important; }
+        .faq-theme-amber .blog-faq-icon { background: #fef3c7 !important; color: #d97706 !important; }
+        .faq-theme-amber .blog-faq-title { color: #92400e !important; }
+        .faq-theme-amber .blog-faq-item { background: #ffffff !important; border: 1px solid #fef3c7 !important; }
+        .faq-theme-amber .faq-num-badge { background: #fef3c7 !important; color: #b45309 !important; }
+        .faq-theme-amber .faq-q-text { color: #451a03 !important; }
+        .faq-theme-amber .faq-a-text { color: #78350f !important; }
+        .faq-theme-amber .faq-toggle-icon { color: #d97706 !important; }
+
+        /* 5. Theme: Clean Emerald Mint */
+        .faq-theme-emerald {
+            background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%) !important;
+            border: 1.5px solid #a7f3d0 !important;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.08) !important;
+        }
+        .faq-theme-emerald .blog-faq-watermark {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Ctext x='25' y='45' font-size='24' font-family='sans-serif' font-weight='800' fill='%2310b981' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='95' y='110' font-size='36' font-family='sans-serif' font-weight='800' fill='%2310b981' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='100' y='35' font-size='18' font-family='sans-serif' font-weight='800' fill='%2310b981' opacity='0.05' filter='url(%23b)'%3E%3F%3C/text%3E%3Ctext x='35' y='125' font-size='20' font-family='sans-serif' font-weight='800' fill='%2310b981' opacity='0.04' filter='url(%23b)'%3E%3F%3C/text%3E%3C/svg%3E") !important;
+        }
+        .faq-theme-emerald .blog-faq-head { border-bottom-color: #d1fae5 !important; }
+        .faq-theme-emerald .blog-faq-icon { background: #d1fae5 !important; color: #059669 !important; }
+        .faq-theme-emerald .blog-faq-title { color: #065f46 !important; }
+        .faq-theme-emerald .blog-faq-item { background: #ffffff !important; border: 1px solid #d1fae5 !important; }
+        .faq-theme-emerald .faq-num-badge { background: #d1fae5 !important; color: #047857 !important; }
+        .faq-theme-emerald .faq-q-text { color: #064e3b !important; }
+        .faq-theme-emerald .faq-a-text { color: #047857 !important; }
+        .faq-theme-emerald .faq-toggle-icon { color: #059669 !important; }
         /* Single Unified Prompt Card (No nested boxes) */
         .blog-prompt-card {
             background: #f8fafc;
@@ -2663,26 +3057,41 @@ function closeNoteBoxModal() {
 function setNoteBoxModalTab(tab) {
     var cardsTab = document.getElementById('nbCardsTabContent');
     var textTab = document.getElementById('nbTextTabContent');
+    var faqTab = document.getElementById('nbFaqTabContent');
     var cardsBtn = document.getElementById('nbTabCardsBtn');
     var textBtn = document.getElementById('nbTabTextBtn');
+    var faqBtn = document.getElementById('nbTabFaqBtn');
+    
+    [cardsTab, textTab, faqTab].forEach(function(el) { if (el) el.style.display = 'none'; });
+    [cardsBtn, textBtn, faqBtn].forEach(function(btn) {
+        if (btn) {
+            btn.style.background = 'transparent';
+            btn.style.color = '#64748b';
+            btn.style.boxShadow = 'none';
+        }
+    });
+
     if (tab === 'cards') {
-        cardsTab.style.display = 'block';
-        textTab.style.display = 'none';
-        cardsBtn.style.background = '#ffffff';
-        cardsBtn.style.color = '#0f172a';
-        cardsBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
-        textBtn.style.background = 'transparent';
-        textBtn.style.color = '#64748b';
-        textBtn.style.boxShadow = 'none';
-    } else {
-        cardsTab.style.display = 'none';
-        textTab.style.display = 'block';
-        textBtn.style.background = '#ffffff';
-        textBtn.style.color = '#0f172a';
-        textBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
-        cardsBtn.style.background = 'transparent';
-        cardsBtn.style.color = '#64748b';
-        cardsBtn.style.boxShadow = 'none';
+        if (cardsTab) cardsTab.style.display = 'block';
+        if (cardsBtn) {
+            cardsBtn.style.background = '#ffffff';
+            cardsBtn.style.color = '#0f172a';
+            cardsBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+        }
+    } else if (tab === 'text') {
+        if (textTab) textTab.style.display = 'block';
+        if (textBtn) {
+            textBtn.style.background = '#ffffff';
+            textBtn.style.color = '#0f172a';
+            textBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+        }
+    } else if (tab === 'faq') {
+        if (faqTab) faqTab.style.display = 'block';
+        if (faqBtn) {
+            faqBtn.style.background = '#ffffff';
+            faqBtn.style.color = '#0f172a';
+            faqBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+        }
     }
 }
 function addNoteBoxPromptCardRow(preset) {
@@ -2766,15 +3175,204 @@ function onNoteBoxPromptSelect(selectEl) {
     if (imgInput) imgInput.value = img;
     if (imgPreview) imgPreview.src = img || 'toplogo/logo01.webp';
 }
+window.currentEditingFaqBox = null;
+
+function openFaqModal() {
+    window.currentEditingFaqBox = null;
+    var modal = document.getElementById('faqModal');
+    if (!modal) return;
+    document.getElementById('faqModalHeading').textContent = 'Insert Quick FAQ Section';
+    document.getElementById('faqModalSubmitBtn').innerHTML = '<i class="fa-solid fa-check"></i> Insert FAQ Section into Blog';
+    
+    var list = document.getElementById('faqModalItemList');
+    if (list && list.children.length === 0) {
+        addFaqModalRow('How do I unlock the secret codes on Arigato Devan?', 'Comment on our Instagram post to receive the secret code in your DMs, or visit our All Codes page to unlock prompts instantly.');
+        addFaqModalRow('Which AI image generators are supported?', 'All prompts are tested and verified across ChatGPT (DALL-E 3), Midjourney v6, and Google Gemini with photorealistic output.');
+    }
+    modal.style.display = 'flex';
+}
+
+function openFaqModalForEdit(faqBox) {
+    window.currentEditingFaqBox = faqBox;
+    var modal = document.getElementById('faqModal');
+    if (!modal) return;
+    
+    document.getElementById('faqModalHeading').textContent = '✏️ Edit FAQ Section';
+    document.getElementById('faqModalSubmitBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update FAQ in Blog';
+    
+    // 1. Read Title
+    var titleEl = faqBox.querySelector('.blog-faq-title');
+    if (titleEl) {
+        document.getElementById('faqModalSectionTitle').value = titleEl.textContent.trim();
+    }
+    
+    // 2. Read Theme
+    var matchedTheme = 'faq-theme-nogoda';
+    ['faq-theme-nogoda', 'faq-theme-sky', 'faq-theme-navy', 'faq-theme-amber', 'faq-theme-emerald'].forEach(function(t) {
+        if (faqBox.classList.contains(t)) matchedTheme = t;
+    });
+    var themeRadio = document.querySelector(`input[name="faqBoxTheme"][value="${matchedTheme}"]`);
+    if (themeRadio) {
+        themeRadio.checked = true;
+    }
+    
+    // 3. Read Badge Style
+    var isQa = !!faqBox.querySelector('.faq-q-badge');
+    var badgeSelect = document.getElementById('faqModalBadgeStyle');
+    if (badgeSelect) badgeSelect.value = isQa ? 'qa' : 'num';
+    
+    // 4. Read Questions & Answers
+    var list = document.getElementById('faqModalItemList');
+    if (list) {
+        list.innerHTML = '';
+        var items = faqBox.querySelectorAll('.blog-faq-item');
+        if (items.length > 0) {
+            items.forEach(function(item) {
+                var qEl = item.querySelector('.faq-q-text');
+                var aEl = item.querySelector('.faq-a-text');
+                addFaqModalRow(qEl ? qEl.textContent.trim() : '', aEl ? aEl.textContent.trim() : '');
+            });
+        } else {
+            addFaqModalRow('', '');
+        }
+    }
+    modal.style.display = 'flex';
+}
+
+function closeFaqModal() {
+    var modal = document.getElementById('faqModal');
+    if (modal) modal.style.display = 'none';
+    window.currentEditingFaqBox = null;
+}
+
+function addFaqModalRow(q, a) {
+    var list = document.getElementById('faqModalItemList');
+    if (!list) return;
+    var row = document.createElement('div');
+    row.className = 'faq-modal-row';
+    row.style.cssText = 'background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 14px; position:relative;';
+    
+    row.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:0.75rem; font-weight:800; color:#64748b;" class="faq-row-num">Question</span>
+            <button type="button" onclick="this.closest('.faq-modal-row').remove(); updateFaqRowNumbers();" style="background:none; border:none; color:#ef4444; font-size:0.85rem; cursor:pointer; padding:2px 6px;" title="Remove this question"><i class="fa-regular fa-trash-can"></i></button>
+        </div>
+        <input type="text" class="faq-input-q" placeholder="Enter question..." value="${escapeHtml(q || '')}" style="width:100%; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:0.88rem; font-weight:700; margin-bottom:8px; box-sizing:border-box;">
+        <textarea class="faq-input-a" rows="2" placeholder="Enter answer..." style="width:100%; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:0.86rem; box-sizing:border-box;">${escapeHtml(a || '')}</textarea>
+    `;
+    list.appendChild(row);
+    updateFaqRowNumbers();
+}
+
+function updateFaqRowNumbers() {
+    var rows = document.querySelectorAll('#faqModalItemList .faq-modal-row');
+    rows.forEach(function(r, idx) {
+        var numEl = r.querySelector('.faq-row-num');
+        if (numEl) numEl.textContent = 'Question ' + (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+    });
+}
+
+function insertFaqFromModal() {
+    if (!tinymce.activeEditor) return;
+    var themeRadio = document.querySelector('input[name="faqBoxTheme"]:checked');
+    var theme = themeRadio ? themeRadio.value : 'faq-theme-nogoda';
+    var sectionTitle = (document.getElementById('faqModalSectionTitle').value || '').trim() || 'Frequently Asked Questions';
+    var badgeStyle = document.getElementById('faqModalBadgeStyle').value || 'num';
+    
+    var rows = document.querySelectorAll('#faqModalItemList .faq-modal-row');
+    var itemsHtml = [];
+    
+    rows.forEach(function(row, idx) {
+        var q = (row.querySelector('.faq-input-q').value || '').trim();
+        var a = (row.querySelector('.faq-input-a').value || '').trim();
+        if (!q && !a) return;
+        
+        var numStr = (idx + 1 < 10) ? ('0' + (idx + 1)) : ('' + (idx + 1));
+        var badgeHtml = (badgeStyle === 'qa') 
+            ? `<span class="faq-num-badge" style="background:#7c3aed; color:#fff; font-size:0.72rem;">Q</span>` 
+            : `<span class="faq-num-badge">${numStr}</span>`;
+            
+        itemsHtml.push(`
+        <div class="blog-faq-item">
+          <div class="faq-q-row">
+            ${badgeHtml}
+            <h4 class="faq-q-text" contenteditable="true">${escapeHtml(q || 'Question')}</h4>
+            <span class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="faq-a-row">
+            <div class="faq-a-spacer"></div>
+            <p class="faq-a-text" contenteditable="true">${escapeHtml(a || 'Answer')}</p>
+          </div>
+        </div>`.trim());
+    });
+    
+    if (itemsHtml.length === 0) {
+        alert('Please enter at least one question and answer.');
+        return;
+    }
+    
+    var faqHtml = `
+      <div class="blog-faq-box ${theme}">
+        <div class="blog-faq-watermark"></div>
+        <div class="blog-faq-inner">
+          <div class="blog-faq-head">
+            <div class="blog-faq-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h3 class="blog-faq-title" contenteditable="true">${escapeHtml(sectionTitle)}</h3>
+          </div>
+          <div class="blog-faq-list">
+            ${itemsHtml.join('\n            ')}
+          </div>
+        </div>
+      </div>
+    `.trim();
+
+    if (window.currentEditingFaqBox) {
+        var dummy = document.createElement('div');
+        dummy.innerHTML = faqHtml;
+        var newEl = dummy.firstElementChild;
+        window.currentEditingFaqBox.parentNode.replaceChild(newEl, window.currentEditingFaqBox);
+        tinymce.activeEditor.nodeChanged();
+        window.currentEditingFaqBox = null;
+    } else {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, faqHtml + '<p><br></p>');
+    }
+    closeFaqModal();
+}
+
 function insertNoteBoxFromModal() {
     if (!tinymce.activeEditor) return;
     var cardsTab = document.getElementById('nbCardsTabContent');
+    var faqTab = document.getElementById('nbFaqTabContent');
     var isCardsMode = cardsTab && cardsTab.style.display !== 'none';
+    var isFaqMode = faqTab && faqTab.style.display !== 'none';
     
+    if (isFaqMode) {
+        closeNoteBoxModal();
+        openFaqModal();
+        return;
+    }
+
     if (!isCardsMode) {
         var simpleText = (document.getElementById('nbModalSimpleText').value || '').trim();
+        var themeRadio = document.querySelector('input[name="nbBoxTheme"]:checked');
+        var theme = themeRadio ? themeRadio.value : 'tip';
+        
+        var themeClass = 'blog-box-tip';
+        var iconHtml = '<span class="box-icon">💡</span> <strong>Extra Tip:</strong>';
+        
+        if (theme === 'info') {
+            themeClass = 'blog-box-info';
+            iconHtml = '<span class="box-icon">ℹ️</span> <strong>Please Note:</strong>';
+        } else if (theme === 'alert') {
+            themeClass = 'blog-box-alert';
+            iconHtml = '<span class="box-icon">🔑</span> <strong>Important Note:</strong>';
+        }
+
         var simpleHtml = `
-          <div class="blog-grey-box">
+          <div class="blog-grey-box ${themeClass}">
+            <div class="blog-box-header">${iconHtml}</div>
             <p contenteditable="true"><em>${escapeHtml(simpleText) || 'We independently review every prompt and tool we recommend.'}</em></p>
           </div>
           <p><br></p>
@@ -3435,11 +4033,14 @@ if (descTextarea) {
         <div style="padding:20px 24px;">
             <!-- Tabs -->
             <div style="display:flex; gap:8px; margin-bottom:18px; background:#f1f5f9; padding:4px; border-radius:10px;">
-                <button type="button" id="nbTabCardsBtn" onclick="setNoteBoxModalTab('cards')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-weight:700; font-size:0.84rem; cursor:pointer; background:#ffffff; color:#0f172a; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:all 0.15s;">
-                    <i class="fa-regular fa-images" style="color:#0284c7; margin-right:5px;"></i> Prompt Cards + Note
+                <button type="button" id="nbTabCardsBtn" onclick="setNoteBoxModalTab('cards')" style="flex:1; padding:8px 10px; border:none; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; background:#ffffff; color:#0f172a; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:all 0.15s;">
+                    <i class="fa-regular fa-images" style="color:#0284c7; margin-right:4px;"></i> Prompt Cards
                 </button>
-                <button type="button" id="nbTabTextBtn" onclick="setNoteBoxModalTab('text')" style="flex:1; padding:8px 12px; border:none; border-radius:8px; font-weight:700; font-size:0.84rem; cursor:pointer; background:transparent; color:#64748b; transition:all 0.15s;">
-                    <i class="fa-regular fa-file-lines" style="margin-right:5px;"></i> Simple Text Note Only
+                <button type="button" id="nbTabTextBtn" onclick="setNoteBoxModalTab('text')" style="flex:1; padding:8px 10px; border:none; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; background:transparent; color:#64748b; transition:all 0.15s;">
+                    <i class="fa-solid fa-lightbulb" style="color:#f59e0b; margin-right:4px;"></i> Callout (3 Themes)
+                </button>
+                <button type="button" id="nbTabFaqBtn" onclick="setNoteBoxModalTab('faq')" style="flex:1; padding:8px 10px; border:none; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; background:transparent; color:#64748b; transition:all 0.15s;">
+                    <i class="fa-solid fa-circle-question" style="color:#6366f1; margin-right:4px;"></i> Quick FAQ Box
                 </button>
             </div>
 
@@ -3461,11 +4062,49 @@ if (descTextarea) {
                 </div>
             </div>
 
-            <!-- Tab 2: Simple Text Only -->
+            <!-- Tab 2: Callout Note with 3 Themes -->
             <div id="nbTextTabContent" style="display:none;">
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px;">Choose Callout Box Theme:</label>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+                        <label style="display:flex; flex-direction:column; align-items:center; padding:10px 6px; border:2px solid #f59e0b; background:#fffdf5; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                            <input type="radio" name="nbBoxTheme" value="tip" checked style="accent-color:#f59e0b; margin-bottom:4px;">
+                            <span style="font-size:1.3rem; line-height:1;">💡</span>
+                            <strong style="font-size:0.8rem; color:#92400e; margin-top:4px;">Extra / Pro Tip</strong>
+                            <span style="font-size:0.68rem; color:#b45309;">Amber bulb theme</span>
+                        </label>
+                        <label style="display:flex; flex-direction:column; align-items:center; padding:10px 6px; border:2px solid #e2e8f0; background:#f8fafc; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                            <input type="radio" name="nbBoxTheme" value="info" style="accent-color:#0284c7; margin-bottom:4px;">
+                            <span style="font-size:1.3rem; line-height:1;">ℹ️</span>
+                            <strong style="font-size:0.8rem; color:#0f172a; margin-top:4px;">Standard Info</strong>
+                            <span style="font-size:0.68rem; color:#64748b;">Classic slate blue</span>
+                        </label>
+                        <label style="display:flex; flex-direction:column; align-items:center; padding:10px 6px; border:2px solid #e2e8f0; background:#fff5f6; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                            <input type="radio" name="nbBoxTheme" value="alert" style="accent-color:#f43f5e; margin-bottom:4px;">
+                            <span style="font-size:1.3rem; line-height:1;">🔑</span>
+                            <strong style="font-size:0.8rem; color:#9f1239; margin-top:4px;">Secret / Alert</strong>
+                            <span style="font-size:0.68rem; color:#be123c;">Rose coral theme</span>
+                        </label>
+                    </div>
+                </div>
                 <div style="margin-bottom:16px;">
                     <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Note Content</label>
-                    <textarea id="nbModalSimpleText" rows="4" placeholder="Enter disclaimer, notice, or callout text..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">Please note: The prompts provided above are tested and verified on Gemini and ChatGPT. Follow the step-by-step instructions to get the exact output.</textarea>
+                    <textarea id="nbModalSimpleText" rows="4" placeholder="Enter tip, disclaimer, or instructions..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">Always specify lighting (like golden hour or cinematic neon reflections) in your prompt to make your photos look instantly authentic.</textarea>
+                </div>
+            </div>
+
+            <!-- Tab 3: Quick FAQ Box Preview & Insert -->
+            <div id="nbFaqTabContent" style="display:none;">
+                <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                        <span style="width:28px; height:28px; border-radius:8px; background:#e0e7ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:1rem;"><i class="fa-solid fa-circle-question"></i></span>
+                        <strong style="font-size:0.95rem; color:#0f172a;">Quick FAQ Section Preview</strong>
+                    </div>
+                    <p style="font-size:0.82rem; color:#64748b; margin:0 0 12px;">This will insert a sleek, high-readability FAQ section box with question mark badge into your blog. You can easily click and edit questions and answers directly in the editor.</p>
+                    <div style="background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:10px 14px; font-size:0.85rem; color:#334155;">
+                        <div style="display:flex; gap:6px; margin-bottom:4px;"><span style="background:#4f46e5; color:#fff; font-size:0.65rem; font-weight:800; padding:1px 5px; border-radius:4px;">Q</span> <strong>How do I unlock secret code prompts?</strong></div>
+                        <div style="display:flex; gap:6px;"><span style="background:#059669; color:#fff; font-size:0.65rem; font-weight:800; padding:1px 5px; border-radius:4px;">A</span> <span style="color:#64748b;">Comment on Instagram @arigato.devan or check All Codes.</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3474,6 +4113,102 @@ if (descTextarea) {
             <button type="button" onclick="closeNoteBoxModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
             <button type="button" id="nbModalSubmitBtn" onclick="insertNoteBoxFromModal()" style="padding:10px 22px; border:none; border-radius:10px; background:#0f172a; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-check"></i> Insert Box into Blog
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Dedicated FAQ Builder & Editor Modal -->
+<div id="faqModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:680px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1);">
+        <!-- Modal Header -->
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#ede9fe; color:#7c3aed; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+                <div>
+                    <h3 id="faqModalHeading" style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Insert Quick FAQ Section</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Custom styled Q&A section with blurred watermark background</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeFaqModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div style="padding:20px 24px;">
+            <!-- 5 Theme Selection -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px;">Choose FAQ Theme (5 Options):</label>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap:8px;">
+                    <!-- Theme 1: Nogoda Violet -->
+                    <label style="display:flex; flex-direction:column; align-items:center; padding:10px 4px; border:2px solid #7c3aed; background:#faf5ff; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                        <input type="radio" name="faqBoxTheme" value="faq-theme-nogoda" checked style="accent-color:#7c3aed; margin-bottom:4px;">
+                        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#7c3aed; margin-bottom:4px;"></span>
+                        <strong style="font-size:0.75rem; color:#4c1d95;">Nogoda Violet</strong>
+                        <span style="font-size:0.65rem; color:#7c3aed;">Purple glow</span>
+                    </label>
+                    <!-- Theme 2: Minimalist Sky -->
+                    <label style="display:flex; flex-direction:column; align-items:center; padding:10px 4px; border:2px solid #e2e8f0; background:#f0f9ff; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                        <input type="radio" name="faqBoxTheme" value="faq-theme-sky" style="accent-color:#0284c7; margin-bottom:4px;">
+                        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#0284c7; margin-bottom:4px;"></span>
+                        <strong style="font-size:0.75rem; color:#0369a1;">Clean Sky</strong>
+                        <span style="font-size:0.65rem; color:#0284c7;">Sample style</span>
+                    </label>
+                    <!-- Theme 3: Executive Navy -->
+                    <label style="display:flex; flex-direction:column; align-items:center; padding:10px 4px; border:2px solid #e2e8f0; background:#f8fafc; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                        <input type="radio" name="faqBoxTheme" value="faq-theme-navy" style="accent-color:#0f172a; margin-bottom:4px;">
+                        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#0f172a; margin-bottom:4px;"></span>
+                        <strong style="font-size:0.75rem; color:#0f172a;">Dark Slate</strong>
+                        <span style="font-size:0.65rem; color:#475569;">High contrast</span>
+                    </label>
+                    <!-- Theme 4: Sunset Amber -->
+                    <label style="display:flex; flex-direction:column; align-items:center; padding:10px 4px; border:2px solid #e2e8f0; background:#fffdf5; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                        <input type="radio" name="faqBoxTheme" value="faq-theme-amber" style="accent-color:#f59e0b; margin-bottom:4px;">
+                        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#f59e0b; margin-bottom:4px;"></span>
+                        <strong style="font-size:0.75rem; color:#92400e;">Sunset Gold</strong>
+                        <span style="font-size:0.65rem; color:#b45309;">Warm tint</span>
+                    </label>
+                    <!-- Theme 5: Emerald Mint -->
+                    <label style="display:flex; flex-direction:column; align-items:center; padding:10px 4px; border:2px solid #e2e8f0; background:#f0fdf4; border-radius:12px; cursor:pointer; text-align:center; transition:all 0.15s;">
+                        <input type="radio" name="faqBoxTheme" value="faq-theme-emerald" style="accent-color:#10b981; margin-bottom:4px;">
+                        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#10b981; margin-bottom:4px;"></span>
+                        <strong style="font-size:0.75rem; color:#065f46;">Mint Green</strong>
+                        <span style="font-size:0.65rem; color:#059669;">Fresh organic</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Title & Badge Type Row -->
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-bottom:16px;">
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Section Heading</label>
+                    <input type="text" id="faqModalSectionTitle" value="Frequently Asked Questions" placeholder="e.g. Frequently Asked Questions" style="width:100%; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">Badge Style</label>
+                    <select id="faqModalBadgeStyle" style="width:100%; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.88rem; background:#fff; box-sizing:border-box; color:#0f172a; font-weight:600;">
+                        <option value="num" selected>Numbers (01, 02...)</option>
+                        <option value="qa">Letters (Q / A)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div style="margin-bottom:12px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <label style="font-size:0.85rem; font-weight:800; color:#0f172a;">Questions & Answers</label>
+                    <button type="button" onclick="addFaqModalRow()" style="background:#f1f5f9; border:none; border-radius:6px; padding:5px 12px; font-size:0.78rem; font-weight:700; color:#7c3aed; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Question</button>
+                </div>
+                <div id="faqModalItemList" style="display:flex; flex-direction:column; gap:12px; max-height:42vh; overflow-y:auto; padding-right:4px;">
+                    <!-- Dynamically populated rows -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div style="padding:16px 24px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:#f8fafc; border-radius:0 0 20px 20px;">
+            <button type="button" onclick="closeFaqModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" id="faqModalSubmitBtn" onclick="insertFaqFromModal()" style="padding:10px 22px; border:none; border-radius:10px; background:#7c3aed; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(124,58,237,0.25);">
+                <i class="fa-solid fa-check"></i> Insert FAQ Section into Blog
             </button>
         </div>
     </div>
