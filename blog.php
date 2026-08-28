@@ -79,7 +79,72 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260828mobfix">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260828bleed">
+<style>
+/* Direct In-Page Override: Desktop Separation & Mobile Edge-to-Edge Boundary */
+@media (min-width: 901px) {
+  .ba-page {
+    max-width: 1360px !important;
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+  }
+  .ba-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+    gap: 150px !important;
+    align-items: start !important;
+  }
+  .ba-layout > div:first-child {
+    max-width: 760px !important;
+    width: 100% !important;
+  }
+}
+@media (max-width: 1280px) and (min-width: 1025px) {
+  .ba-layout {
+    grid-template-columns: minmax(0, 1fr) 260px !important;
+    gap: 120px !important;
+  }
+}
+@media (max-width: 1024px) and (min-width: 901px) {
+  .ba-layout {
+    grid-template-columns: minmax(0, 1fr) 250px !important;
+    gap: 96px !important;
+  }
+}
+@media (max-width: 900px) {
+  .ba-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  .ba-hero.has-photo {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 0 !important;
+  }
+  .ba-hero.has-photo .ba-gallery,
+  .ba-hero.has-photo .ba-gallery-main,
+  .ba-hero.has-photo .ba-gallery-main img,
+  .ba-hero.has-photo .ba-cover-pic {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  .ba-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px !important;
+  }
+}
+</style>
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
 ) ?>">
@@ -2663,6 +2728,113 @@ document.querySelectorAll('.ba-content pre, .blog-content pre').forEach(function
         tools.appendChild(copyBtn);
         pre.appendChild(tools);
     }
+});
+
+// ── Interactive Frontend Carousel Controller (Overflow Aware) ──
+document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
+    var viewport = box.querySelector('.bcar-viewport');
+    var track = box.querySelector('.bcar-track');
+    var slides = box.querySelectorAll('.bcar-slide');
+    var prevBtn = box.querySelector('.bcar-prev');
+    var nextBtn = box.querySelector('.bcar-next');
+    var dotsWrap = box.querySelector('.bcar-dots');
+    var dots = box.querySelectorAll('.bcar-dot');
+    if (!viewport || !track || !slides.length) return;
+
+    var currentIndex = 0;
+    var is916 = box.classList.contains('bcar-ratio-9-16') || box.getAttribute('data-ratio') === '9:16';
+
+    function checkOverflowAndNav() {
+        var hasOverflow = track.scrollWidth > viewport.clientWidth + 8;
+        if (!hasOverflow) {
+            // Everything fits! No slide needed (e.g. 2 cards on laptop)
+            box.classList.add('bcar-no-overflow');
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (dotsWrap) dotsWrap.style.display = 'none';
+            return;
+        }
+
+        // Sliding is needed! (e.g. on mobile or with 3+ cards)
+        box.classList.remove('bcar-no-overflow');
+        if (dotsWrap) dotsWrap.style.display = 'flex';
+
+        var scrollLeft = viewport.scrollLeft;
+        var maxScroll = track.scrollWidth - viewport.clientWidth;
+
+        if (prevBtn) {
+            prevBtn.style.display = scrollLeft > 10 ? 'flex' : 'none';
+        }
+        if (nextBtn) {
+            nextBtn.style.display = scrollLeft < (maxScroll - 10) ? 'flex' : 'none';
+        }
+    }
+
+    function updateCarousel(idx) {
+        if (idx < 0) idx = 0;
+        if (idx >= slides.length) idx = slides.length - 1;
+        currentIndex = idx;
+
+        if (!is916) {
+            var scrollX = idx * viewport.clientWidth;
+            viewport.scrollTo({ left: scrollX, behavior: 'smooth' });
+        } else {
+            var slideEl = slides[idx];
+            if (slideEl) {
+                var targetLeft = slideEl.offsetLeft - (viewport.clientWidth - slideEl.clientWidth) / 2;
+                viewport.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+            }
+        }
+
+        dots.forEach(function(d, i) {
+            d.classList.toggle('active', i === currentIndex);
+        });
+
+        setTimeout(checkOverflowAndNav, 350);
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            updateCarousel(currentIndex - 1);
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            updateCarousel(currentIndex + 1);
+        });
+    }
+
+    dots.forEach(function(dot, i) {
+        dot.addEventListener('click', function(e) {
+            e.stopPropagation();
+            updateCarousel(i);
+        });
+    });
+
+    viewport.addEventListener('scroll', function() {
+        checkOverflowAndNav();
+    }, { passive: true });
+
+    window.addEventListener('resize', checkOverflowAndNav);
+    window.addEventListener('load', checkOverflowAndNav);
+    setTimeout(checkOverflowAndNav, 60);
+    setTimeout(checkOverflowAndNav, 350);
+
+    var startX = 0;
+    viewport.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', function(e) {
+        var endX = e.changedTouches[0].clientX;
+        var diff = startX - endX;
+        if (Math.abs(diff) > 40) {
+            if (diff > 0) updateCarousel(currentIndex + 1);
+            else updateCarousel(currentIndex - 1);
+        }
+    }, { passive: true });
 });
 </script>
 </body></html>

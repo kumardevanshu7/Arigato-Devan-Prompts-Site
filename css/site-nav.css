@@ -1672,49 +1672,80 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     border-radius: 4px;
 }
 
-/* Mobile Drawer Language Box */
+/* Mobile Drawer Language Box — Modern Segmented Card */
 .gal-mobile-lang-box {
-    margin: 14px 0 6px;
-    padding: 12px;
-    background: var(--bg-hover, #f8fafc);
-    border-radius: 12px;
-    border: 1px solid var(--border, #e2e8f0);
+    margin: 16px 0 10px;
+    padding: 12px 14px 14px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
-.gal-mobile-lang-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted, #64748b);
-    margin-bottom: 8px;
+.gal-mobile-lang-header {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 2px;
 }
-.gal-mobile-lang-grid {
+.gal-mobile-lang-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.gal-mobile-lang-title i {
+    color: var(--accent-warm, #ff6b4a);
+    font-size: 0.84rem;
+}
+.gal-mobile-lang-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent-warm, #ff6b4a);
+    background: rgba(255, 107, 74, 0.08);
+    border: 1px solid rgba(255, 107, 74, 0.18);
+    padding: 2px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.02em;
+}
+.gal-mobile-lang-segmented {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    gap: 4px;
 }
 .gal-m-lang-btn {
-    padding: 6px 4px;
-    border-radius: 8px;
-    border: 1px solid var(--border, #cbd5e1);
-    background: #ffffff;
-    color: var(--text-secondary, #334155);
-    font-size: 0.75rem;
+    border: none;
+    background: transparent;
+    padding: 8px 4px;
+    border-radius: 9px;
+    font-size: 0.8rem;
     font-weight: 600;
+    color: #64748b;
     cursor: pointer;
     text-align: center;
-    transition: all 0.15s ease;
+    font-family: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
 }
 .gal-m-lang-btn:hover {
-    border-color: var(--accent-warm, #ff6b4a);
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.6);
 }
 .gal-m-lang-btn.is-active {
-    background: var(--accent-warm, #ff6b4a);
-    color: #ffffff;
-    border-color: var(--accent-warm, #ff6b4a);
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 /* Google Translate Overrides — Completely remove top banner and layout shifts */

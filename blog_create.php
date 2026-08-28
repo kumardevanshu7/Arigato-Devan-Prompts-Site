@@ -550,31 +550,113 @@ $current_blog_categories = ['Uncategorized'];
             display: none;
         }
 
-        .be-tb-select {
-            border: 1px solid transparent;
+        /* ── Custom In-Page Dropdown UI (Replaces ugly native browser OS <select>) ── */
+        .be-dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .be-tb-dropdown-btn {
             background: transparent;
+            border: 1px solid transparent;
             color: #334155;
             font-family: inherit;
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 3px 6px;
-            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 7px;
             cursor: pointer;
-            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             height: 28px;
-            transition: all 0.12s ease;
+            transition: all 0.15s ease;
+            white-space: nowrap;
         }
-        .be-tb-select:hover, .be-tb-select:focus {
+        .be-tb-dropdown-btn:hover,
+        .be-dropdown.be-dd-open .be-tb-dropdown-btn {
             background: #ffffff;
             border-color: #cbd5e1;
             color: #0f172a;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
         }
-        .be-tb-select-mini {
-            padding: 2px 4px;
-            font-size: 0.75rem;
+        .be-dd-chevron {
+            font-size: 0.65rem;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+        .be-dropdown.be-dd-open .be-dd-chevron {
+            transform: rotate(180deg);
+            color: #2563eb;
+        }
+        .be-tb-dropdown-mini {
+            font-size: 0.74rem;
             color: #0284c7;
             font-weight: 700;
+            padding: 2px 6px;
+        }
+        .be-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 175px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+            z-index: 99999;
+            padding: 5px;
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            animation: beDropdownPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes beDropdownPop {
+            from { opacity: 0; transform: translateY(-3px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .be-dropdown.be-dd-open .be-dropdown-menu {
+            display: flex;
+        }
+        .be-dd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 7px 10px;
+            border: none;
+            background: transparent;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: #334155;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .be-dd-item:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .be-dd-item:active {
+            background: #e2e8f0;
+        }
+        .be-dd-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 3px 0;
+        }
+        .be-tb-more-btn {
+            display: none;
+        }
+        .be-tb-primary {
+            display: contents;
+        }
+        .be-tb-more-drawer {
+            display: contents;
         }
 
         /* Inspector Compact Sections */
@@ -1027,46 +1109,90 @@ $current_blog_categories = ['Uncategorized'];
                 white-space: nowrap;
             }
             .be-toolbar {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 6px 8px;
+                margin-bottom: 14px;
+                box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
                 display: flex;
                 flex-direction: column;
-                align-items: stretch;
-                flex-wrap: nowrap;
+                gap: 6px;
                 overflow: visible;
-                gap: 8px;
-                padding: 8px;
-                position: static;
             }
-            .be-tb-row {
-                display: flex;
-                flex-wrap: wrap;
+            .be-tb-primary {
+                display: flex !important;
+                align-items: center;
+                gap: 6px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
                 width: 100%;
-                gap: 6px;
+                padding-bottom: 3px;
             }
-            .be-tb-row-selects .be-tb-select {
-                flex: 1 1 calc(50% - 3px);
-                max-width: none;
-                min-width: 0;
-                height: 40px;
-                background: #f8fafc;
-                border: 1px solid var(--be-border);
-                border-radius: 8px;
-                padding: 0 10px;
-                font-size: 0.82rem;
-            }
-            .be-tb-row-format {
-                display: grid;
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 6px;
-            }
-            .be-tb-divider {
+            .be-tb-primary::-webkit-scrollbar {
                 display: none;
             }
-            .be-tb-btn {
-                width: 100%;
-                min-width: 0;
-                height: 40px;
-                border-radius: 8px;
+            .be-tb-group {
+                display: inline-flex;
+                align-items: center;
                 background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 2px;
+                gap: 2px;
+                flex-shrink: 0;
+            }
+            .be-tb-btn {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 0.82rem;
+                flex-shrink: 0;
+                border-radius: 6px;
+                background: transparent;
+            }
+            .be-tb-more-btn {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 5px;
+                padding: 0 12px;
+                height: 32px;
+                border-radius: 8px;
+                border: 1px solid #cbd5e1;
+                background: #f8fafc;
+                color: #475569;
+                font-size: 0.78rem;
+                font-weight: 700;
+                cursor: pointer;
+                flex-shrink: 0;
+                white-space: nowrap;
+                transition: all 0.15s ease;
+            }
+            .be-tb-more-btn.active {
+                background: #eff6ff;
+                border-color: #3b82f6;
+                color: #2563eb;
+                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+            }
+            .be-tb-more-drawer {
+                display: none !important;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-top: 6px;
+                border-top: 1px solid #f1f5f9;
+                animation: beDrawerSlide 0.2s ease;
+            }
+            .be-tb-more-drawer.be-drawer-expanded {
+                display: flex !important;
+            }
+            @keyframes beDrawerSlide {
+                from { opacity: 0; transform: translateY(-4px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             .be-editor-wrap {
                 min-height: 260px;
@@ -1158,90 +1284,135 @@ $current_blog_categories = ['Uncategorized'];
 
             <!-- Sleek Minimalist Formatting Toolbar -->
             <div class="be-toolbar">
-                <!-- Group: Style & Font -->
-                <div class="be-tb-group">
-                    <select class="be-tb-select" onchange="fmtBlock(this.value); this.selectedIndex=0;" title="Headings & Callouts">
-                        <option value="">Style</option>
-                        <option value="p">Paragraph</option>
-                        <option value="h1">Heading 1</option>
-                        <option value="h2">Heading 2</option>
-                        <option value="h3">Heading 3</option>
-                        <option value="blockquote">Quote Callout</option>
-                        <option value="greybox">Grey Note Box</option>
-                    </select>
-                    <select class="be-tb-select" onchange="applyFontFamily(this.value); this.selectedIndex=0;" title="Font Family">
-                        <option value="">Font</option>
-                        <option value="Lora, Georgia, serif">Editorial Serif</option>
-                        <option value="'Playfair Display', serif">Display Serif</option>
-                        <option value="'Plus Jakarta Sans', sans-serif">Modern Bold</option>
-                        <option value="'Inter', sans-serif">Clean Sans</option>
-                        <option value="'JetBrains Mono', monospace">Monospace</option>
-                    </select>
+                <!-- ── Primary Row (Always Visible & Smooth Horizontal Swipe on Mobile) ── -->
+                <div class="be-tb-primary">
+                    <!-- Group: Style Custom Dropdown -->
+                    <div class="be-tb-group">
+                        <div class="be-dropdown" id="beStyleDropdown">
+                            <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beStyleDropdown')" title="Headings & Callouts">
+                                <span class="be-dd-label">Style</span>
+                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                            </button>
+                            <div class="be-dropdown-menu">
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('p', 'Paragraph')">Paragraph</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h1', 'Heading 1')"><span style="font-size:1.1rem; font-weight:800;">Heading 1</span></button>
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h2', 'Heading 2')"><span style="font-size:1.0rem; font-weight:700;">Heading 2</span></button>
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h3', 'Heading 3')"><span style="font-size:0.9rem; font-weight:700;">Heading 3</span></button>
+                                <div class="be-dd-divider"></div>
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('blockquote', 'Quote Callout')"><i class="fa-solid fa-quote-left" style="color:#0284c7;"></i> Quote Callout</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeStyle('greybox', 'Grey Note Box')"><i class="fa-solid fa-square-pen" style="color:#64748b;"></i> Grey Note Box</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group: Basic Text Formats -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+                        <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
+                    </div>
+
+                    <!-- Group: Lists -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="continueCurrentOrderedList()" title="Continue Numbering from Previous List (e.g. 2, 3...)"><i class="fa-solid fa-arrow-down-1-9" style="color:#0284c7;"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="promptSetListStart()" title="Set Starting Number"><i class="fa-solid fa-hashtag" style="color:#64748b; font-size:0.75rem;"></i></button>
+                    </div>
+
+                    <!-- Group: Alignment -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+                    </div>
+
+                    <!-- Group: Links -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="fmt('unlink')" title="Remove Link"><i class="fa-solid fa-link-slash"></i></button>
+                    </div>
+
+                    <!-- Group: Media Inserts -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="openEditorImageModal()" title="Insert Image with SEO Description & Alt Text"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="openEditorCarouselModal()" title="Insert Carousel (16:9 Landscape or 9:16 Vertical Reel)"><i class="fa-solid fa-images" style="color:#8b5cf6;"></i></button>
+                    </div>
+
+                    <!-- Mobile "••• More" Toggle Button -->
+                    <button type="button" id="beTbMoreToggleBtn" class="be-tb-more-btn" onclick="toggleMobileTbMore()" title="More Tools">
+                        <i class="fa-solid fa-ellipsis"></i> More
+                    </button>
                 </div>
 
-                <!-- Group: Basic Text Formats -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
-                    <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
-                </div>
+                <!-- ── Secondary Shelf (Collapsible on Mobile, Inline on Desktop) ── -->
+                <div class="be-tb-more-drawer" id="beTbMoreDrawer">
+                    <!-- Group: Font Family Custom Dropdown -->
+                    <div class="be-tb-group">
+                        <div class="be-dropdown" id="beFontDropdown">
+                            <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beFontDropdown')" title="Font Family">
+                                <span class="be-dd-label">Font</span>
+                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                            </button>
+                            <div class="be-dropdown-menu">
+                                <button type="button" class="be-dd-item" onclick="selectBeFont('Lora, Georgia, serif', 'Editorial Serif')" style="font-family:Lora, Georgia, serif;">Editorial Serif</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Playfair Display\', serif', 'Display Serif')" style="font-family:'Playfair Display', serif;">Display Serif</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Plus Jakarta Sans\', sans-serif', 'Modern Bold')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700;">Modern Bold</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Inter\', sans-serif', 'Clean Sans')" style="font-family:'Inter', sans-serif;">Clean Sans</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'JetBrains Mono\', monospace', 'Monospace')" style="font-family:'JetBrains Mono', monospace;">Monospace</button>
+                            </div>
+                        </div>
+                        <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
+                        <button type="button" class="be-tb-btn" onclick="removeHighlight()" title="Remove Highlight"><i class="fa-solid fa-eraser" style="color:#ef4444;"></i></button>
+                    </div>
 
-                <!-- Group: Alignment -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
-                </div>
+                    <!-- Group: Special Arigato Blocks (Note, FAQ, TOC, CTA) -->
+                    <div class="be-tb-group be-tb-group-accent">
+                        <button type="button" class="be-tb-btn" onclick="openNoteBoxModal()" title="Insert Note Box / Featured Prompt Cards"><i class="fa-regular fa-note-sticky" style="color:#475569;"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="openFaqModal()" title="Insert Sleek Quick FAQ Section Box"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Insert Table of Contents"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
+                        <div class="be-dropdown" id="beTocSizeDropdown">
+                            <button type="button" class="be-tb-dropdown-btn be-tb-dropdown-mini" onclick="toggleBeDropdown('beTocSizeDropdown')" title="Table of Contents Size">
+                                <span class="be-dd-label">Size</span>
+                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                            </button>
+                            <div class="be-dropdown-menu">
+                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('sm', 'Small')">Small (Compact)</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('md', 'Medium')">Medium (Standard)</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('lg', 'Large')">Large (Spacious)</button>
+                            </div>
+                        </div>
+                        <button type="button" class="be-tb-btn" onclick="openCtaModal()" title="Insert Nogoda CTA Color Box with Buttons"><i class="fa-solid fa-bullhorn" style="color:#7c3aed;"></i></button>
+                    </div>
 
-                <!-- Group: Lists -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
-                </div>
+                    <!-- Group: Media Details & Inserts -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="toggleSelectedImageCaption()" title="Add / Edit Image Caption"><i class="fa-solid fa-closed-captioning" style="color:#475569;"></i></button>
+                        <div class="be-dropdown" id="beImgBorderDropdown">
+                            <button type="button" class="be-tb-dropdown-btn be-tb-dropdown-mini" onclick="toggleBeDropdown('beImgBorderDropdown')" title="Picture Border">
+                                <span class="be-dd-label">Border</span>
+                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                            </button>
+                            <div class="be-dropdown-menu">
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('0', 'None')">None</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('1', '1px')">1px Thin</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('2', '2px')">2px Medium</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('3', '3px')">3px Bold</button>
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('4', '4px')">4px Thick</button>
+                                <div class="be-dd-divider"></div>
+                                <button type="button" class="be-dd-item" onclick="selectBeBorder('custom', 'Custom...')"><i class="fa-solid fa-gear"></i> Custom...</button>
+                            </div>
+                        </div>
+                        <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
+                        <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
+                        <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) handleEimFileSelect(this.files[0], true)">
+                    </div>
 
-                <!-- Group: Links -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="fmt('unlink')" title="Remove Link"><i class="fa-solid fa-link-slash"></i></button>
-                </div>
-
-                <!-- Group: Special Arigato Blocks (Note, FAQ, TOC, CTA) -->
-                <div class="be-tb-group be-tb-group-accent">
-                    <button type="button" class="be-tb-btn" onclick="openNoteBoxModal()" title="Insert Note Box / Featured Prompt Cards"><i class="fa-regular fa-note-sticky" style="color:#475569;"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="openFaqModal()" title="Insert Sleek Quick FAQ Section Box"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Insert Table of Contents"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
-                    <select class="be-tb-select be-tb-select-mini" onchange="setTocSize(this.value); this.selectedIndex=0;" title="Table of Contents Size">
-                        <option value="">Size</option>
-                        <option value="sm">Small (Compact)</option>
-                        <option value="md">Medium (Standard)</option>
-                        <option value="lg">Large (Spacious)</option>
-                    </select>
-                    <button type="button" class="be-tb-btn" onclick="openCtaModal()" title="Insert Nogoda CTA Color Box with Buttons"><i class="fa-solid fa-bullhorn" style="color:#7c3aed;"></i></button>
-                </div>
-
-                <!-- Group: Media & Inserts -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="document.getElementById('editor-inline-img').click()" title="Insert Image into Content"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="toggleSelectedImageCaption()" title="Add / Edit Image Caption"><i class="fa-solid fa-closed-captioning" style="color:#475569;"></i></button>
-                    <select class="be-tb-select be-tb-select-mini" onchange="setSelectedImageBorder(this.value); this.selectedIndex=0;" title="Picture Border">
-                        <option value="">Border</option>
-                        <option value="0">None</option>
-                        <option value="1">1px</option>
-                        <option value="2">2px</option>
-                        <option value="3">3px</option>
-                        <option value="4">4px</option>
-                        <option value="custom">Custom...</option>
-                    </select>
-                    <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
-                    <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
-                    <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) uploadEditorImage(this.files[0])">
-                </div>
-
-                <!-- Group: Utilities -->
-                <div class="be-tb-group">
-                    <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                    <!-- Group: Clear Format -->
+                    <div class="be-tb-group">
+                        <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                    </div>
                 </div>
             </div>
 
@@ -1916,15 +2087,15 @@ tinymce.init({
     promotion: false,
     toolbar: false,
     plugins: 'image link lists table code codesample charmap emoticons wordcount autosave visualblocks quickbars',
-    quickbars_selection_toolbar: 'bold italic underline caseTransform | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist',
+    quickbars_selection_toolbar: 'bold italic underline caseTransform | highlightBtn removeHighlightBtn | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist continueListBtn',
     quickbars_insert_toolbar: window.matchMedia('(max-width: 768px)').matches ? false : 'image link table codesample',
     content_css: ['default', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'],
-    contextmenu: 'link image table editFaqMenuItem',
+    contextmenu: 'link image table editFaqMenuItem editCarouselMenuItem continueListMenuItem setListStartMenuItem restartListMenuItem removeHighlightMenuItem',
     table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
     paste_webkit_styles: 'all',
-    extended_valid_elements: 'div[class|style|id|contenteditable],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],span[class|style|id|contenteditable],p[class|style|id|dir|contenteditable]',
+    extended_valid_elements: 'div[class|style|id|contenteditable|data-ratio],button[class|style|type|aria-label],span[class|style|id|contenteditable|data-index],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width|loading],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],p[class|style|id|dir|contenteditable]',
     formats: {
         highlight: { inline: 'mark', classes: 'font-highlight', styles: { 'background-color': '#fef08a', 'padding': '2px 6px', 'border-radius': '4px', 'color': '#0f172a' } }
     },
@@ -2017,9 +2188,15 @@ tinymce.init({
             }
         });
 
+        // ── Custom Toolbar SVG Icons ──────────────────────────────────────────
+        editor.ui.registry.addIcon('be-continue-list', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>');
+        editor.ui.registry.addIcon('be-start-num', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>');
+        editor.ui.registry.addIcon('be-restart-list', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>');
+
         // ── Prompt Card Floating Context Toolbar & Handlers ──────────────────
         editor.ui.registry.addButton('swapPromptCardBtn', {
-            text: '🔁 Change / Swap Prompt',
+            icon: 'duplicate',
+            text: 'Swap Prompt',
             tooltip: 'Swap this card with another prompt from your site',
             onAction: function () {
                 var node = editor.selection.getNode();
@@ -2031,7 +2208,8 @@ tinymce.init({
         });
 
         editor.ui.registry.addButton('removePromptCardBtn', {
-            text: '🗑️ Delete Card',
+            icon: 'remove',
+            text: 'Delete Card',
             tooltip: 'Delete this card',
             onAction: function () {
                 var node = editor.selection.getNode();
@@ -2054,7 +2232,8 @@ tinymce.init({
 
         // ── FAQ Box Floating Context Toolbar & Handlers ──────────────────
         editor.ui.registry.addButton('editFaqBtn', {
-            text: '✏️ Edit FAQ Section',
+            icon: 'edit-block',
+            text: 'Edit FAQ',
             tooltip: 'Edit FAQ questions, answers, and theme in popup',
             onAction: function () {
                 var node = editor.selection.getNode();
@@ -2066,7 +2245,8 @@ tinymce.init({
         });
 
         editor.ui.registry.addButton('removeFaqBtn', {
-            text: '🗑️ Delete FAQ',
+            icon: 'remove',
+            text: 'Delete FAQ',
             tooltip: 'Delete this FAQ section',
             onAction: function () {
                 var node = editor.selection.getNode();
@@ -2079,7 +2259,7 @@ tinymce.init({
         });
 
         editor.ui.registry.addMenuItem('editFaqMenuItem', {
-            text: '✏️ Edit FAQ Section...',
+            text: 'Edit FAQ Section...',
             icon: 'edit-block',
             onAction: function () {
                 var node = editor.selection.getNode();
@@ -2099,6 +2279,180 @@ tinymce.init({
             scope: 'node'
         });
 
+        // ── Ordered List Numbering Handlers ───────────────────────────────────
+        editor.ui.registry.addButton('continueListBtn', {
+            icon: 'be-continue-list',
+            text: 'Continue',
+            tooltip: 'Continue numbering from previous numbered list (e.g. 2, 3...)',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) continueOlNumbering(editor, ol);
+                else continueCurrentOrderedList();
+            }
+        });
+
+        editor.ui.registry.addButton('setListStartBtn', {
+            icon: 'be-start-num',
+            text: 'Start #',
+            tooltip: 'Set starting number for this list',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) setOlStartNumber(editor, ol);
+            }
+        });
+
+        editor.ui.registry.addButton('restartListBtn', {
+            icon: 'be-restart-list',
+            text: 'Restart',
+            tooltip: 'Restart numbering at 1',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) restartOlAtOne(editor, ol);
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('orderedListToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, 'ol');
+            },
+            items: 'continueListBtn setListStartBtn restartListBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
+        editor.ui.registry.addMenuItem('continueListMenuItem', {
+            text: 'Continue List Numbering',
+            icon: 'be-continue-list',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) continueOlNumbering(editor, ol);
+            }
+        });
+
+        editor.ui.registry.addMenuItem('setListStartMenuItem', {
+            text: 'Set Starting Number...',
+            icon: 'be-start-num',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) setOlStartNumber(editor, ol);
+            }
+        });
+
+        editor.ui.registry.addMenuItem('restartListMenuItem', {
+            text: 'Restart Numbering at 1',
+            icon: 'be-restart-list',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var ol = editor.dom.getParent(node, 'ol');
+                if (ol) restartOlAtOne(editor, ol);
+            }
+        });
+
+        // ── Highlight & Remove Highlight UI ──────────────────────────────────
+        editor.ui.registry.addButton('highlightBtn', {
+            icon: 'highlight-bg-color',
+            tooltip: 'Highlight Text (Yellow Marker)',
+            onAction: function () {
+                toggleHighlight();
+            }
+        });
+
+        editor.ui.registry.addButton('removeHighlightBtn', {
+            icon: 'remove-formatting',
+            tooltip: 'Remove Highlight',
+            onAction: function () {
+                removeHighlight();
+            }
+        });
+
+        editor.ui.registry.addMenuItem('removeHighlightMenuItem', {
+            text: 'Remove Highlight',
+            icon: 'remove-formatting',
+            onAction: function () {
+                removeHighlight();
+            }
+        });
+
+        // ── Carousel Box Floating Context Toolbar & Handlers ──────────────────
+        editor.ui.registry.addButton('editCarouselBtn', {
+            icon: 'image-options',
+            text: 'Edit Carousel',
+            tooltip: 'Edit slides, ratio, and images in popup',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var box = editor.dom.getParent(node, '.blog-carousel-box');
+                if (box) openEditorCarouselModalForEdit(box);
+            }
+        });
+
+        editor.ui.registry.addButton('removeCarouselBtn', {
+            icon: 'remove',
+            text: 'Delete Carousel',
+            tooltip: 'Delete this carousel',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var box = editor.dom.getParent(node, '.blog-carousel-box');
+                if (box) {
+                    editor.dom.remove(box);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addMenuItem('editCarouselMenuItem', {
+            text: 'Edit Carousel...',
+            icon: 'image-options',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var box = editor.dom.getParent(node, '.blog-carousel-box');
+                if (box) openEditorCarouselModalForEdit(box);
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('carouselBoxToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, '.blog-carousel-box');
+            },
+            items: 'editCarouselBtn removeCarouselBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
+        // ── Multi-Word Selection with Ctrl Key ────────────────────────────────
+        editor.on('click', function (e) {
+            if (!e.ctrlKey && !e.metaKey) {
+                var body = editor.getBody();
+                if (body && body.querySelector('.mce-ctrl-multiselect')) {
+                    clearMultiSelections(editor);
+                }
+            }
+        });
+
+        editor.on('mouseup', function (e) {
+            if (e.ctrlKey || e.metaKey) {
+                var selContent = editor.selection.getContent({ format: 'text' }).trim();
+                if (selContent.length > 0) {
+                    var rng = editor.selection.getRng();
+                    if (rng && !rng.collapsed) {
+                        try {
+                            var span = editor.dom.create('span', {
+                                'class': 'mce-ctrl-multiselect',
+                                'style': 'background: rgba(59, 130, 246, 0.25) !important; outline: 1.5px solid #2563eb !important; border-radius: 3px !important;'
+                            });
+                            rng.surroundContents(span);
+                        } catch (err) {
+                            // Cross-boundary selection fallback
+                        }
+                    }
+                }
+            }
+        });
+
         editor.on('dblclick', function (e) {
             var card = editor.dom.getParent(e.target, '.blog-prompt-card');
             if (card) {
@@ -2112,12 +2466,24 @@ tinymce.init({
                 openFaqModalForEdit(faqBox);
                 return;
             }
+            var carouselBox = editor.dom.getParent(e.target, '.blog-carousel-box');
+            if (carouselBox) {
+                e.preventDefault();
+                openEditorCarouselModalForEdit(carouselBox);
+                return;
+            }
         });
 
         editor.on('contextmenu', function (e) {
             var faqBox = editor.dom.getParent(e.target, '.blog-faq-box');
             if (faqBox) {
                 editor.selection.select(faqBox);
+                return;
+            }
+            var carouselBox = editor.dom.getParent(e.target, '.blog-carousel-box');
+            if (carouselBox) {
+                editor.selection.select(carouselBox);
+                return;
             }
         });
 
@@ -2903,6 +3269,134 @@ tinymce.init({
         .blog-cta-rose .blog-cta-btn-primary { background: #fbbf24; color: #881337 !important; }
         .blog-cta-rose .blog-cta-btn-secondary { background: #ffffff; color: #be123c !important; }
         .blog-cta-rose .blog-cta-btn-ghost { background: rgba(255,255,255,0.2); color: #ffffff !important; }
+
+        /* ── Carousel Box in Editor ── */
+        .blog-carousel-box {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 1.8em 0 !important;
+            border-radius: 18px !important;
+            background: #0f172a !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            user-select: none !important;
+        }
+        .blog-carousel-box.bcar-ratio-9-16 {
+            background: transparent !important;
+        }
+        .bcar-viewport {
+            position: relative !important;
+            width: 100% !important;
+            overflow-x: auto !important;
+            scroll-behavior: smooth !important;
+        }
+        .bcar-track {
+            display: flex !important;
+            gap: 16px !important;
+            width: max-content !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .bcar-ratio-16-9 .bcar-track {
+            gap: 0 !important;
+            width: 100% !important;
+        }
+        .bcar-ratio-16-9 .bcar-slide {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            position: relative !important;
+        }
+        .bcar-ratio-16-9 .bcar-slide img {
+            display: block !important;
+            width: 100% !important;
+            aspect-ratio: 16 / 9 !important;
+            object-fit: cover !important;
+            border-radius: 18px !important;
+            margin: 0 !important;
+        }
+        .bcar-ratio-9-16 .bcar-track {
+            padding: 8px 4px 16px !important;
+            gap: 14px !important;
+        }
+        .bcar-ratio-9-16.bcar-no-overflow .bcar-track {
+            justify-content: center !important;
+        }
+        .bcar-ratio-9-16 .bcar-slide {
+            flex: 0 0 175px !important;
+            min-width: 140px !important;
+            max-width: 190px !important;
+            max-height: 335px !important;
+            position: relative !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.15) !important;
+            background: #1e1e2e !important;
+        }
+        .bcar-ratio-9-16 .bcar-slide img {
+            display: block !important;
+            width: 100% !important;
+            aspect-ratio: 9 / 16 !important;
+            max-height: 335px !important;
+            object-fit: cover !important;
+            border-radius: 16px !important;
+            margin: 0 !important;
+        }
+        .bcar-caption {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            padding: 10px 14px !important;
+            background: linear-gradient(to top, rgba(15,23,42,0.9), transparent) !important;
+            color: #f8fafc !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+        }
+        .bcar-nav {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            font-size: 1.2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            z-index: 10 !important;
+        }
+        .bcar-prev { left: 10px !important; }
+        .bcar-next { right: 10px !important; }
+        .bcar-dots {
+            position: absolute !important;
+            bottom: 10px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            display: flex !important;
+            gap: 6px !important;
+            z-index: 10 !important;
+        }
+        .bcar-dot {
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.4) !important;
+        }
+        .bcar-dot.active {
+            width: 18px !important;
+            border-radius: 999px !important;
+            background: #ffffff !important;
+        }
+        .mce-ctrl-multiselect {
+            background: rgba(59, 130, 246, 0.25) !important;
+            outline: 1.5px solid #2563eb !important;
+            border-radius: 3px !important;
+        }
     `,
     
     images_upload_handler: function (blobInfo, progress) {
@@ -2925,6 +3419,85 @@ tinymce.init({
     }
 });
 
+// ── Custom Toolbar Dropdowns & Mobile More Drawer ───────────────────────────
+function toggleBeDropdown(id) {
+    var dd = document.getElementById(id);
+    if (!dd) return;
+    var isOpen = dd.classList.contains('be-dd-open');
+    closeAllBeDropdowns();
+    if (!isOpen) {
+        dd.classList.add('be-dd-open');
+    }
+}
+
+function closeAllBeDropdowns() {
+    document.querySelectorAll('.be-dropdown.be-dd-open').forEach(function(d) {
+        d.classList.remove('be-dd-open');
+    });
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.be-dropdown')) {
+        closeAllBeDropdowns();
+    }
+});
+
+function selectBeStyle(val, label) {
+    fmtBlock(val);
+    closeAllBeDropdowns();
+    var dd = document.getElementById('beStyleDropdown');
+    if (dd) {
+        var labelEl = dd.querySelector('.be-dd-label');
+        if (labelEl) labelEl.textContent = label || 'Style';
+    }
+}
+
+function selectBeFont(val, label) {
+    applyFontFamily(val);
+    closeAllBeDropdowns();
+    var dd = document.getElementById('beFontDropdown');
+    if (dd) {
+        var labelEl = dd.querySelector('.be-dd-label');
+        if (labelEl) labelEl.textContent = label || 'Font';
+    }
+}
+
+function selectBeTocSize(val, label) {
+    setTocSize(val);
+    closeAllBeDropdowns();
+    var dd = document.getElementById('beTocSizeDropdown');
+    if (dd) {
+        var labelEl = dd.querySelector('.be-dd-label');
+        if (labelEl) labelEl.textContent = label || 'Size';
+    }
+}
+
+function selectBeBorder(val, label) {
+    setSelectedImageBorder(val);
+    closeAllBeDropdowns();
+    var dd = document.getElementById('beImgBorderDropdown');
+    if (dd) {
+        var labelEl = dd.querySelector('.be-dd-label');
+        if (labelEl) labelEl.textContent = label || 'Border';
+    }
+}
+
+function toggleMobileTbMore() {
+    var drawer = document.getElementById('beTbMoreDrawer');
+    var btn = document.getElementById('beTbMoreToggleBtn');
+    if (!drawer || !btn) return;
+    var isExpanded = drawer.classList.contains('be-drawer-expanded');
+    if (isExpanded) {
+        drawer.classList.remove('be-drawer-expanded');
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="fa-solid fa-ellipsis"></i> More';
+    } else {
+        drawer.classList.add('be-drawer-expanded');
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Less';
+    }
+}
+
 function toggleWideWritingMode() {
     document.body.classList.toggle('be-wide-mode');
     var isWide = document.body.classList.contains('be-wide-mode');
@@ -2944,17 +3517,579 @@ if (localStorage.getItem('be_wide_mode') === '1') {
     });
 }
 
+function clearMultiSelections(ed) {
+    if (!ed) ed = tinymce.activeEditor;
+    if (!ed) return;
+    var body = ed.getBody();
+    if (!body) return;
+    var els = body.querySelectorAll('.mce-ctrl-multiselect');
+    els.forEach(function (el) {
+        ed.dom.remove(el, true);
+    });
+    ed.nodeChanged();
+}
+
 function fmt(cmd) {
     if (tinymce.activeEditor) {
+        var multi = tinymce.activeEditor.getBody().querySelectorAll('.mce-ctrl-multiselect');
+        if (multi.length > 0) {
+            multi.forEach(function(el) {
+                tinymce.activeEditor.selection.select(el);
+                tinymce.activeEditor.execCommand(cmd);
+            });
+            clearMultiSelections(tinymce.activeEditor);
+            return;
+        }
         tinymce.activeEditor.execCommand(cmd);
     }
 }
+
 function toggleHighlight() {
     if (tinymce.activeEditor) {
         tinymce.activeEditor.focus();
+        var multi = tinymce.activeEditor.getBody().querySelectorAll('.mce-ctrl-multiselect');
+        if (multi.length > 0) {
+            multi.forEach(function(el) {
+                tinymce.activeEditor.selection.select(el);
+                tinymce.activeEditor.formatter.toggle('highlight');
+            });
+            clearMultiSelections(tinymce.activeEditor);
+            return;
+        }
         tinymce.activeEditor.formatter.toggle('highlight');
     }
 }
+
+function removeHighlight() {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.focus();
+        var multi = tinymce.activeEditor.getBody().querySelectorAll('.mce-ctrl-multiselect');
+        if (multi.length > 0) {
+            multi.forEach(function(el) {
+                tinymce.activeEditor.selection.select(el);
+                tinymce.activeEditor.formatter.remove('highlight');
+            });
+            clearMultiSelections(tinymce.activeEditor);
+            return;
+        }
+        tinymce.activeEditor.formatter.remove('highlight');
+    }
+}
+
+// ── Ordered List Numbering Functions ─────────────────────────────────────────
+function continueCurrentOrderedList() {
+    if (!tinymce.activeEditor) return;
+    var editor = tinymce.activeEditor;
+    var node = editor.selection.getNode();
+    var ol = editor.dom.getParent(node, 'ol');
+    if (!ol) {
+        editor.execCommand('InsertOrderedList');
+        ol = editor.dom.getParent(editor.selection.getNode(), 'ol');
+    }
+    if (ol) {
+        continueOlNumbering(editor, ol);
+    }
+}
+
+// ── In-Page Toast & Notice Modals (No native browser alerts/prompts) ──────────
+function showToast(msg, type) {
+    var container = document.getElementById('beToastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'beToastContainer';
+        container.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:9999999; display:flex; flex-direction:column; gap:8px; pointer-events:none; font-family:"Plus Jakarta Sans",sans-serif;';
+        document.body.appendChild(container);
+    }
+    var toast = document.createElement('div');
+    toast.style.cssText = 'background:#0f172a; color:#f8fafc; padding:12px 18px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-size:0.86rem; font-weight:600; display:flex; align-items:center; gap:10px; pointer-events:auto; transition:all 0.25s ease; opacity:0; transform:translateY(10px); border:1px solid #334155;';
+    var icon = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i>';
+    if (type === 'warn') icon = '<i class="fa-solid fa-triangle-exclamation" style="color:#eab308;"></i>';
+    if (type === 'error') icon = '<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i>';
+    toast.innerHTML = icon + '<span>' + (msg || '') + '</span>';
+    container.appendChild(toast);
+    
+    requestAnimationFrame(function() {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3200);
+}
+
+function showNoticeModal(title, message, type) {
+    var modal = document.getElementById('customNoticeModal');
+    if (!modal) {
+        alert(message);
+        return;
+    }
+    document.getElementById('cnmTitle').textContent = title || 'Notice';
+    document.getElementById('cnmMessage').textContent = message || '';
+    var iconWrap = document.getElementById('cnmIconWrap');
+    var icon = document.getElementById('cnmIcon');
+    if (type === 'warn') {
+        iconWrap.style.background = '#fef3c7';
+        iconWrap.style.color = '#d97706';
+        icon.className = 'fa-solid fa-triangle-exclamation';
+    } else if (type === 'error') {
+        iconWrap.style.background = '#fee2e2';
+        iconWrap.style.color = '#dc2626';
+        icon.className = 'fa-solid fa-circle-xmark';
+    } else {
+        iconWrap.style.background = '#eff6ff';
+        iconWrap.style.color = '#2563eb';
+        icon.className = 'fa-solid fa-circle-info';
+    }
+    modal.style.display = 'flex';
+}
+
+function closeNoticeModal() {
+    var modal = document.getElementById('customNoticeModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// ── In-Page List Numbering Continuity Modal Logic ────────────────────────────
+window.currentEditingOl = null;
+
+function openListNumberModal(olNode, suggestedNum, infoText) {
+    window.currentEditingOl = olNode;
+    var modal = document.getElementById('listNumberModal');
+    if (!modal) return;
+    document.getElementById('lnmNumberInput').value = suggestedNum || 2;
+    if (infoText) {
+        document.getElementById('lnmInfoText').textContent = infoText;
+    } else {
+        document.getElementById('lnmInfoText').textContent = 'Set the starting number for this list item:';
+    }
+    modal.style.display = 'flex';
+    var inp = document.getElementById('lnmNumberInput');
+    inp.focus();
+    inp.select();
+}
+
+function closeListNumberModal() {
+    var modal = document.getElementById('listNumberModal');
+    if (modal) modal.style.display = 'none';
+    window.currentEditingOl = null;
+}
+
+function stepListNumber(delta) {
+    var inp = document.getElementById('lnmNumberInput');
+    var val = parseInt(inp.value, 10) || 1;
+    val = Math.max(1, val + delta);
+    inp.value = val;
+}
+
+function setListNumberPreset(num) {
+    var inp = document.getElementById('lnmNumberInput');
+    inp.value = num;
+}
+
+function applyListNumberModal() {
+    var inp = document.getElementById('lnmNumberInput');
+    var val = parseInt(inp.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+    
+    if (window.currentEditingOl && tinymce.activeEditor) {
+        if (val === 1) {
+            window.currentEditingOl.removeAttribute('start');
+            showToast('Numbered list restarted at 1');
+        } else {
+            window.currentEditingOl.setAttribute('start', val);
+            showToast('Numbered list set to start at ' + val);
+        }
+        tinymce.activeEditor.nodeChanged();
+    }
+    closeListNumberModal();
+}
+
+function continueOlNumbering(editor, olNode) {
+    if (!olNode || olNode.nodeName !== 'OL') return;
+    var allOls = Array.from(editor.getBody().querySelectorAll('ol'));
+    var currentIndex = allOls.indexOf(olNode);
+    if (currentIndex > 0) {
+        var prevOl = allOls[currentIndex - 1];
+        var prevStart = parseInt(prevOl.getAttribute('start') || '1', 10);
+        var prevCount = prevOl.querySelectorAll(':scope > li').length;
+        var nextStart = prevStart + prevCount;
+        olNode.setAttribute('start', nextStart);
+        editor.nodeChanged();
+        showToast('Numbered list continued: Starting at ' + nextStart);
+    } else {
+        openListNumberModal(olNode, 2, 'No previous numbered list found above. Choose starting number for this list:');
+    }
+}
+
+function setOlStartNumber(editor, olNode) {
+    if (!olNode || olNode.nodeName !== 'OL') return;
+    var currentStart = parseInt(olNode.getAttribute('start') || '1', 10);
+    openListNumberModal(olNode, currentStart > 1 ? currentStart : 2, 'Choose the starting number for this list item:');
+}
+
+function restartOlAtOne(editor, olNode) {
+    if (!olNode || olNode.nodeName !== 'OL') return;
+    olNode.removeAttribute('start');
+    editor.nodeChanged();
+    showToast('Numbered list restarted at 1');
+}
+
+function promptSetListStart() {
+    if (!tinymce.activeEditor) return;
+    var editor = tinymce.activeEditor;
+    var node = editor.selection.getNode();
+    var ol = editor.dom.getParent(node, 'ol');
+    if (!ol) {
+        showNoticeModal('Numbered List Needed', 'Please click inside a numbered list first to adjust its starting number.', 'info');
+        return;
+    }
+    setOlStartNumber(editor, ol);
+}
+
+// ── Single Image Modal Logic with SEO Alt & Title Description ────────────────
+window.currentEimFile = null;
+
+function openEditorImageModal() {
+    window.currentEimFile = null;
+    var modal = document.getElementById('editorImageModal');
+    if (!modal) return;
+    document.getElementById('eimFileInput').value = '';
+    document.getElementById('eimSeoAlt').value = '';
+    document.getElementById('eimCaption').value = '';
+    document.getElementById('eimPlaceholder').style.display = 'block';
+    document.getElementById('eimPreviewWrap').style.display = 'none';
+    document.getElementById('eimPreviewImg').src = '';
+    modal.style.display = 'flex';
+}
+
+function closeEditorImageModal() {
+    var modal = document.getElementById('editorImageModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleEimFileSelect(file, autoOpenModal) {
+    if (!file) return;
+    window.currentEimFile = file;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('eimPreviewImg').src = e.target.result;
+        document.getElementById('eimPlaceholder').style.display = 'none';
+        document.getElementById('eimPreviewWrap').style.display = 'block';
+        var altInput = document.getElementById('eimSeoAlt');
+        if (altInput && !altInput.value.trim()) {
+            var rawName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+            altInput.value = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        }
+    };
+    reader.readAsDataURL(file);
+    if (autoOpenModal) {
+        var modal = document.getElementById('editorImageModal');
+        if (modal) modal.style.display = 'flex';
+    }
+}
+
+function submitEditorImageUpload() {
+    if (!window.currentEimFile) {
+        showToast('Please select an image file first.', 'warn');
+        return;
+    }
+    var seo = document.getElementById('eimSeoAlt').value.trim();
+    if (!seo) {
+        showToast('Please enter an Image SEO Description / Alt Text.', 'warn');
+        document.getElementById('eimSeoAlt').focus();
+        return;
+    }
+    var caption = (document.getElementById('eimCaption').value || '').trim();
+    var alignRadios = document.getElementsByName('eimAlign');
+    var align = 'center';
+    for (var i = 0; i < alignRadios.length; i++) {
+        if (alignRadios[i].checked) { align = alignRadios[i].value; break; }
+    }
+    
+    var btn = document.getElementById('eimSubmitBtn');
+    var origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+    
+    var formData = new FormData();
+    formData.append('file', window.currentEimFile);
+    
+    fetch('upload_editor_image.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        if (data && data.url && tinymce.activeEditor) {
+            var safeSeo = escapeImgAttr(seo);
+            var safeCaption = escapeImgAttr(caption);
+            var imgStyle = 'max-width:100%; border-radius:12px; display:block;';
+            var pStyle = 'text-align:' + (align === 'full' ? 'center' : align) + '; margin:1.5em 0;';
+            if (align === 'center') imgStyle += ' margin:0 auto;';
+            else if (align === 'left') imgStyle += ' margin:0;';
+            else if (align === 'full') imgStyle += ' width:100%;';
+            
+            var html = '';
+            if (caption) {
+                html = '<figure style="' + pStyle + '">' +
+                       '<img src="' + data.url + '" alt="' + safeSeo + '" title="' + safeSeo + '" loading="lazy" style="' + imgStyle + '">' +
+                       '<figcaption style="font-size:0.84rem; color:#64748b; margin-top:8px; font-style:italic; text-align:center;">' + safeCaption + '</figcaption>' +
+                       '</figure><p><br></p>';
+            } else {
+                html = '<p style="' + pStyle + '">' +
+                       '<img src="' + data.url + '" alt="' + safeSeo + '" title="' + safeSeo + '" loading="lazy" style="' + imgStyle + '">' +
+                       '</p><p><br></p>';
+            }
+            tinymce.activeEditor.execCommand('mceInsertContent', false, html);
+            closeEditorImageModal();
+        } else {
+            alert('Upload failed: ' + (data && data.error ? data.error : 'Unknown error'));
+        }
+    })
+    .catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        alert('Upload error: ' + err.message);
+    });
+}
+
+// ── Carousel Builder Modal Logic (16:9 Landscape & 9:16 Vertical) ─────────────
+window.currentEditingCarouselBox = null;
+window.carouselSlideData = [];
+
+function getCarouselMaxSlides(ratio) {
+    return ratio === '9-16' ? 5 : 4;
+}
+
+function openEditorCarouselModal() {
+    window.currentEditingCarouselBox = null;
+    var modal = document.getElementById('editorCarouselModal');
+    if (!modal) return;
+    document.getElementById('ecmModalHeading').textContent = 'Insert Image Carousel';
+    document.getElementById('ecmSubmitBtn').innerHTML = '<i class="fa-solid fa-check"></i> Insert Carousel into Blog';
+    
+    setCarouselRatio('16-9');
+    window.carouselSlideData = [];
+    renderCarouselSlideCards();
+    addCarouselSlideCard();
+    addCarouselSlideCard();
+    modal.style.display = 'flex';
+}
+
+function openEditorCarouselModalForEdit(boxEl) {
+    window.currentEditingCarouselBox = boxEl;
+    var modal = document.getElementById('editorCarouselModal');
+    if (!modal) return;
+    document.getElementById('ecmModalHeading').textContent = '✏️ Edit Image Carousel';
+    document.getElementById('ecmSubmitBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Carousel in Blog';
+    
+    var is916 = boxEl.classList.contains('bcar-ratio-9-16') || boxEl.getAttribute('data-ratio') === '9:16';
+    var ratio = is916 ? '9-16' : '16-9';
+    setCarouselRatio(ratio);
+    
+    window.carouselSlideData = [];
+    var slides = boxEl.querySelectorAll('.bcar-slide');
+    slides.forEach(function(sl) {
+        var img = sl.querySelector('img');
+        var cap = sl.querySelector('.bcar-caption');
+        window.carouselSlideData.push({
+            url: img ? img.getAttribute('src') : '',
+            alt: img ? (img.getAttribute('alt') || '') : '',
+            caption: cap ? cap.textContent.trim() : ''
+        });
+    });
+    renderCarouselSlideCards();
+    modal.style.display = 'flex';
+}
+
+function closeEditorCarouselModal() {
+    var modal = document.getElementById('editorCarouselModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function setCarouselRatio(ratio) {
+    var r169 = document.querySelector('input[name="ecmRatio"][value="16-9"]');
+    var r916 = document.querySelector('input[name="ecmRatio"][value="9-16"]');
+    if (ratio === '9-16' && r916) r916.checked = true;
+    else if (r169) r169.checked = true;
+    handleCarouselRatioChange(ratio);
+}
+
+function handleCarouselRatioChange(ratio) {
+    var max = getCarouselMaxSlides(ratio);
+    var label169 = document.getElementById('ecmRatio169Label');
+    var label916 = document.getElementById('ecmRatio916Label');
+    if (ratio === '16-9') {
+        if (label169) { label169.style.borderColor = '#8b5cf6'; label169.style.background = '#fbf8ff'; }
+        if (label916) { label916.style.borderColor = '#e2e8f0'; label916.style.background = '#f8fafc'; }
+        document.getElementById('ecmLimitTip').textContent = 'Max 4 landscape images';
+    } else {
+        if (label916) { label916.style.borderColor = '#8b5cf6'; label916.style.background = '#fbf8ff'; }
+        if (label169) { label169.style.borderColor = '#e2e8f0'; label169.style.background = '#f8fafc'; }
+        document.getElementById('ecmLimitTip').textContent = 'Max 5 vertical reel images';
+    }
+    if (window.carouselSlideData.length > max) {
+        window.carouselSlideData = window.carouselSlideData.slice(0, max);
+    }
+    renderCarouselSlideCards();
+}
+
+function getSelectedCarouselRatio() {
+    var radios = document.getElementsByName('ecmRatio');
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) return radios[i].value;
+    }
+    return '16-9';
+}
+
+function addCarouselSlideCard(slide) {
+    var ratio = getSelectedCarouselRatio();
+    var max = getCarouselMaxSlides(ratio);
+    if (window.carouselSlideData.length >= max) {
+        showToast('Maximum ' + max + ' slides allowed for ' + (ratio === '9-16' ? '9:16 Vertical' : '16:9 Landscape') + '.', 'warn');
+        return;
+    }
+    window.carouselSlideData.push(slide || { url: '', alt: '', caption: '' });
+    renderCarouselSlideCards();
+}
+
+function removeCarouselSlideCard(idx) {
+    window.carouselSlideData.splice(idx, 1);
+    renderCarouselSlideCards();
+}
+
+function handleCarouselSlideUpload(input, idx) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var formData = new FormData();
+    formData.append('file', file);
+    
+    var cardEl = document.getElementById('ecmCard_' + idx);
+    if (cardEl) {
+        cardEl.style.opacity = '0.6';
+    }
+    
+    fetch('upload_editor_image.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (cardEl) cardEl.style.opacity = '1';
+        if (data && data.url) {
+            window.carouselSlideData[idx].url = data.url;
+            if (!window.carouselSlideData[idx].alt) {
+                var raw = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+                window.carouselSlideData[idx].alt = raw.charAt(0).toUpperCase() + raw.slice(1);
+            }
+            renderCarouselSlideCards();
+        } else {
+            showToast('Upload failed: ' + (data && data.error ? data.error : 'Unknown error'), 'error');
+        }
+    })
+    .catch(function(err) {
+        if (cardEl) cardEl.style.opacity = '1';
+        showToast('Upload error: ' + err.message, 'error');
+    });
+}
+
+function renderCarouselSlideCards() {
+    var container = document.getElementById('ecmCardsContainer');
+    if (!container) return;
+    var ratio = getSelectedCarouselRatio();
+    var max = getCarouselMaxSlides(ratio);
+    
+    document.getElementById('ecmSlideCountText').textContent = window.carouselSlideData.length + ' / ' + max;
+    
+    var html = '';
+    window.carouselSlideData.forEach(function(slide, idx) {
+        var cardAspect = ratio === '9-16' ? 'aspect-ratio: 9/16; max-height: 220px;' : 'aspect-ratio: 16/9; max-height: 140px;';
+        html += '<div id="ecmCard_' + idx + '" style="min-width:200px; max-width:230px; flex:0 0 auto; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); position:relative;">';
+        
+        html += '<button type="button" onclick="removeCarouselSlideCard(' + idx + ')" style="position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; background:#fee2e2; border:none; color:#ef4444; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:2;" title="Delete slide"><i class="fa-solid fa-xmark"></i></button>';
+        
+        html += '<div onclick="document.getElementById(\'ecmFileInput_' + idx + '\').click()" style="width:100%; ' + cardAspect + ' background:#f1f5f9; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; border:1px dashed #cbd5e1; position:relative;">';
+        if (slide.url) {
+            html += '<img src="' + slide.url + '" style="width:100%; height:100%; object-fit:cover;">';
+            html += '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); opacity:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.75rem; font-weight:700; transition:opacity 0.2s;" onmouseenter="this.style.opacity=\'1\'" onmouseleave="this.style.opacity=\'0\'"><i class="fa-solid fa-camera"></i>&nbsp;Change</div>';
+        } else {
+            html += '<i class="fa-solid fa-cloud-arrow-up" style="color:#8b5cf6; font-size:1.4rem; margin-bottom:4px;"></i><span style="font-size:0.72rem; color:#64748b; font-weight:700;">Upload Pic</span>';
+        }
+        html += '</div>';
+        html += '<input type="file" id="ecmFileInput_' + idx + '" accept="image/*" style="display:none" onchange="handleCarouselSlideUpload(this, ' + idx + ')">';
+        
+        html += '<div>';
+        html += '<label style="display:block; font-size:0.72rem; font-weight:800; color:#334155; margin-bottom:2px;">SEO Description (Alt Tag):</label>';
+        html += '<input type="text" value="' + escapeImgAttr(slide.alt || '') + '" placeholder="e.g. Prompt photo on Midjourney" oninput="window.carouselSlideData[' + idx + '].alt = this.value" style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.78rem; box-sizing:border-box;">';
+        html += '</div>';
+        
+        html += '<div>';
+        html += '<label style="display:block; font-size:0.72rem; font-weight:700; color:#64748b; margin-bottom:2px;">Caption (Optional):</label>';
+        html += '<input type="text" value="' + escapeImgAttr(slide.caption || '') + '" placeholder="e.g. 85mm f/1.4 lens test" oninput="window.carouselSlideData[' + idx + '].caption = this.value" style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.78rem; box-sizing:border-box;">';
+        html += '</div>';
+        
+        html += '</div>';
+    });
+    
+    var addBtnDisabled = window.carouselSlideData.length >= max;
+    html += '<div id="ecmAddCardBtn" onclick="' + (addBtnDisabled ? 'showToast(\'Maximum ' + max + ' slides reached.\', \'warn\')' : 'addCarouselSlideCard()') + '" style="min-width:140px; min-height:180px; border:2px dashed ' + (addBtnDisabled ? '#e2e8f0' : '#8b5cf6') + '; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:' + (addBtnDisabled ? 'not-allowed' : 'pointer') + '; background:' + (addBtnDisabled ? '#f8fafc' : '#faf5ff') + '; transition:all 0.2s; padding:14px; box-sizing:border-box; opacity:' + (addBtnDisabled ? '0.5' : '1') + ';">';
+    html += '<div style="width:44px; height:44px; border-radius:50%; border:2px solid ' + (addBtnDisabled ? '#94a3b8' : '#8b5cf6') + '; display:flex; align-items:center; justify-content:center; color:' + (addBtnDisabled ? '#94a3b8' : '#8b5cf6') + '; font-size:1.25rem; margin-bottom:8px;">';
+    html += '<i class="fa-solid fa-plus"></i>';
+    html += '</div>';
+    html += '<span style="font-size:0.8rem; font-weight:700; color:' + (addBtnDisabled ? '#94a3b8' : '#7c3aed') + ';">Add Slide</span>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+function insertCarouselFromModal() {
+    var ratio = getSelectedCarouselRatio();
+    var validSlides = window.carouselSlideData.filter(function(s) { return s.url && s.url.trim() !== ''; });
+    if (validSlides.length === 0) {
+        showToast('Please upload at least one image for the carousel.', 'warn');
+        return;
+    }
+    
+    var ratioClass = ratio === '9-16' ? 'bcar-ratio-9-16' : 'bcar-ratio-16-9';
+    var ratioData = ratio === '9-16' ? '9:16' : '16:9';
+    
+    var html = '<div class="blog-carousel-box ' + ratioClass + '" data-ratio="' + ratioData + '" contenteditable="false">';
+    html += '<div class="bcar-viewport">';
+    html += '<div class="bcar-track">';
+    validSlides.forEach(function(s) {
+        var alt = escapeImgAttr(s.alt || 'Arigato Devan AI prompt result');
+        html += '<div class="bcar-slide">';
+        html += '<img src="' + s.url + '" alt="' + alt + '" title="' + alt + '" loading="lazy">';
+        if (s.caption && s.caption.trim()) {
+            html += '<div class="bcar-caption">' + escapeImgAttr(s.caption.trim()) + '</div>';
+        }
+        html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<button class="bcar-nav bcar-prev" type="button" aria-label="Previous slide">&lsaquo;</button>';
+    html += '<button class="bcar-nav bcar-next" type="button" aria-label="Next slide">&rsaquo;</button>';
+    
+    html += '<div class="bcar-dots">';
+    validSlides.forEach(function(_, i) {
+        html += '<span class="bcar-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '"></span>';
+    });
+    html += '</div>';
+    html += '</div><p><br></p>';
+    
+    if (window.currentEditingCarouselBox && tinymce.activeEditor) {
+        window.currentEditingCarouselBox.outerHTML = html;
+        tinymce.activeEditor.nodeChanged();
+    } else if (tinymce.activeEditor) {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, html);
+    }
+    closeEditorCarouselModal();
+}
+
 function insertLink() {
     if (tinymce.activeEditor) {
         tinymce.activeEditor.execCommand('mceLink');
@@ -4213,5 +5348,218 @@ if (descTextarea) {
         </div>
     </div>
 </div>
+
+<!-- Dedicated Image Upload Modal with SEO Alt / Title Description -->
+<div id="editorImageModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:540px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif;">
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-regular fa-image"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Insert Image into Blog</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Upload image with Google SEO Alt & Title description</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditorImageModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div style="padding:20px 24px;">
+            <!-- Dropzone / File Picker -->
+            <div id="eimDropzone" onclick="document.getElementById('eimFileInput').click()" style="border:2px dashed #cbd5e1; border-radius:14px; padding:24px 16px; text-align:center; cursor:pointer; background:#f8fafc; transition:all 0.2s; margin-bottom:16px;">
+                <input type="file" id="eimFileInput" accept="image/*" style="display:none" onchange="handleEimFileSelect(this.files[0])">
+                <div id="eimPlaceholder">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem; color:#0284c7; margin-bottom:8px;"></i>
+                    <p style="margin:0; font-size:0.9rem; font-weight:700; color:#1e293b;">Click to choose an image or drag & drop</p>
+                    <p style="margin:4px 0 0; font-size:0.75rem; color:#64748b;">PNG, JPG, WEBP up to 5MB</p>
+                </div>
+                <div id="eimPreviewWrap" style="display:none; position:relative;">
+                    <img id="eimPreviewImg" src="" style="max-height:180px; max-width:100%; border-radius:10px; object-fit:contain; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="margin-top:8px;">
+                        <span style="font-size:0.75rem; color:#0284c7; font-weight:700; text-decoration:underline;">Click to change image</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO Alt Description Field -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:4px;">
+                    Image SEO Description / Alt Text <span style="color:#ef4444;">*</span>
+                </label>
+                <input type="text" id="eimSeoAlt" placeholder="e.g. Photorealistic prompt result of couple in neon city on Midjourney v6" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+                <span style="display:block; font-size:0.72rem; color:#64748b; margin-top:3px;">Important: Google uses this for image ranking & Instagram/Twitter previews.</span>
+            </div>
+
+            <!-- Optional Caption Field -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:4px;">
+                    Caption (Optional)
+                </label>
+                <input type="text" id="eimCaption" placeholder="e.g. Midjourney v6 prompt test with 85mm f/1.4 lens" style="width:100%; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.88rem; box-sizing:border-box;">
+            </div>
+
+            <!-- Image Alignment & Width -->
+            <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:0.82rem; font-weight:700; color:#334155; margin-bottom:6px;">Alignment</label>
+                <div style="display:flex; gap:10px;">
+                    <label style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:1.5px solid #0284c7; background:#f0f9ff; border-radius:10px; cursor:pointer; font-size:0.82rem; font-weight:700; color:#0369a1;">
+                        <input type="radio" name="eimAlign" value="center" checked style="accent-color:#0284c7;"> Center
+                    </label>
+                    <label style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:1.5px solid #e2e8f0; background:#fff; border-radius:10px; cursor:pointer; font-size:0.82rem; font-weight:700; color:#475569;">
+                        <input type="radio" name="eimAlign" value="left" style="accent-color:#0284c7;"> Left
+                    </label>
+                    <label style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border:1.5px solid #e2e8f0; background:#fff; border-radius:10px; cursor:pointer; font-size:0.82rem; font-weight:700; color:#475569;">
+                        <input type="radio" name="eimAlign" value="full" style="accent-color:#0284c7;"> Full Width
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding:16px 24px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:#f8fafc; border-radius:0 0 20px 20px;">
+            <button type="button" onclick="closeEditorImageModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" id="eimSubmitBtn" onclick="submitEditorImageUpload()" style="padding:10px 22px; border:none; border-radius:10px; background:#0284c7; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(2,132,199,0.25);">
+                <i class="fa-solid fa-check"></i> Upload & Insert Image
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Dedicated Carousel Builder & Editor Modal -->
+<div id="editorCarouselModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:820px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif;">
+        <!-- Modal Header -->
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#f3e8ff; color:#9333ea; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-solid fa-images"></i>
+                </div>
+                <div>
+                    <h3 id="ecmModalHeading" style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Insert Image Carousel</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Multi-slide interactive gallery with aspect ratio & SEO metadata</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditorCarouselModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div style="padding:20px 24px;">
+            <!-- Ratio Selector -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px;">Choose Aspect Ratio:</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <!-- 16:9 Landscape -->
+                    <label id="ecmRatio169Label" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:2px solid #8b5cf6; background:#fbf8ff; border-radius:14px; cursor:pointer; transition:all 0.15s;">
+                        <input type="radio" name="ecmRatio" value="16-9" checked onchange="handleCarouselRatioChange('16-9')" style="accent-color:#8b5cf6;">
+                        <div>
+                            <strong style="display:block; font-size:0.88rem; color:#581c87;">16:9 Landscape (Max 4 Images)</strong>
+                            <span style="font-size:0.75rem; color:#7e22ce;">Cinematic wide artworks & landscape prompt comparisons</span>
+                        </div>
+                    </label>
+                    <!-- 9:16 Vertical Reel -->
+                    <label id="ecmRatio916Label" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:2px solid #e2e8f0; background:#f8fafc; border-radius:14px; cursor:pointer; transition:all 0.15s;">
+                        <input type="radio" name="ecmRatio" value="9-16" onchange="handleCarouselRatioChange('9-16')" style="accent-color:#8b5cf6;">
+                        <div>
+                            <strong style="display:block; font-size:0.88rem; color:#1e293b;">9:16 Vertical / Reel (Max 5 Images)</strong>
+                            <span style="font-size:0.75rem; color:#64748b;">Phone screen ratio, portrait shots & reel prompts</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Carousel Cards Grid (Matches User's Hand Drawing in Image 5!) -->
+            <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <label style="font-size:0.85rem; font-weight:800; color:#0f172a;">
+                        Carousel Slides (<span id="ecmSlideCountText">0 / 4</span>)
+                    </label>
+                    <span style="font-size:0.75rem; color:#64748b;" id="ecmLimitTip">Max 4 landscape images</span>
+                </div>
+
+                <div id="ecmCardsContainer" style="display:flex; gap:14px; overflow-x:auto; padding-bottom:12px; align-items:stretch;">
+                    <!-- Dynamically populated slide cards -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding:16px 24px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-radius:0 0 20px 20px;">
+            <span style="font-size:0.78rem; color:#64748b;">Includes touch swipe, navigation arrows & dots</span>
+            <div style="display:flex; gap:10px;">
+                <button type="button" onclick="closeEditorCarouselModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
+                <button type="button" id="ecmSubmitBtn" onclick="insertCarouselFromModal()" style="padding:10px 22px; border:none; border-radius:10px; background:#8b5cf6; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(139,92,246,0.25);">
+                    <i class="fa-solid fa-check"></i> Insert Carousel into Blog
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dedicated List Numbering Continuity Modal (No browser prompt) -->
+<div id="listNumberModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:440px; width:100%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1); overflow:hidden;">
+        <div style="padding:18px 22px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; background:#fafafa;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, #0284c7, #2563eb); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 4px 10px rgba(37,99,235,0.25);">
+                    <i class="fa-solid fa-arrow-down-1-9"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:#0f172a;">List Numbering</h3>
+                    <p id="lnmSubtitle" style="margin:0; font-size:0.78rem; color:#64748b;">Set starting number for this list</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeListNumberModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:4px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div style="padding:22px;">
+            <div id="lnmInfoBox" style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:10px 14px; margin-bottom:16px; font-size:0.82rem; color:#1e40af; display:flex; align-items:flex-start; gap:10px;">
+                <i class="fa-solid fa-circle-info" style="margin-top:2px; color:#3b82f6;"></i>
+                <span id="lnmInfoText">Choose the starting number for this list item:</span>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <label style="display:block; font-size:0.82rem; font-weight:800; color:#334155; margin-bottom:8px;">Starting Number:</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" onclick="stepListNumber(-1)" style="width:44px; height:44px; border-radius:12px; border:1.5px solid #cbd5e1; background:#f8fafc; font-size:1.1rem; font-weight:800; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"><i class="fa-solid fa-minus"></i></button>
+                    <input type="number" id="lnmNumberInput" min="1" max="999" value="2" style="flex:1; height:44px; text-align:center; font-size:1.35rem; font-weight:800; color:#0f172a; border:2px solid #3b82f6; border-radius:12px; outline:none; background:#ffffff;">
+                    <button type="button" onclick="stepListNumber(1)" style="width:44px; height:44px; border-radius:12px; border:1.5px solid #cbd5e1; background:#f8fafc; font-size:1.1rem; font-weight:800; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+
+            <!-- Quick Presets -->
+            <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Quick Presets</label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <button type="button" onclick="setListNumberPreset(1)" style="padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; font-size:0.8rem; font-weight:700; color:#475569; cursor:pointer;">Restart at 1</button>
+                    <button type="button" onclick="setListNumberPreset(2)" style="padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; font-size:0.8rem; font-weight:700; color:#475569; cursor:pointer;">Start at 2</button>
+                    <button type="button" onclick="setListNumberPreset(3)" style="padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; font-size:0.8rem; font-weight:700; color:#475569; cursor:pointer;">Start at 3</button>
+                    <button type="button" onclick="setListNumberPreset(4)" style="padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; font-size:0.8rem; font-weight:700; color:#475569; cursor:pointer;">Start at 4</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding:14px 22px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:#f8fafc;">
+            <button type="button" onclick="closeListNumberModal()" style="padding:9px 16px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.84rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" onclick="applyListNumberModal()" style="padding:9px 20px; border:none; border-radius:10px; background:#2563eb; color:#fff; font-weight:700; font-size:0.84rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+                <i class="fa-solid fa-check"></i> Apply Number
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom In-Page Alert/Notice Modal -->
+<div id="customNoticeModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15,23,42,0.65); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:400px; width:100%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif; text-align:center; padding:24px; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1);">
+        <div id="cnmIconWrap" style="width:52px; height:52px; border-radius:50%; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin:0 auto 14px;">
+            <i id="cnmIcon" class="fa-solid fa-circle-info"></i>
+        </div>
+        <h3 id="cnmTitle" style="margin:0 0 8px; font-size:1.1rem; font-weight:800; color:#0f172a;">Notice</h3>
+        <p id="cnmMessage" style="margin:0 0 20px; font-size:0.88rem; color:#64748b; line-height:1.5;"></p>
+        <button type="button" onclick="closeNoticeModal()" style="width:100%; padding:10px; border:none; border-radius:10px; background:#2563eb; color:#fff; font-weight:700; font-size:0.9rem; cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+            OK, Got it
+        </button>
+    </div>
+</div>
+<div id="beToastContainer" style="position:fixed; bottom:24px; right:24px; z-index:9999999; display:flex; flex-direction:column; gap:8px; pointer-events:none; font-family:'Plus Jakarta Sans',sans-serif;"></div>
 </body>
 </html>

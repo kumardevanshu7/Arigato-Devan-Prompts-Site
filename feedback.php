@@ -208,43 +208,82 @@ body {
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    BACK LINK
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.back-link {
-    position: fixed; top: 20px; left: 24px; z-index: 100;
-    display: inline-flex; align-items: center; gap: 7px;
-    font-family: var(--sans); font-size: .78rem; font-weight: 700;
-    color: var(--muted); text-decoration: none;
-    background: rgba(250,248,243,0.85); backdrop-filter: blur(10px);
-    border: 1px solid var(--border); border-radius: 100px;
-    padding: 8px 16px;
-    transition: all .2s;
+.feedback-top-bar {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 10;
 }
-.back-link:hover { color: var(--ink); transform: translateX(-2px); }
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 700;
+    color: #4f46e5;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(165, 180, 252, 0.45);
+    border-radius: 100px;
+    padding: 8px 18px;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.08);
+    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.back-link:hover {
+    color: #312e81;
+    background: #ffffff;
+    border-color: #818cf8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(99, 102, 241, 0.16);
+}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   PAGE WRAPPER
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-wrap {
     min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 26px 20px 36px;
-    position: relative; z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px 36px;
+    position: relative;
+    z-index: 1;
     overflow-y: auto;
     overflow-x: hidden;
 }
-.feedback-card { margin: 10px 0 16px; }
+.feedback-card { margin: 6px 0 16px; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SECTION LABEL
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .section-label {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: var(--sans); font-size: .65rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: .18em;
-    color: var(--muted);
-    border: 1px solid var(--border); border-radius: 100px;
-    padding: 5px 14px; margin-bottom: 18px;
-    background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--sans);
+    font-size: .68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #4338ca;
+    border: 1.5px solid rgba(165, 180, 252, 0.45);
+    border-radius: 100px;
+    padding: 8px 18px;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.08);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -252,13 +291,13 @@ body {
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .feedback-card {
     width: 100%; max-width: 520px;
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1.5px solid rgba(165,180,252,0.4);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(30px) saturate(190%);
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    border: 1.5px solid rgba(165,180,252,0.45);
     border-radius: var(--card-r);
-    box-shadow: var(--shadow);
-    padding: 28px 32px 24px;
+    box-shadow: 0 24px 64px rgba(99,102,241,0.14), 0 4px 16px rgba(99,102,241,0.06);
+    padding: 30px 32px 26px;
     position: relative; overflow: hidden;
     animation: cardIn .55s cubic-bezier(.34,1.56,.64,1) both;
 }
@@ -464,8 +503,8 @@ body {
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .submit-btn {
     width: 100%;
-    padding: 16px;
-    background: var(--ink);
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: #fff;
     border: none; border-radius: 14px;
     font-family: var(--sans); font-size: .92rem; font-weight: 800;
@@ -474,14 +513,15 @@ body {
     display: flex; align-items: center; justify-content: center; gap: 9px;
     transition: all .22s ease;
     position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
 }
 .submit-btn::after {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(192,132,252,0.2), transparent);
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent);
     opacity: 0; transition: opacity .22s;
 }
-.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(26,20,16,0.25); }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.45); }
 .submit-btn:hover::after { opacity: 1; }
 .submit-btn:active { transform: translateY(0); }
 .submit-btn:disabled {
@@ -540,14 +580,16 @@ body {
 .back-home-btn {
     display: inline-flex; align-items: center; gap: 8px;
     margin-top: 20px;
-    padding: 13px 28px;
-    background: var(--ink); color: #fff;
+    padding: 12px 26px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
     border: none; border-radius: 12px;
     font-family: var(--sans); font-size: .85rem; font-weight: 800;
     text-decoration: none; letter-spacing: .04em;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.28);
     transition: all .2s;
 }
-.back-home-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,20,16,0.22); }
+.back-home-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COOLDOWN STATE
@@ -613,15 +655,17 @@ body {
    MOBILE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 600px) {
-    .feedback-card { padding: 20px 16px 18px; border-radius: 20px; max-width: 95vw; margin: 8px 0 18px; }
+    .page-wrap { min-height: 100dvh; overflow-y: auto; overflow-x: hidden; padding: 16px 12px 24px; }
+    .feedback-top-bar { max-width: 95vw; margin-bottom: 12px; gap: 8px; }
+    .back-link { font-size: .74rem; padding: 7px 13px; gap: 6px; }
+    .section-label { font-size: .64rem; padding: 7px 13px; letter-spacing: .08em; gap: 5px; }
+    .feedback-card { padding: 22px 16px 20px; border-radius: 22px; max-width: 95vw; margin: 4px 0 16px; }
     .card-title { font-size: 1.35rem; }
     .emoji-btn { font-size: .95rem; padding: 5px 1px 4px; border-radius: 8px; }
     .emoji-num { font-size: .38rem; }
     .avatar-ring { width: 58px; height: 58px; }
     .user-name { font-size: 1.1rem; }
-    .back-link { top: 12px; left: 12px; font-size: .68rem; padding: 5px 10px; }
-    .page-wrap { min-height: 100dvh; overflow-y: auto; overflow-x: hidden; padding: 18px 12px 24px; }
-    .feedback-textarea { min-height: 72px; }
+    .feedback-textarea { min-height: 76px; }
 }
 </style>
 
@@ -633,14 +677,15 @@ body {
 <div class="bg-side-word bg-side-left">Feedback</div>
 <div class="bg-side-word bg-side-right">Feedback</div>
 
-<a href="index.php" class="back-link">
-    <i class="fa-solid fa-arrow-left"></i> Back to Home
-</a>
-
 <div class="page-wrap">
-    <div class="section-label">
-        <i class="fa-solid fa-comment-dots"></i>
-        Share Your Thoughts
+    <div class="feedback-top-bar">
+        <a href="index.php" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> <span>Back to Home</span>
+        </a>
+        <div class="section-label">
+            <i class="fa-solid fa-comment-dots"></i>
+            <span>Share Your Thoughts</span>
+        </div>
     </div>
 
     <div class="feedback-card" id="mainCard">
@@ -775,7 +820,7 @@ body {
         <form method="POST" id="feedbackForm">
             <!-- Mood Tags -->
             <div class="mood-tags" id="moodTags">
-                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Bahut sunder couyple promptts</span>
+                <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Bahut sundar couple prompts ❤️</span>
                 <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-fire" style="color: #f97316;"></i> Best prompt ever! 🔥</span>
                 <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Worked perfectly. Thank you! ❤️</span>
                 <span class="mood-tag" onclick="toggleMood(this)"><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Finally got the result I wanted.</span>

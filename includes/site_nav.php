@@ -176,11 +176,14 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
             <i class="fa-brands fa-instagram"></i> @arigato.devan
         </a>
         <div class="gal-mobile-lang-box notranslate" translate="no">
-            <div class="gal-mobile-lang-title notranslate" translate="no"><i class="fa-solid fa-globe"></i> Select Language</div>
-            <div class="gal-mobile-lang-grid notranslate" translate="no">
-                <button type="button" class="gal-m-lang-btn notranslate is-active" translate="no" data-lang="en">🇺🇸 English</button>
-                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="es">🇪🇸 Español</button>
-                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="hi">🇮🇳 Hindi</button>
+            <div class="gal-mobile-lang-header notranslate" translate="no">
+                <span class="gal-mobile-lang-title notranslate" translate="no"><i class="fa-solid fa-globe"></i> Language</span>
+                <span class="gal-mobile-lang-tag notranslate" translate="no" id="galMobileLangCurrentTag">English</span>
+            </div>
+            <div class="gal-mobile-lang-segmented notranslate" translate="no" role="tablist">
+                <button type="button" class="gal-m-lang-btn notranslate is-active" translate="no" data-lang="en">English</button>
+                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="es">Español</button>
+                <button type="button" class="gal-m-lang-btn notranslate" translate="no" data-lang="hi">हिन्दी</button>
             </div>
         </div>
         <?php if (isset($_SESSION['user_id'])): ?>
@@ -333,8 +336,11 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
 
         function updateLangUI(lang) {
             var label = (lang === 'es' ? 'ES' : (lang === 'hi' ? 'HI' : 'EN'));
+            var fullLabel = (lang === 'es' ? 'Español' : (lang === 'hi' ? 'हिन्दी' : 'English'));
             var cur = document.getElementById('galLangCurrent');
             if (cur) cur.textContent = label;
+            var mTag = document.getElementById('galMobileLangCurrentTag');
+            if (mTag) mTag.textContent = fullLabel;
             document.querySelectorAll('.gal-lang-opt').forEach(function(el) {
                 el.classList.toggle('is-active', el.getAttribute('data-lang') === lang);
             });
