@@ -1765,5 +1765,38 @@ font[style] {
     box-shadow: none !important;
 }
 
+/* Mobile Optimization for Language Switcher & Header Elements */
+@media (max-width: 620px) {
+    .gal-lang-btn {
+        padding: 4px 8px !important;
+        height: 34px !important;
+        font-size: 0.72rem !important;
+        gap: 4px !important;
+        border-radius: 999px !important;
+    }
+    .gal-lang-btn i.fa-globe {
+        font-size: 0.8rem !important;
+    }
+    .gal-lang-btn i.fa-chevron-down {
+        font-size: 0.48rem !important;
+        opacity: 0.6 !important;
+    }
+    .store-header-right {
+        gap: 5px !important;
+        flex-shrink: 0 !important;
+    }
+}
 
-
+@media (max-width: 380px) {
+    .gal-lang-btn {
+        padding: 4px 6px !important;
+        font-size: 0.68rem !important;
+        gap: 3px !important;
+    }
+    .gal-lang-btn i.fa-chevron-down {
+        display: none !important;
+    }
+    .store-header-right {
+        gap: 4px !important;
+    }
+}

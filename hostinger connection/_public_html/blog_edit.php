@@ -2119,14 +2119,108 @@ tinymce.init({
             }
         });
 
+        // Override TinyMCE's internal shortcuts for Ctrl+A / Cmd+A
+        function selectCodeBlockOnly() {
+            var selNode = editor.selection.getNode();
+            var targetPre = editor.dom.getParent(selNode, 'pre');
+            if (targetPre) {
+                var codeEl = targetPre.querySelector('code') || targetPre;
+                var rng = editor.dom.createRng();
+                rng.selectNodeContents(codeEl);
+                editor.selection.setRng(rng);
+                return true;
+            }
+            return false;
+        }
+
+        editor.addShortcut('meta+a', 'Select code block or all', function () {
+            if (!selectCodeBlockOnly()) {
+                editor.execCommand('SelectAll');
+            }
+        });
+        editor.addShortcut('ctrl+a', 'Select code block or all', function () {
+            if (!selectCodeBlockOnly()) {
+                editor.execCommand('SelectAll');
+            }
+        });
+
+        // Synthetic keydown fallback on editor
+        editor.on('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A' || e.keyCode === 65)) {
+                if (selectCodeBlockOnly()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+        });
+
+        function updatePreWordCounts() {
+            var pres = editor.dom.select('pre');
+            pres.forEach(function(p) {
+                var text = (p.textContent || p.innerText || '').trim();
+                var count = text ? (text.match(/\S+/g) || []).length : 0;
+                p.setAttribute('data-words', count + (count === 1 ? ' word' : ' words'));
+            });
+        }
+
         editor.on('init', function () {
             editor.getContainer().style.border = 'none';
             editor.getContainer().style.boxShadow = 'none';
             editor.getContainer().style.background = 'transparent';
             updateEditorialStats();
+            updatePreWordCounts();
+
+            // Intercept at raw DOM capture phase before browser or TinyMCE can trigger native SelectAll
+            var doc = editor.getDoc();
+            var win = editor.getWin();
+
+            function handleCodeCtrlACapture(e) {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A' || e.keyCode === 65)) {
+                    var sel = win ? win.getSelection() : null;
+                    var anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+                    var el = anchor ? (anchor.nodeType === 1 ? anchor : anchor.parentElement) : null;
+                    var targetPre = (el && el.closest) ? el.closest('pre') : null;
+                    if (!targetPre) {
+                        var selNode = editor.selection.getNode();
+                        targetPre = editor.dom.getParent(selNode, 'pre');
+                    }
+
+                    if (targetPre) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        e.stopPropagation();
+
+                        var codeEl = targetPre.querySelector('code') || targetPre;
+                        
+                        // Set DOM Range on window selection
+                        if (doc && doc.createRange && sel) {
+                            var r = doc.createRange();
+                            r.selectNodeContents(codeEl);
+                            sel.removeAllRanges();
+                            sel.addRange(r);
+                        }
+
+                        // Also update TinyMCE's internal selection
+                        var rng = editor.dom.createRng();
+                        rng.selectNodeContents(codeEl);
+                        editor.selection.setRng(rng);
+
+                        return false;
+                    }
+                }
+            }
+
+            if (doc) {
+                doc.addEventListener('keydown', handleCodeCtrlACapture, true);
+            }
+            if (win) {
+                win.addEventListener('keydown', handleCodeCtrlACapture, true);
+            }
         });
         editor.on('NodeChange keyup change input', function () {
             updateEditorialStats();
+            updatePreWordCounts();
         });
         editor.on('OpenWindow', function () {
             window.setTimeout(function () {
@@ -2199,14 +2293,69 @@ tinymce.init({
             color: #1e3a8a;
         }
         pre {
-            background: #0f172a;
-            border-radius: 10px;
-            padding: 14px 18px;
-            color: #cbd5e1;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            margin: 1.5em 0;
+            position: relative !important;
+            background: #1e1e2e !important;
+            border: 2px solid #2f4156 !important;
+            border-radius: 14px !important;
+            padding: 46px 20px 20px 20px !important;
+            color: #93c5fd !important;
+            font-family: 'DM Mono', 'JetBrains Mono', Consolas, Monaco, monospace !important;
+            font-size: 0.92rem !important;
+            line-height: 1.7 !important;
+            overflow-x: auto !important;
+            margin: 1.6em 0 !important;
+            box-shadow: 4px 4px 0 rgba(47, 65, 86, 0.25) !important;
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+        }
+        pre::before {
+            content: "PROMPT.txt" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 34px !important;
+            background: 
+                radial-gradient(circle 5px at 18px 17px, #ff5f57 100%, transparent 0),
+                radial-gradient(circle 5px at 33px 17px, #febc2e 100%, transparent 0),
+                radial-gradient(circle 5px at 48px 17px, #28c840 100%, transparent 0),
+                #2f4156 !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+            font-size: 0.74rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            pointer-events: none !important;
+            user-select: none !important;
+            border-top-left-radius: 11px !important;
+            border-top-right-radius: 11px !important;
+        }
+        pre::after {
+            content: attr(data-words) !important;
+            position: absolute !important;
+            top: 0 !important;
+            right: 16px !important;
+            height: 34px !important;
+            display: flex !important;
+            align-items: center !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.72rem !important;
+            color: rgba(255, 255, 255, 0.65) !important;
+            font-weight: 600 !important;
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+        pre code {
+            background: transparent !important;
+            color: inherit !important;
+            font-family: inherit !important;
+            font-size: inherit !important;
+            padding: 0 !important;
+            border: none !important;
         }
         img {
             max-width: 100%;

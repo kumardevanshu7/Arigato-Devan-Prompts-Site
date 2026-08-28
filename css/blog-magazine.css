@@ -735,6 +735,145 @@ html, body.bm-list {
   border-radius: 12px;
 }
 
+/* ============================================================
+   macOS Code Block / Terminal Window (PROMPT.txt style)
+   ============================================================ */
+.ba-content pre,
+.blog-content pre {
+  position: relative !important;
+  background: #1e1e2e !important;
+  border: 2px solid var(--pal-navy, #2f4156) !important;
+  border-radius: 14px !important;
+  padding: 48px 20px 20px 20px !important;
+  color: #93c5fd !important;
+  font-family: 'DM Mono', 'JetBrains Mono', Consolas, Monaco, monospace !important;
+  font-size: 0.92rem !important;
+  line-height: 1.75 !important;
+  overflow-x: auto !important;
+  margin: 1.6em 0 !important;
+  box-shadow: 4px 4px 0 rgba(47, 65, 86, 0.25) !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+.ba-content pre::before,
+.blog-content pre::before {
+  content: "PROMPT.txt" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 36px !important;
+  background: 
+    radial-gradient(circle 5px at 18px 18px, #ff5f57 100%, transparent 0),
+    radial-gradient(circle 5px at 33px 18px, #febc2e 100%, transparent 0),
+    radial-gradient(circle 5px at 48px 18px, #28c840 100%, transparent 0),
+    var(--pal-navy, #2f4156) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+
+.ba-content pre::after,
+.blog-content pre::after {
+  content: attr(data-words) !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 16px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.72rem !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-weight: 600 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* Hide fallback CSS pseudo-element when interactive JS tools are present */
+.ba-content pre:has(.ba-code-tools)::after,
+.blog-content pre:has(.ba-code-tools)::after,
+.ba-content pre.has-tools::after,
+.blog-content pre.has-tools::after {
+  display: none !important;
+}
+
+.ba-content pre code,
+.blog-content pre code {
+  background: transparent !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  padding: 0 !important;
+  border: none !important;
+  display: block;
+}
+
+/* Flexbox container for Word Count + Copy Button (Eliminates overlap completely) */
+.ba-code-tools {
+  position: absolute;
+  top: 0;
+  right: 14px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.ba-code-words {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ba-code-copy-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.ba-code-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+.ba-code-copy-btn.copied {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .ba-code-words {
+    display: none;
+  }
+}
+
 .ba-side {
   position: sticky;
   top: 92px;

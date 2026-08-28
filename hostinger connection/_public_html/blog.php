@@ -79,7 +79,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260820k">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260828tools">
 <meta name="description" content="<?= htmlspecialchars(
     $blog["meta_description"] ?? ($blog["description"] ?? ""),
 ) ?>">
@@ -2297,6 +2297,46 @@ document.querySelectorAll('.blog-toc-box').forEach(function(box) {
             if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
         };
         title.appendChild(toggleBtn);
+    }
+});
+
+// Auto-enhance code blocks with word count & copy button (flex container, zero overlap)
+document.querySelectorAll('.ba-content pre, .blog-content pre').forEach(function(pre) {
+    var text = (pre.textContent || pre.innerText || '').trim();
+    var words = text ? (text.match(/\S+/g) || []).length : 0;
+    var wordLabel = words + (words === 1 ? ' word' : ' words');
+    pre.setAttribute('data-words', wordLabel);
+    
+    if (!pre.querySelector('.ba-code-tools')) {
+        pre.classList.add('has-tools');
+        var tools = document.createElement('div');
+        tools.className = 'ba-code-tools';
+        
+        var wordsSpan = document.createElement('span');
+        wordsSpan.className = 'ba-code-words';
+        wordsSpan.textContent = wordLabel;
+        
+        var copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'ba-code-copy-btn';
+        copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+        copyBtn.title = 'Copy code';
+        copyBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var codeText = (pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText) || text;
+            navigator.clipboard.writeText(codeText.trim()).then(function() {
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                setTimeout(function() {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                }, 2000);
+            });
+        });
+        
+        tools.appendChild(wordsSpan);
+        tools.appendChild(copyBtn);
+        pre.appendChild(tools);
     }
 });
 </script>
