@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $meta_title = trim($_POST["meta_title"] ?? "");
     $meta_desc = trim($_POST["meta_description"] ?? "");
     $tags = trim($_POST["tags"] ?? "");
+    $focus_keyword = trim($_POST["focus_keyword"] ?? "");
     
     // Process selected categories
     $selected_cats = isset($_POST['categories']) && is_array($_POST['categories']) ? array_filter(array_map('trim', $_POST['categories'])) : [];
@@ -139,25 +140,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($error)) {
-            $stmt = $pdo->prepare(
-                "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, category=?, is_published=?, updated_at=NOW() WHERE id=?"
-            );
-            $stmt->execute([
-                $title,
-                $slug,
-                $description,
-                $content,
-                $content_hindi,
-                $image_path,
-                $image_path_landscape,
-                $image_ratio,
-                $meta_title,
-                $meta_desc,
-                $tags,
-                $category_str,
-                $publish,
-                $id,
-            ]);
+            // Check / ensure focus_keyword column exists in blogs table
+            $has_fk_col = false;
+            try {
+                $colCheck = $pdo->query("SHOW COLUMNS FROM blogs LIKE 'focus_keyword'")->fetch();
+                if (!$colCheck) {
+                    $pdo->exec("ALTER TABLE blogs ADD COLUMN focus_keyword VARCHAR(255) DEFAULT '' AFTER tags");
+                    $has_fk_col = true;
+                } else {
+                    $has_fk_col = true;
+                }
+            } catch (Exception $e) {
+                $has_fk_col = false;
+            }
+
+            if ($has_fk_col) {
+                $stmt = $pdo->prepare(
+                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, focus_keyword=?, category=?, is_published=?, updated_at=NOW() WHERE id=?"
+                );
+                $stmt->execute([
+                    $title,
+                    $slug,
+                    $description,
+                    $content,
+                    $content_hindi,
+                    $image_path,
+                    $image_path_landscape,
+                    $image_ratio,
+                    $meta_title,
+                    $meta_desc,
+                    $tags,
+                    $focus_keyword,
+                    $category_str,
+                    $publish,
+                    $id,
+                ]);
+            } else {
+                $stmt = $pdo->prepare(
+                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, category=?, is_published=?, updated_at=NOW() WHERE id=?"
+                );
+                $stmt->execute([
+                    $title,
+                    $slug,
+                    $description,
+                    $content,
+                    $content_hindi,
+                    $image_path,
+                    $image_path_landscape,
+                    $image_ratio,
+                    $meta_title,
+                    $meta_desc,
+                    $tags,
+                    $category_str,
+                    $publish,
+                    $id,
+                ]);
+            }
 
             $_SESSION["success_msg"] = "Article updated successfully!";
             header("Location: blog_edit.php?id=" . $id);
@@ -1694,7 +1732,7 @@ if (empty($current_blog_categories)) {
                 <!-- Focus Keyword -->
                 <div class="be-form-group" style="margin-bottom: 8px;">
                     <label class="be-form-label">Focus Keyword</label>
-                    <input type="text" class="be-form-input" id="seo-focus-keyword" placeholder="e.g. couple prompt, midjourney..." autocomplete="off">
+                    <input type="text" class="be-form-input" id="seo-focus-keyword" name="focus_keyword" value="<?= htmlspecialchars($bl["focus_keyword"] ?? "") ?>" placeholder="e.g. couple prompt, midjourney..." autocomplete="off">
                 </div>
 
                 <!-- Live SEO Health Checklist -->
@@ -5799,6 +5837,44 @@ function setCheckWarn(id, text) {
         el.addEventListener('input', updateEditorialStats);
     }
 });
+
+// Focus Keyword persistence backup with localStorage
+(function() {
+    const fkInput = document.getElementById('seo-focus-keyword');
+    if (!fkInput) return;
+    const storageKey = 'blog_fk_<?= (int)($bl["id"] ?? 0) ?>';
+    
+    // If DB value was empty, check if we have a localStorage backup
+    if (!fkInput.value.trim()) {
+        const savedFk = localStorage.getItem(storageKey);
+        if (savedFk) {
+            fkInput.value = savedFk;
+        }
+    } else {
+        // DB has value, update localStorage to keep in sync
+        localStorage.setItem(storageKey, fkInput.value.trim());
+    }
+
+    fkInput.addEventListener('input', function() {
+        localStorage.setItem(storageKey, this.value.trim());
+    });
+
+    const form = document.getElementById('blogForm') || document.getElementById('articleForm');
+    if (form) {
+        form.addEventListener('submit', function() {
+            if (window.tinymce && tinymce.triggerSave) {
+                tinymce.triggerSave();
+            }
+            localStorage.setItem(storageKey, fkInput.value.trim());
+        });
+    }
+
+    // Auto-run stats after short delay so checklist evaluates restored keyword immediately
+    setTimeout(updateEditorialStats, 120);
+    window.addEventListener('load', function() {
+        setTimeout(updateEditorialStats, 150);
+    });
+})();
 
 const descTextarea = document.getElementById('bc-desc');
 if (descTextarea) {
