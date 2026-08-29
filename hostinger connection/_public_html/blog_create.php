@@ -2288,6 +2288,39 @@ tinymce.init({
         });
 
         // ── FAQ Box Floating Context Toolbar & Handlers ──────────────────
+        editor.ui.registry.addButton('faqSpaceAboveBtn', {
+            icon: 'line',
+            text: '↵ Space Above',
+            tooltip: 'Insert blank line above FAQ (Push Down & Type)',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox) {
+                    var p = editor.dom.create('p', {}, '<br data-mce-bogus="1">');
+                    faqBox.parentNode.insertBefore(p, faqBox);
+                    editor.selection.setCursorLocation(p, 0);
+                    editor.nodeChanged();
+                    editor.focus();
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('faqSpaceBelowBtn', {
+            text: '↵ Space Below',
+            tooltip: 'Insert blank line below FAQ',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox) {
+                    var p = editor.dom.create('p', {}, '<br data-mce-bogus="1">');
+                    editor.dom.insertAfter(p, faqBox);
+                    editor.selection.setCursorLocation(p, 0);
+                    editor.nodeChanged();
+                    editor.focus();
+                }
+            }
+        });
+
         editor.ui.registry.addButton('editFaqBtn', {
             icon: 'edit-block',
             text: 'Edit FAQ',
@@ -2327,11 +2360,41 @@ tinymce.init({
             }
         });
 
+        editor.ui.registry.addButton('faqMoveUpBtn', {
+            icon: 'chevron-up',
+            text: '⬆ Move Up',
+            tooltip: 'Move FAQ box above the previous block',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox && faqBox.previousElementSibling) {
+                    faqBox.parentNode.insertBefore(faqBox, faqBox.previousElementSibling);
+                    editor.selection.select(faqBox);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('faqMoveDownBtn', {
+            icon: 'chevron-down',
+            text: '⬇ Move Down',
+            tooltip: 'Move FAQ box below the next block',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var faqBox = editor.dom.getParent(node, '.blog-faq-box');
+                if (faqBox && faqBox.nextElementSibling) {
+                    editor.dom.insertAfter(faqBox, faqBox.nextElementSibling);
+                    editor.selection.select(faqBox);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
         editor.ui.registry.addContextToolbar('faqBoxToolbar', {
             predicate: function (node) {
                 return !!editor.dom.getParent(node, '.blog-faq-box');
             },
-            items: 'editFaqBtn removeFaqBtn',
+            items: 'faqSpaceAboveBtn faqMoveUpBtn faqMoveDownBtn editFaqBtn removeFaqBtn faqSpaceBelowBtn',
             position: 'node',
             scope: 'node'
         });
@@ -2640,13 +2703,108 @@ tinymce.init({
             }
         });
 
+        // ── Auto-sanitize Widgets Out of Lists (FAQ / Note Cards / Carousel trapped in <li>) ──
+        function sanitizeWidgetsOutOfLists() {
+            var body = editor.getBody();
+            if (!body) return;
+            var trapped = body.querySelectorAll('li > .blog-faq-box, ul > .blog-faq-box, ol > .blog-faq-box, li > .blog-prompt-card, ul > .blog-prompt-card, li > .blog-carousel-box, ul > .blog-carousel-box');
+            if (!trapped || trapped.length === 0) return;
+
+            trapped.forEach(function (widget) {
+                var list = editor.dom.getParent(widget, 'ul, ol');
+                var li = editor.dom.getParent(widget, 'li');
+                if (list && list.parentNode) {
+                    var parent = list.parentNode;
+                    var p = editor.dom.create('p', {}, '<br>');
+                    editor.dom.insertAfter(widget, list);
+                    parent.insertBefore(p, widget);
+
+                    if (li) {
+                        var liText = (li.textContent || '').trim();
+                        var wText = (widget.textContent || '').trim();
+                        if (!liText || liText === wText) {
+                            editor.dom.remove(li);
+                        }
+                    }
+                    if ((list.textContent || '').trim() === '' && list.children.length === 0) {
+                        editor.dom.remove(list);
+                    }
+                }
+            });
+            editor.nodeChanged();
+        }
+
+        editor.on('init SetContent NodeChange keyup', function () {
+            sanitizeWidgetsOutOfLists();
+        });
+
         editor.on('keydown', function (e) {
             if (e.key === 'Enter') {
                 var node = editor.selection.getNode();
+                
+                // 1. Inside <pre> (code block) -> Insert line break
                 var pre = editor.dom.getParent(node, 'pre');
                 if (pre) {
                     e.preventDefault();
                     editor.execCommand('InsertLineBreak');
+                    return;
+                }
+
+                // 2. On or inside FAQ Box, Note Box, Carousel Box
+                var widget = editor.dom.getParent(node, '.blog-faq-box, .blog-prompt-card, .blog-carousel-box');
+                if (widget) {
+                    var inEditableField = editor.dom.getParent(node, '.faq-q-text, .faq-a-text, .bpc-desc');
+                    var isFaqTitle = node.classList && node.classList.contains('blog-faq-title');
+                    var rng = editor.selection.getRng();
+                    var isAtStart = rng && rng.startOffset === 0;
+
+                    // If user is at the beginning of the FAQ section title or selecting the widget container
+                    if (!inEditableField || (isFaqTitle && isAtStart)) {
+                        e.preventDefault();
+                        var p = editor.dom.create('p', {}, '<br data-mce-bogus="1">');
+                        if (e.shiftKey) {
+                            editor.dom.insertAfter(p, widget);
+                        } else {
+                            widget.parentNode.insertBefore(p, widget);
+                        }
+                        editor.selection.setCursorLocation(p, 0);
+                        editor.nodeChanged();
+                        editor.focus();
+                        return;
+                    }
+                }
+
+                // 3. User is in the block immediately preceding a widget (e.g. at the end of a list item or paragraph above FAQ)
+                var curBlock = editor.dom.getParent(node, 'p, h1, h2, h3, h4, h5, h6, li');
+                if (curBlock) {
+                    var nextWidget = null;
+                    var next = curBlock.nextElementSibling;
+                    if (next && next.matches && next.matches('.blog-faq-box, .blog-prompt-card, .blog-carousel-box')) {
+                        nextWidget = next;
+                    } else if (curBlock.nodeName === 'LI') {
+                        var ul = editor.dom.getParent(curBlock, 'ul, ol');
+                        if (ul && !curBlock.nextElementSibling) {
+                            if (ul.nextElementSibling && ul.nextElementSibling.matches('.blog-faq-box, .blog-prompt-card, .blog-carousel-box')) {
+                                nextWidget = ul.nextElementSibling;
+                            }
+                        }
+                    }
+
+                    if (nextWidget) {
+                        var rng2 = editor.selection.getRng();
+                        if (rng2 && rng2.collapsed) {
+                            var textLen = (curBlock.textContent || '').length;
+                            if (rng2.endOffset >= textLen || rng2.startOffset >= textLen) {
+                                e.preventDefault();
+                                var newP = editor.dom.create('p', {}, '<br data-mce-bogus="1">');
+                                nextWidget.parentNode.insertBefore(newP, nextWidget);
+                                editor.selection.setCursorLocation(newP, 0);
+                                editor.nodeChanged();
+                                editor.focus();
+                                return;
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -4917,7 +5075,25 @@ function insertFaqFromModal() {
         tinymce.activeEditor.nodeChanged();
         window.currentEditingFaqBox = null;
     } else {
-        tinymce.activeEditor.execCommand('mceInsertContent', false, faqHtml + '<p><br></p>');
+        var selNode = tinymce.activeEditor.selection.getNode();
+        var listParent = tinymce.activeEditor.dom.getParent(selNode, 'ul, ol');
+        if (listParent) {
+            var tempWrap = document.createElement('div');
+            tempWrap.innerHTML = faqHtml + '<p><br></p>';
+            var ref = listParent;
+            while (tempWrap.firstChild) {
+                var elem = tempWrap.firstChild;
+                tinymce.activeEditor.dom.insertAfter(elem, ref);
+                ref = elem;
+            }
+            var curLi = tinymce.activeEditor.dom.getParent(selNode, 'li');
+            if (curLi && (curLi.textContent || '').trim() === '') {
+                tinymce.activeEditor.dom.remove(curLi);
+            }
+            tinymce.activeEditor.nodeChanged();
+        } else {
+            tinymce.activeEditor.execCommand('mceInsertContent', false, faqHtml + '<p><br></p>');
+        }
     }
     closeFaqModal();
 }
