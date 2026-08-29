@@ -1,28 +1,80 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
-$slug = $_GET["slug"] ?? "";
-if (!$slug) {
-    header("Location: blogs.php");
-    exit();
+$is_admin = (isset($_SESSION["user_id"]) && ($_SESSION["role"] ?? "") === "admin");
+$is_preview_mode = false;
+
+// 1. Live form preview via POST (from blog_create.php or blog_edit.php)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['is_live_preview'])) {
+    $blog = [
+        'id' => (int)($_POST['preview_id'] ?? 0),
+        'title' => trim($_POST['preview_title'] ?? 'Untitled Draft Preview'),
+        'slug' => trim($_POST['preview_slug'] ?? 'draft-preview'),
+        'content' => $_POST['preview_content'] ?? '',
+        'content_hindi' => $_POST['preview_content_hindi'] ?? '',
+        'category' => trim($_POST['preview_category'] ?? 'General'),
+        'tags' => trim($_POST['preview_tags'] ?? ''),
+        'description' => trim($_POST['preview_desc'] ?? ''),
+        'meta_title' => trim($_POST['preview_meta_title'] ?? ''),
+        'meta_description' => trim($_POST['preview_meta_desc'] ?? ''),
+        'meta_keywords' => trim($_POST['preview_meta_keywords'] ?? ''),
+        'image_path' => trim($_POST['preview_image_path'] ?? ''),
+        'image_path_landscape' => trim($_POST['preview_image_path_landscape'] ?? ''),
+        'is_published' => 0,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s'),
+        'author_id' => $_SESSION['user_id'] ?? 1,
+        'author_name' => $_SESSION['username'] ?? 'Admin',
+        'author_avatar' => $_SESSION['avatar'] ?? $_SESSION['profile_image'] ?? '',
+        'view_count' => 0,
+        'likes' => 0,
+        'likes_count' => 0
+    ];
+    $_SESSION['blog_live_preview'] = $blog;
+    $is_preview_mode = true;
+} elseif (isset($_GET['preview']) && !empty($_SESSION['blog_live_preview']) && $is_admin && empty($_GET['slug'])) {
+    // Stored live session preview
+    $blog = $_SESSION['blog_live_preview'];
+    $is_preview_mode = true;
+} else {
+    $slug = $_GET["slug"] ?? "";
+    if (!$slug) {
+        header("Location: blogs.php");
+        exit();
+    }
+
+    if ($is_admin || isset($_GET['preview'])) {
+        // Admin or preview request can view unpublished drafts
+        $stmt = $pdo->prepare(
+            "SELECT b.*, u.username as author_name, u.avatar as author_avatar FROM blogs b LEFT JOIN users u ON b.author_id=u.id WHERE b.slug=?"
+        );
+        $stmt->execute([$slug]);
+        $blog = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($blog && empty($blog['is_published'])) {
+            $is_preview_mode = true;
+        }
+    } else {
+        $stmt = $pdo->prepare(
+            "SELECT b.*, u.username as author_name, u.avatar as author_avatar FROM blogs b LEFT JOIN users u ON b.author_id=u.id WHERE b.slug=? AND b.is_published=1"
+        );
+        $stmt->execute([$slug]);
+        $blog = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    if (!$blog) {
+        header("Location: blogs.php");
+        exit();
+    }
 }
 
-$stmt = $pdo->prepare(
-    "SELECT b.*, u.username as author_name, u.avatar as author_avatar FROM blogs b LEFT JOIN users u ON b.author_id=u.id WHERE b.slug=? AND b.is_published=1",
-);
-$stmt->execute([$slug]);
-$blog = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$blog) {
-    header("Location: blogs.php");
-    exit();
+// Increment view count (never in preview mode)
+if (empty($is_preview_mode) && !empty($blog['id'])) {
+    try { $pdo->prepare("UPDATE blogs SET view_count = COALESCE(view_count,0) + 1 WHERE id = ?")->execute([$blog['id']]); } catch (Exception $e) {}
 }
-
-// Increment view count
-try { $pdo->prepare("UPDATE blogs SET view_count = COALESCE(view_count,0) + 1 WHERE id = ?")->execute([$blog['id']]); } catch (Exception $e) {}
 
 // Has current user liked?
 $user_liked = false;
-if (isset($_SESSION["user_id"])) {
+if (!empty($blog['id']) && isset($_SESSION["user_id"])) {
     $lk = $pdo->prepare(
         "SELECT id FROM blog_likes WHERE user_id=? AND blog_id=?",
     );
@@ -33,22 +85,27 @@ if (isset($_SESSION["user_id"])) {
 // Reactions
 $reaction_counts = ['heart'=>0,'fire'=>0,'wow'=>0,'clap'=>0,'laugh'=>0];
 $my_reactions = [];
-try {
-    $rk = isset($_SESSION['user_id']) ? 'u'.$_SESSION['user_id'] : 'ip'.md5($_SERVER['REMOTE_ADDR']);
-    $rc = $pdo->prepare("SELECT reaction, COUNT(*) as cnt FROM blog_reactions WHERE blog_id=? GROUP BY reaction");
-    $rc->execute([$blog['id']]);
-    foreach ($rc->fetchAll() as $r) $reaction_counts[$r['reaction']] = (int)$r['cnt'];
-    $mr = $pdo->prepare("SELECT reaction FROM blog_reactions WHERE blog_id=? AND reactor_key=?");
-    $mr->execute([$blog['id'], $rk]);
-    $my_reactions = array_column($mr->fetchAll(), 'reaction');
-} catch(Exception $e) {}
+if (!empty($blog['id'])) {
+    try {
+        $rk = isset($_SESSION['user_id']) ? 'u'.$_SESSION['user_id'] : 'ip'.md5($_SERVER['REMOTE_ADDR']);
+        $rc = $pdo->prepare("SELECT reaction, COUNT(*) as cnt FROM blog_reactions WHERE blog_id=? GROUP BY reaction");
+        $rc->execute([$blog['id']]);
+        foreach ($rc->fetchAll() as $r) $reaction_counts[$r['reaction']] = (int)$r['cnt'];
+        $mr = $pdo->prepare("SELECT reaction FROM blog_reactions WHERE blog_id=? AND reactor_key=?");
+        $mr->execute([$blog['id'], $rk]);
+        $my_reactions = array_column($mr->fetchAll(), 'reaction');
+    } catch(Exception $e) {}
+}
 
 // Comments
-$comments = $pdo->prepare(
-    "SELECT bc.*, u.username, u.avatar as profile_image FROM blog_comments bc LEFT JOIN users u ON bc.user_id=u.id WHERE bc.blog_id=? ORDER BY bc.created_at ASC",
-);
-$comments->execute([$blog["id"]]);
-$comments = $comments->fetchAll(PDO::FETCH_ASSOC);
+$comments = [];
+if (!empty($blog['id'])) {
+    $stmt_c = $pdo->prepare(
+        "SELECT bc.*, u.username, u.avatar as profile_image FROM blog_comments bc LEFT JOIN users u ON bc.user_id=u.id WHERE bc.blog_id=? ORDER BY bc.created_at ASC",
+    );
+    $stmt_c->execute([$blog["id"]]);
+    $comments = $stmt_c->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // Calculate reading time (200 words per minute average)
 $word_count = str_word_count(strip_tags($blog["content"] ?? ""));
@@ -79,8 +136,99 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260828bleed">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260829themes">
 <style>
+/* Code Block: Full width wide horizontal rectangle with compact height */
+.ba-content pre,
+.blog-content pre,
+.ba-content li pre,
+.blog-content li pre,
+pre {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  clear: both !important;
+  margin: 1.4em 0 !important;
+}
+.ba-content pre code,
+.blog-content pre code,
+.ba-content li pre code,
+.blog-content li pre code,
+pre code {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  padding: 46px 20px 18px 20px !important;
+}
+.ba-content ol,
+.blog-content ol,
+.ba-content ul,
+.blog-content ul {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.ba-content li,
+.blog-content li {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ── Code Block Themes ── */
+.ba-content pre.code-theme-light,
+.blog-content pre.code-theme-light,
+pre.code-theme-light {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 4px 4px 0 rgba(203, 213, 225, 0.5) !important;
+}
+.ba-content pre.code-theme-light::before,
+.blog-content pre.code-theme-light::before,
+pre.code-theme-light::before {
+  background: 
+    radial-gradient(circle 5px at 18px 18px, #ff5f57 100%, transparent 0),
+    radial-gradient(circle 5px at 33px 18px, #febc2e 100%, transparent 0),
+    radial-gradient(circle 5px at 48px 18px, #28c840 100%, transparent 0),
+    #e2e8f0 !important;
+  color: #334155 !important;
+}
+.ba-content pre.code-theme-light code,
+.blog-content pre.code-theme-light code,
+pre.code-theme-light code {
+  color: #0f172a !important;
+}
+
+.ba-content pre.code-theme-cyber,
+.blog-content pre.code-theme-cyber,
+pre.code-theme-cyber {
+  background: #090a10 !important;
+  border-color: #8b5cf6 !important;
+  color: #34d399 !important;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.25), 4px 4px 0 rgba(139, 92, 246, 0.3) !important;
+}
+.ba-content pre.code-theme-cyber::before,
+.blog-content pre.code-theme-cyber::before,
+pre.code-theme-cyber::before {
+  background: 
+    radial-gradient(circle 5px at 18px 18px, #ec4899 100%, transparent 0),
+    radial-gradient(circle 5px at 33px 18px, #8b5cf6 100%, transparent 0),
+    radial-gradient(circle 5px at 48px 18px, #06b6d4 100%, transparent 0),
+    linear-gradient(90deg, #1e1035 0%, #2e1065 100%) !important;
+  color: #e9d5ff !important;
+}
+.ba-content pre.code-theme-cyber code,
+.blog-content pre.code-theme-cyber code,
+pre.code-theme-cyber code {
+  color: #34d399 !important;
+}
+
 /* Direct In-Page Override: Desktop Separation & Mobile Edge-to-Edge Boundary */
 @media (min-width: 901px) {
   .ba-page {
@@ -2259,9 +2407,106 @@ footer .footer-links a:hover {
     html.blog-read-little .blog-content { font-size: 1.15rem !important; line-height: 1.75 !important; }
     html.blog-read-medium .blog-content { font-size: 1.26rem !important; line-height: 1.8 !important; }
 }
+
+/* ── Floating Admin Draft Preview Banner ── */
+.ba-preview-banner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999999;
+    background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #31104b 100%);
+    color: #ffffff;
+    border-bottom: 1.5px solid rgba(192, 132, 252, 0.45);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    padding: 8px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.ba-preview-inner {
+    max-width: 1360px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 0.84rem;
+}
+.ba-preview-badge {
+    background: #f59e0b;
+    color: #1c1917;
+    font-weight: 800;
+    font-size: 0.72rem;
+    padding: 4px 9px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+.ba-preview-text {
+    color: rgba(255, 255, 255, 0.88);
+    font-weight: 500;
+    flex: 1;
+}
+.ba-preview-btn {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.ba-preview-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+@media (max-width: 768px) {
+    .ba-preview-banner {
+        padding: 6px 12px !important;
+    }
+    .ba-preview-inner {
+        gap: 8px !important;
+        font-size: 0.76rem !important;
+    }
+    .ba-preview-text {
+        display: none !important;
+    }
+    .ba-preview-badge {
+        font-size: 0.68rem !important;
+        padding: 3px 8px !important;
+    }
+    .ba-preview-btn {
+        padding: 4px 10px !important;
+        font-size: 0.72rem !important;
+    }
+}
 </style>
 </head>
 <body class="page-store theme-nogoda bm-article">
+<?php if (!empty($is_preview_mode)): ?>
+<div class="ba-preview-banner">
+    <div class="ba-preview-inner">
+        <span class="ba-preview-badge"><i class="fa-solid fa-eye"></i> DRAFT PREVIEW MODE</span>
+        <span class="ba-preview-text">This post is unpublished. Visible only to admins for previewing before publish.</span>
+        <div class="ba-preview-actions">
+            <?php if (!empty($blog['id'])): ?>
+                <a href="blog_edit.php?id=<?= (int)$blog['id'] ?>" class="ba-preview-btn"><i class="fa-solid fa-pen-to-square"></i> Edit in CMS</a>
+            <?php else: ?>
+                <button type="button" onclick="window.close()" class="ba-preview-btn"><i class="fa-solid fa-xmark"></i> Close Preview</button>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -2389,7 +2634,7 @@ footer .footer-links a:hover {
         </div>
         <div class="ba-stats">
           <div>
-            <b><?= (int) $blog["likes_count"] ?></b>
+            <b><?= (int) ($blog["likes_count"] ?? 0) ?></b>
             <span>Likes</span>
           </div>
           <div>
@@ -2409,7 +2654,7 @@ footer .footer-links a:hover {
         </div>
         <button class="blog-like-btn <?= $user_liked ? "liked" : "" ?>" id="blog-like-btn" data-blog-id="<?= $blog["id"] ?>" style="margin-top:12px;width:100%;justify-content:center;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="<?= $user_liked ? "#fff" : "none" ?>" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          <span id="blog-like-count"><?= (int) $blog["likes_count"] ?></span> Likes
+          <span id="blog-like-count"><?= (int) ($blog["likes_count"] ?? 0) ?></span> Likes
         </button>
       </div>
     </aside>
@@ -2692,6 +2937,15 @@ document.querySelectorAll('.blog-toc-box').forEach(function(box) {
 
 // Auto-enhance code blocks with word count & copy button (flex container, zero overlap)
 document.querySelectorAll('.ba-content pre, .blog-content pre').forEach(function(pre) {
+    // Ensure all content is inside a <code> tag for smooth scrolling under the pinned header
+    if (!pre.querySelector('code')) {
+        var codeEl = document.createElement('code');
+        while (pre.firstChild) {
+            codeEl.appendChild(pre.firstChild);
+        }
+        pre.appendChild(codeEl);
+    }
+
     var text = (pre.textContent || pre.innerText || '').trim();
     var words = text ? (text.match(/\S+/g) || []).length : 0;
     var wordLabel = words + (words === 1 ? ' word' : ' words');

@@ -1019,19 +1019,28 @@ html, body.bm-list {
 .ba-content pre,
 .blog-content pre {
   position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
   background: #1e1e2e !important;
   border: 2px solid var(--pal-navy, #2f4156) !important;
   border-radius: 14px !important;
-  padding: 48px 20px 20px 20px !important;
+  padding: 0 !important;
   color: #93c5fd !important;
   font-family: 'DM Mono', 'JetBrains Mono', Consolas, Monaco, monospace !important;
   font-size: 0.92rem !important;
   line-height: 1.75 !important;
-  overflow-x: auto !important;
   margin: 1.6em 0 !important;
   box-shadow: 4px 4px 0 rgba(47, 65, 86, 0.25) !important;
-  white-space: pre-wrap !important;
-  word-break: break-word !important;
+  overflow: hidden !important;
+}
+
+.ba-content li pre,
+.blog-content li pre {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
 }
 
 .ba-content pre::before,
@@ -1060,6 +1069,7 @@ html, body.bm-list {
   user-select: none !important;
   border-top-left-radius: 11px !important;
   border-top-right-radius: 11px !important;
+  z-index: 3 !important;
 }
 
 .ba-content pre::after,
@@ -1077,6 +1087,7 @@ html, body.bm-list {
   font-weight: 600 !important;
   pointer-events: none !important;
   user-select: none !important;
+  z-index: 3 !important;
 }
 
 /* Hide fallback CSS pseudo-element when interactive JS tools are present */
@@ -1093,21 +1104,124 @@ html, body.bm-list {
   color: inherit !important;
   font-family: inherit !important;
   font-size: inherit !important;
-  padding: 0 !important;
+  padding: 48px 20px 20px 20px !important;
   border: none !important;
-  display: block;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(147, 197, 253, 0.4) rgba(0, 0, 0, 0.2);
 }
 
-/* Flexbox container for Word Count + Copy Button (Eliminates overlap completely) */
+.ba-content pre code::-webkit-scrollbar,
+.blog-content pre code::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.ba-content pre code::-webkit-scrollbar-track,
+.blog-content pre code::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+.ba-content pre code::-webkit-scrollbar-thumb,
+.blog-content pre code::-webkit-scrollbar-thumb {
+  background: rgba(147, 197, 253, 0.4);
+  border-radius: 4px;
+}
+.ba-content pre code::-webkit-scrollbar-thumb:hover,
+.blog-content pre code::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 197, 253, 0.65);
+}
+
+/* ── Code Block Theme 2: Minimalist Light (Paper) ── */
+.ba-content pre.code-theme-light,
+.blog-content pre.code-theme-light {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 4px 4px 0 rgba(203, 213, 225, 0.5) !important;
+}
+.ba-content pre.code-theme-light::before,
+.blog-content pre.code-theme-light::before {
+  background: 
+    radial-gradient(circle 5px at 18px 18px, #ff5f57 100%, transparent 0),
+    radial-gradient(circle 5px at 33px 18px, #febc2e 100%, transparent 0),
+    radial-gradient(circle 5px at 48px 18px, #28c840 100%, transparent 0),
+    #e2e8f0 !important;
+  color: #334155 !important;
+}
+.ba-content pre.code-theme-light code,
+.blog-content pre.code-theme-light code {
+  color: #0f172a !important;
+  scrollbar-color: rgba(148, 163, 184, 0.5) rgba(0, 0, 0, 0.05) !important;
+}
+.ba-content pre.code-theme-light .ba-code-words,
+.blog-content pre.code-theme-light .ba-code-words {
+  color: #64748b !important;
+}
+.ba-content pre.code-theme-light .ba-code-copy-btn,
+.blog-content pre.code-theme-light .ba-code-copy-btn {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #334155 !important;
+}
+.ba-content pre.code-theme-light .ba-code-copy-btn:hover,
+.blog-content pre.code-theme-light .ba-code-copy-btn:hover {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ── Code Block Theme 3: Cyberpunk Neon (Matrix) ── */
+.ba-content pre.code-theme-cyber,
+.blog-content pre.code-theme-cyber {
+  background: #090a10 !important;
+  border-color: #8b5cf6 !important;
+  color: #34d399 !important;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.25), 4px 4px 0 rgba(139, 92, 246, 0.3) !important;
+}
+.ba-content pre.code-theme-cyber::before,
+.blog-content pre.code-theme-cyber::before {
+  background: 
+    radial-gradient(circle 5px at 18px 18px, #ec4899 100%, transparent 0),
+    radial-gradient(circle 5px at 33px 18px, #8b5cf6 100%, transparent 0),
+    radial-gradient(circle 5px at 48px 18px, #06b6d4 100%, transparent 0),
+    linear-gradient(90deg, #1e1035 0%, #2e1065 100%) !important;
+  color: #e9d5ff !important;
+}
+.ba-content pre.code-theme-cyber code,
+.blog-content pre.code-theme-cyber code {
+  color: #34d399 !important;
+  scrollbar-color: rgba(139, 92, 246, 0.5) rgba(0, 0, 0, 0.3) !important;
+}
+.ba-content pre.code-theme-cyber .ba-code-words,
+.blog-content pre.code-theme-cyber .ba-code-words {
+  color: #c084fc !important;
+}
+.ba-content pre.code-theme-cyber .ba-code-copy-btn,
+.blog-content pre.code-theme-cyber .ba-code-copy-btn {
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  color: #e9d5ff !important;
+}
+.ba-content pre.code-theme-cyber .ba-code-copy-btn:hover,
+.blog-content pre.code-theme-cyber .ba-code-copy-btn:hover {
+  background: rgba(139, 92, 246, 0.35) !important;
+}
+
+/* Flexbox container for Word Count + Copy Button (Pinned at top, zero overlap) */
 .ba-code-tools {
-  position: absolute;
-  top: 0;
-  right: 14px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 2;
+  position: absolute !important;
+  top: 0 !important;
+  right: 14px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  z-index: 4 !important;
 }
 
 .ba-code-words {

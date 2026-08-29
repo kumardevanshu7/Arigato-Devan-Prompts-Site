@@ -426,12 +426,13 @@ $current_blog_categories = ['Uncategorized'];
             box-shadow: none !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
             font-weight: 800 !important;
-            font-size: 2rem !important;
+            font-size: 1.85rem !important;
             line-height: 1.25 !important;
             color: var(--be-text-main) !important;
             letter-spacing: -0.02em !important;
-            margin-bottom: 10px !important;
+            margin-bottom: 6px !important;
             padding: 0 !important;
+            flex-shrink: 0 !important;
         }
         .be-title-input::placeholder {
             color: #cbd5e1 !important;
@@ -444,13 +445,14 @@ $current_blog_categories = ['Uncategorized'];
             background: transparent !important;
             box-shadow: none !important;
             font-family: 'Inter', sans-serif !important;
-            font-size: 0.98rem !important;
-            line-height: 1.5 !important;
+            font-size: 0.94rem !important;
+            line-height: 1.45 !important;
             color: var(--be-text-sec) !important;
             resize: none !important;
-            margin-bottom: 14px !important;
-            min-height: 40px;
+            margin-bottom: 8px !important;
+            min-height: 32px;
             padding: 0 !important;
+            flex-shrink: 0 !important;
         }
         .be-subtitle-input::placeholder {
             color: #cbd5e1 !important;
@@ -459,13 +461,14 @@ $current_blog_categories = ['Uncategorized'];
         .be-meta-bar {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding-bottom: 14px;
-            margin-bottom: 14px;
+            gap: 12px;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #f1f5f9;
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             color: var(--be-text-muted);
             font-weight: 500;
+            flex-shrink: 0 !important;
         }
         .be-meta-bar span {
             display: inline-flex;
@@ -482,12 +485,15 @@ $current_blog_categories = ['Uncategorized'];
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 6px 8px;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
             display: flex;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+            flex-shrink: 0 !important;
+            min-height: 46px !important;
+            box-sizing: border-box !important;
         }
         .be-tb-group {
             display: inline-flex;
@@ -495,19 +501,24 @@ $current_blog_categories = ['Uncategorized'];
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 2px 3px;
+            padding: 3px 4px;
             gap: 2px;
-            flex-shrink: 0;
+            flex-shrink: 0 !important;
+            height: 32px;
+            box-sizing: border-box;
         }
         .be-tb-group-accent {
-            background: #f0f9ff;
-            border-color: #bae6fd;
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+        .be-tb-divider {
+            display: none;
         }
         .be-editor-wrap {
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 680px;
+            min-height: 650px;
             min-width: 0;
             max-width: 100%;
         }
@@ -531,23 +542,26 @@ $current_blog_categories = ['Uncategorized'];
             padding: 0;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.82rem;
+            font-size: 0.84rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             transition: all 0.12s ease;
+            flex-shrink: 0;
+            line-height: 1;
         }
         .be-tb-btn:hover {
             background: #ffffff;
             color: #0f172a;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
-
-        .be-tb-divider {
-            display: none;
+        .be-tb-btn.active {
+            background: #ffffff;
+            color: #0284c7;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         /* ── Custom In-Page Dropdown UI (Replaces ugly native browser OS <select>) ── */
@@ -563,15 +577,17 @@ $current_blog_categories = ['Uncategorized'];
             font-family: inherit;
             font-size: 0.8rem;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 7px;
+            padding: 0 8px;
+            border-radius: 6px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            height: 28px;
+            height: 26px;
             transition: all 0.15s ease;
             white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1;
         }
         .be-tb-dropdown-btn:hover,
         .be-dropdown.be-dd-open .be-tb-dropdown-btn {
@@ -579,6 +595,27 @@ $current_blog_categories = ['Uncategorized'];
             border-color: #cbd5e1;
             color: #0f172a;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+        .be-tb-dropdown-accent {
+            background: transparent !important;
+            color: #7c3aed !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .be-tb-dropdown-accent:hover,
+        .be-dropdown.be-dd-open .be-tb-dropdown-accent {
+            background: transparent !important;
+            color: #6d28d9 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .be-tb-group-accent {
+            transition: all 0.15s ease;
+        }
+        .be-tb-group-accent:hover,
+        .be-tb-group-accent:has(.be-dd-open) {
+            background: #ede9fe !important;
+            border-color: #c4b5fd !important;
         }
         .be-dd-chevron {
             font-size: 0.65rem;
@@ -1115,26 +1152,19 @@ $current_blog_categories = ['Uncategorized'];
                 background: rgba(255, 255, 255, 0.98);
                 backdrop-filter: blur(10px);
                 border: 1px solid #e2e8f0;
-                border-radius: 14px;
+                border-radius: 12px;
                 padding: 6px 8px;
-                margin-bottom: 14px;
-                box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+                margin-bottom: 12px;
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
                 display: flex;
-                flex-direction: column;
-                gap: 6px;
-                overflow: visible;
-            }
-            .be-tb-primary {
-                display: flex !important;
                 align-items: center;
                 gap: 6px;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                width: 100%;
-                padding-bottom: 3px;
+                flex-wrap: wrap;
+                flex-shrink: 0 !important;
+                min-height: 46px !important;
+                box-sizing: border-box !important;
             }
-            .be-tb-primary::-webkit-scrollbar {
+            .be-toolbar::-webkit-scrollbar {
                 display: none;
             }
             .be-tb-group {
@@ -1143,56 +1173,26 @@ $current_blog_categories = ['Uncategorized'];
                 background: #f8fafc;
                 border: 1px solid #e2e8f0;
                 border-radius: 8px;
-                padding: 2px;
+                padding: 3px 4px;
                 gap: 2px;
-                flex-shrink: 0;
+                flex-shrink: 0 !important;
+                height: 32px;
+                box-sizing: border-box;
             }
             .be-tb-btn {
-                width: 32px;
-                height: 32px;
-                min-width: 32px;
+                width: 30px;
+                height: 30px;
+                min-width: 30px;
                 font-size: 0.82rem;
                 flex-shrink: 0;
                 border-radius: 6px;
                 background: transparent;
             }
             .be-tb-more-btn {
-                display: inline-flex !important;
-                align-items: center;
-                gap: 5px;
-                padding: 0 12px;
-                height: 32px;
-                border-radius: 8px;
-                border: 1px solid #cbd5e1;
-                background: #f8fafc;
-                color: #475569;
-                font-size: 0.78rem;
-                font-weight: 700;
-                cursor: pointer;
-                flex-shrink: 0;
-                white-space: nowrap;
-                transition: all 0.15s ease;
-            }
-            .be-tb-more-btn.active {
-                background: #eff6ff;
-                border-color: #3b82f6;
-                color: #2563eb;
-                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+                display: none !important;
             }
             .be-tb-more-drawer {
                 display: none !important;
-                flex-wrap: wrap;
-                gap: 6px;
-                padding-top: 6px;
-                border-top: 1px solid #f1f5f9;
-                animation: beDrawerSlide 0.2s ease;
-            }
-            .be-tb-more-drawer.be-drawer-expanded {
-                display: flex !important;
-            }
-            @keyframes beDrawerSlide {
-                from { opacity: 0; transform: translateY(-4px); }
-                to { opacity: 1; transform: translateY(0); }
             }
             .be-editor-wrap {
                 min-height: 260px;
@@ -1236,6 +1236,11 @@ $current_blog_categories = ['Uncategorized'];
                 <span class="be-dot"></span>
                 <span id="statusIndicatorText">Draft</span>
             </div>
+
+            <button type="button" class="be-btn-preview" onclick="openLivePreview()" title="Open live draft preview in new tab">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>Preview</span>
+            </button>
 
             <a href="blog_admin.php" class="be-btn-sec">Cancel</a>
             <button type="submit" class="be-btn-primary" id="btnSubmitForm">
@@ -1282,138 +1287,127 @@ $current_blog_categories = ['Uncategorized'];
                 <span id="metaReadTime"><i class="fa-regular fa-clock"></i> ~0 min read</span>
             </div>
 
-            <!-- Sleek Minimalist Formatting Toolbar -->
+            <!-- Sleek Minimalist Formatting Toolbar (Single-Row Compact Bar) -->
             <div class="be-toolbar">
-                <!-- ── Primary Row (Always Visible & Smooth Horizontal Swipe on Mobile) ── -->
-                <div class="be-tb-primary">
-                    <!-- Group: Style Custom Dropdown -->
-                    <div class="be-tb-group">
-                        <div class="be-dropdown" id="beStyleDropdown">
-                            <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beStyleDropdown')" title="Headings & Callouts">
-                                <span class="be-dd-label">Style</span>
-                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
-                            </button>
-                            <div class="be-dropdown-menu">
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('p', 'Paragraph')">Paragraph</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h1', 'Heading 1')"><span style="font-size:1.1rem; font-weight:800;">Heading 1</span></button>
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h2', 'Heading 2')"><span style="font-size:1.0rem; font-weight:700;">Heading 2</span></button>
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('h3', 'Heading 3')"><span style="font-size:0.9rem; font-weight:700;">Heading 3</span></button>
-                                <div class="be-dd-divider"></div>
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('blockquote', 'Quote Callout')"><i class="fa-solid fa-quote-left" style="color:#0284c7;"></i> Quote Callout</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeStyle('greybox', 'Grey Note Box')"><i class="fa-solid fa-square-pen" style="color:#64748b;"></i> Grey Note Box</button>
-                            </div>
+                <!-- Group: Style Custom Dropdown -->
+                <div class="be-tb-group">
+                    <div class="be-dropdown" id="beStyleDropdown">
+                        <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beStyleDropdown')" title="Headings & Callouts">
+                            <span class="be-dd-label">Style</span>
+                            <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                        </button>
+                        <div class="be-dropdown-menu">
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('p', 'Paragraph')">Paragraph</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('h1', 'Heading 1')"><span style="font-size:1.1rem; font-weight:800;">Heading 1</span></button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('h2', 'Heading 2')"><span style="font-size:1.0rem; font-weight:700;">Heading 2</span></button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('h3', 'Heading 3')"><span style="font-size:0.9rem; font-weight:700;">Heading 3</span></button>
+                            <div class="be-dd-divider"></div>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('blockquote', 'Quote Callout')"><i class="fa-solid fa-quote-left" style="color:#0284c7;"></i> Quote Callout</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('greybox', 'Grey Note Box')"><i class="fa-solid fa-square-pen" style="color:#64748b;"></i> Grey Note Box</button>
                         </div>
                     </div>
-
-                    <!-- Group: Basic Text Formats -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
-                        <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
-                    </div>
-
-                    <!-- Group: Lists -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="continueCurrentOrderedList()" title="Continue Numbering from Previous List (e.g. 2, 3...)"><i class="fa-solid fa-arrow-down-1-9" style="color:#0284c7;"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="promptSetListStart()" title="Set Starting Number"><i class="fa-solid fa-hashtag" style="color:#64748b; font-size:0.75rem;"></i></button>
-                    </div>
-
-                    <!-- Group: Alignment -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
-                    </div>
-
-                    <!-- Group: Links -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="fmt('unlink')" title="Remove Link"><i class="fa-solid fa-link-slash"></i></button>
-                    </div>
-
-                    <!-- Group: Media Inserts -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="openEditorImageModal()" title="Insert Image with SEO Description & Alt Text"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="openEditorCarouselModal()" title="Insert Carousel (16:9 Landscape or 9:16 Vertical Reel)"><i class="fa-solid fa-images" style="color:#8b5cf6;"></i></button>
-                    </div>
-
-                    <!-- Mobile "••• More" Toggle Button -->
-                    <button type="button" id="beTbMoreToggleBtn" class="be-tb-more-btn" onclick="toggleMobileTbMore()" title="More Tools">
-                        <i class="fa-solid fa-ellipsis"></i> More
-                    </button>
                 </div>
 
-                <!-- ── Secondary Shelf (Collapsible on Mobile, Inline on Desktop) ── -->
-                <div class="be-tb-more-drawer" id="beTbMoreDrawer">
-                    <!-- Group: Font Family Custom Dropdown -->
-                    <div class="be-tb-group">
-                        <div class="be-dropdown" id="beFontDropdown">
-                            <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beFontDropdown')" title="Font Family">
-                                <span class="be-dd-label">Font</span>
-                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
-                            </button>
-                            <div class="be-dropdown-menu">
-                                <button type="button" class="be-dd-item" onclick="selectBeFont('Lora, Georgia, serif', 'Editorial Serif')" style="font-family:Lora, Georgia, serif;">Editorial Serif</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Playfair Display\', serif', 'Display Serif')" style="font-family:'Playfair Display', serif;">Display Serif</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Plus Jakarta Sans\', sans-serif', 'Modern Bold')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700;">Modern Bold</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'Inter\', sans-serif', 'Clean Sans')" style="font-family:'Inter', sans-serif;">Clean Sans</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeFont('\'JetBrains Mono\', monospace', 'Monospace')" style="font-family:'JetBrains Mono', monospace;">Monospace</button>
-                            </div>
-                        </div>
-                        <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
-                        <button type="button" class="be-tb-btn" onclick="removeHighlight()" title="Remove Highlight"><i class="fa-solid fa-eraser" style="color:#ef4444;"></i></button>
-                    </div>
+                <!-- Group: Basic Text Formats -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
+                    <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
+                </div>
 
-                    <!-- Group: Special Arigato Blocks (Note, FAQ, TOC, CTA) -->
-                    <div class="be-tb-group be-tb-group-accent">
-                        <button type="button" class="be-tb-btn" onclick="openNoteBoxModal()" title="Insert Note Box / Featured Prompt Cards"><i class="fa-regular fa-note-sticky" style="color:#475569;"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="openFaqModal()" title="Insert Sleek Quick FAQ Section Box"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Insert Table of Contents"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
-                        <div class="be-dropdown" id="beTocSizeDropdown">
-                            <button type="button" class="be-tb-dropdown-btn be-tb-dropdown-mini" onclick="toggleBeDropdown('beTocSizeDropdown')" title="Table of Contents Size">
-                                <span class="be-dd-label">Size</span>
-                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
-                            </button>
-                            <div class="be-dropdown-menu">
-                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('sm', 'Small')">Small (Compact)</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('md', 'Medium')">Medium (Standard)</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeTocSize('lg', 'Large')">Large (Spacious)</button>
-                            </div>
-                        </div>
-                        <button type="button" class="be-tb-btn" onclick="openCtaModal()" title="Insert Nogoda CTA Color Box with Buttons"><i class="fa-solid fa-bullhorn" style="color:#7c3aed;"></i></button>
-                    </div>
+                <!-- Group: Lists -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('insertOrderedList')" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="continueCurrentOrderedList()" title="Continue Numbering from Previous List"><i class="fa-solid fa-arrow-down-1-9" style="color:#0284c7;"></i></button>
+                </div>
 
-                    <!-- Group: Media Details & Inserts -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="toggleSelectedImageCaption()" title="Add / Edit Image Caption"><i class="fa-solid fa-closed-captioning" style="color:#475569;"></i></button>
-                        <div class="be-dropdown" id="beImgBorderDropdown">
-                            <button type="button" class="be-tb-dropdown-btn be-tb-dropdown-mini" onclick="toggleBeDropdown('beImgBorderDropdown')" title="Picture Border">
-                                <span class="be-dd-label">Border</span>
-                                <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
-                            </button>
-                            <div class="be-dropdown-menu">
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('0', 'None')">None</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('1', '1px')">1px Thin</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('2', '2px')">2px Medium</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('3', '3px')">3px Bold</button>
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('4', '4px')">4px Thick</button>
-                                <div class="be-dd-divider"></div>
-                                <button type="button" class="be-dd-item" onclick="selectBeBorder('custom', 'Custom...')"><i class="fa-solid fa-gear"></i> Custom...</button>
-                            </div>
-                        </div>
-                        <button type="button" class="be-tb-btn" onclick="insertTable()" title="Insert Table"><i class="fa-solid fa-table"></i></button>
-                        <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Code Snippet"><i class="fa-solid fa-code"></i></button>
-                        <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) handleEimFileSelect(this.files[0], true)">
-                    </div>
+                <!-- Group: Alignment -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyLeft')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyCenter')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('justifyRight')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+                </div>
 
-                    <!-- Group: Clear Format -->
-                    <div class="be-tb-group">
-                        <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                <!-- Group: Links & Media -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="openEditorImageModal()" title="Insert Image with SEO Alt Text"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="openEditorCarouselModal()" title="Insert Carousel"><i class="fa-solid fa-images" style="color:#8b5cf6;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Prompt Code Snippet"><i class="fa-solid fa-code"></i></button>
+                </div>
+
+                <!-- Group: Table of Contents -->
+                <div class="be-tb-group" id="beTocGroup">
+                    <button type="button" class="be-tb-btn" onclick="insertTableOfContents('sm')" title="Table of Contents (Auto-links H2/H3)"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i></button>
+                    <div class="be-dropdown" id="beTocDropdown">
+                        <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beTocDropdown')" title="TOC Size & Options">
+                            <span class="be-dd-label">TOC</span>
+                            <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                        </button>
+                        <div class="be-dropdown-menu">
+                            <button type="button" class="be-dd-item" onclick="insertTableOfContents('sm')"><i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> Auto-Update / Refresh</button>
+                            <div class="be-dd-divider"></div>
+                            <div style="padding: 4px 12px; font-size:0.68rem; color:#94a3b8; font-weight:700; text-transform:uppercase;">Size & Columns</div>
+                            <button type="button" class="be-dd-item" onclick="setTocSize('sm')"><i class="fa-solid fa-table-columns" style="color:#64748b;"></i> Small (2 Columns, Compact)</button>
+                            <button type="button" class="be-dd-item" onclick="setTocSize('md')"><i class="fa-solid fa-table-columns" style="color:#64748b;"></i> Medium (2 Columns, Standard)</button>
+                            <button type="button" class="be-dd-item" onclick="setTocSize('lg')"><i class="fa-solid fa-table-columns" style="color:#64748b;"></i> Large (2 Columns, Spacious)</button>
+                            <div class="be-dd-divider"></div>
+                            <button type="button" class="be-dd-item" onclick="removeTocFromDoc()" style="color:#ef4444;"><i class="fa-solid fa-trash-can" style="color:#ef4444;"></i> Delete TOC</button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Group: + Insert Special Blocks -->
+                <div class="be-tb-group be-tb-group-accent">
+                    <div class="be-dropdown" id="beInsertDropdown">
+                        <button type="button" class="be-tb-dropdown-btn be-tb-dropdown-accent" onclick="toggleBeDropdown('beInsertDropdown')" title="Insert Special Blocks">
+                            <i class="fa-solid fa-plus" style="font-size:0.72rem;"></i>
+                            <span class="be-dd-label">Insert</span>
+                            <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                        </button>
+                        <div class="be-dropdown-menu">
+                            <button type="button" class="be-dd-item" onclick="openNoteBoxModal()"><i class="fa-regular fa-note-sticky" style="color:#f59e0b;"></i> Pro Tip / Note Box</button>
+                            <button type="button" class="be-dd-item" onclick="openFaqModal()"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i> Quick FAQ Section Box</button>
+                            <button type="button" class="be-dd-item" onclick="insertTableOfContents('sm')"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i> Table of Contents</button>
+                            <button type="button" class="be-dd-item" onclick="openCtaModal()"><i class="fa-solid fa-bullhorn" style="color:#ec4899;"></i> CTA Banner Box</button>
+                            <div class="be-dd-divider"></div>
+                            <button type="button" class="be-dd-item" onclick="insertTable()"><i class="fa-solid fa-table" style="color:#64748b;"></i> Table</button>
+                            <button type="button" class="be-dd-item" onclick="promptSetListStart()"><i class="fa-solid fa-hashtag" style="color:#64748b;"></i> Set Starting Number</button>
+                            <button type="button" class="be-dd-item" onclick="toggleSelectedImageCaption()"><i class="fa-solid fa-closed-captioning" style="color:#64748b;"></i> Image Caption</button>
+                            <div class="be-dd-divider"></div>
+                            <button type="button" class="be-dd-item" onclick="insertCodeBlock('dark')"><i class="fa-solid fa-code" style="color:#38bdf8;"></i> Code: 🌙 Dark Theme</button>
+                            <button type="button" class="be-dd-item" onclick="insertCodeBlock('light')"><i class="fa-solid fa-code" style="color:#64748b;"></i> Code: ☀️ Light Theme</button>
+                            <button type="button" class="be-dd-item" onclick="insertCodeBlock('cyber')"><i class="fa-solid fa-code" style="color:#a855f7;"></i> Code: ⚡ Cyber Theme</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group: Font Family -->
+                <div class="be-tb-group">
+                    <div class="be-dropdown" id="beFontDropdown">
+                        <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beFontDropdown')" title="Font Family">
+                            <span class="be-dd-label">Font</span>
+                            <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
+                        </button>
+                        <div class="be-dropdown-menu">
+                            <button type="button" class="be-dd-item" onclick="selectBeFont('Lora, Georgia, serif', 'Editorial Serif')" style="font-family:Lora, Georgia, serif;">Editorial Serif</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeFont('\'Playfair Display\', serif', 'Display Serif')" style="font-family:'Playfair Display', serif;">Display Serif</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeFont('\'Plus Jakarta Sans\', sans-serif', 'Modern Bold')" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700;">Modern Bold</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeFont('\'Inter\', sans-serif', 'Clean Sans')" style="font-family:'Inter', sans-serif;">Clean Sans</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeFont('\'JetBrains Mono\', monospace', 'Monospace')" style="font-family:'JetBrains Mono', monospace;">Monospace</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group: Clear Format -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                </div>
+
+                <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) handleEimFileSelect(this.files[0], true)">
             </div>
 
             <!-- Rich Text Area -->
@@ -2079,8 +2073,8 @@ function simplifyTinyImageDialog() {
 
 tinymce.init({
     selector: '#blog-editor',
-    height: Math.max(680, window.innerHeight - 280),
-    min_height: 520,
+    height: Math.max(760, window.innerHeight - 170),
+    min_height: 600,
     menubar: false,
     statusbar: false,
     branding: false,
@@ -2423,6 +2417,161 @@ tinymce.init({
             scope: 'node'
         });
 
+        // ── Table of Contents Floating Context Toolbar ──
+        editor.ui.registry.addButton('tocRefreshBtn', {
+            icon: 'reload',
+            text: 'Update TOC',
+            tooltip: 'Auto-update Table of Contents from H2/H3 headings',
+            onAction: function () {
+                insertTableOfContents();
+            }
+        });
+
+        editor.ui.registry.addButton('tocSizeSmBtn', {
+            text: 'Small',
+            tooltip: 'Small (2 Columns, Compact)',
+            onAction: function () {
+                setTocSize('sm');
+            }
+        });
+
+        editor.ui.registry.addButton('tocSizeMdBtn', {
+            text: 'Medium',
+            tooltip: 'Medium (2 Columns, Standard)',
+            onAction: function () {
+                setTocSize('md');
+            }
+        });
+
+        editor.ui.registry.addButton('tocSizeLgBtn', {
+            text: 'Large',
+            tooltip: 'Large (Spacious)',
+            onAction: function () {
+                setTocSize('lg');
+            }
+        });
+
+        editor.ui.registry.addButton('tocRemoveBtn', {
+            icon: 'remove',
+            tooltip: 'Delete Table of Contents',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var box = editor.dom.getParent(node, '.blog-toc-box');
+                if (box) {
+                    editor.dom.remove(box);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('tocBoxToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, '.blog-toc-box');
+            },
+            items: 'tocRefreshBtn | tocSizeSmBtn tocSizeMdBtn tocSizeLgBtn | tocRemoveBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
+        // ── Code Block Floating Context Toolbar & Theme Switcher ──
+        editor.ui.registry.addButton('codeThemeDark', {
+            text: '🌙 Dark',
+            tooltip: 'Dark Terminal Theme (Default)',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var pre = editor.dom.getParent(node, 'pre');
+                if (pre) {
+                    pre.classList.remove('code-theme-light', 'code-theme-cyber');
+                    pre.classList.add('code-theme-dark');
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('codeThemeLight', {
+            text: '☀️ Light',
+            tooltip: 'Clean Light / Minimalist Paper Theme',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var pre = editor.dom.getParent(node, 'pre');
+                if (pre) {
+                    pre.classList.remove('code-theme-dark', 'code-theme-cyber');
+                    pre.classList.add('code-theme-light');
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('codeThemeCyber', {
+            text: '⚡ Cyber',
+            tooltip: 'Cyberpunk Neon Glow Theme',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var pre = editor.dom.getParent(node, 'pre');
+                if (pre) {
+                    pre.classList.remove('code-theme-dark', 'code-theme-light');
+                    pre.classList.add('code-theme-cyber');
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addButton('removeCodeBlockBtn', {
+            icon: 'remove',
+            tooltip: 'Delete Code Block',
+            onAction: function () {
+                var node = editor.selection.getNode();
+                var pre = editor.dom.getParent(node, 'pre');
+                if (pre) {
+                    editor.dom.remove(pre);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.ui.registry.addContextToolbar('codeBlockToolbar', {
+            predicate: function (node) {
+                return !!editor.dom.getParent(node, 'pre');
+            },
+            items: 'codeThemeDark codeThemeLight codeThemeCyber | removeCodeBlockBtn',
+            position: 'node',
+            scope: 'node'
+        });
+
+        // ── Prevent Pasted Content from Escaping/Breaking Code Blocks ──
+        editor.on('paste', function (e) {
+            var node = editor.selection.getNode();
+            var pre = editor.dom.getParent(node, 'pre');
+            if (pre) {
+                e.preventDefault();
+                e.stopPropagation();
+                var clipboardData = e.clipboardData || window.clipboardData;
+                var text = clipboardData ? clipboardData.getData('text/plain') : '';
+                if (text) {
+                    var doc = editor.getDoc();
+                    var textNode = doc.createTextNode(text);
+                    var range = editor.selection.getRng();
+                    range.deleteContents();
+                    range.insertNode(textNode);
+                    range.setStartAfter(textNode);
+                    range.setEndAfter(textNode);
+                    editor.selection.setRng(range);
+                    editor.nodeChanged();
+                }
+            }
+        });
+
+        editor.on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                var node = editor.selection.getNode();
+                var pre = editor.dom.getParent(node, 'pre');
+                if (pre) {
+                    e.preventDefault();
+                    editor.execCommand('InsertLineBreak');
+                }
+            }
+        });
+
         // ── Multi-Word Selection with Ctrl Key ────────────────────────────────
         editor.on('click', function (e) {
             if (!e.ctrlKey && !e.metaKey) {
@@ -2538,6 +2687,13 @@ tinymce.init({
             editor.getContainer().style.background = 'transparent';
             updateEditorialStats();
             updatePreWordCounts();
+
+            // Close toolbar dropdowns when clicking, focusing, or typing inside the editor
+            editor.on('click focus keydown', function () {
+                if (typeof closeAllBeDropdowns === 'function') {
+                    closeAllBeDropdowns();
+                }
+            });
 
             // Intercept at raw DOM capture phase before browser or TinyMCE can trigger native SelectAll
             var doc = editor.getDoc();
@@ -2688,6 +2844,10 @@ tinymce.init({
         }
         pre {
             position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
             background: #1e1e2e !important;
             border: 2px solid #2f4156 !important;
             border-radius: 14px !important;
@@ -2696,11 +2856,18 @@ tinymce.init({
             font-family: 'DM Mono', 'JetBrains Mono', Consolas, Monaco, monospace !important;
             font-size: 0.92rem !important;
             line-height: 1.7 !important;
+            max-height: 220px !important;
+            overflow-y: auto !important;
             overflow-x: auto !important;
             margin: 1.6em 0 !important;
             box-shadow: 4px 4px 0 rgba(47, 65, 86, 0.25) !important;
             white-space: pre-wrap !important;
             word-break: break-word !important;
+        }
+        pre code {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            display: block !important;
         }
         pre::before {
             content: "PROMPT.txt" !important;
@@ -2750,6 +2917,42 @@ tinymce.init({
             font-size: inherit !important;
             padding: 0 !important;
             border: none !important;
+        }
+        /* Theme 2: Minimalist Light */
+        pre.code-theme-light {
+            background: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 4px 4px 0 rgba(203, 213, 225, 0.5) !important;
+        }
+        pre.code-theme-light::before {
+            background: 
+                radial-gradient(circle 5px at 18px 17px, #ff5f57 100%, transparent 0),
+                radial-gradient(circle 5px at 33px 17px, #febc2e 100%, transparent 0),
+                radial-gradient(circle 5px at 48px 17px, #28c840 100%, transparent 0),
+                #e2e8f0 !important;
+            color: #334155 !important;
+        }
+        pre.code-theme-light code {
+            color: #0f172a !important;
+        }
+        /* Theme 3: Cyberpunk Neon */
+        pre.code-theme-cyber {
+            background: #090a10 !important;
+            border-color: #8b5cf6 !important;
+            color: #34d399 !important;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.25), 4px 4px 0 rgba(139, 92, 246, 0.3) !important;
+        }
+        pre.code-theme-cyber::before {
+            background: 
+                radial-gradient(circle 5px at 18px 17px, #ec4899 100%, transparent 0),
+                radial-gradient(circle 5px at 33px 17px, #8b5cf6 100%, transparent 0),
+                radial-gradient(circle 5px at 48px 17px, #06b6d4 100%, transparent 0),
+                linear-gradient(90deg, #1e1035 0%, #2e1065 100%) !important;
+            color: #e9d5ff !important;
+        }
+        pre.code-theme-cyber code {
+            color: #34d399 !important;
         }
         img {
             max-width: 100%;
@@ -3420,7 +3623,10 @@ tinymce.init({
 });
 
 // ── Custom Toolbar Dropdowns & Mobile More Drawer ───────────────────────────
-function toggleBeDropdown(id) {
+function toggleBeDropdown(id, event) {
+    if (event && event.stopPropagation) {
+        event.stopPropagation();
+    }
     var dd = document.getElementById(id);
     if (!dd) return;
     var isOpen = dd.classList.contains('be-dd-open');
@@ -3436,8 +3642,17 @@ function closeAllBeDropdowns() {
     });
 }
 
+// Close dropdowns when clicking anywhere on the document
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.be-dropdown')) {
+    if (e.target.closest('.be-tb-dropdown-btn')) {
+        return;
+    }
+    closeAllBeDropdowns();
+});
+
+// Close dropdowns on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
         closeAllBeDropdowns();
     }
 });
@@ -3515,6 +3730,58 @@ if (localStorage.getItem('be_wide_mode') === '1') {
         var btn = document.getElementById('wideModeBtn');
         if (btn) btn.innerHTML = '<i class="fa-solid fa-compress"></i> <span>Normal View</span>';
     });
+}
+
+function openLivePreview() {
+    var title = (document.getElementById('bc-title') ? document.getElementById('bc-title').value : '').trim() || 'Untitled Draft Preview';
+    var desc = (document.getElementById('bc-desc') ? document.getElementById('bc-desc').value : '').trim();
+    var slug = (document.getElementById('bc-slug') ? document.getElementById('bc-slug').value : '').trim() || 'draft-preview';
+    var cat = (document.getElementById('bc-cat') ? document.getElementById('bc-cat').value : '').trim();
+    var tags = (document.getElementById('bc-tags') ? document.getElementById('bc-tags').value : '').trim();
+    var metaTitle = (document.getElementById('bc-meta-title') ? document.getElementById('bc-meta-title').value : '').trim();
+    var metaDesc = (document.getElementById('bc-meta-desc') ? document.getElementById('bc-meta-desc').value : '').trim();
+    var metaKeywords = (document.getElementById('bc-meta-keywords') ? document.getElementById('bc-meta-keywords').value : '').trim();
+    var content = (window.tinymce && tinymce.activeEditor) ? tinymce.activeEditor.getContent() : '';
+    
+    // Get cover photo URLs (preview data or existing image paths)
+    var imgP = document.getElementById('coverPreviewImg');
+    var coverPortrait = (imgP && imgP.style.display !== 'none' && imgP.src) ? imgP.src : '';
+    var imgL = document.getElementById('coverPreviewLand');
+    var coverLand = (imgL && imgL.style.display !== 'none' && imgL.src) ? imgL.src : '';
+    
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'blog.php?preview=1';
+    form.target = '_blank';
+    form.style.display = 'none';
+    
+    function addField(name, val) {
+        var inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = name;
+        inp.value = val || '';
+        form.appendChild(inp);
+    }
+    
+    addField('is_live_preview', '1');
+    addField('preview_id', '0');
+    addField('preview_title', title);
+    addField('preview_slug', slug);
+    addField('preview_desc', desc);
+    addField('preview_content', content);
+    addField('preview_category', cat);
+    addField('preview_tags', tags);
+    addField('preview_meta_title', metaTitle);
+    addField('preview_meta_desc', metaDesc);
+    addField('preview_meta_keywords', metaKeywords);
+    addField('preview_image_path', coverPortrait);
+    addField('preview_image_path_landscape', coverLand);
+    
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function() {
+        if (form.parentNode) form.parentNode.removeChild(form);
+    }, 1000);
 }
 
 function clearMultiSelections(ed) {
@@ -4628,6 +4895,17 @@ function insertTableOfContents(size) {
         ed.execCommand('mceInsertContent', false, tocHtml);
     }
 }
+function removeTocFromDoc() {
+    if (!tinymce.activeEditor) return;
+    var ed = tinymce.activeEditor;
+    var existingToc = ed.dom.select('.blog-toc-box');
+    if (existingToc && existingToc.length > 0) {
+        existingToc.forEach(function(el) {
+            ed.dom.remove(el);
+        });
+        ed.nodeChanged();
+    }
+}
 function toggleImageCaption(editor, img) {
     if (!img || img.nodeName !== 'IMG') return;
     var parent = img.parentNode;
@@ -4741,10 +5019,11 @@ function insertTable() {
         tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: 3, columns: 2 });
     }
 }
-function insertCodeBlock() {
+function insertCodeBlock(theme) {
     if (tinymce.activeEditor) {
+        var cls = theme === 'light' ? 'code-theme-light' : (theme === 'cyber' ? 'code-theme-cyber' : 'code-theme-dark');
         const codeHtml = `
-          <pre><code>// Insert code here...</code></pre>
+          <pre class="${cls}"><code>// Insert code here...</code></pre>
           <p><br></p>
         `;
         tinymce.activeEditor.execCommand('mceInsertContent', false, codeHtml);
