@@ -136,7 +136,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260829themes">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260829milestones">
 <style>
 /* Code Block: Full width wide horizontal rectangle with compact height */
 .ba-content pre,
@@ -227,6 +227,224 @@ pre.code-theme-cyber::before {
 .blog-content pre.code-theme-cyber code,
 pre.code-theme-cyber code {
   color: #34d399 !important;
+}
+
+/* Secondary / Muted Grey Text */
+.ba-content .text-muted,
+.blog-content .text-muted,
+.text-muted,
+p.text-muted,
+span.text-muted {
+  color: #64748b !important;
+}
+
+/* Horizontal Line Divider */
+.ba-content hr,
+.blog-content hr,
+hr.blog-hr-divider,
+hr {
+  border: none !important;
+  border-top: 1.5px solid #cbd5e1 !important;
+  margin: 2.4em 0 !important;
+  clear: both !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Inline Prompt Variable / Placeholder Pill Boxes */
+code.prompt-var,
+span.prompt-var,
+.prompt-var,
+.ba-content code:not(pre code),
+.blog-content code:not(pre code) {
+  background-color: #eaecf0 !important;
+  color: #1e293b !important;
+  font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+  font-size: 0.88em !important;
+  padding: 2px 7px !important;
+  border-radius: 5px !important;
+  border: 1px solid #cbd5e1 !important;
+  display: inline-block !important;
+  vertical-align: baseline !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0.01em !important;
+  font-weight: 600 !important;
+  word-break: break-word !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+}
+
+code.prompt-var-blue, span.prompt-var-blue,
+.ba-content code.prompt-var-blue, .blog-content code.prompt-var-blue {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #bae6fd !important;
+}
+
+code.prompt-var-purple, span.prompt-var-purple,
+.ba-content code.prompt-var-purple, .blog-content code.prompt-var-purple {
+  background-color: #ede9fe !important;
+  color: #6d28d9 !important;
+  border-color: #ddd6fe !important;
+}
+
+code.prompt-var-amber, span.prompt-var-amber,
+.ba-content code.prompt-var-amber, .blog-content code.prompt-var-amber {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
+
+/* Top Reading Progress Bar (Dynamic Red -> Yellow -> Orange -> Green) */
+.ba-reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3.5px;
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  z-index: 9999999;
+  transition: width 0.08s linear, background 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 1px 6px rgba(239, 68, 68, 0.4);
+}
+
+/* Desktop Circular Reading Indicator */
+.ba-reading-circle {
+  position: fixed;
+  left: max(20px, calc((100vw - 1360px) / 2 - 70px));
+  bottom: 36px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(47, 65, 86, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99999;
+  opacity: 0;
+  transform: translateY(12px) scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+.ba-reading-circle.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.ba-reading-circle:hover {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 6px 22px rgba(139, 92, 246, 0.28);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+.ba-circle-svg {
+  width: 50px;
+  height: 50px;
+  transform: rotate(-90deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.ba-circle-track {
+  fill: none;
+  stroke: rgba(47, 65, 86, 0.12);
+  stroke-width: 3.5;
+}
+.ba-circle-fill {
+  fill: none;
+  stroke: #8b5cf6;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 113.1;
+  stroke-dashoffset: 113.1;
+  transition: stroke-dashoffset 0.1s linear;
+}
+.ba-circle-inner {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #2f4156;
+  z-index: 2;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Tooltip Speech Bubble above Reading Circle / Clock */
+.ba-circle-tooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px) scale(0.88);
+  background: #1e293b;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.32s;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
+  z-index: 100000;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.ba-circle-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1e293b;
+}
+.ba-circle-tooltip.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+.ba-circle-tooltip.tooltip-50 {
+  background: linear-gradient(95deg, #1e293b 0%, #334155 100%) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.35) !important;
+}
+.ba-circle-tooltip.tooltip-50::after {
+  border-top-color: #334155 !important;
+}
+
+.ba-circle-tooltip.tooltip-70 {
+  background: linear-gradient(95deg, #3730a3 0%, #6366f1 100%) !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
+}
+.ba-circle-tooltip.tooltip-70::after {
+  border-top-color: #6366f1 !important;
+}
+
+.ba-circle-tooltip.tooltip-90 {
+  background: linear-gradient(95deg, #c2410c 0%, #ea580c 100%) !important;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4) !important;
+}
+.ba-circle-tooltip.tooltip-90::after {
+  border-top-color: #ea580c !important;
+}
+
+.ba-circle-tooltip.tooltip-celebrate {
+  background: linear-gradient(95deg, #7928ca 0%, #a832a6 48%, #d8358e 100%) !important;
+  box-shadow: 0 5px 18px rgba(216, 53, 142, 0.42), 0 2px 6px rgba(121, 40, 202, 0.25) !important;
+  color: #ffffff !important;
+}
+.ba-circle-tooltip.tooltip-celebrate::after {
+  border-top-color: #ba2f99 !important;
+}
+
+@media (max-width: 900px) {
+  .ba-reading-circle {
+    display: none !important;
+  }
 }
 
 /* Direct In-Page Override: Desktop Separation & Mobile Edge-to-Edge Boundary */
@@ -2492,6 +2710,19 @@ footer .footer-links a:hover {
 </style>
 </head>
 <body class="page-store theme-nogoda bm-article">
+<!-- Reading Progress Bar (Top Line - Nogoda Theme) -->
+<div id="ba-reading-progress-bar" class="ba-reading-progress-bar" aria-hidden="true"></div>
+
+<!-- Desktop Circular Reading Progress Badge -->
+<div id="ba-reading-circle" class="ba-reading-circle" title="Reading progress - Click to go top" aria-label="Reading progress" role="button" tabindex="0">
+    <div id="ba-circle-tooltip" class="ba-circle-tooltip">Read more 50%</div>
+    <svg class="ba-circle-svg" viewBox="0 0 50 50">
+        <circle class="ba-circle-track" cx="25" cy="25" r="18"></circle>
+        <circle class="ba-circle-fill" id="ba-circle-fill" cx="25" cy="25" r="18"></circle>
+    </svg>
+    <div class="ba-circle-inner" id="ba-circle-text">0%</div>
+</div>
+
 <?php if (!empty($is_preview_mode)): ?>
 <div class="ba-preview-banner">
     <div class="ba-preview-inner">
@@ -3090,6 +3321,285 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
         }
     }, { passive: true });
 });
+
+// ── Reading Progress Tracker with Milestones, Dynamic Colors & Confetti ──
+(function() {
+    var bar = document.getElementById('ba-reading-progress-bar');
+    var circle = document.getElementById('ba-reading-circle');
+    var circleFill = document.getElementById('ba-circle-fill');
+    var circleText = document.getElementById('ba-circle-text');
+    var circleTooltip = document.getElementById('ba-circle-tooltip');
+
+    var shown50Notice = false;
+    var shown70Notice = false;
+    var shown90Notice = false;
+    var confettiFired = false;
+    var autoLikedDone = false;
+    var tooltipHideTimer = null;
+
+    // 10 Unique engaging messages for each milestone (randomly chosen on each visit)
+    var MESSAGES_50 = [
+        'Halfway there! 🚀',
+        '50% done! Keep going ✨',
+        'Halfway through! Great read 💡',
+        '50% down, best parts ahead! 🔥',
+        'Awesome focus! 50% read 🎯',
+        'Midway milestone reached! ⚡',
+        '50% completed! Enjoying it? ☕',
+        'Halfway there, knowledge unlocked! 🧠',
+        'Cruising nicely! 50% done 💫',
+        'Solid progress! 50% down 📈'
+    ];
+
+    var MESSAGES_70 = [
+        'Almost done! 70% 🌟',
+        'Cruising through! 70% ⚡',
+        'Only a few scrolls left! 📖',
+        '70% done! The best insights 🔥',
+        'Impressive speed! 70% read 🚀',
+        '70% milestone! Finish strong 💪',
+        'Nearly at the finish line! 🎯',
+        'Almost there! 70% completed ✨',
+        'Key takeaways ahead! 💡',
+        '70% read! You’re a pro 👏'
+    ];
+
+    var MESSAGES_90 = [
+        'Last stretch! 90% 🏁',
+        'Just 10% left! So close 🎯',
+        'Wrapping up! 90% read 💫',
+        'Final thoughts ahead! 90% 🌟',
+        'Almost at 100%! Ready? 🚀',
+        '90% done! Masterpiece read 📖',
+        'The finale! 90% completed ✨',
+        'Home stretch! Almost there 🔥',
+        'Final wisdom coming! 💡',
+        'Final seconds of reading! ⚡'
+    ];
+
+    function getRandomMsg(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    if (circle) {
+        circle.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    function showCircleTooltip(text, duration, variantClass) {
+        if (!circleTooltip) return;
+        clearTimeout(tooltipHideTimer);
+        circleTooltip.textContent = text;
+        circleTooltip.classList.remove('tooltip-50', 'tooltip-70', 'tooltip-90', 'tooltip-celebrate');
+        if (variantClass) {
+            circleTooltip.classList.add(variantClass);
+        }
+        circleTooltip.classList.add('show');
+        tooltipHideTimer = setTimeout(function() {
+            circleTooltip.classList.remove('show');
+        }, duration || 3500);
+    }
+
+    // Celebratory Confetti Animation
+    function launchReadingConfetti() {
+        var canvas = document.createElement('canvas');
+        canvas.id = 'ba-confetti-canvas';
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999999;';
+        document.body.appendChild(canvas);
+        
+        var ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        var colors = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#ef4444'];
+        var particles = [];
+        for (var i = 0; i < 95; i++) {
+            particles.push({
+                x: window.innerWidth * (0.15 + Math.random() * 0.7),
+                y: window.innerHeight * 0.55 + (Math.random() * 80 - 40),
+                vx: (Math.random() - 0.5) * 18,
+                vy: -Math.random() * 16 - 7,
+                size: Math.random() * 9 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * 360,
+                rotSpeed: (Math.random() - 0.5) * 14,
+                opacity: 1,
+                gravity: 0.45 + Math.random() * 0.35
+            });
+        }
+        
+        var startTime = Date.now();
+        function animate() {
+            var elapsed = Date.now() - startTime;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(function(p) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= 0.98;
+                p.rotation += p.rotSpeed;
+                if (elapsed > 2000) {
+                    p.opacity -= 0.025;
+                }
+                
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.globalAlpha = Math.max(0, p.opacity);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                ctx.restore();
+            });
+            
+            if (elapsed < 3500 && particles.some(function(p) { return p.opacity > 0; })) {
+                requestAnimationFrame(animate);
+            } else {
+                if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // Auto-like blog for logged-in user upon reading completion (silent in background)
+    function triggerAutoLikeOnRead() {
+        <?php if (isset($_SESSION["user_id"]) && !empty($blog["id"])): ?>
+        if (autoLikedDone) return;
+        var likeBtnEl = document.getElementById('blog-like-btn');
+        if (likeBtnEl && likeBtnEl.classList.contains('liked')) {
+            return; // Already liked manually
+        }
+        autoLikedDone = true;
+        var blogId = <?= (int)$blog['id'] ?>;
+        var fd = new FormData();
+        fd.append('blog_id', blogId);
+        fd.append('action', 'like_only');
+        
+        fetch('blog_like.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success && d.action === 'liked') {
+                    var countEl = document.getElementById('blog-like-count');
+                    if (countEl) countEl.textContent = d.likes_count;
+                    if (likeBtnEl) {
+                        likeBtnEl.classList.add('liked');
+                        var svg = likeBtnEl.querySelector('svg');
+                        if (svg) {
+                            svg.setAttribute('fill', '#fff');
+                            svg.setAttribute('stroke', '#fff');
+                        }
+                    }
+                    // Auto-like is completely silent - NO popups or toasts
+                }
+            })
+            .catch(function() {});
+        <?php endif; ?>
+    }
+
+    function calculateReadingProgress() {
+        var content = document.querySelector('.ba-content, .blog-content');
+        if (!content) return;
+        
+        var rect = content.getBoundingClientRect();
+        var contentTop = rect.top + window.scrollY;
+        var contentHeight = content.offsetHeight;
+        var currentScroll = window.scrollY;
+        var windowH = window.innerHeight;
+        
+        var startScroll = contentTop - (windowH * 0.2);
+        var endScroll = contentTop + contentHeight - (windowH * 0.7);
+        
+        var progress = 0;
+        if (currentScroll > startScroll) {
+            if (endScroll <= startScroll) {
+                progress = 100;
+            } else {
+                progress = Math.min(100, Math.max(0, Math.round(((currentScroll - startScroll) / (endScroll - startScroll)) * 100)));
+            }
+        }
+        
+        // ── Mobile/Top Bar Progressive Color Transition (Red -> Orange -> Yellow -> Green) ──
+        if (bar) {
+            bar.style.width = progress + '%';
+            var barColor = 'linear-gradient(90deg, #ef4444, #f87171)';
+            var barShadow = 'rgba(239, 68, 68, 0.45)';
+
+            if (progress < 30) {
+                barColor = 'linear-gradient(90deg, #dc2626, #ef4444)';
+                barShadow = 'rgba(239, 68, 68, 0.45)';
+            } else if (progress < 60) {
+                barColor = 'linear-gradient(90deg, #ef4444, #f97316)';
+                barShadow = 'rgba(249, 115, 22, 0.45)';
+            } else if (progress < 85) {
+                barColor = 'linear-gradient(90deg, #f97316, #eab308)';
+                barShadow = 'rgba(234, 179, 8, 0.45)';
+            } else {
+                barColor = 'linear-gradient(90deg, #10b981, #22c55e)';
+                barShadow = 'rgba(16, 185, 129, 0.55)';
+            }
+            bar.style.background = barColor;
+            bar.style.boxShadow = '0 1px 8px ' + barShadow;
+        }
+        
+        // ── Desktop Circular Badge ──
+        if (circle) {
+            circle.classList.toggle('is-visible', currentScroll > 150);
+            
+            if (circleFill) {
+                var circumference = 113.1;
+                var offset = circumference - (circumference * progress / 100);
+                circleFill.style.strokeDashoffset = offset;
+            }
+            if (circleText) {
+                if (progress >= 100) {
+                    circleText.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981; font-size:0.75rem;"></i>';
+                } else {
+                    circleText.textContent = progress + '%';
+                }
+            }
+        }
+
+        // ── Milestone 1: 50% Notice (Randomized from 10 engaging messages) ──
+        if (progress >= 50 && progress < 70) {
+            if (!shown50Notice) {
+                shown50Notice = true;
+                showCircleTooltip(getRandomMsg(MESSAGES_50), 3800, 'tooltip-50');
+            }
+        }
+
+        // ── Milestone 2: 70% Notice (Randomized from 10 engaging messages) ──
+        if (progress >= 70 && progress < 90) {
+            if (!shown70Notice) {
+                shown70Notice = true;
+                showCircleTooltip(getRandomMsg(MESSAGES_70), 3800, 'tooltip-70');
+            }
+        }
+
+        // ── Milestone 3: 90% Notice (Randomized from 10 engaging messages) ──
+        if (progress >= 90 && progress < 98) {
+            if (!shown90Notice) {
+                shown90Notice = true;
+                showCircleTooltip(getRandomMsg(MESSAGES_90), 3800, 'tooltip-90');
+            }
+        }
+
+        // ── Milestone 4: 100% Completed -> Confetti + Sleek "Like kardo 💖" Bubble + Silent Auto-Like ──
+        if (progress >= 98) {
+            if (!confettiFired) {
+                confettiFired = true;
+                launchReadingConfetti();
+                showCircleTooltip('Like kardo 💖', 7000, 'tooltip-celebrate');
+                triggerAutoLikeOnRead();
+            }
+        }
+    }
+    
+    window.addEventListener('scroll', calculateReadingProgress, { passive: true });
+    window.addEventListener('resize', calculateReadingProgress);
+    document.addEventListener('DOMContentLoaded', calculateReadingProgress);
+    calculateReadingProgress();
+})();
 </script>
 </body></html>
 

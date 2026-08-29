@@ -341,6 +341,29 @@ $current_blog_categories = ['Uncategorized'];
             color: var(--be-text-main);
         }
 
+        .be-btn-preview {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--be-text-sec);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: var(--be-radius-sm);
+            border: 1px solid var(--be-border);
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .be-btn-preview:hover {
+            color: var(--be-primary);
+            border-color: var(--be-primary);
+            background: var(--be-primary-light);
+            transform: translateY(-1px);
+        }
+
         .be-btn-primary {
             display: inline-flex;
             align-items: center;
@@ -487,7 +510,9 @@ $current_blog_categories = ['Uncategorized'];
             padding: 6px 8px;
             margin-bottom: 14px;
             box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-            display: flex;
+            display: inline-flex;
+            width: fit-content;
+            max-width: 100%;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
@@ -1304,6 +1329,8 @@ $current_blog_categories = ['Uncategorized'];
                             <div class="be-dd-divider"></div>
                             <button type="button" class="be-dd-item" onclick="selectBeStyle('blockquote', 'Quote Callout')"><i class="fa-solid fa-quote-left" style="color:#0284c7;"></i> Quote Callout</button>
                             <button type="button" class="be-dd-item" onclick="selectBeStyle('greybox', 'Grey Note Box')"><i class="fa-solid fa-square-pen" style="color:#64748b;"></i> Grey Note Box</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('muted', 'Muted Grey Text')"><i class="fa-solid fa-font" style="color:#64748b;"></i> Muted Grey Text</button>
+                            <button type="button" class="be-dd-item" onclick="selectBeStyle('promptvar', 'Prompt Variable Box')"><span style="display:inline-block; padding:1px 5px; background:#eaecf0; border:1px solid #cbd5e1; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#1e293b; font-weight:700; margin-right:4px;">[x]</span> Prompt Variable Box</button>
                         </div>
                     </div>
                 </div>
@@ -1315,6 +1342,30 @@ $current_blog_categories = ['Uncategorized'];
                     <button type="button" class="be-tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
                     <button type="button" class="be-tb-btn" onclick="fmt('strikethrough')" title="Strikethrough"><s>S</s></button>
                     <button type="button" class="be-tb-btn" onclick="toggleHighlight()" title="Highlight Text (Yellow Marker)"><i class="fa-solid fa-highlighter" style="color:#ca8a04;"></i></button>
+                    <!-- Prompt Variable / Placeholder Box (Inline Code Pill) -->
+                    <div class="be-dropdown" id="beVarDropdown" style="display:inline-flex;">
+                        <button type="button" class="be-tb-btn" onclick="togglePromptVar()" title="Prompt Variable Box (Grey Pill e.g. [Male name: Devanshu])" style="border-top-right-radius:0; border-bottom-right-radius:0; padding-right:4px;">
+                            <span style="display:inline-block; padding:1px 5px; background:#eaecf0; border:1px solid #cbd5e1; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#1e293b; font-weight:700;">[x]</span>
+                        </button>
+                        <button type="button" class="be-tb-dropdown-btn" onclick="toggleBeDropdown('beVarDropdown')" title="Choose Variable Box Color" style="border-top-left-radius:0; border-bottom-left-radius:0; padding:0 5px; margin-left:-1px;">
+                            <i class="fa-solid fa-chevron-down" style="font-size:0.58rem;"></i>
+                        </button>
+                        <div class="be-dropdown-menu" style="min-width: 180px;">
+                            <button type="button" class="be-dd-item" onclick="togglePromptVar(); closeAllBeDropdowns();">
+                                <span style="display:inline-block; padding:1px 6px; background:#eaecf0; border:1px solid #cbd5e1; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#1e293b; font-weight:700; margin-right:6px;">[x]</span> Grey Box (Default)
+                            </button>
+                            <button type="button" class="be-dd-item" onclick="togglePromptVar('blue'); closeAllBeDropdowns();">
+                                <span style="display:inline-block; padding:1px 6px; background:#e0f2fe; border:1px solid #bae6fd; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#0369a1; font-weight:700; margin-right:6px;">[x]</span> Blue Box
+                            </button>
+                            <button type="button" class="be-dd-item" onclick="togglePromptVar('purple'); closeAllBeDropdowns();">
+                                <span style="display:inline-block; padding:1px 6px; background:#ede9fe; border:1px solid #ddd6fe; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#6d28d9; font-weight:700; margin-right:6px;">[x]</span> Purple Box
+                            </button>
+                            <button type="button" class="be-dd-item" onclick="togglePromptVar('amber'); closeAllBeDropdowns();">
+                                <span style="display:inline-block; padding:1px 6px; background:#fef3c7; border:1px solid #fde68a; border-radius:4px; font-family:monospace; font-size:0.75rem; color:#92400e; font-weight:700; margin-right:6px;">[x]</span> Amber Box
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="be-tb-btn" onclick="toggleMutedText()" title="Muted Grey Text (Secondary color)"><i class="fa-solid fa-font" style="color:#64748b; font-weight:700;"></i></button>
                 </div>
 
                 <!-- Group: Lists -->
@@ -1337,6 +1388,7 @@ $current_blog_categories = ['Uncategorized'];
                     <button type="button" class="be-tb-btn" onclick="openEditorImageModal()" title="Insert Image with SEO Alt Text"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
                     <button type="button" class="be-tb-btn" onclick="openEditorCarouselModal()" title="Insert Carousel"><i class="fa-solid fa-images" style="color:#8b5cf6;"></i></button>
                     <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Prompt Code Snippet"><i class="fa-solid fa-code"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="insertHorizontalRule()" title="Horizontal Divider Line (or type ----)"><i class="fa-solid fa-minus" style="font-weight:900;"></i></button>
                 </div>
 
                 <!-- Group: Table of Contents -->
@@ -1405,6 +1457,12 @@ $current_blog_categories = ['Uncategorized'];
                 <!-- Group: Clear Format -->
                 <div class="be-tb-group">
                     <button type="button" class="be-tb-btn" onclick="fmt('removeFormat')" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+                </div>
+
+                <!-- Group: History (Undo / Redo) -->
+                <div class="be-tb-group">
+                    <button type="button" class="be-tb-btn" onclick="fmt('undo')" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="fmt('redo')" title="Redo (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
 
                 <input type="file" id="editor-inline-img" style="display:none" accept="image/*" onchange="if(this.files[0]) handleEimFileSelect(this.files[0], true)">
@@ -2081,7 +2139,7 @@ tinymce.init({
     promotion: false,
     toolbar: false,
     plugins: 'image link lists table code codesample charmap emoticons wordcount autosave visualblocks quickbars',
-    quickbars_selection_toolbar: 'bold italic underline caseTransform | highlightBtn removeHighlightBtn | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist continueListBtn',
+    quickbars_selection_toolbar: 'bold italic underline caseTransform | highlightBtn promptVarBtn mutedTextBtn removeHighlightBtn | quicklink | alignleft aligncenter alignright | fontfamily blocks | numlist bullist continueListBtn',
     quickbars_insert_toolbar: window.matchMedia('(max-width: 768px)').matches ? false : 'image link table codesample',
     content_css: ['default', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'],
     contextmenu: 'link image table editFaqMenuItem editCarouselMenuItem continueListMenuItem setListStartMenuItem restartListMenuItem removeHighlightMenuItem',
@@ -2089,9 +2147,14 @@ tinymce.init({
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
     paste_webkit_styles: 'all',
-    extended_valid_elements: 'div[class|style|id|contenteditable|data-ratio],button[class|style|type|aria-label],span[class|style|id|contenteditable|data-index],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width|loading],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],p[class|style|id|dir|contenteditable]',
+    extended_valid_elements: 'div[class|style|id|contenteditable|data-ratio],button[class|style|type|aria-label],span[class|style|id|contenteditable|data-index],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width|loading],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],p[class|style|id|dir|contenteditable],hr[class|style],code[class|style]',
     formats: {
-        highlight: { inline: 'mark', classes: 'font-highlight', styles: { 'background-color': '#fef08a', 'padding': '2px 6px', 'border-radius': '4px', 'color': '#0f172a' } }
+        highlight: { inline: 'mark', classes: 'font-highlight', styles: { 'background-color': '#fef08a', 'padding': '2px 6px', 'border-radius': '4px', 'color': '#0f172a' } },
+        mutedText: { inline: 'span', classes: 'text-muted', styles: { 'color': '#64748b' } },
+        promptVar: { inline: 'code', classes: 'prompt-var', styles: { 'background-color': '#eaecf0', 'color': '#1e293b', 'padding': '2px 7px', 'border-radius': '5px', 'border': '1px solid #cbd5e1', 'font-family': 'JetBrains Mono, monospace', 'font-size': '0.88em' } },
+        promptVar_blue: { inline: 'code', classes: 'prompt-var prompt-var-blue', styles: { 'background-color': '#e0f2fe', 'color': '#0369a1', 'padding': '2px 7px', 'border-radius': '5px', 'border': '1px solid #bae6fd', 'font-family': 'JetBrains Mono, monospace', 'font-size': '0.88em' } },
+        promptVar_purple: { inline: 'code', classes: 'prompt-var prompt-var-purple', styles: { 'background-color': '#ede9fe', 'color': '#6d28d9', 'padding': '2px 7px', 'border-radius': '5px', 'border': '1px solid #ddd6fe', 'font-family': 'JetBrains Mono, monospace', 'font-size': '0.88em' } },
+        promptVar_amber: { inline: 'code', classes: 'prompt-var prompt-var-amber', styles: { 'background-color': '#fef3c7', 'color': '#92400e', 'padding': '2px 7px', 'border-radius': '5px', 'border': '1px solid #fde68a', 'font-family': 'JetBrains Mono, monospace', 'font-size': '0.88em' } }
     },
     font_family_formats: 'Editorial Serif=Lora, serif; Display Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Monospace=JetBrains Mono, monospace',
     quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | imgborder | imgcaption | editimage',
@@ -2356,6 +2419,22 @@ tinymce.init({
             }
         });
 
+        editor.ui.registry.addButton('mutedTextBtn', {
+            text: 'Grey',
+            tooltip: 'Muted Grey Text (Secondary color)',
+            onAction: function () {
+                editor.formatter.toggle('mutedText');
+            }
+        });
+
+        editor.ui.registry.addButton('promptVarBtn', {
+            text: '[x] Box',
+            tooltip: 'Prompt Variable Box (Grey Pill e.g. [Male name: Devanshu])',
+            onAction: function () {
+                togglePromptVar();
+            }
+        });
+
         editor.ui.registry.addButton('removeHighlightBtn', {
             icon: 'remove-formatting',
             tooltip: 'Remove Highlight',
@@ -2568,6 +2647,24 @@ tinymce.init({
                 if (pre) {
                     e.preventDefault();
                     editor.execCommand('InsertLineBreak');
+                }
+            }
+        });
+
+        // ── Auto-convert '----' or '---' into a Horizontal Divider Line ──
+        editor.on('keyup', function (e) {
+            if (e.key === '-' || e.key === 'Enter' || e.key === ' ') {
+                var node = editor.selection.getNode();
+                if (node && (node.nodeName === 'P' || node.nodeName === 'DIV')) {
+                    var raw = (node.textContent || '').trim();
+                    if (raw === '----' || raw === '---') {
+                        var hr = editor.dom.create('hr', { class: 'blog-hr-divider' });
+                        var p = editor.dom.create('p', {}, '<br>');
+                        editor.dom.replace(hr, node);
+                        editor.dom.insertAfter(p, hr);
+                        editor.selection.setCursorLocation(p, 0);
+                        editor.nodeChanged();
+                    }
                 }
             }
         });
@@ -2832,6 +2929,48 @@ tinymce.init({
             padding: 2px 6px;
             border-radius: 4px;
             color: #0f172a;
+        }
+        .text-muted, span.text-muted, p.text-muted {
+            color: #64748b !important;
+        }
+        hr, hr.blog-hr-divider {
+            border: none !important;
+            border-top: 1.5px solid #cbd5e1 !important;
+            margin: 2.2em 0 !important;
+            clear: both !important;
+            display: block !important;
+            width: 100% !important;
+        }
+        /* Inline Prompt Variable / Placeholder Pill Boxes */
+        code.prompt-var, span.prompt-var, .prompt-var, code:not(pre code) {
+            background-color: #eaecf0 !important;
+            color: #1e293b !important;
+            font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+            font-size: 0.88em !important;
+            padding: 2px 7px !important;
+            border-radius: 5px !important;
+            border: 1px solid #cbd5e1 !important;
+            display: inline-block !important;
+            vertical-align: baseline !important;
+            line-height: 1.45 !important;
+            letter-spacing: 0.01em !important;
+            font-weight: 600 !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+        }
+        code.prompt-var-blue, span.prompt-var-blue {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border-color: #bae6fd !important;
+        }
+        code.prompt-var-purple, span.prompt-var-purple {
+            background-color: #ede9fe !important;
+            color: #6d28d9 !important;
+            border-color: #ddd6fe !important;
+        }
+        code.prompt-var-amber, span.prompt-var-amber {
+            background-color: #fef3c7 !important;
+            color: #92400e !important;
+            border-color: #fde68a !important;
         }
         blockquote {
             border-left: 4px solid #3b82f6;
@@ -3827,19 +3966,51 @@ function toggleHighlight() {
     }
 }
 
+function togglePromptVar(variant) {
+    if (!tinymce.activeEditor) return;
+    var editor = tinymce.activeEditor;
+    editor.focus();
+    var fmtName = variant ? ('promptVar_' + variant) : 'promptVar';
+    
+    // Check if multi-word selected with Ctrl
+    var multi = editor.getBody().querySelectorAll('.mce-ctrl-multiselect');
+    if (multi.length > 0) {
+        multi.forEach(function(el) {
+            editor.selection.select(el);
+            editor.formatter.toggle(fmtName);
+        });
+        clearMultiSelections(editor);
+        return;
+    }
+    
+    // If no text selected, insert a placeholder [Your Value]
+    if (editor.selection.isCollapsed()) {
+        var cls = variant ? ('prompt-var prompt-var-' + variant) : 'prompt-var';
+        editor.execCommand('mceInsertContent', false, `<code class="${cls}">[Your Value]</code>&nbsp;`);
+        return;
+    }
+    
+    editor.formatter.toggle(fmtName);
+}
+
 function removeHighlight() {
     if (tinymce.activeEditor) {
         tinymce.activeEditor.focus();
+        var formatsToRemove = ['highlight', 'promptVar', 'promptVar_blue', 'promptVar_purple', 'promptVar_amber', 'mutedText'];
         var multi = tinymce.activeEditor.getBody().querySelectorAll('.mce-ctrl-multiselect');
         if (multi.length > 0) {
             multi.forEach(function(el) {
                 tinymce.activeEditor.selection.select(el);
-                tinymce.activeEditor.formatter.remove('highlight');
+                formatsToRemove.forEach(function(f) {
+                    tinymce.activeEditor.formatter.remove(f);
+                });
             });
             clearMultiSelections(tinymce.activeEditor);
             return;
         }
-        tinymce.activeEditor.formatter.remove('highlight');
+        formatsToRemove.forEach(function(f) {
+            tinymce.activeEditor.formatter.remove(f);
+        });
     }
 }
 
@@ -4366,6 +4537,14 @@ function fmtBlock(tag) {
     if (!tag) return;
     if (tag === 'greybox') {
         insertGreyBox();
+        return;
+    }
+    if (tag === 'muted') {
+        toggleMutedText();
+        return;
+    }
+    if (tag === 'promptvar') {
+        togglePromptVar();
         return;
     }
     if (tinymce.activeEditor) {
@@ -5027,6 +5206,16 @@ function insertCodeBlock(theme) {
           <p><br></p>
         `;
         tinymce.activeEditor.execCommand('mceInsertContent', false, codeHtml);
+    }
+}
+function insertHorizontalRule() {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, '<hr class="blog-hr-divider"><p><br></p>');
+    }
+}
+function toggleMutedText() {
+    if (tinymce.activeEditor) {
+        tinymce.activeEditor.formatter.toggle('mutedText');
     }
 }
 function uploadEditorImage(file) {
