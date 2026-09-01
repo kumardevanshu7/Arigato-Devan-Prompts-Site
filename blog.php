@@ -1704,11 +1704,25 @@ figcaption, .img-caption {
     background: #bae6fd;
     color: #0369a1;
 }
-.blog-toc-box ol {
+.blog-toc-box ol,
+.blog-toc-list {
     margin: 0;
 }
 .blog-toc-box li {
     color: #0284c7;
+    break-inside: avoid;
+}
+.blog-toc-sublist {
+    list-style-type: circle !important;
+    padding-left: 18px !important;
+    margin: 4px 0 6px !important;
+}
+.blog-toc-sublist li {
+    color: #0284c7 !important;
+    margin-bottom: 3px !important;
+    font-size: 0.94em !important;
+    break-inside: avoid;
+    list-style-type: circle !important;
 }
 .blog-toc-box a {
     color: #0369a1 !important;
@@ -1720,6 +1734,16 @@ figcaption, .img-caption {
     color: #0284c7 !important;
     text-decoration: underline !important;
     text-underline-offset: 2px !important;
+}
+
+/* Fix Carousel image margins inside blog article */
+.ba-content .bcar-slide img,
+.blog-content .bcar-slide img {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
 }
 
 /* SIZE 1: SMALL / COMPACT (Default) */
@@ -3146,18 +3170,46 @@ document.querySelectorAll('.blog-content table').forEach(function(table) {
     applySize(saved);
 })();
 
-// Auto-attach [Hide / Show] toggle button to Table of Contents
+// Auto-attach [Hide / Show] toggle button & normalize any flat TOC hierarchy
 document.querySelectorAll('.blog-toc-box').forEach(function(box) {
     var title = box.querySelector('.blog-toc-title');
-    var list = box.querySelector('ol, ul');
-    if (title && list && !box.querySelector('.blog-toc-toggle')) {
+    var list = box.querySelector('ol');
+    
+    // If there's an older flat TOC with circle subheadings directly in <ol>, group them into nested <ul>
+    if (list) {
+        var directLis = Array.from(list.children).filter(function(el) { return el.nodeName === 'LI'; });
+        var currentParentLi = null;
+        var currentSubUl = null;
+        
+        directLis.forEach(function(li) {
+            var styleStr = (li.getAttribute('style') || '').toLowerCase();
+            var isSub = li.style.listStyleType === 'circle' || styleStr.indexOf('circle') !== -1 || styleStr.indexOf('margin-left') !== -1;
+            if (isSub) {
+                if (currentParentLi) {
+                    if (!currentSubUl) {
+                        currentSubUl = document.createElement('ul');
+                        currentSubUl.className = 'blog-toc-sublist';
+                        currentParentLi.appendChild(currentSubUl);
+                    }
+                    li.removeAttribute('style');
+                    currentSubUl.appendChild(li);
+                }
+            } else {
+                currentParentLi = li;
+                currentSubUl = null;
+            }
+        });
+    }
+
+    var activeList = box.querySelector('ol, ul');
+    if (title && activeList && !box.querySelector('.blog-toc-toggle')) {
         var toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'blog-toc-toggle';
         toggleBtn.innerHTML = '<span class="toc-toggle-text">Hide</span> <i class="fa-solid fa-chevron-up" style="font-size:0.7rem;"></i>';
         toggleBtn.onclick = function() {
-            var isHidden = list.style.display === 'none';
-            list.style.display = isHidden ? '' : 'none';
+            var isHidden = activeList.style.display === 'none';
+            activeList.style.display = isHidden ? '' : 'none';
             toggleBtn.querySelector('.toc-toggle-text').textContent = isHidden ? 'Hide' : 'Show';
             var icon = toggleBtn.querySelector('i');
             if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
@@ -3600,6 +3652,145 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
     document.addEventListener('DOMContentLoaded', calculateReadingProgress);
     calculateReadingProgress();
 })();
+
+// ── Interactive Fullscreen Image Lightbox Preview ──
+(function() {
+    var lightbox = document.getElementById('blogImageLightbox');
+    if (!lightbox) return;
+
+    var lbImg = document.getElementById('blogLightboxImg');
+    var lbCaption = document.getElementById('blogLightboxCaption');
+    var lbCounter = document.getElementById('blogLightboxCounter');
+    var lbOpenOrig = document.getElementById('blogLightboxOpenOrig');
+    var lbPrev = lightbox.querySelector('.blog-lightbox-prev');
+    var lbNext = lightbox.querySelector('.blog-lightbox-next');
+
+    var imagesList = [];
+    var activeIdx = 0;
+
+    function gatherImages() {
+        var imgs = document.querySelectorAll('.ba-content img, .blog-content img, .bcar-slide img, .ba-gallery-main img, .ba-gallery-side img');
+        imagesList = [];
+        imgs.forEach(function(img) {
+            // Ignore tiny icons / avatars / badges
+            if (img.classList.contains('admin-avatar') || img.classList.contains('be-serp-favicon') || img.classList.contains('fa-icon') || (img.naturalWidth && img.naturalWidth < 60)) return;
+            var src = img.getAttribute('data-full-src') || img.currentSrc || img.src;
+            if (!src) return;
+
+            var caption = img.getAttribute('alt') || img.getAttribute('title') || '';
+            var parentFig = img.closest('figure');
+            if (parentFig && parentFig.querySelector('figcaption, .img-caption')) {
+                caption = parentFig.querySelector('figcaption, .img-caption').textContent.trim();
+            }
+            var slideCap = img.closest('.bcar-slide');
+            if (slideCap && slideCap.querySelector('.bcar-caption')) {
+                caption = slideCap.querySelector('.bcar-caption').textContent.trim();
+            }
+
+            var index = imagesList.length;
+            imagesList.push({ src: src, caption: caption, el: img });
+
+            img.addEventListener('click', function(e) {
+                e.preventDefault();
+                openBlogLightbox(index);
+            });
+        });
+    }
+
+    window.openBlogLightbox = function(idx) {
+        if (!imagesList.length) gatherImages();
+        if (idx < 0) idx = 0;
+        if (idx >= imagesList.length) idx = imagesList.length - 1;
+        activeIdx = idx;
+
+        var item = imagesList[activeIdx];
+        if (!item) return;
+
+        lbImg.src = item.src;
+        lbCaption.textContent = item.caption || '';
+        lbCounter.textContent = (activeIdx + 1) + ' / ' + imagesList.length;
+        if (lbOpenOrig) lbOpenOrig.href = item.src;
+
+        if (imagesList.length <= 1) {
+            if (lbPrev) lbPrev.style.display = 'none';
+            if (lbNext) lbNext.style.display = 'none';
+            if (lbCounter) lbCounter.style.display = 'none';
+        } else {
+            if (lbPrev) lbPrev.style.display = 'flex';
+            if (lbNext) lbNext.style.display = 'flex';
+            if (lbCounter) lbCounter.style.display = 'block';
+        }
+
+        lightbox.style.display = 'flex';
+        void lightbox.offsetWidth;
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeBlogLightbox = function() {
+        lightbox.classList.remove('is-open');
+        setTimeout(function() {
+            lightbox.style.display = 'none';
+            lbImg.src = '';
+            document.body.style.overflow = '';
+        }, 220);
+    };
+
+    window.prevBlogLightbox = function(e) {
+        if (e) e.stopPropagation();
+        var nextIdx = (activeIdx - 1 + imagesList.length) % imagesList.length;
+        openBlogLightbox(nextIdx);
+    };
+
+    window.nextBlogLightbox = function(e) {
+        if (e) e.stopPropagation();
+        var nextIdx = (activeIdx + 1) % imagesList.length;
+        openBlogLightbox(nextIdx);
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeBlogLightbox();
+        if (e.key === 'ArrowLeft') prevBlogLightbox();
+        if (e.key === 'ArrowRight') nextBlogLightbox();
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', gatherImages);
+    } else {
+        gatherImages();
+    }
+})();
 </script>
+
+<!-- ── Blog Image Fullscreen Preview Lightbox Modal ── -->
+<div id="blogImageLightbox" class="blog-lightbox-backdrop" style="display:none;" aria-hidden="true" role="dialog">
+    <div class="blog-lightbox-overlay" onclick="closeBlogLightbox()"></div>
+    <div class="blog-lightbox-wrapper">
+        <header class="blog-lightbox-topbar">
+            <div class="blog-lightbox-counter" id="blogLightboxCounter">1 / 1</div>
+            <div class="blog-lightbox-title" id="blogLightboxCaption"></div>
+            <div class="blog-lightbox-actions">
+                <a href="#" target="_blank" id="blogLightboxOpenOrig" class="blog-lightbox-btn" title="Open original image" download>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                <button type="button" class="blog-lightbox-btn blog-lightbox-close" onclick="closeBlogLightbox()" title="Close (Esc)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </header>
+        <div class="blog-lightbox-stage">
+            <button type="button" class="blog-lightbox-arrow blog-lightbox-prev" onclick="prevBlogLightbox(event)" title="Previous (Left arrow)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="blog-lightbox-img-container">
+                <img src="" alt="" id="blogLightboxImg" class="blog-lightbox-img">
+            </div>
+            <button type="button" class="blog-lightbox-arrow blog-lightbox-next" onclick="nextBlogLightbox(event)" title="Next (Right arrow)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
 </body></html>
 

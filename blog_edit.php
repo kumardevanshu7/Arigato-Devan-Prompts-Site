@@ -3824,8 +3824,10 @@ tinymce.init({
             align-items: center;
             justify-content: space-between;
         }
-        .blog-toc-box ol { margin: 0; }
-        .blog-toc-box li { color: #0284c7; }
+        .blog-toc-box ol, .blog-toc-box .blog-toc-list { margin: 0; }
+        .blog-toc-box li { color: #0284c7; break-inside: avoid; }
+        .blog-toc-sublist { list-style-type: circle !important; padding-left: 18px !important; margin: 3px 0 5px !important; }
+        .blog-toc-sublist li { color: #0284c7 !important; margin-bottom: 3px !important; font-size: 0.94em !important; list-style-type: circle !important; }
         .blog-toc-box a { color: #0369a1; text-decoration: none; font-weight: 500; }
 
         /* SIZE 1: SMALL / COMPACT */
@@ -5344,9 +5346,9 @@ function insertTableOfContents(size) {
         var starter = `
           <div class="blog-toc-box blog-toc-${tocSize}" data-toc-size="${tocSize}">
             <div class="blog-toc-title"><i class="fa-solid fa-list-ol" style="margin-right:6px;"></i>Table of Contents</div>
-            <ol>
-              <li><a href="#section-1">1. Section 1 Title</a></li>
-              <li><a href="#section-2">2. Section 2 Title</a></li>
+            <ol class="blog-toc-list">
+              <li><a href="#section-1">Section 1 Title</a></li>
+              <li><a href="#section-2">Section 2 Title</a></li>
             </ol>
           </div>
           <p><br></p>
@@ -5354,7 +5356,11 @@ function insertTableOfContents(size) {
         ed.execCommand('mceInsertContent', false, starter);
         return;
     }
-    var listItems = [];
+
+    // Build structured hierarchy: H2 -> [H3 subheadings]
+    var tocTree = [];
+    var currentH2Node = null;
+
     headings.forEach(function(h, idx) {
         var rawText = (h.textContent || '').replace(/\u00a0/g, ' ').trim();
         if (!rawText) return;
@@ -5363,14 +5369,45 @@ function insertTableOfContents(size) {
             cleanId = 'toc-' + rawText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || ('section-' + (idx + 1));
             h.setAttribute('id', cleanId);
         }
-        var isSub = h.nodeName === 'H3';
-        listItems.push(`<li style="${isSub ? 'margin-left:16px; list-style-type:circle;' : 'margin-bottom:4px;'}"><a href="#${cleanId}">${escapeHtml(rawText)}</a></li>`);
+        var isH3 = h.nodeName.toUpperCase() === 'H3';
+
+        if (!isH3) {
+            currentH2Node = {
+                id: cleanId,
+                text: rawText,
+                subheadings: []
+            };
+            tocTree.push(currentH2Node);
+        } else {
+            if (currentH2Node) {
+                currentH2Node.subheadings.push({ id: cleanId, text: rawText });
+            } else {
+                currentH2Node = {
+                    id: cleanId,
+                    text: rawText,
+                    subheadings: []
+                };
+                tocTree.push(currentH2Node);
+            }
+        }
     });
+
+    var listHtml = tocTree.map(function(item) {
+        var subHtml = '';
+        if (item.subheadings && item.subheadings.length > 0) {
+            var subLis = item.subheadings.map(function(sub) {
+                return `<li><a href="#${sub.id}">${escapeHtml(sub.text)}</a></li>`;
+            }).join('\n                ');
+            subHtml = `\n              <ul class="blog-toc-sublist">\n                ${subLis}\n              </ul>`;
+        }
+        return `<li><a href="#${item.id}">${escapeHtml(item.text)}</a>${subHtml}</li>`;
+    }).join('\n          ');
+
     var tocHtml = `
       <div class="blog-toc-box blog-toc-${tocSize}" data-toc-size="${tocSize}">
         <div class="blog-toc-title"><i class="fa-solid fa-list-ol" style="margin-right:6px;"></i>Table of Contents</div>
-        <ol>
-          ${listItems.join('\n          ')}
+        <ol class="blog-toc-list">
+          ${listHtml}
         </ol>
       </div>
       <p><br></p>
