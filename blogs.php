@@ -1038,12 +1038,15 @@ footer .footer-links a:hover {
         <h3><?= htmlspecialchars($b['title']) ?></h3>
         <?php if ($preview): ?><p><?= htmlspecialchars($preview) ?></p><?php endif; ?>
         <div class="bm-meta">
-          <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="">
-          <span><?= htmlspecialchars($b['author_name'] ?? 'Admin') ?></span>
-          <span>·</span>
-          <span><?= date('M j, Y', strtotime($b['created_at'])) ?></span>
-          <span>·</span>
-          <span><?= $mins ?> min read</span>
+          <div class="bm-meta-author">
+            <img loading="lazy" src="<?= htmlspecialchars($av) ?>" alt="">
+            <span class="bm-author-name"><?= htmlspecialchars($b['author_name'] ?? 'Admin') ?></span>
+          </div>
+          <div class="bm-meta-info">
+            <span class="bm-meta-date"><?= date('M j, Y', strtotime($b['created_at'])) ?></span>
+            <span class="bm-meta-dot">·</span>
+            <span class="bm-meta-read"><?= $mins ?> min read</span>
+          </div>
         </div>
       </div>
     </a>

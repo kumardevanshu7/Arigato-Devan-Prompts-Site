@@ -154,9 +154,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $has_fk_col = false;
             }
 
+            $was_published = (int)($bl['is_published'] ?? 0);
+            $set_date_clause = ($was_published === 0 && $publish === 1) ? ", created_at=NOW()" : "";
+
             if ($has_fk_col) {
                 $stmt = $pdo->prepare(
-                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, focus_keyword=?, category=?, is_published=?, updated_at=NOW() WHERE id=?"
+                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, focus_keyword=?, category=?, is_published=?, updated_at=NOW(){$set_date_clause} WHERE id=?"
                 );
                 $stmt->execute([
                     $title,
@@ -177,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             } else {
                 $stmt = $pdo->prepare(
-                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, category=?, is_published=?, updated_at=NOW() WHERE id=?"
+                    "UPDATE blogs SET title=?, slug=?, description=?, content=?, content_hindi=?, image_path=?, image_path_landscape=?, image_ratio=?, meta_title=?, meta_description=?, tags=?, category=?, is_published=?, updated_at=NOW(){$set_date_clause} WHERE id=?"
                 );
                 $stmt->execute([
                     $title,
@@ -2067,10 +2070,18 @@ function registerImageWriteButtons(editor) {
     });
     editor.ui.registry.addButton('imgcaption', {
         text: 'Caption',
-        tooltip: 'Add / Edit Image Caption',
+        tooltip: 'Add / Edit Image Caption with Smart Suggestions',
         onAction: function () {
             var img = currentImg();
-            if (img) toggleImageCaption(editor, img);
+            if (img) openImageCaptionModal(editor, img);
+        }
+    });
+    editor.ui.registry.addButton('imgreplace', {
+        text: 'Replace Image',
+        tooltip: 'Replace image without changing size, alignment or styles',
+        onAction: function () {
+            var img = currentImg();
+            if (img) triggerReplaceImage(editor, img);
         }
     });
     editor.on('click', function (e) {
@@ -2288,7 +2299,7 @@ tinymce.init({
         promptVar_amber: { inline: 'code', classes: 'prompt-var prompt-var-amber', styles: { 'background-color': '#fef3c7', 'color': '#92400e', 'padding': '2px 7px', 'border-radius': '5px', 'border': '1px solid #fde68a', 'font-family': 'JetBrains Mono, monospace', 'font-size': '0.88em' } }
     },
     font_family_formats: 'Editorial Serif=Lora, serif; Display Serif=Playfair Display, serif; Modern Bold=Plus Jakarta Sans, sans-serif; Inter Sans=Inter, sans-serif; Monospace=JetBrains Mono, monospace',
-    quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | imgborder | imgcaption | editimage',
+    quickbars_image_toolbar: 'writebefore writeafter | imgalignleft imgaligncenter imgalignright | imgborder | imgcaption | imgreplace',
     link_assume_external_targets: 'https',
     default_link_target: '_blank',
     link_context_toolbar: true,
@@ -5430,44 +5441,230 @@ function removeTocFromDoc() {
         ed.nodeChanged();
     }
 }
-function toggleImageCaption(editor, img) {
+function triggerReplaceImage(editor, img) {
     if (!img || img.nodeName !== 'IMG') return;
+    var fileInp = document.getElementById('beReplaceImgHiddenInput');
+    if (!fileInp) {
+        fileInp = document.createElement('input');
+        fileInp.type = 'file';
+        fileInp.id = 'beReplaceImgHiddenInput';
+        fileInp.accept = 'image/*';
+        fileInp.style.display = 'none';
+        document.body.appendChild(fileInp);
+    }
+    
+    fileInp.onchange = function() {
+        if (!fileInp.files || !fileInp.files[0]) return;
+        var file = fileInp.files[0];
+        var formData = new FormData();
+        formData.append('file', file, file.name);
+        
+        var toast = document.createElement('div');
+        toast.className = 'be-toast-notice';
+        toast.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i> Uploading replacement image...';
+        toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:999999; background:#0f172a; color:#fff; padding:12px 20px; border-radius:12px; font-weight:700; font-size:0.88rem; box-shadow:0 10px 25px rgba(0,0,0,0.3); font-family:"Plus Jakarta Sans", sans-serif;';
+        document.body.appendChild(toast);
+
+        fetch('upload_editor_image.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.url) {
+                // Update image URL while preserving exact width, alignment, classes, and styles
+                img.setAttribute('src', data.url);
+                img.setAttribute('data-full-src', data.url);
+                img.setAttribute('data-mce-src', data.url);
+                editor.nodeChanged();
+                editor.undoManager.add();
+                toast.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:8px;"></i> Image replaced successfully!';
+                setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2500);
+            } else {
+                alert(data && data.error ? data.error : 'Failed to upload replacement image.');
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }
+        })
+        .catch(function(err) {
+            alert('Upload error: ' + (err.message || 'Unknown error'));
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        });
+        fileInp.value = '';
+    };
+
+    fileInp.click();
+}
+
+function openImageCaptionModal(editor, img) {
+    if (!img || img.nodeName !== 'IMG') return;
+    
+    var currentCaptionText = '';
     var parent = img.parentNode;
+    var existingCapEl = null;
+    
     if (parent && parent.nodeName === 'FIGURE') {
-        var existingCap = parent.querySelector('figcaption, .img-caption');
-        if (existingCap) {
-            editor.selection.select(existingCap);
-            return;
-        }
-        var newCap = editor.dom.create('figcaption', { class: 'img-caption' }, '(Image credit: Source name)');
-        parent.appendChild(newCap);
-        editor.selection.select(newCap);
+        existingCapEl = parent.querySelector('figcaption, .img-caption');
+        if (existingCapEl) currentCaptionText = existingCapEl.textContent.trim();
     } else {
         var next = img.nextElementSibling;
         if (!next && parent && (parent.nodeName === 'P' || parent.nodeName === 'DIV')) {
             next = parent.nextElementSibling;
         }
         if (next && (next.classList.contains('img-caption') || next.nodeName === 'FIGCAPTION')) {
-            editor.selection.select(next);
-            return;
+            existingCapEl = next;
+            currentCaptionText = next.textContent.trim();
         }
-        var capEl = editor.dom.create('p', { class: 'img-caption' }, '(Image credit: Source name)');
-        if (parent && (parent.nodeName === 'P' || parent.nodeName === 'DIV') && parent.childNodes.length === 1) {
-            parent.parentNode.insertBefore(capEl, parent.nextSibling);
-        } else {
-            img.parentNode.insertBefore(capEl, img.nextSibling);
-        }
-        editor.selection.select(capEl);
     }
-    editor.nodeChanged();
+
+    var savedCaptions = [];
+    try {
+        var stored = localStorage.getItem('recent_blog_captions');
+        if (stored) savedCaptions = JSON.parse(stored);
+    } catch(e) {}
+
+    var docCaptions = [];
+    var capEls = editor.dom.select('.img-caption, figcaption');
+    capEls.forEach(function(el) {
+        var t = (el.textContent || '').trim();
+        if (t && docCaptions.indexOf(t) === -1) docCaptions.push(t);
+    });
+
+    var defaultSuggestions = [
+        '(Image Source: Google Flow)',
+        '(Image Source: Midjourney)',
+        '(Image Source: ChatGPT / DALL-E)',
+        '(Image Source: Bing Image Creator)',
+        '(Image Source: Flux.1)',
+        '(Image credit: Arigato Devan)'
+    ];
+
+    var allSuggestions = [];
+    [docCaptions, savedCaptions, defaultSuggestions].forEach(function(list) {
+        if (Array.isArray(list)) {
+            list.forEach(function(item) {
+                var trimmed = (item || '').trim();
+                if (trimmed && allSuggestions.indexOf(trimmed) === -1) {
+                    allSuggestions.push(trimmed);
+                }
+            });
+        }
+    });
+
+    var modal = document.getElementById('beImageCaptionModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'beImageCaptionModal';
+        modal.className = 'be-modal-backdrop';
+        modal.style.cssText = 'display:none; position:fixed; inset:0; z-index:999999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px; font-family:"Plus Jakarta Sans", sans-serif;';
+        document.body.appendChild(modal);
+    }
+
+    var suggestionChipsHtml = allSuggestions.slice(0, 10).map(function(s) {
+        return `<button type="button" class="be-cap-chip" onclick="document.getElementById('beCapInputText').value = this.getAttribute('data-val')" data-val="${escapeHtml(s)}" style="padding:5px 12px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:0.78rem; font-weight:600; color:#334155; cursor:pointer; text-align:left; transition:all 0.15s ease;">${escapeHtml(s)}</button>`;
+    }).join('');
+
+    modal.innerHTML = `
+        <div class="be-modal-dialog" style="background:#ffffff; border-radius:18px; max-width:480px; width:100%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); border:1px solid #e2e8f0; animation:modalPop 0.2s cubic-bezier(0.16,1,0.3,1); overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:34px; height:34px; border-radius:10px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:1rem;">
+                        <i class="fa-solid fa-quote-left"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin:0; font-size:1rem; font-weight:800; color:#0f172a;">Image Caption</h4>
+                        <p style="margin:0; font-size:0.75rem; color:#64748b;">Add credit, source, or description</p>
+                    </div>
+                </div>
+                <button type="button" onclick="document.getElementById('beImageCaptionModal').style.display='none'" style="background:none; border:none; font-size:1.2rem; color:#94a3b8; cursor:pointer; padding:4px;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="padding:18px 20px;">
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.80rem; font-weight:700; color:#334155; margin-bottom:6px;">Caption Text</label>
+                    <input type="text" id="beCapInputText" value="${escapeHtml(currentCaptionText)}" placeholder="e.g. (Image Source: Google Flow)" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.88rem; font-family:inherit; outline:none;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">⚡ Quick Suggestions & Recent Captions</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; max-height:120px; overflow-y:auto; padding:2px;">
+                        ${suggestionChipsHtml}
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #f1f5f9;">
+                    ${existingCapEl ? `<button type="button" id="beRemoveCapBtn" style="padding:8px 14px; background:#fee2e2; color:#ef4444; border:none; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> Remove</button>` : '<div></div>'}
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" onclick="document.getElementById('beImageCaptionModal').style.display='none'" style="padding:8px 14px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer;">Cancel</button>
+                        <button type="button" id="beApplyCapBtn" style="padding:8px 18px; background:#0284c7; color:#ffffff; border:none; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(2,132,199,0.25);">Apply Caption</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+    var input = document.getElementById('beCapInputText');
+    if (input) {
+        input.focus();
+        input.select();
+    }
+
+    var applyBtn = document.getElementById('beApplyCapBtn');
+    if (applyBtn) {
+        applyBtn.onclick = function() {
+            var newText = (document.getElementById('beCapInputText').value || '').trim();
+            if (!newText) {
+                if (existingCapEl) editor.dom.remove(existingCapEl);
+            } else {
+                try {
+                    var idx = savedCaptions.indexOf(newText);
+                    if (idx !== -1) savedCaptions.splice(idx, 1);
+                    savedCaptions.unshift(newText);
+                    if (savedCaptions.length > 20) savedCaptions = savedCaptions.slice(0, 20);
+                    localStorage.setItem('recent_blog_captions', JSON.stringify(savedCaptions));
+                } catch(e) {}
+
+                if (existingCapEl) {
+                    existingCapEl.textContent = newText;
+                } else {
+                    if (parent && parent.nodeName === 'FIGURE') {
+                        var cap = editor.dom.create('figcaption', { class: 'img-caption' }, newText);
+                        parent.appendChild(cap);
+                    } else {
+                        var cap = editor.dom.create('p', { class: 'img-caption' }, newText);
+                        if (parent && (parent.nodeName === 'P' || parent.nodeName === 'DIV') && parent.childNodes.length === 1) {
+                            parent.parentNode.insertBefore(cap, parent.nextSibling);
+                        } else {
+                            img.parentNode.insertBefore(cap, img.nextSibling);
+                        }
+                    }
+                }
+            }
+            editor.nodeChanged();
+            editor.undoManager.add();
+            modal.style.display = 'none';
+        };
+    }
+
+    var removeBtn = document.getElementById('beRemoveCapBtn');
+    if (removeBtn) {
+        removeBtn.onclick = function() {
+            if (existingCapEl) editor.dom.remove(existingCapEl);
+            editor.nodeChanged();
+            editor.undoManager.add();
+            modal.style.display = 'none';
+        };
+    }
 }
+
+function toggleImageCaption(editor, img) {
+    openImageCaptionModal(editor, img);
+}
+
 function toggleSelectedImageCaption() {
     if (!tinymce.activeEditor) return;
     var ed = tinymce.activeEditor;
     var node = ed.selection.getNode();
     if (node && node.nodeName !== 'IMG') node = ed.dom.getParent(node, 'img');
     if (node && node.nodeName === 'IMG') {
-        toggleImageCaption(ed, node);
+        openImageCaptionModal(ed, node);
     } else {
         alert('Please click on an image in the editor first to add or edit its caption.');
     }

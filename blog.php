@@ -3652,32 +3652,247 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
     document.addEventListener('DOMContentLoaded', calculateReadingProgress);
     calculateReadingProgress();
 })();
+</script>
 
-// ── Interactive Fullscreen Image Lightbox Preview ──
+<!-- ── Interactive Fullscreen Image Lightbox Preview Modal ── -->
+<style id="blog-lightbox-inline-css">
+#blogImageLightbox {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999999 !important;
+    display: none;
+    background: rgba(8, 12, 22, 0.94) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    opacity: 0;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+#blogImageLightbox.is-open {
+    opacity: 1 !important;
+}
+.blog-lightbox-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    cursor: zoom-out !important;
+    z-index: 1 !important;
+}
+
+/* Top-Left Counter */
+.blog-lightbox-top-left {
+    position: absolute !important;
+    top: 20px !important;
+    left: 24px !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+.blog-lightbox-counter {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    color: #f8fafc !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    padding: 6px 16px !important;
+    border-radius: 30px !important;
+    letter-spacing: 0.5px !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Top-Right Buttons */
+.blog-lightbox-top-right {
+    position: absolute !important;
+    top: 20px !important;
+    right: 24px !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    pointer-events: auto !important;
+}
+.blog-lightbox-btn {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    font-size: 1.15rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    transition: background 0.18s ease, transform 0.18s ease, color 0.18s ease !important;
+}
+.blog-lightbox-btn:hover {
+    background: rgba(255, 255, 255, 0.26) !important;
+    transform: scale(1.08) !important;
+    color: #38bdf8 !important;
+}
+
+/* Centered Stage & Image */
+.blog-lightbox-center-stage {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 50px 80px !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+}
+.blog-lightbox-img {
+    max-width: 90vw !important;
+    max-height: 85vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 16px !important;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+    transform: scale(0.92) translateY(6px) !important;
+    opacity: 0 !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease-out !important;
+    pointer-events: auto !important;
+}
+#blogImageLightbox.is-open .blog-lightbox-img {
+    transform: scale(1) translateY(0) !important;
+    opacity: 1 !important;
+}
+
+/* Nav Arrows */
+.blog-lightbox-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    font-size: 1.35rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+    transition: background 0.18s ease, transform 0.18s ease, color 0.18s ease !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+.blog-lightbox-arrow:hover {
+    background: rgba(255, 255, 255, 0.28) !important;
+    transform: translateY(-50%) scale(1.1) !important;
+    color: #38bdf8 !important;
+}
+.blog-lightbox-prev { left: 24px !important; }
+.blog-lightbox-next { right: 24px !important; }
+
+/* Caption Pill (Bottom Centered) */
+.blog-lightbox-caption-pill {
+    position: absolute !important;
+    bottom: 24px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
+    max-width: 80vw !important;
+    background: rgba(15, 23, 42, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 30px !important;
+    padding: 8px 24px !important;
+    color: #f8fafc !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    backdrop-filter: blur(14px) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    pointer-events: auto !important;
+}
+
+@media (max-width: 768px) {
+  .blog-lightbox-top-left { top: 14px !important; left: 14px !important; }
+  .blog-lightbox-top-right { top: 14px !important; right: 14px !important; gap: 8px !important; }
+  .blog-lightbox-counter { font-size: 0.76rem !important; padding: 5px 12px !important; }
+  .blog-lightbox-btn { width: 38px !important; height: 38px !important; font-size: 1rem !important; }
+  .blog-lightbox-prev { left: 10px !important; width: 42px !important; height: 42px !important; font-size: 1.15rem !important; }
+  .blog-lightbox-next { right: 10px !important; width: 42px !important; height: 42px !important; font-size: 1.15rem !important; }
+  .blog-lightbox-center-stage { padding: 55px 16px 45px !important; }
+  .blog-lightbox-img { max-width: 95vw !important; max-height: 80vh !important; }
+  .blog-lightbox-caption-pill { bottom: 14px !important; font-size: 0.78rem !important; padding: 6px 16px !important; }
+}
+</style>
+
+<div id="blogImageLightbox" class="blog-lightbox-backdrop" aria-hidden="true" role="dialog">
+    <div class="blog-lightbox-overlay" onclick="closeBlogLightbox()"></div>
+    
+    <!-- Top-Left Counter -->
+    <div class="blog-lightbox-top-left">
+        <div class="blog-lightbox-counter" id="blogLightboxCounter">1 / 1</div>
+    </div>
+
+    <!-- Top-Right Actions -->
+    <div class="blog-lightbox-top-right">
+        <a href="#" target="_blank" id="blogLightboxOpenOrig" class="blog-lightbox-btn" title="Open original image in new tab">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+        <button type="button" class="blog-lightbox-btn blog-lightbox-close" onclick="closeBlogLightbox()" title="Close (Esc)">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Nav Arrows -->
+    <button type="button" class="blog-lightbox-arrow blog-lightbox-prev" onclick="prevBlogLightbox(event)" title="Previous (Left arrow)">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button type="button" class="blog-lightbox-arrow blog-lightbox-next" onclick="nextBlogLightbox(event)" title="Next (Right arrow)">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <!-- Center Stage with Image -->
+    <div class="blog-lightbox-center-stage">
+        <img src="" alt="" id="blogLightboxImg" class="blog-lightbox-img">
+    </div>
+
+    <!-- Bottom Caption Pill -->
+    <div class="blog-lightbox-caption-pill" id="blogLightboxCaption" style="display:none;"></div>
+</div>
+
+<script>
+// ── Interactive Fullscreen Image Lightbox Preview Controller ──
 (function() {
-    var lightbox = document.getElementById('blogImageLightbox');
-    if (!lightbox) return;
-
-    var lbImg = document.getElementById('blogLightboxImg');
-    var lbCaption = document.getElementById('blogLightboxCaption');
-    var lbCounter = document.getElementById('blogLightboxCounter');
-    var lbOpenOrig = document.getElementById('blogLightboxOpenOrig');
-    var lbPrev = lightbox.querySelector('.blog-lightbox-prev');
-    var lbNext = lightbox.querySelector('.blog-lightbox-next');
-
     var imagesList = [];
     var activeIdx = 0;
 
+    function getLb() {
+        return document.getElementById('blogImageLightbox');
+    }
+
     function gatherImages() {
-        var imgs = document.querySelectorAll('.ba-content img, .blog-content img, .bcar-slide img, .ba-gallery-main img, .ba-gallery-side img');
+        var imgs = document.querySelectorAll('.ba-content img, .blog-content img, .bcar-slide img, .ba-gallery-main img, .ba-gallery-side img, .ba-cover-pic img, .blog-article-content img');
         imagesList = [];
         imgs.forEach(function(img) {
-            // Ignore tiny icons / avatars / badges
-            if (img.classList.contains('admin-avatar') || img.classList.contains('be-serp-favicon') || img.classList.contains('fa-icon') || (img.naturalWidth && img.naturalWidth < 60)) return;
+            if (img.classList.contains('admin-avatar') || img.classList.contains('be-serp-favicon') || img.classList.contains('fa-icon') || img.classList.contains('bm-slider-btn') || (img.naturalWidth && img.naturalWidth < 40)) return;
             var src = img.getAttribute('data-full-src') || img.currentSrc || img.src;
             if (!src) return;
 
-            var caption = img.getAttribute('alt') || img.getAttribute('title') || '';
+            var caption = '';
             var parentFig = img.closest('figure');
             if (parentFig && parentFig.querySelector('figcaption, .img-caption')) {
                 caption = parentFig.querySelector('figcaption, .img-caption').textContent.trim();
@@ -3687,17 +3902,21 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
                 caption = slideCap.querySelector('.bcar-caption').textContent.trim();
             }
 
-            var index = imagesList.length;
             imagesList.push({ src: src, caption: caption, el: img });
-
-            img.addEventListener('click', function(e) {
-                e.preventDefault();
-                openBlogLightbox(index);
-            });
         });
     }
 
     window.openBlogLightbox = function(idx) {
+        var lightbox = getLb();
+        if (!lightbox) return;
+
+        var lbImg = document.getElementById('blogLightboxImg');
+        var lbCaption = document.getElementById('blogLightboxCaption');
+        var lbCounter = document.getElementById('blogLightboxCounter');
+        var lbOpenOrig = document.getElementById('blogLightboxOpenOrig');
+        var lbPrev = lightbox.querySelector('.blog-lightbox-prev');
+        var lbNext = lightbox.querySelector('.blog-lightbox-next');
+
         if (!imagesList.length) gatherImages();
         if (idx < 0) idx = 0;
         if (idx >= imagesList.length) idx = imagesList.length - 1;
@@ -3706,9 +3925,20 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
         var item = imagesList[activeIdx];
         if (!item) return;
 
-        lbImg.src = item.src;
-        lbCaption.textContent = item.caption || '';
-        lbCounter.textContent = (activeIdx + 1) + ' / ' + imagesList.length;
+        if (lbImg) {
+            lbImg.src = item.src;
+            lbImg.alt = item.caption || '';
+        }
+        if (lbCaption) {
+            if (item.caption && item.caption.length > 0) {
+                lbCaption.textContent = item.caption;
+                lbCaption.style.display = 'block';
+            } else {
+                lbCaption.textContent = '';
+                lbCaption.style.display = 'none';
+            }
+        }
+        if (lbCounter) lbCounter.textContent = (activeIdx + 1) + ' / ' + Math.max(1, imagesList.length);
         if (lbOpenOrig) lbOpenOrig.href = item.src;
 
         if (imagesList.length <= 1) {
@@ -3728,28 +3958,69 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
     };
 
     window.closeBlogLightbox = function() {
+        var lightbox = getLb();
+        if (!lightbox) return;
         lightbox.classList.remove('is-open');
         setTimeout(function() {
             lightbox.style.display = 'none';
-            lbImg.src = '';
+            var lbImg = document.getElementById('blogLightboxImg');
+            if (lbImg) lbImg.src = '';
             document.body.style.overflow = '';
-        }, 220);
+        }, 200);
     };
 
     window.prevBlogLightbox = function(e) {
         if (e) e.stopPropagation();
-        var nextIdx = (activeIdx - 1 + imagesList.length) % imagesList.length;
+        var nextIdx = (activeIdx - 1 + imagesList.length) % Math.max(1, imagesList.length);
         openBlogLightbox(nextIdx);
     };
 
     window.nextBlogLightbox = function(e) {
         if (e) e.stopPropagation();
-        var nextIdx = (activeIdx + 1) % imagesList.length;
+        var nextIdx = (activeIdx + 1) % Math.max(1, imagesList.length);
         openBlogLightbox(nextIdx);
     };
 
+    // Global Direct Click Handler
+    document.addEventListener('click', function(e) {
+        // Ignore clicks on nav buttons, dots, tools, links, and inside open lightbox
+        if (e.target.closest('.bcar-prev, .bcar-next, .bcar-dots, .bcar-dot, .ba-code-tools, .blog-toc-toggle, .read-size-bar, #blogImageLightbox')) return;
+        
+        var targetImg = null;
+        if (e.target.tagName === 'IMG') {
+            targetImg = e.target;
+        } else {
+            var container = e.target.closest('.bcar-slide, .bcar-viewport, figure, .ba-cover-pic, .ba-gallery-item');
+            if (container) targetImg = container.querySelector('img');
+        }
+
+        if (!targetImg) return;
+
+        // Check if inside blog content or hero
+        if (!targetImg.closest('.ba-content, .blog-content, .blog-carousel-box, .ba-hero-cover, .ba-cover-pic, article')) return;
+
+        // Ignore small icons & avatars
+        if (targetImg.classList.contains('admin-avatar') || targetImg.classList.contains('be-serp-favicon') || targetImg.classList.contains('fa-icon') || (targetImg.naturalWidth && targetImg.naturalWidth < 40)) return;
+
+        e.preventDefault();
+        gatherImages();
+
+        var src = targetImg.getAttribute('data-full-src') || targetImg.currentSrc || targetImg.src;
+        var foundIdx = imagesList.findIndex(function(item) {
+            return item.el === targetImg || (src && item.src === src);
+        });
+
+        if (foundIdx === -1) {
+            imagesList.push({ src: src, caption: '', el: targetImg });
+            foundIdx = imagesList.length - 1;
+        }
+
+        openBlogLightbox(foundIdx);
+    });
+
     document.addEventListener('keydown', function(e) {
-        if (!lightbox.classList.contains('is-open')) return;
+        var lightbox = getLb();
+        if (!lightbox || lightbox.style.display === 'none') return;
         if (e.key === 'Escape') closeBlogLightbox();
         if (e.key === 'ArrowLeft') prevBlogLightbox();
         if (e.key === 'ArrowRight') nextBlogLightbox();
@@ -3762,35 +4033,5 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
     }
 })();
 </script>
-
-<!-- ── Blog Image Fullscreen Preview Lightbox Modal ── -->
-<div id="blogImageLightbox" class="blog-lightbox-backdrop" style="display:none;" aria-hidden="true" role="dialog">
-    <div class="blog-lightbox-overlay" onclick="closeBlogLightbox()"></div>
-    <div class="blog-lightbox-wrapper">
-        <header class="blog-lightbox-topbar">
-            <div class="blog-lightbox-counter" id="blogLightboxCounter">1 / 1</div>
-            <div class="blog-lightbox-title" id="blogLightboxCaption"></div>
-            <div class="blog-lightbox-actions">
-                <a href="#" target="_blank" id="blogLightboxOpenOrig" class="blog-lightbox-btn" title="Open original image" download>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <button type="button" class="blog-lightbox-btn blog-lightbox-close" onclick="closeBlogLightbox()" title="Close (Esc)">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </header>
-        <div class="blog-lightbox-stage">
-            <button type="button" class="blog-lightbox-arrow blog-lightbox-prev" onclick="prevBlogLightbox(event)" title="Previous (Left arrow)">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <div class="blog-lightbox-img-container">
-                <img src="" alt="" id="blogLightboxImg" class="blog-lightbox-img">
-            </div>
-            <button type="button" class="blog-lightbox-arrow blog-lightbox-next" onclick="nextBlogLightbox(event)" title="Next (Right arrow)">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-</div>
 </body></html>
 
