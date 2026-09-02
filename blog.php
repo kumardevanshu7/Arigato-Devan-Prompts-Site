@@ -574,6 +574,116 @@ code.prompt-var-amber, span.prompt-var-amber,
 /* Global Modern Reset for Blog Post Viewer */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Highlights Category & Related Topics Tag Badges */
+.ba-hl { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+.ba-hl li {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    padding: 10px 0 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 0.88rem !important;
+    color: #334155 !important;
+    font-weight: 500 !important;
+}
+.ba-hl li:last-child { border-bottom: none !important; }
+.ba-hl li i { font-size: 0.88rem !important; flex-shrink: 0 !important; }
+.ba-hl-cat-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    align-items: flex-start !important;
+}
+.ba-hl-cat-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    font-size: 0.85rem !important;
+}
+.ba-hl-cats {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+}
+.ba-hl-cat-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: 1px solid #bae6fd !important;
+    border-radius: 20px !important;
+    padding: 4px 12px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    transition: all 0.18s ease !important;
+}
+.ba-hl-cat-pill:hover {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border-color: #0284c7 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25) !important;
+}
+.ba-hl-tags-box {
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid #f1f5f9 !important;
+}
+.ba-hl-tags-label {
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #64748b !important;
+    margin-bottom: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+.ba-hl-tags-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+.ba-hl-tag-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    background: #f8fafc !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 9999px !important;
+    padding: 6px 13px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.ba-hl-tag-badge .tag-hash {
+    color: #6366f1 !important;
+    font-weight: 800 !important;
+    font-size: 0.74rem !important;
+}
+.ba-hl-tag-badge .tag-text {
+    color: #334155 !important;
+}
+.ba-hl-tag-badge:hover {
+    background: #eff6ff !important;
+    border-color: #93c5fd !important;
+    color: #1d4ed8 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+}
+.ba-hl-tag-badge:hover .tag-text {
+    color: #1d4ed8 !important;
+}
+
 body {
     background-color: #f1f5f9 !important; /* Neutral light-gray base */
     font-family: 'Inter', sans-serif !important;
@@ -2869,15 +2979,38 @@ footer .footer-links a:hover {
       <div class="ba-panel">
         <h3>Highlights</h3>
         <ul class="ba-hl">
-          <?php if (!empty($blog['category']) && $blog['category'] !== 'Uncategorized'): ?>
-          <li><i class="fa-solid fa-folder" style="color:#0284c7;"></i> Category: <?= htmlspecialchars($blog['category']) ?></li>
+          <?php 
+          if (!empty($blog['category']) && $blog['category'] !== 'Uncategorized'): 
+              $hl_cats = array_filter(array_map('trim', explode(',', $blog['category'])));
+          ?>
+          <li class="ba-hl-cat-row">
+            <div class="ba-hl-cat-header"><i class="fa-solid fa-folder-open" style="color:#0284c7;"></i> Category:</div>
+            <div class="ba-hl-cats">
+              <?php foreach ($hl_cats as $hcat): ?>
+              <a href="blogs.php?category=<?= urlencode($hcat) ?>" class="ba-hl-cat-pill" title="Filter blogs by <?= htmlspecialchars($hcat) ?>">
+                <?= htmlspecialchars($hcat) ?>
+              </a>
+              <?php endforeach; ?>
+            </div>
+          </li>
           <?php endif; ?>
-          <li><i class="fa-solid fa-check"></i> <?= $read_time ?> minute read</li>
-          <li><i class="fa-solid fa-check"></i> <?= (int)($blog["view_count"] ?? 0) ?> views</li>
-          <?php foreach (array_slice($tags_list, 0, 5) as $tag): ?>
-          <li><i class="fa-solid fa-check"></i> <?= htmlspecialchars($tag) ?></li>
-          <?php endforeach; ?>
+          <li><i class="fa-solid fa-clock" style="color:#64748b;"></i> <?= $read_time ?> minute read</li>
+          <li><i class="fa-solid fa-eye" style="color:#64748b;"></i> <?= (int)($blog["view_count"] ?? 0) ?> views</li>
         </ul>
+
+        <?php if (!empty($tags_list)): ?>
+        <div class="ba-hl-tags-box">
+          <div class="ba-hl-tags-label"><i class="fa-solid fa-tags" style="color:#6366f1;"></i> Related Topics</div>
+          <div class="ba-hl-tags-wrap">
+            <?php foreach (array_slice($tags_list, 0, 10) as $tag): ?>
+            <a href="blogs.php?tag=<?= urlencode($tag) ?>" class="ba-hl-tag-badge" title="Filter by <?= htmlspecialchars($tag) ?>">
+              <span class="tag-hash">#</span>
+              <span class="tag-text"><?= htmlspecialchars($tag) ?></span>
+            </a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php endif; ?>
       </div>
       <div class="ba-panel">
         <div class="ba-author">

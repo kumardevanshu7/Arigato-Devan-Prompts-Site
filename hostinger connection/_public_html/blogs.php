@@ -914,8 +914,135 @@ footer .footer-links a:hover {
     font-weight: 600;
     font-size: 1.1rem;
 }
+
+/* Bulletproof Card Bottom Footer & Side-by-Side Author Alignment */
+.bm-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    gap: 24px !important;
+    align-items: stretch !important;
+}
+.bm-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    text-decoration: none !important;
+    color: inherit !important;
+}
+.bm-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+}
+.bm-card-img {
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    background: #0f172a !important;
+    overflow: hidden !important;
+}
+.bm-card-img img,
+.bm-card-img .bm-cover-rect {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+.bm-card-body {
+    padding: 18px 20px 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+}
+.bm-card-body h3 {
+    margin: 0 0 8px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.35 !important;
+    color: #0f172a !important;
+}
+.bm-card-body p {
+    margin: 0 0 16px !important;
+    color: #64748b !important;
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+}
+.bm-meta {
+    margin-top: auto !important;
+    padding-top: 14px !important;
+    border-top: 1px solid #f1f5f9 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.bm-meta-author {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+}
+.bm-meta-author img {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: inline-block !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+.bm-author-name {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block !important;
+    line-height: 1.2 !important;
+}
+.bm-meta-info {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-size: 0.76rem !important;
+    color: #64748b !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+.bm-meta-date {
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+.bm-meta-dot {
+    color: #cbd5e1 !important;
+    font-weight: 900 !important;
+}
+.bm-meta-read {
+    color: #64748b !important;
+}
 </style>
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260827f">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260902_v5">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -1111,7 +1238,7 @@ try {
 
 function filterByTag(tag, btn) {
   document.querySelectorAll('.bm-tag').forEach(p => p.classList.remove('is-on'));
-  btn.classList.add('is-on');
+  if (btn) btn.classList.add('is-on');
   const noRes = document.getElementById('no-results-msg');
   let anyVisible = false;
   document.querySelectorAll('.bm-card-filter').forEach(card => {
@@ -1121,6 +1248,26 @@ function filterByTag(tag, btn) {
   });
   if (noRes) noRes.style.display = anyVisible ? 'none' : 'block';
 }
+
+// Auto filter from URL query parameter (?category=... or ?tag=...)
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const filterParam = urlParams.get('category') || urlParams.get('tag');
+  if (filterParam) {
+    const cleanTag = filterParam.trim().toLowerCase();
+    let matchedBtn = null;
+    document.querySelectorAll('.bm-tag').forEach(function(btn) {
+      if ((btn.getAttribute('data-tag') || '').toLowerCase() === cleanTag) {
+        matchedBtn = btn;
+      }
+    });
+    if (matchedBtn) {
+      filterByTag(cleanTag, matchedBtn);
+    } else {
+      filterByTag(cleanTag, null);
+    }
+  }
+})();
 </script>
 <script src="js/blog-splash.js?v=20260756" defer></script>
 <script>
