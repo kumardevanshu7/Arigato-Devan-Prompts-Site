@@ -206,7 +206,7 @@ $author_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 // Fetch site prompts for quick embedding in callout box
 $site_prompts_list = [];
 try {
-    $stmt_spl = $pdo->query("SELECT id, title, image_path, slug FROM prompts ORDER BY id DESC LIMIT 50");
+    $stmt_spl = $pdo->query("SELECT id, title, image_path, slug FROM prompts ORDER BY id DESC");
     $site_prompts_list = $stmt_spl->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {}
 
@@ -4922,8 +4922,12 @@ function addNoteBoxPromptCardRow(preset) {
         </div>
         <div style="margin-bottom:10px;">
             <label style="display:block; font-size:0.8rem; font-weight:800; color:#0f172a; margin-bottom:5px;">
-                <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> Select Another Prompt (Instant Swap):
+                <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> Select Another Prompt (All Prompts Loaded):
             </label>
+            <div style="position:relative; margin-bottom:6px;">
+                <input type="text" placeholder="🔍 Type name or #ID to search prompt..." oninput="filterPromptPicker(this)" style="width:100%; box-sizing:border-box; padding:7px 10px 7px 30px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; background:#ffffff;">
+                <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.78rem; pointer-events:none;"></i>
+            </div>
             <select class="nb-prompt-picker" onchange="onNoteBoxPromptSelect(this)" style="width:100%; padding:9px 12px; border:2px solid #38bdf8; border-radius:10px; font-size:0.88rem; background:#ffffff; color:#0f172a; font-weight:700; cursor:pointer; box-shadow:0 1px 4px rgba(56,189,248,0.2);">
                 ${promptOptions}
             </select>
@@ -4962,6 +4966,21 @@ function onNoteBoxPromptSelect(selectEl) {
     if (urlInput) urlInput.value = slug ? ('prompts/' + encodeURIComponent(slug)) : ('prompt.php?id=' + id);
     if (imgInput) imgInput.value = img;
     if (imgPreview) imgPreview.src = img || 'toplogo/logo01.webp';
+}
+function filterPromptPicker(inputEl) {
+    var query = inputEl.value.toLowerCase().trim();
+    var selectEl = inputEl.closest('.nb-card-row').querySelector('.nb-prompt-picker');
+    if (!selectEl) return;
+    for (var i = 0; i < selectEl.options.length; i++) {
+        var opt = selectEl.options[i];
+        if (!opt.value) { opt.hidden = false; continue; }
+        var text = opt.text.toLowerCase();
+        if (query === '' || text.indexOf(query) !== -1) {
+            opt.hidden = false;
+        } else {
+            opt.hidden = true;
+        }
+    }
 }
 window.currentEditingFaqBox = null;
 

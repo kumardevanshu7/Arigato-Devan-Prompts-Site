@@ -575,11 +575,100 @@ code.prompt-var-amber, span.prompt-var-amber,
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Highlights Category & Related Topics Tag Badges */
+@media (min-width: 901px) {
+    .ba-page {
+        max-width: 1080px !important;
+        margin: 0 auto !important;
+        padding: 48px 24px 72px !important;
+    }
+    .ba-gallery.is-single {
+        width: 100% !important;
+        max-width: 1080px !important;
+        height: auto !important;
+        margin: 0 auto 28px !important;
+        display: block !important;
+    }
+    .ba-gallery.is-single .ba-gallery-main {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 18px !important;
+        overflow: hidden !important;
+        display: block !important;
+    }
+    .ba-gallery.is-single .ba-cover-pic,
+    .ba-gallery.is-single .ba-cover-pic img,
+    .ba-gallery.is-single .ba-gallery-main img {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 85vh !important;
+        object-fit: contain !important;
+        display: block !important;
+        border-radius: 18px !important;
+        margin: 0 auto !important;
+    }
+    .ba-layout {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 280px !important;
+        gap: 40px !important;
+        align-items: start !important;
+    }
+}
+@media (max-width: 900px) {
+    .ba-page {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+    .ba-hero.has-photo {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+    }
+    .ba-hero.has-photo .ba-gallery,
+    .ba-hero.has-photo .ba-gallery-main,
+    .ba-hero.has-photo .ba-gallery-main img,
+    .ba-hero.has-photo .ba-cover-pic {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    .ba-sheet {
+        padding: 20px 16px 40px !important;
+    }
+    .ba-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 24px !important;
+        box-sizing: border-box !important;
+    }
+    .ba-layout > div:first-child {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .ba-side {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
 .ba-hl { list-style: none !important; padding: 0 !important; margin: 0 !important; }
 .ba-hl li {
     display: flex !important;
     gap: 10px !important;
     align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
     padding: 10px 0 !important;
     border-bottom: 1px solid #f1f5f9 !important;
     font-size: 0.88rem !important;
@@ -588,25 +677,29 @@ code.prompt-var-amber, span.prompt-var-amber,
 }
 .ba-hl li:last-child { border-bottom: none !important; }
 .ba-hl li i { font-size: 0.88rem !important; flex-shrink: 0 !important; }
-.ba-hl-cat-row {
+.ba-hl-cat-item {
     display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 100% !important;
 }
-.ba-hl-cat-header {
-    display: flex !important;
+.ba-hl-cat-label {
+    display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
     font-weight: 700 !important;
     color: #0f172a !important;
     font-size: 0.85rem !important;
+    flex-shrink: 0 !important;
 }
 .ba-hl-cats {
-    display: flex !important;
+    display: inline-flex !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
-    width: 100% !important;
+    align-items: center !important;
 }
 .ba-hl-cat-pill {
     display: inline-flex !important;
@@ -628,6 +721,29 @@ code.prompt-var-amber, span.prompt-var-amber,
     border-color: #0284c7 !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25) !important;
+}
+.bpc-thumb {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    background: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.bpc-thumb img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    display: block !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
 }
 .ba-hl-tags-box {
     margin-top: 14px !important;
@@ -2983,8 +3099,8 @@ footer .footer-links a:hover {
           if (!empty($blog['category']) && $blog['category'] !== 'Uncategorized'): 
               $hl_cats = array_filter(array_map('trim', explode(',', $blog['category'])));
           ?>
-          <li class="ba-hl-cat-row">
-            <div class="ba-hl-cat-header"><i class="fa-solid fa-folder-open" style="color:#0284c7;"></i> Category:</div>
+          <li class="ba-hl-cat-item">
+            <span class="ba-hl-cat-label"><i class="fa-solid fa-folder-open" style="color:#0284c7;"></i> Category:</span>
             <div class="ba-hl-cats">
               <?php foreach ($hl_cats as $hcat): ?>
               <a href="blogs.php?category=<?= urlencode($hcat) ?>" class="ba-hl-cat-pill" title="Filter blogs by <?= htmlspecialchars($hcat) ?>">
