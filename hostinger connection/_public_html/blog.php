@@ -136,7 +136,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260829milestones">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260903dlicons">
 <style>
 /* Code Block: Full width wide horizontal rectangle with compact height */
 .ba-content pre,
@@ -4279,6 +4279,225 @@ document.querySelectorAll('.blog-carousel-box').forEach(function(box) {
         document.addEventListener('DOMContentLoaded', gatherImages);
     } else {
         gatherImages();
+    }
+})();
+</script>
+
+<!-- Nogoda 3-Second Download Countdown Modal -->
+<div id="nogodaDownloadModal" class="nogoda-dl-modal-backdrop" style="display:none;" role="dialog" aria-modal="true">
+  <div class="nogoda-dl-modal-box">
+    <button type="button" class="nogoda-dl-close-btn" onclick="closeNogodaDownloadModal()" aria-label="Close download modal">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    
+    <!-- State 1: 3-Second Animated Countdown -->
+    <div id="nogodaDlStateCounting" class="nogoda-dl-state">
+      <div class="nogoda-dl-header-badge">
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+        <span>Arigato Devan Asset</span>
+      </div>
+      
+      <h3 class="nogoda-dl-title" id="nogodaDlModalTitle">Preparing Your Download</h3>
+      <p class="nogoda-dl-subtitle">Your high-speed direct download will start automatically in:</p>
+      
+      <!-- Circular Progress Ring with Nogoda Theme -->
+      <div class="nogoda-dl-timer-container">
+        <svg class="nogoda-dl-timer-svg" viewBox="0 0 120 120">
+          <circle class="nogoda-dl-circle-bg" cx="60" cy="60" r="52"></circle>
+          <circle class="nogoda-dl-circle-bar" id="nogodaDlCircleBar" cx="60" cy="60" r="52" style="stroke-dasharray: 326.72; stroke-dashoffset: 0;"></circle>
+        </svg>
+        <div class="nogoda-dl-timer-number" id="nogodaDlCountdownNum">3</div>
+      </div>
+      
+      <div class="nogoda-dl-file-pill">
+        <span class="nogoda-dl-pill-badge" id="nogodaDlModalBadge">ZIP ARCHIVE</span>
+        <span class="nogoda-dl-pill-name" id="nogodaDlModalFileName">Asset-Pack.zip</span>
+        <span class="nogoda-dl-pill-size" id="nogodaDlModalFileSize">4.8 MB</span>
+      </div>
+    </div>
+
+    <!-- State 2: Download Started & Thank You -->
+    <div id="nogodaDlStateFinished" class="nogoda-dl-state" style="display:none;">
+      <div class="nogoda-dl-success-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h3 class="nogoda-dl-title">Thank You for Downloading! 🎉</h3>
+      <p class="nogoda-dl-subtitle">Your file download has started automatically. Check your browser downloads folder!</p>
+      
+      <div class="nogoda-dl-success-actions">
+        <a id="nogodaDlDirectLink" href="#" download class="nogoda-dl-again-btn">
+          <i class="fa-solid fa-arrow-rotate-right"></i> Download Again (If not started)
+        </a>
+        <button type="button" class="nogoda-dl-done-btn" onclick="closeNogodaDownloadModal()">
+          <i class="fa-solid fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.currentDownloadTimer = null;
+
+function triggerBlogAssetDownload(btnEl) {
+    if (!btnEl) return;
+    var url = btnEl.getAttribute('data-url') || '';
+    var name = btnEl.getAttribute('data-name') || 'Download-Asset';
+    var size = btnEl.getAttribute('data-size') || '';
+    var badge = btnEl.getAttribute('data-badge') || 'FREE ASSET';
+    
+    if (!url) {
+        alert('Download link not found.');
+        return;
+    }
+    
+    var modal = document.getElementById('nogodaDownloadModal');
+    if (!modal) {
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+    }
+    
+    // Setup modal text
+    document.getElementById('nogodaDlModalTitle').textContent = name;
+    document.getElementById('nogodaDlModalFileName').textContent = name;
+    document.getElementById('nogodaDlModalFileSize').textContent = size ? ('• ' + size) : '';
+    document.getElementById('nogodaDlModalBadge').textContent = badge;
+    
+    var dlLink = document.getElementById('nogodaDlDirectLink');
+    if (dlLink) {
+        dlLink.href = url;
+        dlLink.setAttribute('download', name);
+    }
+    
+    document.getElementById('nogodaDlStateCounting').style.display = 'block';
+    document.getElementById('nogodaDlStateFinished').style.display = 'none';
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    var countdownNum = document.getElementById('nogodaDlCountdownNum');
+    var circleBar = document.getElementById('nogodaDlCircleBar');
+    var totalSeconds = 3;
+    var currentSec = 3;
+    var circumference = 2 * Math.PI * 52; // 326.72
+    
+    if (circleBar) {
+        circleBar.style.strokeDasharray = circumference;
+        circleBar.style.strokeDashoffset = 0;
+        circleBar.style.transition = 'stroke-dashoffset 1s linear';
+    }
+    
+    if (countdownNum) countdownNum.textContent = '3';
+    
+    if (window.currentDownloadTimer) clearInterval(window.currentDownloadTimer);
+    
+    window.currentDownloadTimer = setInterval(function() {
+        currentSec--;
+        if (currentSec > 0) {
+            if (countdownNum) countdownNum.textContent = currentSec;
+            if (circleBar) {
+                var offset = circumference * ((totalSeconds - currentSec) / totalSeconds);
+                circleBar.style.strokeDashoffset = offset;
+            }
+        } else {
+            clearInterval(window.currentDownloadTimer);
+            if (countdownNum) countdownNum.textContent = '✓';
+            if (circleBar) circleBar.style.strokeDashoffset = circumference;
+            
+            // Trigger actual browser download
+            var trigA = document.createElement('a');
+            trigA.href = url;
+            trigA.download = name;
+            trigA.target = '_blank';
+            document.body.appendChild(trigA);
+            trigA.click();
+            document.body.removeChild(trigA);
+            
+            // Switch to Thank you screen
+            setTimeout(function() {
+                var stateCount = document.getElementById('nogodaDlStateCounting');
+                var stateFinish = document.getElementById('nogodaDlStateFinished');
+                if (stateCount) stateCount.style.display = 'none';
+                if (stateFinish) stateFinish.style.display = 'block';
+            }, 350);
+        }
+    }, 1000);
+}
+
+function closeNogodaDownloadModal() {
+    var modal = document.getElementById('nogodaDownloadModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    if (window.currentDownloadTimer) clearInterval(window.currentDownloadTimer);
+}
+
+// Close on backdrop click & allow clicking entire download card
+document.addEventListener('click', function(e) {
+    var modal = document.getElementById('nogodaDownloadModal');
+    if (modal && e.target === modal) {
+        closeNogodaDownloadModal();
+    }
+    
+    var card = e.target.closest('.blog-download-card');
+    if (card && !e.target.closest('.blog-dl-trigger-btn')) {
+        var btn = card.querySelector('.blog-dl-trigger-btn');
+        if (btn) triggerBlogAssetDownload(btn);
+    }
+});
+
+// ── Inject SVG icons into download cards (TinyMCE strips inline SVGs during save) ──
+(function() {
+    function getAssetSvgIcon(badgeType) {
+        var b = (badgeType || '').toUpperCase();
+        if (b.indexOf('VIDEO') !== -1 || b.indexOf('MP4') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="3"/></svg>';
+        } else if (b.indexOf('PDF') !== -1 || b.indexOf('DOC') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12v6"/><path d="M14 15v3"/></svg>';
+        } else if (b.indexOf('AUDIO') !== -1 || b.indexOf('MP3') !== -1 || b.indexOf('MUSIC') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+        } else if (b.indexOf('IMAGE') !== -1 || b.indexOf('PHOTO') !== -1 || b.indexOf('GRAPHIC') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+        } else if (b.indexOf('PROMPT') !== -1 || b.indexOf('PRESET') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+        } else if (b.indexOf('ZIP') !== -1 || b.indexOf('RAR') !== -1 || b.indexOf('ARCHIVE') !== -1) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 20V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2h6"/><circle cx="16" cy="19" r="2"/><path d="M18 11v5.5"/><path d="M21 16l-3 3-3-3"/></svg>';
+        } else {
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+        }
+    }
+
+    var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6 11 6 6 6-6"/><path d="M4 21h16"/></svg>';
+
+    function injectDownloadCardIcons() {
+        var cards = document.querySelectorAll('.blog-download-card');
+        cards.forEach(function(card) {
+            var badge = card.getAttribute('data-dl-badge') || '';
+
+            // Inject icon into left badge circle if empty or has no SVG
+            var iconBadge = card.querySelector('.blog-dl-icon-badge');
+            if (iconBadge && !iconBadge.querySelector('svg')) {
+                iconBadge.innerHTML = getAssetSvgIcon(badge);
+            }
+
+            // Inject arrow into right trigger button if empty or has no SVG
+            var triggerBtn = card.querySelector('.blog-dl-trigger-btn');
+            if (triggerBtn && !triggerBtn.querySelector('svg')) {
+                triggerBtn.innerHTML = arrowSvg;
+            }
+        });
+    }
+
+    // Run on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectDownloadCardIcons);
+    } else {
+        injectDownloadCardIcons();
     }
 })();
 </script>

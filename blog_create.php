@@ -1426,6 +1426,7 @@ $current_blog_categories = ['Uncategorized'];
                     <button type="button" class="be-tb-btn" onclick="insertLink()" title="Insert Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
                     <button type="button" class="be-tb-btn" onclick="openEditorImageModal()" title="Insert Image with SEO Alt Text"><i class="fa-regular fa-image" style="color:#0284c7;"></i></button>
                     <button type="button" class="be-tb-btn" onclick="openEditorCarouselModal()" title="Insert Carousel"><i class="fa-solid fa-images" style="color:#8b5cf6;"></i></button>
+                    <button type="button" class="be-tb-btn" onclick="openDownloadAssetModal()" title="Insert Download Asset Box (PDF, Video, MP3, Images, ZIP)"><i class="fa-solid fa-cloud-arrow-down" style="color:#0ea5e9;"></i></button>
                     <button type="button" class="be-tb-btn" onclick="insertCodeBlock()" title="Insert Prompt Code Snippet"><i class="fa-solid fa-code"></i></button>
                     <button type="button" class="be-tb-btn" onclick="insertHorizontalRule()" title="Horizontal Divider Line (or type ----)"><i class="fa-solid fa-minus" style="font-weight:900;"></i></button>
                 </div>
@@ -1460,6 +1461,7 @@ $current_blog_categories = ['Uncategorized'];
                             <i class="fa-solid fa-chevron-down be-dd-chevron"></i>
                         </button>
                         <div class="be-dropdown-menu">
+                            <button type="button" class="be-dd-item" onclick="openDownloadAssetModal()"><i class="fa-solid fa-cloud-arrow-down" style="color:#0ea5e9;"></i> Download Asset Box (PDF, ZIP, Video, MP3)</button>
                             <button type="button" class="be-dd-item" onclick="openNoteBoxModal()"><i class="fa-regular fa-note-sticky" style="color:#f59e0b;"></i> Pro Tip / Note Box</button>
                             <button type="button" class="be-dd-item" onclick="openFaqModal()"><i class="fa-solid fa-circle-question" style="color:#6366f1;"></i> Quick FAQ Section Box</button>
                             <button type="button" class="be-dd-item" onclick="insertTableOfContents('sm')"><i class="fa-solid fa-list-ol" style="color:#0284c7;"></i> Table of Contents</button>
@@ -2194,7 +2196,8 @@ tinymce.init({
     table_default_styles: { width: '100%', 'border-collapse': 'collapse' },
     table_resize_bars: true,
     paste_webkit_styles: 'all',
-    extended_valid_elements: 'div[class|style|id|contenteditable|data-ratio],button[class|style|type|aria-label],span[class|style|id|contenteditable|data-index],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width|loading],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],p[class|style|id|dir|contenteditable],hr[class|style],code[class|style]',
+    custom_elements: '~svg,~path,~circle,~rect,~polygon,~polyline,~line,~g,~defs,~use',
+    extended_valid_elements: 'svg[*],path[*],circle[*],rect[*],polygon[*],polyline[*],line[*],g[*],defs[*],use[*],i[class|style|aria-hidden],div[class|style|id|contenteditable|data-ratio|data-dl-url|data-dl-name|data-dl-size|data-dl-badge],button[class|style|type|aria-label|title|onclick|data-url|data-name|data-size|data-badge],span[class|style|id|contenteditable|data-index],figure[class|style],figcaption[class|style|contenteditable],ol[class|style|start],li[class|style],h1[id|class|style|contenteditable],h2[id|class|style|contenteditable],h3[id|class|style|contenteditable],h4[id|class|style|contenteditable],mark[class|style],a[href|target|rel|title|class|id|contenteditable],img[class|src|alt|title|width|height|style|data-align|data-border-width|loading],table[border|cellpadding|cellspacing|width|class|style],thead,tbody,tfoot,tr[class|style],th[colspan|rowspan|class|style|scope|width],td[colspan|rowspan|class|style|width],caption,colgroup,col[span|width],p[class|style|id|dir|contenteditable],hr[class|style],code[class|style]',
     formats: {
         highlight: { inline: 'mark', classes: 'font-highlight', styles: { 'background-color': '#fef08a', 'padding': '2px 6px', 'border-radius': '4px', 'color': '#0f172a' } },
         mutedText: { inline: 'span', classes: 'text-muted', styles: { 'color': '#64748b' } },
@@ -3061,6 +3064,7 @@ tinymce.init({
     
     content_style: `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
         html, body {
             overflow-y: auto !important;
             scroll-behavior: smooth;
@@ -3946,6 +3950,287 @@ tinymce.init({
             outline: 1.5px solid #2563eb !important;
             border-radius: 3px !important;
         }
+
+        /* ── Blog Download Grid & Fluid Capsule Cards (No shadows behind boxes) ── */
+        .blog-download-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px !important;
+            margin: 24px 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        @media (max-width: 640px) {
+            .blog-download-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+        }
+        .blog-download-card {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 14px !important;
+            padding: 10px 14px 10px 10px !important;
+            border-radius: 9999px !important;
+            box-sizing: border-box !important;
+            user-select: none !important;
+            position: relative !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease !important;
+            cursor: default !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: none !important;
+        }
+
+        /* 1. Fluid Nogoda Velvet (Signature Purple) */
+        .blog-download-card.blog-dl-theme-nogoda-purple,
+        .blog-download-card.blog-dl-theme-nogoda {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 60%, #581c87 100%) !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple:hover,
+        .blog-download-card.blog-dl-theme-nogoda:hover {
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-icon-badge,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-icon-badge {
+            background: #ffffff !important;
+            color: #7c3aed !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-icon-badge svg,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-icon-badge svg {
+            stroke: #7c3aed !important;
+            color: #7c3aed !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-title,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-title {
+            color: #ffffff !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-meta,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-meta {
+            color: rgba(255, 255, 255, 0.88) !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-ext,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-ext {
+            background: rgba(255, 255, 255, 0.22) !important;
+            color: #ffffff !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-trigger-btn,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-trigger-btn {
+            background: #ffffff !important;
+            color: #7c3aed !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-trigger-btn svg,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-trigger-btn svg {
+            stroke: #7c3aed !important;
+            color: #7c3aed !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-purple .blog-dl-trigger-btn:hover,
+        .blog-download-card.blog-dl-theme-nogoda .blog-dl-trigger-btn:hover {
+            background: #faf5ff !important;
+            color: #581c87 !important;
+            transform: scale(1.08) !important;
+        }
+
+        /* 2. Fluid Nogoda Pearl (Clean White Glass) */
+        .blog-download-card.blog-dl-theme-nogoda-white {
+            background: #ffffff !important;
+            border: 1.5px solid #ede9fe !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white:hover {
+            border-color: #c084fc !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-icon-badge {
+            background: linear-gradient(135deg, #9333ea, #6d28d9) !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-icon-badge svg {
+            stroke: #ffffff !important;
+            color: #ffffff !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-title {
+            color: #0f172a !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-meta {
+            color: #64748b !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-ext {
+            background: #f3e8ff !important;
+            color: #7c3aed !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-trigger-btn {
+            background: #f3e8ff !important;
+            color: #7c3aed !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-trigger-btn svg {
+            stroke: #7c3aed !important;
+            color: #7c3aed !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-trigger-btn:hover {
+            background: #7c3aed !important;
+            color: #ffffff !important;
+            transform: scale(1.08) !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-white .blog-dl-trigger-btn:hover svg {
+            stroke: #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        /* 3. Fluid Obsidian Dark (Cyber Matte) */
+        .blog-download-card.blog-dl-theme-nogoda-dark,
+        .blog-download-card.blog-dl-theme-midnight {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+            border: 1.5px solid #334155 !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark:hover,
+        .blog-download-card.blog-dl-theme-midnight:hover {
+            border-color: #6366f1 !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-icon-badge,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-icon-badge {
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%) !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-icon-badge svg,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-icon-badge svg {
+            stroke: #ffffff !important;
+            color: #ffffff !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-title,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-title {
+            color: #f8fafc !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-meta,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-meta {
+            color: #94a3b8 !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-ext,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-ext {
+            background: rgba(56, 189, 248, 0.18) !important;
+            color: #38bdf8 !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-trigger-btn,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-trigger-btn {
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%) !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-trigger-btn svg,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-trigger-btn svg {
+            stroke: #ffffff !important;
+            color: #ffffff !important;
+        }
+        .blog-download-card.blog-dl-theme-nogoda-dark .blog-dl-trigger-btn:hover,
+        .blog-download-card.blog-dl-theme-midnight .blog-dl-trigger-btn:hover {
+            transform: scale(1.08) !important;
+        }
+
+        /* Icon Badge */
+        .blog-dl-icon-badge {
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            box-shadow: none !important;
+        }
+        .blog-dl-icon-badge svg {
+            display: block !important;
+            width: 22px !important;
+            height: 22px !important;
+            min-width: 22px !important;
+            min-height: 22px !important;
+            stroke-width: 2.2 !important;
+        }
+
+        /* Middle Info */
+        .blog-dl-info {
+            flex: 1 !important;
+            min-width: 0 !important;
+            text-align: left !important;
+        }
+        .blog-dl-title {
+            margin: 0 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.94rem !important;
+            font-weight: 800 !important;
+            line-height: 1.3 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .blog-dl-meta {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            margin-top: 3px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.76rem !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+        }
+        .blog-dl-size {
+            font-weight: 700 !important;
+        }
+        .blog-dl-dot {
+            opacity: 0.6 !important;
+            font-weight: 900 !important;
+        }
+        .blog-dl-ext {
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.68rem !important;
+            letter-spacing: 0.4px !important;
+            padding: 2px 7px !important;
+            border-radius: 9999px !important;
+        }
+
+        /* Right Action Button [ ↓ ] */
+        .blog-dl-trigger-btn {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .blog-dl-trigger-btn svg {
+            display: block !important;
+            width: 20px !important;
+            height: 20px !important;
+            min-width: 20px !important;
+            min-height: 20px !important;
+            stroke-width: 2.5 !important;
+            transition: transform 0.2s ease !important;
+        }
+        .blog-dl-trigger-btn:hover svg {
+            transform: translateY(2px) !important;
+        }
     `,
     
     images_upload_handler: function (blobInfo, progress) {
@@ -4738,6 +5023,201 @@ function insertCarouselFromModal() {
 function insertLink() {
     if (tinymce.activeEditor) {
         tinymce.activeEditor.execCommand('mceLink');
+    }
+}
+// ── Dedicated Download Asset Box Modal Logic ─────────────────────────────────
+window.currentDamFile = null;
+
+function openDownloadAssetModal() {
+    var modal = document.getElementById('downloadAssetModal');
+    if (!modal) return;
+    window.currentDamFile = null;
+    document.getElementById('damFileInput').value = '';
+    document.getElementById('damDirectUrl').value = '';
+    document.getElementById('damTitle').value = '';
+    document.getElementById('damDesc').value = '';
+    document.getElementById('damSize').value = '';
+    document.getElementById('damFileNameText').textContent = 'Click to choose file or drag & drop';
+    document.getElementById('damFileInfoText').textContent = 'PDF, ZIP, RAR, MP3, MP4, WEBP, PNG, JPG, PSD up to 50MB';
+    document.getElementById('damDropArea').style.borderColor = '#38bdf8';
+    document.getElementById('damDropArea').style.background = '#f0f9ff';
+    modal.style.display = 'flex';
+}
+
+function closeDownloadAssetModal() {
+    var modal = document.getElementById('downloadAssetModal');
+    if (modal) modal.style.display = 'none';
+    window.currentDamFile = null;
+}
+
+function handleDamFileSelect(e) {
+    var file = (e.target.files && e.target.files[0]) ? e.target.files[0] : null;
+    if (!file) return;
+    window.currentDamFile = file;
+    document.getElementById('damDirectUrl').value = '';
+    
+    // Auto-fill title if empty
+    var titleInput = document.getElementById('damTitle');
+    var rawName = file.name.replace(/\.[^/.]+$/, "");
+    if (!titleInput.value.trim()) {
+        titleInput.value = rawName.replace(/[-_]+/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+    }
+    
+    // Auto-detect size
+    var sizeStr = '0 KB';
+    if (file.size >= 1048576) {
+        sizeStr = (file.size / 1048576).toFixed(1) + ' MB';
+    } else {
+        sizeStr = Math.round(file.size / 1024) + ' KB';
+    }
+    document.getElementById('damSize').value = sizeStr;
+    
+    // Auto-select badge
+    var ext = file.name.split('.').pop().toLowerCase();
+    var badgeSelect = document.getElementById('damBadge');
+    if (['zip', 'rar', '7z', 'tar', 'gz'].indexOf(ext) !== -1) {
+        badgeSelect.value = 'ZIP ARCHIVE';
+    } else if (ext === 'pdf') {
+        badgeSelect.value = 'PDF DOCUMENT';
+    } else if (['mp3', 'wav', 'm4a', 'ogg'].indexOf(ext) !== -1) {
+        badgeSelect.value = 'AUDIO TRACK';
+    } else if (['mp4', 'webm', 'mov'].indexOf(ext) !== -1) {
+        badgeSelect.value = '4K VIDEO';
+    } else if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'psd'].indexOf(ext) !== -1) {
+        badgeSelect.value = 'IMAGE PACK';
+    }
+    
+    document.getElementById('damFileNameText').textContent = '✅ Selected: ' + file.name;
+    document.getElementById('damFileInfoText').textContent = sizeStr + ' • Ready to upload';
+    document.getElementById('damDropArea').style.borderColor = '#10b981';
+    document.getElementById('damDropArea').style.background = '#ecfdf5';
+}
+
+function handleDamUrlInput(val) {
+    if (val && val.trim()) {
+        window.currentDamFile = null;
+        document.getElementById('damFileInput').value = '';
+        document.getElementById('damFileNameText').textContent = 'Direct URL mode active';
+        document.getElementById('damFileInfoText').textContent = 'File will be linked directly to external URL';
+        document.getElementById('damDropArea').style.borderColor = '#cbd5e1';
+        document.getElementById('damDropArea').style.background = '#f8fafc';
+    }
+}
+
+function submitDownloadAssetModal() {
+    var title = document.getElementById('damTitle').value.trim();
+    if (!title) {
+        showToast('Please enter an Asset Title.', 'warn');
+        document.getElementById('damTitle').focus();
+        return;
+    }
+    
+    var desc = document.getElementById('damDesc').value.trim();
+    var badge = document.getElementById('damBadge').value;
+    var size = document.getElementById('damSize').value.trim() || 'Free Download';
+    var btnText = document.getElementById('damBtnText').value.trim() || 'Download Asset';
+    var theme = document.getElementById('damTheme').value || 'nogoda';
+    var directUrl = document.getElementById('damDirectUrl').value.trim();
+    
+    if (!window.currentDamFile && !directUrl) {
+        showToast('Please choose a file to upload or enter a direct download URL.', 'warn');
+        return;
+    }
+    
+    var submitBtn = document.getElementById('damSubmitBtn');
+    var origBtnHtml = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    
+    function getAssetSvgIcon(badgeType) {
+        var b = (badgeType || '').toUpperCase();
+        if (b.indexOf('VIDEO') !== -1 || b.indexOf('MP4') !== -1) {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="3"/></svg>';
+        } else if (b.indexOf('PDF') !== -1 || b.indexOf('DOC') !== -1) {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12v6"/><path d="M14 15v3"/></svg>';
+        } else if (b.indexOf('AUDIO') !== -1 || b.indexOf('MP3') !== -1 || b.indexOf('MUSIC') !== -1) {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+        } else if (b.indexOf('IMAGE') !== -1 || b.indexOf('PHOTO') !== -1 || b.indexOf('GRAPHIC') !== -1) {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+        } else if (b.indexOf('PROMPT') !== -1 || b.indexOf('PRESET') !== -1) {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+        } else {
+            return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+        }
+    }
+
+    function insertCardHtml(finalUrl, fileName) {
+        var iconSvg = getAssetSvgIcon(badge);
+        var arrowSvg = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6 11 6 6 6-6"/><path d="M4 21h16"/></svg>';
+        
+        var cardHtml = `
+          <div class="blog-download-card blog-dl-theme-${theme}" data-dl-url="${escapeImgAttr(finalUrl)}" data-dl-name="${escapeImgAttr(fileName)}" data-dl-size="${escapeImgAttr(size)}" data-dl-badge="${escapeImgAttr(badge)}" contenteditable="false">
+            <div class="blog-dl-icon-badge">
+              ${iconSvg}
+            </div>
+            <div class="blog-dl-info">
+              <div class="blog-dl-title">${escapeHtml(title)}</div>
+              <div class="blog-dl-meta">
+                <span class="blog-dl-size">${escapeHtml(size)}</span>
+                <span class="blog-dl-dot">•</span>
+                <span class="blog-dl-ext">${escapeHtml(badge)}</span>
+              </div>
+            </div>
+            <button type="button" class="blog-dl-trigger-btn" onclick="triggerBlogAssetDownload(this)" data-url="${escapeImgAttr(finalUrl)}" data-name="${escapeImgAttr(fileName)}" data-size="${escapeImgAttr(size)}" data-badge="${escapeImgAttr(badge)}" title="Download Asset" aria-label="Download">
+              ${arrowSvg}
+            </button>
+          </div>
+        `.trim();
+        
+        // Check if cursor is currently inside or right next to an existing .blog-download-grid
+        var inserted = false;
+        if (tinymce.activeEditor) {
+            var node = tinymce.activeEditor.selection.getNode();
+            var existingGrid = tinymce.activeEditor.dom.getParent(node, '.blog-download-grid');
+            if (existingGrid) {
+                var temp = document.createElement('div');
+                temp.innerHTML = cardHtml;
+                existingGrid.appendChild(temp.firstElementChild);
+                tinymce.activeEditor.nodeChanged();
+                inserted = true;
+            }
+        }
+        
+        if (!inserted && tinymce.activeEditor) {
+            var wrappedHtml = `<div class="blog-download-grid">\n  ${cardHtml}\n</div>\n<p><br></p>`;
+            tinymce.activeEditor.execCommand('mceInsertContent', false, wrappedHtml);
+        }
+        
+        closeDownloadAssetModal();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
+    }
+    
+    if (window.currentDamFile) {
+        var formData = new FormData();
+        formData.append('file', window.currentDamFile);
+        
+        fetch('upload_blog_asset.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.url) {
+                insertCardHtml(data.url, data.filename || title);
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origBtnHtml;
+                alert('Asset upload failed: ' + (data && data.error ? data.error : 'Unknown error'));
+            }
+        })
+        .catch(function(err) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origBtnHtml;
+            alert('Upload error: ' + err.message);
+        });
+    } else {
+        insertCardHtml(directUrl, title);
     }
 }
 function fmtBlock(tag) {
@@ -6510,6 +6990,105 @@ if (descTextarea) {
             <button type="button" onclick="closeListNumberModal()" style="padding:9px 16px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.84rem; color:#475569; cursor:pointer;">Cancel</button>
             <button type="button" onclick="applyListNumberModal()" style="padding:9px 20px; border:none; border-radius:10px; background:#2563eb; color:#fff; font-weight:700; font-size:0.84rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(37,99,235,0.25);">
                 <i class="fa-solid fa-check"></i> Apply Number
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Dedicated Download Asset Box Modal -->
+<div id="downloadAssetModal" class="be-modal-backdrop" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div class="be-modal-dialog" style="background:#ffffff; border-radius:20px; max-width:620px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); border:1px solid #e2e8f0; font-family:'Plus Jakarta Sans',sans-serif;">
+        <!-- Modal Header -->
+        <div style="padding:18px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px; height:38px; border-radius:12px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0; font-size:1.08rem; font-weight:800; color:#0f172a;">Insert Download Asset Box</h3>
+                    <p style="margin:0; font-size:0.8rem; color:#64748b;">Attach PDF, Image, Video, MP3, or ZIP pack with 3s countdown</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeDownloadAssetModal()" style="background:none; border:none; font-size:1.25rem; color:#94a3b8; cursor:pointer; padding:6px; line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div style="padding:20px 24px;">
+            <!-- File Drop / Select Area -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px;">1. Upload File or Enter Download URL:</label>
+                
+                <div id="damDropArea" onclick="document.getElementById('damFileInput').click()" style="border:2px dashed #38bdf8; background:#f0f9ff; border-radius:14px; padding:20px 16px; text-align:center; cursor:pointer; transition:all 0.15s;">
+                    <div style="width:44px; height:44px; border-radius:50%; background:#0284c7; color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:1.15rem;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div id="damFileNameText" style="font-weight:700; color:#0f172a; font-size:0.92rem; margin-bottom:4px;">Click to choose file or drag &amp; drop</div>
+                    <div id="damFileInfoText" style="font-size:0.78rem; color:#64748b;">PDF, ZIP, RAR, MP3, MP4, WEBP, PNG, JPG, PSD up to 50MB</div>
+                    <input type="file" id="damFileInput" style="display:none;" onchange="handleDamFileSelect(event)">
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px; margin:10px 0;">
+                    <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+                    <span style="font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">OR Direct External URL</span>
+                    <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+                </div>
+
+                <input type="text" id="damDirectUrl" placeholder="https://drive.google.com/... or https://..." oninput="handleDamUrlInput(this.value)" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem;">
+            </div>
+
+            <!-- Asset Title -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:6px;">2. Asset Title / Heading: <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="damTitle" placeholder="e.g. Free 4-Pic Face Consistency Prompt Pack" style="width:100%; box-sizing:border-box; padding:10px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.9rem; font-weight:700; color:#0f172a;">
+            </div>
+
+            <!-- Asset Description / Subtitle -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:6px;">3. Short Description / Subtitle (Optional):</label>
+                <input type="text" id="damDesc" placeholder="e.g. High-resolution photorealistic presets with one-click setup guide" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem; color:#475569;">
+            </div>
+
+            <!-- Two-Column Meta: Format & File Size -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:800; color:#0f172a; margin-bottom:6px;">File Format Badge:</label>
+                    <select id="damBadge" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem; font-weight:700; background:#ffffff; cursor:pointer;">
+                        <option value="ZIP ARCHIVE">📦 ZIP Archive</option>
+                        <option value="PDF DOCUMENT">📄 PDF Document</option>
+                        <option value="IMAGE PACK">🖼️ Image / Graphic Pack</option>
+                        <option value="AUDIO TRACK">🎵 Audio / MP3 Track</option>
+                        <option value="4K VIDEO">🎬 Video / MP4 File</option>
+                        <option value="PROMPT PRESET">⚡ Prompt Presets Code</option>
+                        <option value="FREE ASSET">🎁 Free Asset Download</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:800; color:#0f172a; margin-bottom:6px;">File Size:</label>
+                    <input type="text" id="damSize" placeholder="e.g. 4.8 MB" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem; font-weight:600;">
+                </div>
+            </div>
+
+            <!-- Button Text & Theme -->
+            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:800; color:#0f172a; margin-bottom:6px;">Download Button Label:</label>
+                    <input type="text" id="damBtnText" value="Download Free Assets" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem; font-weight:700;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:800; color:#0f172a; margin-bottom:6px;">Card Style Theme:</label>
+                    <select id="damTheme" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.84rem; font-weight:700; background:#ffffff; cursor:pointer;">
+                        <option value="nogoda-purple">🔮 Fluid Nogoda Velvet (Signature Purple)</option>
+                        <option value="nogoda-white">🤍 Fluid Nogoda Pearl (Clean White Glass)</option>
+                        <option value="nogoda-dark">🌙 Fluid Obsidian Dark (Cyber Matte)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding:16px 24px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:#f8fafc; border-radius:0 0 20px 20px;">
+            <button type="button" onclick="closeDownloadAssetModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; font-weight:700; font-size:0.86rem; color:#475569; cursor:pointer;">Cancel</button>
+            <button type="button" id="damSubmitBtn" onclick="submitDownloadAssetModal()" style="padding:10px 22px; border:none; border-radius:10px; background:#0284c7; color:#fff; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(2,132,199,0.25);">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Insert Download Box
             </button>
         </div>
     </div>

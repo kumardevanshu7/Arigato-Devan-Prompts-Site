@@ -1,0 +1,44 @@
+REFERENCE MAP — KEEP THESE ROLES EXACT
+@video = DEPTH MAP / MOTION REFERENCE ONLY
+@image1 = HEROINE IDENTITY + HEROINE COSTUME REFERENCE
+@image2 = YOUR IDENTITY + YOUR COSTUME REFERENCE
+@image3 = LOCATION / ENVIRONMENT REFERENCE
+
+Create a cinematic vertical video using the supplied references. Preserve the motion, timing, body spacing, camera movement and depth relationships from @video, but do not copy any identity, face, clothing, colour or background from the depth map. The figures in @video are anonymous motion guides only.
+
+1. MOTION TRANSFER
+Use @video only for choreography and movement. Match the timing of every step, turn, hand movement, body lean and interaction. Keep both performers grounded on the floor with realistic foot contact, weight transfer, balance, gravity and fabric response. Maintain the original duration and the same vertical framing unless the video tool requires a crop.
+
+2. HEROINE IDENTITY LOCK — @image1
+Use @image1 as the sole reference for the heroine's identity, face, skin tone, hairstyle, body proportions, costume, jewellery and styling. Preserve her recognisable facial geometry in every frame: eye shape and spacing, brows, nose, lips, jawline and face shape. Do not blend her face with @image2 or invent a different person. Keep her costume construction, colours, material and accessories consistent throughout the shot.
+
+3. MY IDENTITY LOCK — @image2
+Use @image2 as the sole reference for the second performer's identity, face, skin tone, hairstyle, body proportions, costume and accessories. Preserve the recognisable face across every frame and angle. Do not beautify into a generic model, change age, swap ethnicity, alter hairstyle or blend features with the heroine. Use the front, back and close-up information in the character sheet to keep the head, hair and outfit consistent during turns.
+
+4. LOCATION LOCK — @image3
+Rebuild the environment from @image3. Preserve its architecture, room proportions, wall colour, wooden door, window placement, curtains, furniture, rug, stairs, practical lights and warm natural atmosphere. Remove any people from the location reference. The environment must remain stable with no morphing, moving walls or disappearing objects.
+
+5. COMPOSITION AND CAMERA
+Map both performers into @image3 while following @video's depth order, screen position and camera path. Keep correct scale relative to the room and furniture. Preserve natural perspective, lens behaviour and occlusion. Avoid sudden zooms, reframing, duplicated limbs, camera jitter or background drift.
+
+6. LIGHTING AND INTEGRATION
+Use the lighting logic of @image3: warm practical interior light with natural window illumination, soft directional shadows and restrained cinematic contrast. Match the performers to the room with believable contact shadows, colour spill, reflections and depth of field. Do not make either person look pasted into the scene.
+
+7. INTERACTION AND PHYSICS
+When the performers approach, cross, touch or move around each other, maintain correct anatomy and clear separation. Hands must have five natural fingers. Arms must connect correctly to shoulders. Faces must not merge. Clothing must not intersect with bodies or furniture. Hair, jewellery and fabric should react subtly to movement without flicker.
+
+8. EXPRESSION AND PERFORMANCE
+Keep the performance natural, romantic and cinematic. Expressions should remain emotionally coherent with the movement rather than frozen or exaggerated. Maintain stable eye direction and consistent facial identity during profile views, motion blur and partial occlusion.
+
+9. NEGATIVE CONSTRAINTS
+No identity drift. No face swapping between performers. No extra people. No copied silhouettes or visual styling from the depth map. No costume changes. No anatomy errors, extra fingers, fused hands, floating feet, sliding, warped furniture, flicker, pulsing textures, sudden lighting changes, text, captions, logos or watermarks.
+
+PRIORITY ORDER
+1) Exact motion and timing from @video
+2) Exact heroine identity and styling from @image1
+3) Exact personal identity and styling from @image2
+4) Exact room and lighting from @image3
+5) Stable anatomy, physics, camera and cinematic finish
+
+FINAL OUTPUT
+A polished, photorealistic vertical cinematic video in which the two referenced people perform the motion from the depth map inside the supplied location. Keep every identity, costume and environmental detail stable from the first frame to the last.
