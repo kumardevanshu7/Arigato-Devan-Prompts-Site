@@ -189,12 +189,17 @@ sort($secret_sub_tags);
                     </span>
                 </div>
             </div>
-            <div class="card-info">
-                <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>" data-prompt-id="<?= $p['id'] ?>">
-                    <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                    <span class="like-count"><?= (int)$p['likes_count'] ?></span>
-                    <span class="card-likes-label">likes</span>
+            <div class="card-info" style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; flex: 1 1 auto !important;">
+                <p class="card-title" style="min-height: 2.7em !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; line-height: 1.35 !important;"><?= htmlspecialchars($p['title']) ?></p>
+                <div class="card-meta-row" style="display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; margin-top: auto !important;">
+                    <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>" data-prompt-id="<?= $p['id'] ?>">
+                        <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
+                        <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                    </div>
+                    <div class="card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
+                        <i class="fa-regular fa-eye"></i>
+                        <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
+                    </div>
                 </div>
             </div>
         </div>

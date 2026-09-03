@@ -643,6 +643,9 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
 }
 
 .theme-nogoda .prompt-card::before { display: none; }
@@ -660,6 +663,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   padding-bottom: 0;
   overflow: hidden;
   background: var(--pal-beige);
+  flex-shrink: 0 !important;
 }
 
 .theme-nogoda .prompt-card .card-image-wrap img {
@@ -674,8 +678,10 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   padding: 12px 14px 14px;
   background: var(--pal-white);
   border-top: 1px solid var(--pal-sky);
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  flex: 1 1 auto !important;
   gap: 10px;
 }
 
@@ -687,6 +693,20 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   letter-spacing: -0.01em;
   margin-bottom: 0 !important;
   line-height: 1.35 !important;
+  min-height: 2.7em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.theme-nogoda .prompt-card .card-meta-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 8px !important;
+  margin-top: auto !important;
 }
 
 .theme-nogoda .prompt-card .card-like-display {
@@ -701,6 +721,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   color: var(--pal-navy);
   font-size: 0.72rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .theme-nogoda .prompt-card .card-like-display i {
@@ -709,6 +730,26 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 }
 
 .theme-nogoda .prompt-card .card-like-display .liked-heart { color: #e11d48; }
+
+.theme-nogoda .prompt-card .card-views-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(86, 124, 141, 0.08);
+  border: 1px solid rgba(86, 124, 141, 0.2);
+  color: var(--pal-navy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.theme-nogoda .prompt-card .card-views-display i {
+  color: var(--pal-teal, #567C8D);
+  font-size: 0.68rem;
+}
 
 .theme-nogoda .card-badge.scp { background: linear-gradient(135deg, #6D2D52, #2F4156); color: #fff; }
 .theme-nogoda .card-badge.urp { background: linear-gradient(135deg, #F5709D, #6D2D52); color: #fff; }

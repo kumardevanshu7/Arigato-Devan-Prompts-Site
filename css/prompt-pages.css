@@ -994,6 +994,15 @@ body.page-store::after {
     color: #fff;
 }
 
+.prompt-card .card-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+    margin-top: auto;
+}
+
 .prompt-card .card-like-display {
     display: flex;
     align-items: center;
@@ -1004,12 +1013,36 @@ body.page-store::after {
 }
 .prompt-card .card-like-display .liked-heart { color: #e11d48; }
 
+.prompt-card .card-views-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+.prompt-card .card-views-display i {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.prompt-card .card-info {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    flex: 1 1 auto !important;
+}
+
 .prompt-card .card-title {
     font-size: 0.95rem;
     margin-bottom: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-height: 2.7em !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.35 !important;
 }
 
 /* Pagination */

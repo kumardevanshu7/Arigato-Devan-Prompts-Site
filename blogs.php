@@ -1041,8 +1041,25 @@ footer .footer-links a:hover {
 .bm-meta-read {
     color: #64748b !important;
 }
+.bm-meta-views {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+}
+.bm-meta-views i {
+    font-size: 0.72rem !important;
+    color: #64748b !important;
+}
+@media (max-width: 440px) {
+    .bm-meta-date,
+    .bm-meta-dot:first-of-type {
+        display: none !important;
+    }
+}
 </style>
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260902_v5">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260903blogviews">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -1108,7 +1125,7 @@ footer .footer-links a:hover {
     <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-feature">
       <?= blog_list_cover_html($b, true) ?>
       <div class="bm-feature-body">
-        <span class="bm-chip"><?= htmlspecialchars($tag0) ?> · <?= $mins ?> min read</span>
+        <span class="bm-chip"><?= htmlspecialchars($tag0) ?> · <?= $mins ?> min read · <i class="fa-regular fa-eye"></i> <?= number_format((int)($b['view_count'] ?? 0)) ?></span>
         <h2><?= htmlspecialchars($b['title']) ?></h2>
         <?php if ($preview): ?><p><?= htmlspecialchars($preview) ?></p><?php endif; ?>
       </div>
@@ -1173,6 +1190,8 @@ footer .footer-links a:hover {
             <span class="bm-meta-date"><?= date('M j, Y', strtotime($b['created_at'])) ?></span>
             <span class="bm-meta-dot">·</span>
             <span class="bm-meta-read"><?= $mins ?> min read</span>
+            <span class="bm-meta-dot">·</span>
+            <span class="bm-meta-views" title="<?= (int)($b['view_count'] ?? 0) ?> views"><i class="fa-regular fa-eye"></i> <?= number_format((int)($b['view_count'] ?? 0)) ?></span>
           </div>
         </div>
       </div>

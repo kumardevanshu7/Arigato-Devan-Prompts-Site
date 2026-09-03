@@ -461,11 +461,32 @@ body.page-gallery {
   color: var(--pal-teal, #567C8D);
 }
 
+.trending-card-meta .trend-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.trending-card-meta .trend-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--pal-teal, #567C8D);
+  font-weight: 600;
+}
+
+.trending-card-meta .trend-views i {
+  color: var(--pal-teal, #567C8D);
+  font-size: 0.65rem;
+}
+
 .trending-card-meta .likes {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+  font-weight: 600;
 }
 
 .trending-card-meta .likes i {
@@ -912,11 +933,12 @@ body.page-gallery {
   .page-gallery .prompt-card .card-title {
     font-size: 0.74rem !important;
     white-space: normal !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.25;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.35 !important;
+    min-height: 2.7em !important;
   }
 
   .page-gallery .prompt-card .card-badge {
@@ -961,3 +983,67 @@ body.page-gallery {
 button.gallery-tag-btn {
   font-family: inherit;
 }
+
+/* Card Meta Row: Heart Left, Views Right Corner */
+.prompt-card,
+.product-card.prompt-card,
+.page-gallery .prompt-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.prompt-card .card-info,
+.page-gallery .prompt-card .card-info {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  flex: 1 1 auto !important;
+}
+
+.prompt-card .card-title,
+.page-gallery .prompt-card .card-title {
+  min-height: 2.7em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.35 !important;
+}
+
+.card-meta-row,
+.prompt-card .card-meta-row,
+.theme-nogoda .prompt-card .card-meta-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 8px !important;
+  margin-top: auto !important;
+}
+
+.card-views-display,
+.prompt-card .card-views-display,
+.theme-nogoda .prompt-card .card-views-display {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  width: fit-content !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(86, 124, 141, 0.08) !important;
+  border: 1px solid rgba(86, 124, 141, 0.2) !important;
+  color: var(--pal-navy, #2F4156) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+
+.card-views-display i,
+.prompt-card .card-views-display i,
+.theme-nogoda .prompt-card .card-views-display i {
+  color: var(--pal-teal, #567C8D) !important;
+  font-size: 0.68rem !important;
+}
+

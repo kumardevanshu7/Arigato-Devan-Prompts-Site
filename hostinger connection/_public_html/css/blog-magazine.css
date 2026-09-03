@@ -459,7 +459,25 @@ html, body.bm-list {
 }
 .bm-meta-read {
   color: #64748b !important;
-}.bm-stack { display: grid; gap: 18px; }
+}
+.bm-meta-views {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+.bm-meta-views i {
+  font-size: 0.72rem !important;
+  color: #64748b !important;
+}
+@media (max-width: 440px) {
+  .bm-meta-date,
+  .bm-meta-dot:first-of-type {
+    display: none !important;
+  }
+}
+.bm-stack { display: grid; gap: 18px; }
 .bm-empty {
   text-align: center;
   padding: 80px 20px;
@@ -1128,13 +1146,124 @@ code.prompt-var-amber, span.prompt-var-amber,
   font-style: italic;
   background: none;
 }
-.ba-content table { width: 100%; border-collapse: collapse; }
-.ba-content th, .ba-content td { border: 1px solid #e8edf3; padding: 10px 12px; }
+
+/* ============================================================
+   Modern Magazine Table & Responsive Container
+   ============================================================ */
 .blog-table-wrap {
-  overflow-x: auto;
-  margin: 1.1em 0;
-  border: 1px solid #e8edf3;
-  border-radius: 12px;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin: 28px 0 !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05) !important;
+}
+
+.ba-content table,
+.blog-content table,
+.blog-table-wrap table {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  margin: 0 !important;
+  background: #ffffff !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 0.92rem !important;
+  line-height: 1.6 !important;
+}
+
+.ba-content th,
+.blog-content th,
+.blog-table-wrap th {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 14px 18px !important;
+  border: none !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  border-right: 1px solid #f1f5f9 !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+}
+
+.ba-content td,
+.blog-content td,
+.blog-table-wrap td {
+  padding: 14px 18px !important;
+  color: #334155 !important;
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  border-right: 1px solid #f8fafc !important;
+  vertical-align: top !important;
+  background: transparent !important;
+  transition: background 0.15s ease !important;
+}
+
+.ba-content tr:last-child td,
+.blog-content tr:last-child td,
+.blog-table-wrap tr:last-child td {
+  border-bottom: none !important;
+}
+
+.ba-content th:last-child,
+.ba-content td:last-child,
+.blog-content th:last-child,
+.blog-content td:last-child,
+.blog-table-wrap th:last-child,
+.blog-table-wrap td:last-child {
+  border-right: none !important;
+}
+
+.ba-content tbody tr:nth-child(even) td,
+.blog-content tbody tr:nth-child(even) td,
+.blog-table-wrap tbody tr:nth-child(even) td {
+  background: #fafcff !important;
+}
+
+.ba-content tbody tr:hover td,
+.blog-content tbody tr:hover td,
+.blog-table-wrap tbody tr:hover td {
+  background: #f1f5f9 !important;
+}
+
+.ba-content table a,
+.blog-content table a,
+.blog-table-wrap table a {
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 3px !important;
+  transition: color 0.15s ease !important;
+}
+
+.ba-content table a:hover,
+.blog-content table a:hover,
+.blog-table-wrap table a:hover {
+  color: #581c87 !important;
+}
+
+.ba-content table mark,
+.blog-content table mark,
+.blog-table-wrap table mark {
+  background: #fef08a !important;
+  color: #713f12 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 0.9em !important;
+  display: inline-block !important;
+  box-decoration-break: clone !important;
+  -webkit-box-decoration-break: clone !important;
 }
 
 /* ============================================================

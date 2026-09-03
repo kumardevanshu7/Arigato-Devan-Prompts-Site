@@ -69,7 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['is_live_preview'])) 
 
 // Increment view count (never in preview mode)
 if (empty($is_preview_mode) && !empty($blog['id'])) {
-    try { $pdo->prepare("UPDATE blogs SET view_count = COALESCE(view_count,0) + 1 WHERE id = ?")->execute([$blog['id']]); } catch (Exception $e) {}
+    try { 
+        $pdo->prepare("UPDATE blogs SET view_count = COALESCE(view_count,0) + 1 WHERE id = ?")->execute([$blog['id']]); 
+        $blog['view_count'] = ((int)($blog['view_count'] ?? 0)) + 1;
+    } catch (Exception $e) {
+        try {
+            $pdo->exec("ALTER TABLE blogs ADD COLUMN view_count INT NOT NULL DEFAULT 0");
+            $pdo->prepare("UPDATE blogs SET view_count = 1 WHERE id = ?")->execute([$blog['id']]);
+            $blog['view_count'] = 1;
+        } catch (Exception $ex) {}
+    }
 }
 
 // Has current user liked?
@@ -136,7 +145,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
-<link rel="stylesheet" href="css/blog-magazine.css?v=20260903dlicons">
+<link rel="stylesheet" href="css/blog-magazine.css?v=20260903tables">
 <style>
 /* Code Block: Full width wide horizontal rectangle with compact height */
 .ba-content pre,
@@ -1333,35 +1342,82 @@ header .comic-btn:hover {
 .blog-content strong { font-weight: 700; color: #0f172a; }
 .blog-content em { font-style: italic; }
 .blog-table-wrap {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 1.25em 0;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: 28px 0 !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05) !important;
 }
 .blog-content table {
-    width: 100%;
-    min-width: 280px;
-    border-collapse: collapse;
-    font-size: 0.92em;
-    line-height: 1.45;
-    margin: 0;
-}
-.blog-content th,
-.blog-content td {
-    border: 1px solid #e2e8f0;
-    padding: 10px 12px;
-    text-align: left;
-    vertical-align: top;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 0.92rem !important;
+    line-height: 1.6 !important;
 }
 .blog-content th {
-    background: #f8fafc;
-    font-weight: 700;
-    color: #0f172a;
-    white-space: nowrap;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 14px 18px !important;
+    border: none !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    border-right: 1px solid #f1f5f9 !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+    white-space: normal !important;
 }
-.blog-content tr:nth-child(even) td { background: #fafbfc; }
+.blog-content td {
+    padding: 14px 18px !important;
+    color: #334155 !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-right: 1px solid #f8fafc !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    background: transparent !important;
+    transition: background 0.15s ease !important;
+}
+.blog-content tr:last-child td { border-bottom: none !important; }
+.blog-content th:last-child,
+.blog-content td:last-child { border-right: none !important; }
+.blog-content tbody tr:nth-child(even) td { background: #fafcff !important; }
+.blog-content tbody tr:hover td { background: #f1f5f9 !important; }
+.blog-content table a {
+    color: #7c3aed !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+    text-decoration-thickness: 1.5px !important;
+    text-underline-offset: 3px !important;
+    transition: color 0.15s ease !important;
+}
+.blog-content table a:hover {
+    color: #581c87 !important;
+}
+.blog-content table mark {
+    background: #fef08a !important;
+    color: #713f12 !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    font-size: 0.9em !important;
+    display: inline-block !important;
+    box-decoration-break: clone !important;
+    -webkit-box-decoration-break: clone !important;
+}
 .read-size-bar {
     display: flex;
     align-items: center;
@@ -2540,34 +2596,11 @@ footer .footer-links a:hover {
 
 /* Final article polish — must sit last so mobile sizes actually win */
 .blog-content table {
-    display: table;
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-}
-.blog-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 18px 0;
-    border: 1px solid #e8edf3;
-    border-radius: 14px;
-    background: #fff;
-}
-.blog-content th,
-.blog-content td {
-    border-bottom: 1px solid #eef2f6;
-    border-right: 1px solid #eef2f6;
-    padding: 11px 14px;
-}
-.blog-content tr:last-child td { border-bottom: 0; }
-.blog-content th:last-child,
-.blog-content td:last-child { border-right: 0; }
-.blog-content th {
-    background: #f7f8fb;
-    font-size: 0.78rem;
-    letter-spacing: .04em;
-    text-transform: none;
-    white-space: normal;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    border-collapse: collapse !important;
+    background: #fff !important;
 }
 @media (max-width: 720px) {
     .blog-detail-wrap { padding: 64px 10px 40px !important; }
@@ -3111,7 +3144,7 @@ footer .footer-links a:hover {
           </li>
           <?php endif; ?>
           <li><i class="fa-solid fa-clock" style="color:#64748b;"></i> <?= $read_time ?> minute read</li>
-          <li><i class="fa-solid fa-eye" style="color:#64748b;"></i> <?= (int)($blog["view_count"] ?? 0) ?> views</li>
+          <li><i class="fa-solid fa-eye" style="color:#64748b;"></i> <?= number_format((int)($blog["view_count"] ?? 0)) ?> views</li>
         </ul>
 
         <?php if (!empty($tags_list)): ?>
@@ -3393,7 +3426,11 @@ if (typeof gtag !== 'undefined') {
     gtag('event', 'blog_read', { blog_slug: '<?= addslashes($blog["slug"]) ?>', blog_title: '<?= addslashes($blog["title"] ?? "") ?>' });
 }
 
-document.querySelectorAll('.blog-content table').forEach(function(table) {
+document.querySelectorAll('.blog-content table, .ba-content table').forEach(function(table) {
+    table.removeAttribute('width');
+    table.removeAttribute('height');
+    table.style.width = '100%';
+    table.style.maxWidth = '100%';
     if (table.parentElement && table.parentElement.classList.contains('blog-table-wrap')) return;
     var wrap = document.createElement('div');
     wrap.className = 'blog-table-wrap';

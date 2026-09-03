@@ -3428,18 +3428,40 @@ tinymce.init({
             clear: both;
         }
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.4em 0;
-            font-size: 0.92em;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 1.8em 0 !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 14px !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+            box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.05) !important;
+            font-size: 0.92rem !important;
+            line-height: 1.6 !important;
         }
         th, td {
-            border: 1px solid #e2e8f0;
-            padding: 10px 12px;
-            text-align: left;
-            vertical-align: top;
+            padding: 13px 16px !important;
+            text-align: left !important;
+            vertical-align: top !important;
+            border: none !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            border-right: 1px solid #f8fafc !important;
         }
-        th { background: #f8fafc; font-weight: 700; }
+        th {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            font-size: 0.82rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            vertical-align: middle !important;
+        }
+        tr:last-child td { border-bottom: none !important; }
+        th:last-child, td:last-child { border-right: none !important; }
+        tbody tr:nth-child(even) td { background: #fafcff !important; }
+        tbody tr:hover td { background: #f1f5f9 !important; }
         /* ── Callout Boxes with 3 Themes ────────────────────────────── */
         .blog-grey-box {
             background: #f8fafc;
