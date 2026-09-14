@@ -27,11 +27,21 @@ $total = count($prompts);
 :root{--bg:#0b0b10;--surface:#141419;--surface-2:#1a1a22;--border:#252530;--text:#ededf0;--muted:#72728a;--accent:#F5709D;--soft:#11FFC9;--green:#34d399}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
-.sidebar{position:fixed;inset:0 auto 0 0;width:250px;background:var(--surface);border-right:1px solid var(--border);padding:28px 16px}
-.sb-brand{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--accent);margin-bottom:30px}
-.sb-sec{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;padding:0 8px}
-.sb-link{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none}
-.sb-link.active{background:rgba(245,112,157,.16);color:var(--soft);border:1px solid rgba(245,112,157,.2)}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:250px;background:var(--surface);border-right:1px solid var(--border);padding:28px 16px;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(245,112,157,.2);border-radius:4px}
+.sb-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.05rem;color:var(--accent);margin-bottom:30px;padding:0 8px}
+.sb-brand i{font-size:1.1rem}
+.sb-nav{flex:1}
+.sb-sec{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;padding:0 8px}
+.sb-link{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:600;transition:all .2s;margin-bottom:2px;border:1px solid transparent}
+.sb-link:hover{background:var(--surface-2);color:#e9ecfa}
+.sb-link.active{background:rgba(245,112,157,.16);color:var(--soft);border:1px solid rgba(245,112,157,.25);box-shadow:0 0 20px rgba(245,112,157,.12)}
+.sb-link i{width:18px;text-align:center;flex-shrink:0;font-size:.82rem}
+.nm-dash-brand{font-weight:700}
+.sb-bottom{padding:16px 8px 0;border-top:1px solid var(--border);margin-top:auto}
+.sb-logout{display:flex;align-items:center;gap:10px;color:#f87171;text-decoration:none;font-size:.82rem;font-weight:700;padding:8px 12px;border-radius:10px;transition:background .2s}
+.sb-logout:hover{background:rgba(248,113,113,.1)}
 .main{margin-left:250px;padding:40px 48px 80px;max-width:1100px}
 .head{margin-bottom:20px}.head h1{font-size:1.45rem;font-weight:900;display:flex;align-items:center;gap:10px}
 .head h1 i{color:var(--accent)}
@@ -136,6 +146,13 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 </div>
 
 <script>
+try {
+  var sbActive = document.querySelector('.sb-link.active');
+  if (sbActive) {
+    sbActive.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }
+} catch (e) {}
+
 function nmCopyShare(inputId, btn) {
   var input = document.getElementById(inputId);
   var text = input ? input.value : '';

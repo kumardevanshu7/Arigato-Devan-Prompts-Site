@@ -281,7 +281,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="happy_users_admin.php?tab=upload" class="d-link2"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
     <a href="happy_users_admin.php?tab=manage" class="d-link2"><i class="fa-solid fa-images"></i> Manage Pics</a>
     <div class="d-sec2 nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
+    <a href="curated_admin.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-upload" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Upload</span></a>
+    <a href="curated_manage.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-table-list" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Manage</span></a>
+    <a href="curated_links.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
     <div class="d-sec2">Users</div>
     <a href="user_management.php" class="d-link2"><i class="fa-solid fa-users"></i> Users</a>
     <div class="d-sec2">Tools</div>
@@ -326,7 +328,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
     <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
     <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
+    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-upload" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Upload</span></a>
+    <a href="curated_manage.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-table-list" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Manage</span></a>
+    <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Tools</div>

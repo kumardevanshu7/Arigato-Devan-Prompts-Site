@@ -64,6 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
             $prompt_text = trim($_POST['prompt_text'] ?? '');
             $meta_description = trim($_POST['meta_description'] ?? '');
             $meta_keywords = trim($_POST['meta_keywords'] ?? '');
+            $credit_name = trim($_POST['credit_name'] ?? '');
+            $credit_url = trim($_POST['credit_url'] ?? '');
+            if ($credit_url !== '') {
+                if (!preg_match('#^https?://#i', $credit_url)) {
+                    $handle = ltrim($credit_url, '@');
+                    $credit_url = 'https://www.instagram.com/' . $handle;
+                }
+            }
             $chatgpt_failed = !empty($_POST['chatgpt_failed']) ? 1 : 0;
             $gemini_failed = !empty($_POST['gemini_failed']) ? 1 : 0;
 
@@ -115,10 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
                         ? uniqueCuratedSlug($pdo, $title, $edit_id)
                         : $row['slug'];
                     $pdo->prepare(
-                        'UPDATE curated_prompts SET category = ?, title = ?, slug = ?, tags = ?, prompt_text = ?, meta_description = ?, meta_keywords = ?,
+                        'UPDATE curated_prompts SET category = ?, title = ?, slug = ?, tags = ?, prompt_text = ?, meta_description = ?, meta_keywords = ?, credit_name = ?, credit_url = ?,
                          thumbnail_image = ?, chatgpt_image = ?, chatgpt_failed = ?, gemini_image = ?, gemini_failed = ? WHERE id = ?'
                     )->execute([
-                        $category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords,
+                        $category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null,
                         $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed, $edit_id,
                     ]);
                     header('Location: curated_manage.php?edit=' . $edit_id . '&saved=1');
@@ -205,11 +213,21 @@ $filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gp
 :root{--bg:#0b0b10;--surface:#141419;--surface-2:#1a1a22;--border:#252530;--text:#ededf0;--muted:#72728a;--accent:#F5709D;--soft:#11FFC9;--green:#34d399}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
-.sidebar{position:fixed;inset:0 auto 0 0;width:250px;background:var(--surface);border-right:1px solid var(--border);padding:28px 16px}
-.sb-brand{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--accent);margin-bottom:30px}
-.sb-sec{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;padding:0 8px}
-.sb-link{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none}
-.sb-link.active{background:rgba(245,112,157,.16);color:var(--soft);border:1px solid rgba(245,112,157,.2)}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:250px;background:var(--surface);border-right:1px solid var(--border);padding:28px 16px;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(245,112,157,.2);border-radius:4px}
+.sb-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.05rem;color:var(--accent);margin-bottom:30px;padding:0 8px}
+.sb-brand i{font-size:1.1rem}
+.sb-nav{flex:1}
+.sb-sec{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;padding:0 8px}
+.sb-link{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:600;transition:all .2s;margin-bottom:2px;border:1px solid transparent}
+.sb-link:hover{background:var(--surface-2);color:#e9ecfa}
+.sb-link.active{background:rgba(245,112,157,.16);color:var(--soft);border:1px solid rgba(245,112,157,.25);box-shadow:0 0 20px rgba(245,112,157,.12)}
+.sb-link i{width:18px;text-align:center;flex-shrink:0;font-size:.82rem}
+.nm-dash-brand{font-weight:700}
+.sb-bottom{padding:16px 8px 0;border-top:1px solid var(--border);margin-top:auto}
+.sb-logout{display:flex;align-items:center;gap:10px;color:#f87171;text-decoration:none;font-size:.82rem;font-weight:700;padding:8px 12px;border-radius:10px;transition:background .2s}
+.sb-logout:hover{background:rgba(248,113,113,.1)}
 .main{margin-left:250px;padding:40px 48px 80px;max-width:1100px}
 .head{margin-bottom:22px}.head h1{font-size:1.45rem;font-weight:900}
 .toast{margin-bottom:16px;padding:12px 14px;border-radius:10px;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.2);color:var(--green);font-weight:700;font-size:.82rem}
@@ -426,6 +444,18 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       </div>
 
       <div class="form-row">
+        <label class="form-label" for="credit_name">Creator Credit Name / Handle <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input id="credit_name" type="text" name="credit_name" class="form-input" maxlength="150" value="<?= htmlspecialchars($edit_row['credit_name'] ?? '') ?>" placeholder="e.g. Devan or @artbydevan">
+        <p class="form-hint">Displays as 'Credit: Name' on card and prompt page.</p>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" for="credit_url">Creator Instagram Link / Profile URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input id="credit_url" type="text" name="credit_url" class="form-input" maxlength="255" value="<?= htmlspecialchars($edit_row['credit_url'] ?? '') ?>" placeholder="e.g. https://instagram.com/username or @username">
+        <p class="form-hint">Adds a clickable Instagram icon linking to their profile.</p>
+      </div>
+
+      <div class="form-row">
         <label class="form-label">Images — leave empty to keep current</label>
         <div class="upload-grid">
           <div>
@@ -544,6 +574,13 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 </div>
 
 <script>
+try {
+  var sbActive = document.querySelector('.sb-link.active');
+  if (sbActive) {
+    sbActive.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }
+} catch (e) {}
+
 function toggleVis(id, checked) {
   fetch('curated_manage.php', {
     method: 'POST',

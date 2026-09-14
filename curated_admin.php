@@ -50,6 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
     $prompt_text    = trim($_POST['prompt_text'] ?? '');
     $meta_description = trim($_POST['meta_description'] ?? '');
     $meta_keywords  = trim($_POST['meta_keywords'] ?? '');
+    $credit_name    = trim($_POST['credit_name'] ?? '');
+    $credit_url     = trim($_POST['credit_url'] ?? '');
+    if ($credit_url !== '') {
+        if (!preg_match('#^https?://#i', $credit_url)) {
+            $handle = ltrim($credit_url, '@');
+            $credit_url = 'https://www.instagram.com/' . $handle;
+        }
+    }
     $chatgpt_failed = !empty($_POST['chatgpt_failed']) ? 1 : 0;
     $gemini_failed  = !empty($_POST['gemini_failed']) ? 1 : 0;
 
@@ -82,10 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
             if (!$err) {
                 $slug = uniqueCuratedSlug($pdo, $title);
                 $stmt = $pdo->prepare(
-                    'INSERT INTO curated_prompts (category, title, slug, tags, prompt_text, meta_description, meta_keywords, thumbnail_image, chatgpt_image, chatgpt_failed, gemini_image, gemini_failed)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                    'INSERT INTO curated_prompts (category, title, slug, tags, prompt_text, meta_description, meta_keywords, credit_name, credit_url, thumbnail_image, chatgpt_image, chatgpt_failed, gemini_image, gemini_failed)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 );
-                $stmt->execute([$category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords, $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed]);
+                $stmt->execute([$category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null, $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed]);
                 $new_id = (int) $pdo->lastInsertId();
                 $uploaded_share = [
                     'title' => $title,
@@ -659,6 +667,18 @@ input[type="radio"].cat-radio { display: none; }
             </div>
 
             <div class="form-row">
+                <label class="form-label">Creator Credit Name / Handle <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+                <input type="text" name="credit_name" class="form-input" maxlength="150" placeholder="e.g. Devan or @artbydevan">
+                <p class="tag-hint">Displays as 'Credit: Name' on card and prompt page.</p>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">Creator Instagram Link / Profile URL <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+                <input type="text" name="credit_url" class="form-input" maxlength="255" placeholder="e.g. https://instagram.com/username or @username">
+                <p class="tag-hint">Adds a clickable Instagram icon linking to their profile.</p>
+            </div>
+
+            <div class="form-row">
                 <label class="form-label">Main Thumbnail</label>
                 <div class="file-zone" id="zoneThumb">
                     <i class="fa-solid fa-image"></i>
@@ -708,6 +728,13 @@ input[type="radio"].cat-radio { display: none; }
 </div>
 
 <script>
+try {
+  var sbActive = document.querySelector('.sb-link.active');
+  if (sbActive) {
+    sbActive.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }
+} catch (e) {}
+
 // Category selection
 document.querySelectorAll('.cat-radio').forEach(function(r) {
     r.addEventListener('change', function() {

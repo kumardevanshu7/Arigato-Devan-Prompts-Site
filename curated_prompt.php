@@ -100,20 +100,22 @@ function nm_has_column(PDO $pdo, string $table, string $column): bool
     return $cache[$key];
 }
 
-function nm_table_exists(PDO $pdo, string $table): bool
-{
-    static $cache = [];
-    if (array_key_exists($table, $cache)) {
+if (!function_exists('nm_table_exists')) {
+    function nm_table_exists(PDO $pdo, string $table): bool
+    {
+        static $cache = [];
+        if (array_key_exists($table, $cache)) {
+            return $cache[$table];
+        }
+        try {
+            $q = $pdo->prepare('SHOW TABLES LIKE ?');
+            $q->execute([$table]);
+            $cache[$table] = (bool) $q->fetchColumn();
+        } catch (PDOException $e) {
+            $cache[$table] = false;
+        }
         return $cache[$table];
     }
-    try {
-        $q = $pdo->prepare('SHOW TABLES LIKE ?');
-        $q->execute([$table]);
-        $cache[$table] = (bool) $q->fetchColumn();
-    } catch (PDOException $e) {
-        $cache[$table] = false;
-    }
-    return $cache[$table];
 }
 
 // Backfill unlock-like for users who already voted
@@ -558,6 +560,67 @@ body.nmp-preview-open { overflow: hidden; }
 .nmp-act.liked-on i { color: #e11d48; }
 .nmp-act.saved-on { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
 
+/* Credit Yellow Capsule */
+.nmp-credit-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+.nmp-credit-capsule {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 1.5px solid #F59E0B;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);
+    font-size: 0.84rem;
+    font-family: 'Inter', 'Outfit', sans-serif;
+    color: #92400E;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nmp-credit-capsule:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.28);
+    border-color: #D97706;
+}
+.nmp-credit-capsule .nmp-credit-lbl {
+    font-weight: 800;
+    color: #78350F;
+    letter-spacing: 0.02em;
+}
+.nmp-credit-capsule .nmp-credit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #92400E;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s ease;
+}
+.nmp-credit-capsule .nmp-credit-link:hover {
+    color: #B45309;
+    text-decoration: underline;
+}
+.nmp-credit-capsule .nmp-credit-link .fa-instagram {
+    font-size: 1.05rem;
+    color: #E1306C;
+    transition: transform 0.2s ease;
+}
+.nmp-credit-capsule .nmp-credit-link:hover .fa-instagram {
+    transform: scale(1.15) rotate(-6deg);
+}
+.nmp-credit-capsule .nmp-credit-name-plain {
+    font-weight: 700;
+    color: #92400E;
+}
+.nmp-credit-capsule .nmp-credit-ext {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-left: 2px;
+}
+
 .nmp-about {
     margin-top: 40px;
     padding: 24px 26px;
@@ -776,6 +839,24 @@ body.nmp-preview-open { overflow: hidden; }
             <i class="fa-solid fa-bookmark"></i> <span id="saveLabel"><?= $is_saved ? 'Saved' : 'Save' ?></span>
         </button>
     </div>
+
+    <?php if (!empty($p['credit_name'])): ?>
+    <!-- Creator Credit Yellow Capsule -->
+    <div class="nmp-credit-wrap">
+        <div class="nmp-credit-capsule">
+            <span class="nmp-credit-lbl">Credit:</span>
+            <?php if (!empty($p['credit_url'])): ?>
+                <a href="<?= htmlspecialchars($p['credit_url']) ?>" target="_blank" rel="noopener noreferrer" class="nmp-credit-link" title="Visit Instagram profile">
+                    <i class="fa-brands fa-instagram"></i>
+                    <span><?= htmlspecialchars($p['credit_name']) ?></span>
+                    <i class="fa-solid fa-arrow-up-right-from-square nmp-credit-ext"></i>
+                </a>
+            <?php else: ?>
+                <span class="nmp-credit-name-plain"><?= htmlspecialchars($p['credit_name']) ?></span>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <?php if ($about_text !== ''): ?>
     <section class="nmp-about" aria-label="About this prompt">

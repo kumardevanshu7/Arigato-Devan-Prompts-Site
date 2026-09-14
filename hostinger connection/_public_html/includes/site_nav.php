@@ -1,6 +1,6 @@
 <?php
 /**
- * Shared main-site navbar — digital store design system.
+ * Shared main-site navbar design system.
  * Set $nav_active before include: 'home' | 'gallery' | 'blogs' | etc.
  */
 if (!function_exists('sessionAvatar')) {

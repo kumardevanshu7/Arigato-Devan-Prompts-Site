@@ -1,5 +1,5 @@
 /* ============================================
-   DIGITAL STORE — ARIGATO PROMPTS
+   ARIGATO PROMPTS — SITE NAVIGATION
    Design: Editorial Minimalist / Light Theme
    ============================================ */
 
@@ -1225,7 +1225,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     padding: 16px 20px;
   }
 
-  /* Store/coming-soon titles only — never global h1 (breaks blog article titles) */
+  /* Coming-soon titles only — never global h1 (breaks blog article titles) */
   .coming-soon h1,
   .success-title {
     font-size: 2.2rem;

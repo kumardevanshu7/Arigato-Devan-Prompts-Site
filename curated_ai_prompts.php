@@ -438,6 +438,57 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 }
 .nm-card-likes i { font-size: .65rem; color: var(--nm-accent); }
 
+.nm-card-credit {
+    margin-top: 6px;
+    font-size: .68rem;
+    color: var(--pal-teal, #567C8D);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.nm-card-credit .nm-credit-lbl {
+    font-weight: 700;
+    color: var(--pal-navy, #2F4156);
+    opacity: .75;
+    flex-shrink: 0;
+}
+.nm-card-credit .nm-credit-name {
+    font-weight: 600;
+    color: var(--pal-teal, #567C8D);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.nm-card-credit .nm-credit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 700;
+    color: #df2c67;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all .2s ease;
+}
+.nm-card-credit .nm-credit-btn:hover {
+    color: #9d174d;
+    text-decoration: underline;
+}
+.nm-card-credit .nm-credit-btn i {
+    font-size: .74rem;
+    flex-shrink: 0;
+}
+
 @media (max-width: 480px) {
     .nm-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding-left: 10px; padding-right: 10px; }
     .nm-card-info { padding: 10px 11px 12px; }
@@ -540,6 +591,18 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
                 <p class="nm-card-title"><?= htmlspecialchars($p['title']) ?></p>
                 <span class="nm-card-likes"><i class="fa-solid fa-heart"></i> <?= (int)$p['like_count'] ?></span>
             </div>
+            <?php if (!empty($p['credit_name'])): ?>
+            <div class="nm-card-credit">
+                <span class="nm-credit-lbl">Credit:</span>
+                <?php if (!empty($p['credit_url'])): ?>
+                    <span role="button" tabindex="0" class="nm-credit-btn" onclick="event.preventDefault(); event.stopPropagation(); window.open('<?= htmlspecialchars($p['credit_url'], ENT_QUOTES) ?>', '_blank', 'noopener,noreferrer');" title="Open Instagram profile">
+                        <i class="fa-brands fa-instagram"></i> <span><?= htmlspecialchars($p['credit_name']) ?></span>
+                    </span>
+                <?php else: ?>
+                    <span class="nm-credit-name"><?= htmlspecialchars($p['credit_name']) ?></span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </a>
     <?php endforeach; ?>
