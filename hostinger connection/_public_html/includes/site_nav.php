@@ -45,6 +45,26 @@ if (!isset($nav_counts) && isset($pdo)) {
 }
 $nav_counts = $nav_counts ?? [];
 $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
+
+// Check for latest published blog to show notification red dot / NEW indicator
+$nav_latest_blog_id = 0;
+$has_recent_blog = false;
+if (isset($pdo)) {
+    try {
+        $lb_stmt = $pdo->query("SELECT id, created_at FROM blogs WHERE is_published = 1 ORDER BY created_at DESC LIMIT 1");
+        $lb_row = $lb_stmt ? $lb_stmt->fetch(PDO::FETCH_ASSOC) : null;
+        if ($lb_row) {
+            $nav_latest_blog_id = (int)$lb_row['id'];
+            $lb_time = !empty($lb_row['created_at']) ? strtotime($lb_row['created_at']) : 0;
+            // Mark recent if published within last 7 days (or user hasn't seen it)
+            if ($lb_time && (time() - $lb_time) <= 7 * 86400) {
+                $has_recent_blog = true;
+            }
+        }
+    } catch (Exception $e) {
+        $has_recent_blog = false;
+    }
+}
 ?>
 <div id="navStickyWrap">
     <header class="store-header">
@@ -59,7 +79,12 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
 
             <nav class="store-nav">
                 <a href="<?= $nb('gallery.php') ?>" class="<?= $nav_active === 'gallery' ? 'gal-nav-active' : '' ?>">Gallery</a>
-                <a href="<?= $nb('blogs.php') ?>" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?>">Blogs</a>
+                <a href="<?= $nb('blogs.php') ?>" class="<?= $nav_active === 'blogs' ? 'gal-nav-active' : '' ?> gal-nav-blog-link">
+                    Blogs
+                    <?php if ($has_recent_blog): ?>
+                        <span class="nav-blog-dot" data-latest-blog-id="<?= $nav_latest_blog_id ?>" title="New story posted"></span>
+                    <?php endif; ?>
+                </a>
                 <a href="<?= $nb('progress.php') ?>" class="gal-icon-link" title="Our Journey">
                     <i class="fa-solid fa-chart-line"></i>
                 </a>
@@ -126,6 +151,9 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
 
                 <button type="button" class="gal-mobile-menu-btn" id="galMobileMenuBtn" aria-label="Open menu">
                     <i class="fa-solid fa-bars"></i>
+                    <?php if ($has_recent_blog): ?>
+                        <span class="mobile-nav-dot" data-latest-blog-id="<?= $nav_latest_blog_id ?>" aria-hidden="true"></span>
+                    <?php endif; ?>
                 </button>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="<?= $nb('profile.php') ?>" class="gal-profile-link">
@@ -158,7 +186,12 @@ $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
     </div>
     <nav class="gal-mobile-nav">
         <a href="<?= $nb('gallery.php') ?>"><i class="fa-solid fa-images"></i> Gallery</a>
-        <a href="<?= $nb('blogs.php') ?>"><i class="fa-solid fa-pen-nib"></i> Blogs</a>
+        <a href="<?= $nb('blogs.php') ?>" class="gal-drawer-blog-link">
+            <i class="fa-solid fa-pen-nib"></i> Blogs
+            <?php if ($has_recent_blog): ?>
+                <span class="drawer-new-badge" data-latest-blog-id="<?= $nav_latest_blog_id ?>">NEW</span>
+            <?php endif; ?>
+        </a>
         <a href="<?= $nb('progress.php') ?>"><i class="fa-solid fa-chart-line"></i> Our Journey</a>
         <button type="button" class="gal-mobile-section-btn" id="galMobileReelsBtn">
             <i class="fa-solid fa-film"></i> Reels Type <i class="fa-solid fa-chevron-down" style="margin-left:auto;font-size:0.7rem;"></i>
@@ -469,3 +502,35 @@ function googleTranslateElementInit() {
 }
 </script>
 <script type="text/javascript" defer src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+(function() {
+    var latestBlogId = '<?= (int)$nav_latest_blog_id ?>';
+    if (!latestBlogId || latestBlogId === '0') return;
+    try {
+        var seen = localStorage.getItem('arigato_seen_blog_id');
+        if (seen && String(seen) === String(latestBlogId)) {
+            document.querySelectorAll('[data-latest-blog-id="' + latestBlogId + '"]').forEach(function(el) {
+                el.style.display = 'none';
+            });
+        }
+    } catch (e) {}
+})();
+(function() {
+    try {
+        var path = window.location.pathname.toLowerCase();
+        var isBlog = path.indexOf('blog') !== -1;
+        if (!isBlog) {
+            document.addEventListener('click', function(e) {
+                var a = e.target.closest('a');
+                if (!a) return;
+                var href = (a.getAttribute('href') || '').toLowerCase();
+                if (href.indexOf('blogs.php') !== -1 || href.indexOf('blog.php') !== -1 || href.indexOf('/blogs') !== -1) {
+                    try {
+                        sessionStorage.setItem('arigato_enter_blog', '1');
+                    } catch (err) {}
+                }
+            }, true);
+        }
+    } catch (e) {}
+})();
+</script>

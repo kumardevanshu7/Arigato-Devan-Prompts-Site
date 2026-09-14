@@ -363,50 +363,44 @@ body::before, body::after { display: none !important; background-image: none !im
         <textarea id="prompt_text" name="prompt_text" class="form-input" rows="6" placeholder="Enter the main prompt text here..." required></textarea>
       </div>
 
-      <!-- EXTRA PROMPTS -->
-      <div id="ep2-section" style="display:none" class="ep-section">
+      <!-- EXTRA PROMPTS (Up to 10 variants) -->
+      <?php
+      $ep_ordinals = [
+          2 => 'Second',
+          3 => 'Third',
+          4 => 'Fourth',
+          5 => 'Fifth',
+          6 => 'Sixth',
+          7 => 'Seventh',
+          8 => 'Eighth',
+          9 => 'Ninth',
+          10 => 'Tenth',
+      ];
+      for ($ep = 2; $ep <= 10; $ep++):
+          $ord = $ep_ordinals[$ep] ?? "Variant {$ep}";
+      ?>
+      <div id="ep<?= $ep ?>-section" style="display:none" class="ep-section">
         <div class="ep-header">
-          <div class="section-label" style="margin-bottom:0"><i class="fa-solid fa-plus"></i> Extra Prompt 2</div>
-          <button type="button" class="ep-remove-btn" onclick="removeEP(2)"><i class="fa-solid fa-xmark"></i> Remove</button>
+          <div class="section-label" style="margin-bottom:0"><i class="fa-solid fa-plus"></i> Extra Prompt <?= $ep ?></div>
+          <button type="button" class="ep-remove-btn" onclick="removeEP(<?= $ep ?>)"><i class="fa-solid fa-xmark"></i> Remove</button>
         </div>
         <div class="form-group">
-          <label class="form-label">EP2 Title</label>
-          <input type="text" id="ep2_title" name="extra_prompt_2_title" class="form-input" placeholder="Optional variant title">
+          <label class="form-label">EP<?= $ep ?> Title</label>
+          <input type="text" id="ep<?= $ep ?>_title" name="extra_prompt_<?= $ep ?>_title" class="form-input" placeholder="Optional variant title">
         </div>
         <div class="form-group">
-          <label class="form-label">EP2 Text</label>
-          <textarea id="ep2_text" name="extra_prompt_2_text" class="form-input" rows="4" placeholder="Second prompt variant..."></textarea>
+          <label class="form-label">EP<?= $ep ?> Text</label>
+          <textarea id="ep<?= $ep ?>_text" name="extra_prompt_<?= $ep ?>_text" class="form-input" rows="4" placeholder="<?= $ord ?> prompt variant..."></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">EP2 Cover Image</label>
+          <label class="form-label">EP<?= $ep ?> Cover Image</label>
           <div class="file-upload-row">
-            <label class="file-upload-btn"><input type="file" name="extra_prompt_2_image" id="ep2_image" accept="image/*" style="display:none" onchange="document.getElementById('ep2-fname').textContent=this.files[0]?.name||'No file'"><i class="fa-solid fa-image"></i> Choose Image</label>
-            <span id="ep2-fname" class="file-upload-name">No file chosen</span>
+            <label class="file-upload-btn"><input type="file" name="extra_prompt_<?= $ep ?>_image" id="ep<?= $ep ?>_image" accept="image/*" style="display:none" onchange="document.getElementById('ep<?= $ep ?>-fname').textContent=this.files[0]?.name||'No file'"><i class="fa-solid fa-image"></i> Choose Image</label>
+            <span id="ep<?= $ep ?>-fname" class="file-upload-name">No file chosen</span>
           </div>
         </div>
       </div>
-
-      <div id="ep3-section" style="display:none" class="ep-section">
-        <div class="ep-header">
-          <div class="section-label" style="margin-bottom:0"><i class="fa-solid fa-plus"></i> Extra Prompt 3</div>
-          <button type="button" class="ep-remove-btn" onclick="removeEP(3)"><i class="fa-solid fa-xmark"></i> Remove</button>
-        </div>
-        <div class="form-group">
-          <label class="form-label">EP3 Title</label>
-          <input type="text" id="ep3_title" name="extra_prompt_3_title" class="form-input" placeholder="Optional variant title">
-        </div>
-        <div class="form-group">
-          <label class="form-label">EP3 Text</label>
-          <textarea id="ep3_text" name="extra_prompt_3_text" class="form-input" rows="4" placeholder="Third prompt variant..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">EP3 Cover Image</label>
-          <div class="file-upload-row">
-            <label class="file-upload-btn"><input type="file" name="extra_prompt_3_image" id="ep3_image" accept="image/*" style="display:none" onchange="document.getElementById('ep3-fname').textContent=this.files[0]?.name||'No file'"><i class="fa-solid fa-image"></i> Choose Image</label>
-            <span id="ep3-fname" class="file-upload-name">No file chosen</span>
-          </div>
-        </div>
-      </div>
+      <?php endfor; ?>
 
       <div id="ep-add-btns" style="display:flex;gap:10px;flex-wrap:wrap">
         <button type="button" id="ep-add2-btn" class="extra-add-btn" onclick="addEP(2)"><i class="fa-solid fa-plus"></i> Add Prompt 2</button>
@@ -677,22 +671,46 @@ document.querySelector('form').addEventListener('submit',function(e){
   hiddenTagInput.value=tags.join(',');
 });
 
-function addEP(num){
-  document.getElementById('ep'+num+'-section').style.display='block';
-  document.getElementById('ep-add'+num+'-btn').style.display='none';
-  if(num===2){
-    const addBtns=document.getElementById('ep-add-btns');
-    const btn=document.createElement('button');btn.type='button';btn.id='ep-add3-btn';btn.className='extra-add-btn';
-    btn.innerHTML='<i class="fa-solid fa-plus"></i> Add Prompt 3';btn.onclick=function(){addEP(3)};addBtns.appendChild(btn);
+function updateEpAddBtn(){
+  const addBtns=document.getElementById('ep-add-btns');
+  if(!addBtns) return;
+  addBtns.innerHTML='';
+  let nextNum=2;
+  for(let i=2;i<=10;i++){
+    const sec=document.getElementById('ep'+i+'-section');
+    if(sec && sec.style.display!=='none'){
+      nextNum=i+1;
+    }
+  }
+  if(nextNum<=10){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.id='ep-add'+nextNum+'-btn';
+    btn.className='extra-add-btn';
+    btn.innerHTML='<i class="fa-solid fa-plus"></i> Add Prompt '+nextNum;
+    btn.onclick=function(){addEP(nextNum)};
+    addBtns.appendChild(btn);
   }
 }
+
+function addEP(num){
+  const sec=document.getElementById('ep'+num+'-section');
+  if(sec) sec.style.display='block';
+  updateEpAddBtn();
+}
+
 function removeEP(num){
-  document.getElementById('ep'+num+'-section').style.display='none';
-  document.getElementById('ep'+num+'_text').value='';
-  const img=document.getElementById('ep'+num+'_image');if(img)img.value='';
-  const fname=document.getElementById('ep'+num+'-fname');if(fname)fname.textContent='No file chosen';
-  const addBtn=document.getElementById('ep-add'+num+'-btn');if(addBtn)addBtn.style.display='';
-  if(num===2){removeEP(3);const b=document.getElementById('ep-add3-btn');if(b)b.remove();}
+  for(let i=10;i>=num;i--){
+    const sec=document.getElementById('ep'+i+'-section');
+    if(sec && sec.style.display!=='none'){
+      sec.style.display='none';
+      const t=document.getElementById('ep'+i+'_text');if(t)t.value='';
+      const title=document.getElementById('ep'+i+'_title');if(title)title.value='';
+      const img=document.getElementById('ep'+i+'_image');if(img)img.value='';
+      const fname=document.getElementById('ep'+i+'-fname');if(fname)fname.textContent='No file chosen';
+    }
+  }
+  updateEpAddBtn();
 }
 function setBwi(val,el){
   document.querySelectorAll('.bwi-btn').forEach(b=>b.classList.remove('bwi-selected'));

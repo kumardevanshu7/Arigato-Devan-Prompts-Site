@@ -131,6 +131,12 @@
     e.preventDefault();
     var tag = (btn.dataset.tag || 'all').toLowerCase();
     if (tag === activeTag) return;
+    var sInp = document.getElementById('gallery-search');
+    var sClear = document.getElementById('search-clear-btn');
+    if (sInp && sInp.value) {
+      sInp.value = '';
+      if (sClear) sClear.classList.remove('visible');
+    }
     loadTag(tag);
   });
 

@@ -10,11 +10,36 @@ if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     exit();
 }
 
-$is_ajax_cards = isset($_GET['ajax']) && $_GET['ajax'] === 'cards';
-$tag_filter    = trim(strtolower($_GET['tag'] ?? ''));
-$per_page      = 20;
+$is_ajax_cards   = isset($_GET['ajax']) && $_GET['ajax'] === 'cards';
+$is_ajax_suggest = isset($_GET['ajax']) && $_GET['ajax'] === 'suggest';
+$tag_filter      = trim(strtolower($_GET['tag'] ?? ''));
+$search_query    = trim((string)($_GET['q'] ?? $_GET['search'] ?? ''));
+
+if ($is_ajax_suggest) {
+    header('Content-Type: application/json; charset=utf-8');
+    $q = trim((string)($_GET['q'] ?? ''));
+    if ($q === '') {
+        echo json_encode(['ok' => true, 'suggestions' => []]);
+        exit;
+    }
+    $sp = '%' . addcslashes(strtolower($q), '%_') . '%';
+    $stmt = $pdo->prepare("SELECT id, slug, title, image_path, tag, prompt_type 
+                           FROM prompts p
+                           WHERE (p.is_trial = 0 OR p.is_trial IS NULL) 
+                             AND (LOWER(p.title) LIKE ? OR LOWER(p.tag) LIKE ? OR LOWER(p.meta_keywords) LIKE ? OR LOWER(p.about_prompt) LIKE ?)
+                           ORDER BY (CASE WHEN LOWER(p.title) LIKE ? THEN 1 WHEN LOWER(p.tag) LIKE ? THEN 2 ELSE 3 END), p.likes_count DESC, p.created_at DESC 
+                           LIMIT 7");
+    $stmt->execute([$sp, $sp, $sp, $sp, $sp, $sp]);
+    $suggestions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['ok' => true, 'suggestions' => $suggestions]);
+    exit;
+}
+
+$per_page = 20;
 if ($is_ajax_cards) {
-    $per_page = ($tag_filter && $tag_filter !== 'all') ? 120 : 20;
+    $per_page = (($tag_filter && $tag_filter !== 'all') || $search_query !== '') ? 120 : 20;
+} elseif ($search_query !== '') {
+    $per_page = 60;
 }
 $page          = max(1, (int) ($_GET['page'] ?? 1));
 $_page_canonical = 'https://arigatodevan.com/gallery.php' . (($tag_filter && $tag_filter !== 'all') ? '?tag=' . urlencode($tag_filter) : '');
@@ -23,6 +48,7 @@ $gal_data      = gallery_fetch_prompts($pdo, $_SESSION['user_id'] ?? null, [
     'page'     => $page,
     'per_page' => $per_page,
     'tag'      => $tag_filter,
+    'q'        => $search_query,
 ]);
 $prompts       = $gal_data['prompts'];
 $total         = $gal_data['total'];
@@ -33,7 +59,7 @@ $tag_filter    = $gal_data['tag_filter'];
 // is a thin duplicate of the full gallery.
 $gal_seo       = gallery_seo_meta($tag_filter);
 $gal_is_tagged = ($tag_filter !== '' && $tag_filter !== 'all');
-$gal_indexable = !$gal_is_tagged || ($gal_seo !== null && $total > 0);
+$gal_indexable = (!$gal_is_tagged && $search_query === '') || ($gal_seo !== null && $total > 0);
 
 if ($is_ajax_cards) {
     header('Content-Type: application/json; charset=utf-8');
@@ -42,6 +68,7 @@ if ($is_ajax_cards) {
         'html'  => render_gallery_prompt_cards($prompts),
         'total' => $total,
         'tag'   => $tag_filter ?: 'all',
+        'q'     => $search_query,
         'empty' => count($prompts) === 0,
     ]);
     exit;
@@ -65,7 +92,9 @@ $gal_banner_slides = gallery_banner_slides();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php
-    $gal_title = $gal_seo['title'] ?? 'All AI Couple Prompts Gallery &mdash; Arigato Devan';
+    $gal_title = $search_query !== ''
+        ? 'Search: ' . htmlspecialchars($search_query) . ' &mdash; AI Prompts Gallery'
+        : ($gal_seo['title'] ?? 'All AI Couple Prompts Gallery &mdash; Arigato Devan');
     $gal_desc  = $gal_seo['desc']  ?? 'Browse every AI couple prompt in one place &mdash; romantic, candid, traditional and festival looks for Gemini AI and ChatGPT. Save, unlock &amp; share your favourites.';
     ?>
     <title><?= $gal_title ?></title>
@@ -109,7 +138,11 @@ $gal_banner_slides = gallery_banner_slides();
 
 <main class="page-main">
 
-    <?php if (count($prompts) === 0): ?>
+    <?php 
+    $is_entire_gallery_empty = ($total === 0 && $search_query === '' && (!$tag_filter || $tag_filter === 'all'));
+    ?>
+
+    <?php if ($is_entire_gallery_empty): ?>
         <div class="gal-browse-panel">
             <div class="gal-search-wrap">
                 <i class="fa-solid fa-magnifying-glass gal-search-icon"></i>
@@ -125,8 +158,8 @@ $gal_banner_slides = gallery_banner_slides();
         <!-- Search Bar -->
         <div class="gal-search-wrap">
             <i class="fa-solid fa-magnifying-glass gal-search-icon"></i>
-            <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off">
-            <button type="button" class="gal-search-clear" id="search-clear-btn" aria-label="Clear search" onclick="clearGallerySearch()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            <input type="text" id="gallery-search" placeholder="Search prompts by name or tag..." autocomplete="off" value="<?= htmlspecialchars($search_query) ?>">
+            <button type="button" class="gal-search-clear <?= $search_query !== '' ? 'visible' : '' ?>" id="search-clear-btn" aria-label="Clear search" onclick="clearGallerySearch()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             <div class="gal-autocomplete" id="search-autocomplete"></div>
         </div>
 
@@ -173,11 +206,11 @@ $gal_banner_slides = gallery_banner_slides();
              buttons, so crawlers have no other route into these pages. -->
         <nav class="gal-collections" aria-label="Popular prompt collections">
             <span class="gal-collections-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Popular collections</span>
-            <?php if ($gal_is_tagged): ?>
+            <?php if ($gal_is_tagged || $search_query !== ''): ?>
                 <a href="gallery.php">All prompts</a>
             <?php endif; ?>
             <?php foreach (gallery_seo_collections() as $gal_ct => $gal_cmeta): ?>
-                <?php if ($gal_ct === $tag_filter) { continue; } ?>
+                <?php if ($gal_ct === $tag_filter && $search_query === '') { continue; } ?>
                 <a href="gallery.php?tag=<?= urlencode($gal_ct) ?>"><?= htmlspecialchars($gal_cmeta['label']) ?></a>
             <?php endforeach; ?>
         </nav>
@@ -186,15 +219,20 @@ $gal_banner_slides = gallery_banner_slides();
         <div class="gal-all-prompts-section">
         <div class="gal-all-prompts-head">
             <div class="gal-all-prompts-titles">
-                <p class="hero-label"><?= $gal_seo ? 'Prompt Collection' : 'Curated Prompt Collection' ?></p>
-                <h1><?= $gal_seo['h1'] ?? 'All AI Couple Prompts <em>Gallery</em>' ?></h1>
+                <?php if ($search_query !== ''): ?>
+                    <p class="hero-label">Search Results</p>
+                    <h1>Prompts for <em>&ldquo;<?= htmlspecialchars($search_query) ?>&rdquo;</em></h1>
+                <?php else: ?>
+                    <p class="hero-label"><?= $gal_seo ? 'Prompt Collection' : 'Curated Prompt Collection' ?></p>
+                    <h1><?= $gal_seo['h1'] ?? 'All AI Couple Prompts <em>Gallery</em>' ?></h1>
+                <?php endif; ?>
             </div>
             <div class="gal-all-prompts-stat">
                 <span class="page-hero-num" id="gallery-count-badge"><?= $total ?></span>
                 <span class="page-hero-label">prompts</span>
             </div>
         </div>
-        <?php if ($gal_seo): ?>
+        <?php if ($gal_seo && $search_query === ''): ?>
             <p class="gal-collection-intro"><?= $gal_seo['intro'] ?></p>
         <?php endif; ?>
         </div>
@@ -205,7 +243,7 @@ $gal_banner_slides = gallery_banner_slides();
         </div>
 
         <!-- Pagination -->
-        <?php if ($total_pages > 1): ?>
+        <?php if ($total_pages > 1 && $search_query === ''): ?>
         <div class="gal-pagination">
             <?php if ($page > 1): ?>
                 <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>" class="gal-page-btn">&larr; Prev</a>
@@ -219,7 +257,7 @@ $gal_banner_slides = gallery_banner_slides();
         </div>
         <?php endif; ?>
 
-        <div class="gal-no-results" id="gallery-no-results">
+        <div class="gal-no-results <?= ($total === 0 && ($search_query !== '' || $gal_is_tagged)) ? 'show' : '' ?>" id="gallery-no-results">
             <div class="emoji">&#128269;</div>
             <h3>No prompts found</h3>
             <p>Try a different keyword or clear the search</p>
@@ -374,80 +412,274 @@ function promptPageUrl(card) {
 }
 
 (function() {
-    var inp       = document.getElementById('gallery-search');
-    var clearBtn  = document.getElementById('search-clear-btn');
-    var countBadge= document.getElementById('gallery-count-badge');
-    var noResults = document.getElementById('gallery-no-results');
-    var ac        = document.getElementById('search-autocomplete');
+    var inp        = document.getElementById('gallery-search');
+    var clearBtn   = document.getElementById('search-clear-btn');
+    var countBadge = document.getElementById('gallery-count-badge');
+    var noResults  = document.getElementById('gallery-no-results');
+    var ac         = document.getElementById('search-autocomplete');
+    var cardGrid   = document.getElementById('card-stack');
+    var pagination = document.querySelector('.gal-pagination');
     if (!inp) return;
 
-    var cards = Array.from(document.querySelectorAll('.prompt-grid .prompt-card'));
     var activeIdx = -1, acMatches = [];
-
-    window.gallerySearchRefresh = function () {
-        cards = window.galleryGetCards ? window.galleryGetCards() : cards;
-        filterGallery(inp.value.trim().toLowerCase());
-    };
+    var searchTimer = null;
+    var currentSearchXhr = null;
+    var lastQuery = inp.value.trim();
 
     function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    var typeLabels = {secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED',direct:'DIRECT'};
-    var typeColors = {secret_code:'#111111',unreleased:'#f97316',insta_viral:'#e11d48',already_uploaded:'#16a34a',direct:'#567C8D'};
+    var typeLabels = {secret:'SECRET',secret_code:'SECRET',unreleased:'UNRELEASED',insta_viral:'VIRAL',already_uploaded:'UPLOADED',direct:'DIRECT',solo:'SOLO'};
+    var typeColors = {secret:'#111111',secret_code:'#111111',unreleased:'#f97316',insta_viral:'#e11d48',already_uploaded:'#16a34a',direct:'#567C8D',solo:'#8b5cf6'};
 
-    function filterGallery(q) {
+    window.gallerySearchRefresh = function () {
+        var q = inp.value.trim();
+        if (q) {
+            performServerSearch(q);
+        }
+    };
+
+    // Fast local filter on whatever cards are already rendered in DOM
+    function instantLocalFilter(q) {
+        if (!cardGrid) return;
+        var cards = Array.from(cardGrid.querySelectorAll('.prompt-card'));
         var visible = 0;
         cards.forEach(function(card) {
             var match = !q || (card.dataset.title||'').toLowerCase().includes(q) || (card.dataset.tags||'').toLowerCase().includes(q);
             card.style.display = match ? '' : 'none';
             if (match) visible++;
         });
-        if (countBadge) countBadge.textContent = visible;
-        if (noResults)  noResults.classList.toggle('show', visible === 0 && q.length > 0);
-        if (clearBtn) clearBtn.classList.toggle('visible', q.length > 0);
+        if (q && visible > 0 && countBadge) {
+            countBadge.textContent = visible;
+        }
     }
-    function buildAC(q) {
-        if (!q) { hideAC(); return; }
-        acMatches = cards.filter(function(c){ return (c.dataset.title||'').toLowerCase().includes(q)||(c.dataset.tags||'').toLowerCase().includes(q); }).slice(0,7);
-        if (!acMatches.length) { hideAC(); return; }
-        ac.innerHTML = '<div class="ac-header"><i class="fa-solid fa-magnifying-glass" style="margin-right:5px;"></i>Suggestions</div>';
-        acMatches.forEach(function(card, i) {
-            var type=card.dataset.promptType||'secret_code';
-            var tagList=(card.dataset.tags||'').split(',').slice(0,3).map(function(t){return t.trim();}).filter(Boolean).join(' · ');
-            var img=card.dataset.image||'';
-            var thumb=img?'<div class="ac-thumb"><img src="'+escHTML(img)+'" alt="" loading="lazy" decoding="async"></div>':'';
-            var item=document.createElement('div'); item.className='ac-item';
-            item.innerHTML=thumb+
-                '<div class="ac-badge" style="background:'+typeColors[type]+'">'+(typeLabels[type]||'PROMPT')+'</div>'+
-                '<div class="ac-info"><div class="ac-title">'+escHTML(card.dataset.title||'')+'</div>'+(tagList?'<div class="ac-tags">'+escHTML(tagList)+'</div>':'')+
-                '</div><i class="fa-solid fa-arrow-right ac-arrow"></i>';
-            item.addEventListener('mouseover',function(){setActive(i);});
-            item.addEventListener('mousedown',function(e){e.preventDefault();pickSuggestion(acMatches[i]);});
-            ac.appendChild(item);
+
+    // Server-side AJAX search against the full database
+    function performServerSearch(q) {
+        if (currentSearchXhr) {
+            currentSearchXhr.abort();
+            currentSearchXhr = null;
+        }
+        var tag = (window.galleryGetActiveTag ? window.galleryGetActiveTag() : 'all').toLowerCase();
+        var url = 'gallery.php?ajax=cards&q=' + encodeURIComponent(q);
+        if (tag && tag !== 'all') {
+            url += '&tag=' + encodeURIComponent(tag);
+        }
+
+        var controller = new AbortController();
+        currentSearchXhr = controller;
+
+        if (cardGrid) cardGrid.classList.add('is-loading');
+
+        fetch(url, {
+            signal: controller.signal,
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.ok) return;
+            if (inp.value.trim().toLowerCase() !== q.toLowerCase()) return;
+
+            if (cardGrid) {
+                cardGrid.innerHTML = data.html || '';
+            }
+            if (countBadge) countBadge.textContent = data.total;
+            if (noResults) noResults.classList.toggle('show', !!data.empty);
+            if (pagination) pagination.style.display = 'none';
+
+            if (window.galleryBindCardClicks) {
+                window.galleryBindCardClicks();
+            }
+            if (typeof window.revealCardSkeletons === 'function' && cardGrid) {
+                window.revealCardSkeletons(cardGrid);
+            }
+
+            // Sync URL without page reload
+            try {
+                var newUrl = new URL(window.location.href);
+                if (q) {
+                    newUrl.searchParams.set('q', q);
+                } else {
+                    newUrl.searchParams.delete('q');
+                }
+                newUrl.searchParams.delete('page');
+                window.history.replaceState({}, '', newUrl.pathname + newUrl.search);
+            } catch(e) {}
+        })
+        .catch(function(err) {
+            if (err.name === 'AbortError') return;
+            console.error('Search error:', err);
+        })
+        .finally(function() {
+            if (cardGrid) cardGrid.classList.remove('is-loading');
         });
-        activeIdx=-1; ac.style.display='block';
     }
-    function setActive(i){ activeIdx=i; ac.querySelectorAll('.ac-item').forEach(function(el,idx){el.classList.toggle('active',idx===i);}); }
-    function pickSuggestion(card){
-        inp.value=card.dataset.title||''; hideAC(); filterGallery(inp.value.trim().toLowerCase());
-        card.style.display='';
-        setTimeout(function(){
-            card.scrollIntoView({behavior:'smooth',block:'center'});
-            card.style.outline='2px solid var(--accent-warm)'; card.style.outlineOffset='3px';
-            setTimeout(function(){card.style.outline='';card.style.outlineOffset='';},1800);
-        },80);
+
+    // Autocomplete dropdown from database
+    function fetchAutocomplete(q) {
+        if (!q || q.length < 1) { hideAC(); return; }
+        fetch('gallery.php?ajax=suggest&q=' + encodeURIComponent(q), {
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.ok || !data.suggestions || !data.suggestions.length) {
+                hideAC();
+                return;
+            }
+            acMatches = data.suggestions;
+            ac.innerHTML = '<div class="ac-header"><i class="fa-solid fa-magnifying-glass" style="margin-right:5px;"></i>Suggestions</div>';
+            acMatches.forEach(function(item, i) {
+                var type = item.prompt_type || 'secret';
+                var tagList = (item.tag || '').split(',').slice(0, 3).map(function(t){ return t.trim(); }).filter(Boolean).join(' · ');
+                var img = item.image_path || '';
+                var thumb = img ? '<div class="ac-thumb"><img src="' + escHTML(img) + '" alt="" loading="lazy"></div>' : '';
+                var el = document.createElement('div');
+                el.className = 'ac-item';
+                el.innerHTML = thumb +
+                    '<div class="ac-badge" style="background:' + (typeColors[type] || '#111') + '">' + (typeLabels[type] || 'PROMPT') + '</div>' +
+                    '<div class="ac-info"><div class="ac-title">' + escHTML(item.title || '') + '</div>' + (tagList ? '<div class="ac-tags">' + escHTML(tagList) + '</div>' : '') +
+                    '</div><i class="fa-solid fa-arrow-right ac-arrow"></i>';
+                el.addEventListener('mouseover', function() { setActive(i); });
+                el.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    pickSuggestion(acMatches[i]);
+                });
+                ac.appendChild(el);
+            });
+            activeIdx = -1;
+            ac.style.display = 'block';
+        })
+        .catch(function() {
+            hideAC();
+        });
     }
-    function hideAC(){ ac.style.display='none'; ac.innerHTML=''; activeIdx=-1; acMatches=[]; }
-    inp.addEventListener('input',function(){ var q=inp.value.trim().toLowerCase(); filterGallery(q); buildAC(q); });
-    inp.addEventListener('keydown',function(e){
-        var items=ac.querySelectorAll('.ac-item');
-        if(ac.style.display!=='block'||!items.length)return;
-        if(e.key==='ArrowDown'){e.preventDefault();setActive(Math.min(activeIdx+1,items.length-1));}
-        else if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(activeIdx-1,-1));}
-        else if(e.key==='Enter'&&activeIdx>=0){e.preventDefault();if(acMatches[activeIdx])pickSuggestion(acMatches[activeIdx]);}
-        else if(e.key==='Escape'){hideAC();}
+
+    function setActive(i) {
+        activeIdx = i;
+        ac.querySelectorAll('.ac-item').forEach(function(el, idx) {
+            el.classList.toggle('active', idx === i);
+        });
+    }
+
+    function pickSuggestion(item) {
+        hideAC();
+        var url = promptPageUrl(item);
+        document.body.style.transition = 'opacity 0.15s ease';
+        document.body.style.opacity = '0';
+        setTimeout(function() { window.location.href = url; }, 150);
+    }
+
+    function hideAC() {
+        ac.style.display = 'none';
+        ac.innerHTML = '';
+        activeIdx = -1;
+        acMatches = [];
+    }
+
+    function onSearchInput() {
+        var q = inp.value.trim();
+        if (clearBtn) clearBtn.classList.toggle('visible', q.length > 0);
+
+        if (q === '') {
+            hideAC();
+            if (lastQuery !== '') {
+                lastQuery = '';
+                restoreGallery();
+            }
+            return;
+        }
+
+        lastQuery = q;
+        instantLocalFilter(q.toLowerCase());
+        fetchAutocomplete(q);
+
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            performServerSearch(q);
+        }, 260);
+    }
+
+    function restoreGallery() {
+        if (currentSearchXhr) currentSearchXhr.abort();
+        var tag = (window.galleryGetActiveTag ? window.galleryGetActiveTag() : 'all').toLowerCase();
+        var url = 'gallery.php?ajax=cards&tag=' + encodeURIComponent(tag);
+        if (cardGrid) cardGrid.classList.add('is-loading');
+
+        fetch(url, {
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.ok) return;
+            if (cardGrid) cardGrid.innerHTML = data.html || '';
+            if (countBadge) countBadge.textContent = data.total;
+            if (noResults) noResults.classList.remove('show');
+            if (pagination && tag === 'all') pagination.style.display = '';
+            if (window.galleryBindCardClicks) window.galleryBindCardClicks();
+            if (typeof window.revealCardSkeletons === 'function' && cardGrid) window.revealCardSkeletons(cardGrid);
+
+            try {
+                var u = new URL(window.location.href);
+                u.searchParams.delete('q');
+                window.history.replaceState({}, '', u.pathname + u.search);
+            } catch(e) {}
+        })
+        .finally(function() {
+            if (cardGrid) cardGrid.classList.remove('is-loading');
+        });
+    }
+
+    window.clearGallerySearch = function() {
+        inp.value = '';
+        if (clearBtn) clearBtn.classList.remove('visible');
+        hideAC();
+        restoreGallery();
+        inp.focus();
+    };
+
+    inp.addEventListener('input', onSearchInput);
+    inp.addEventListener('keydown', function(e) {
+        var items = ac.querySelectorAll('.ac-item');
+        if (ac.style.display === 'block' && items.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActive(Math.min(activeIdx + 1, items.length - 1));
+                return;
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActive(Math.max(activeIdx - 1, -1));
+                return;
+            }
+            if (e.key === 'Enter' && activeIdx >= 0 && acMatches[activeIdx]) {
+                e.preventDefault();
+                pickSuggestion(acMatches[activeIdx]);
+                return;
+            }
+            if (e.key === 'Escape') {
+                hideAC();
+                return;
+            }
+        }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            hideAC();
+            clearTimeout(searchTimer);
+            var q = inp.value.trim();
+            if (q) performServerSearch(q);
+        }
     });
-    inp.addEventListener('focus',function(){ if(inp.value.trim().length>0)buildAC(inp.value.trim().toLowerCase()); });
-    document.addEventListener('click',function(e){ if(!e.target.closest('.gal-search-wrap'))hideAC(); });
-    window.clearGallerySearch=function(){ inp.value=''; filterGallery(''); hideAC(); inp.focus(); };
+
+    inp.addEventListener('focus', function() {
+        var q = inp.value.trim();
+        if (q.length > 0) fetchAutocomplete(q);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.gal-search-wrap')) hideAC();
+    });
 })();
 </script>
 

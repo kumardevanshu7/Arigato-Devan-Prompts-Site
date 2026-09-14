@@ -74,7 +74,7 @@ function blog_list_cover_html(array $b, bool $wide = false): string {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
-<link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
+<link rel="stylesheet" href="css/blog-splash-loading.css?v=20260914">
 <meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -934,6 +934,9 @@ footer .footer-links a:hover {
     text-decoration: none !important;
     color: inherit !important;
 }
+.bm-card.bm-card-hidden {
+    display: none !important;
+}
 .bm-card:hover {
     transform: translateY(-4px) !important;
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
@@ -1074,7 +1077,54 @@ footer .footer-links a:hover {
 <link rel="stylesheet" href="css/logout-confirm.css?v=20260781">
 <?php endif; ?>
 </head>
-<body class="blog-splash-active page-store theme-nogoda bm-list">
+<body class="page-store theme-nogoda bm-list">
+<script>
+(function() {
+  var isBlog = function(u) {
+    if (!u) return false;
+    try { return new URL(u, window.location.href).pathname.toLowerCase().indexOf('blog') !== -1; }
+    catch(e) { return u.toLowerCase().indexOf('blog') !== -1; }
+  };
+  var isReloadOrBack = false;
+  try {
+    var nav = (typeof performance !== 'undefined' && performance.getEntriesByType) ? performance.getEntriesByType('navigation') : [];
+    if (nav.length > 0) {
+      isReloadOrBack = (nav[0].type === 'reload' || nav[0].type === 'back_forward');
+    } else if (window.performance && window.performance.navigation) {
+      var pt = window.performance.navigation.type;
+      isReloadOrBack = (pt === 1 || pt === 2);
+    }
+  } catch(e) {}
+
+  var ref = document.referrer || '';
+  var hasFlag = false;
+  try {
+    if (sessionStorage.getItem('arigato_enter_blog') === '1') {
+      hasFlag = true;
+      sessionStorage.removeItem('arigato_enter_blog');
+    }
+  } catch(e) {}
+
+  var isInternalNonBlog = false;
+  if (ref) {
+    try {
+      var rUrl = new URL(ref, window.location.href);
+      if (rUrl.host.toLowerCase() === window.location.host.toLowerCase() && !isBlog(ref)) {
+        isInternalNonBlog = true;
+      }
+    } catch(e) {}
+  }
+
+  var shouldShow = !isReloadOrBack && !isBlog(ref) && (hasFlag || isInternalNonBlog);
+  window.__shouldShowBlogSplash = shouldShow;
+  if (!shouldShow) {
+    document.documentElement.classList.add('no-blog-splash');
+  } else {
+    document.documentElement.classList.add('no-scroll');
+    document.body.classList.add('no-scroll', 'blog-splash-active');
+  }
+})();
+</script>
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -1142,7 +1192,7 @@ footer .footer-links a:hover {
     <div class="bm-tags" id="tag-filters">
       <button type="button" class="bm-tag is-on" data-tag="all" onclick="filterByTag('all', this)">All</button>
       <?php foreach ($filter_categories as $catName => $count): ?>
-      <button type="button" class="bm-tag" data-tag="<?= htmlspecialchars(strtolower($catName)) ?>" onclick="filterByTag('<?= htmlspecialchars(strtolower($catName)) ?>', this)"><?= htmlspecialchars($catName) ?> <span><?= (int)$count ?></span></button>
+      <button type="button" class="bm-tag" data-tag="<?= htmlspecialchars(strtolower($catName), ENT_QUOTES, 'UTF-8') ?>" onclick="filterByTag(this.getAttribute('data-tag'), this)"><?= htmlspecialchars($catName) ?> <span><?= (int)$count ?></span></button>
       <?php endforeach; ?>
     </div>
     <?php else: ?>
@@ -1169,7 +1219,7 @@ footer .footer-links a:hover {
       $p_img = !empty($b['image_path']) ? $b['image_path'] : (!empty($b['image_path_landscape']) ? $b['image_path_landscape'] : '');
       $l_img = !empty($b['image_path_landscape']) ? $b['image_path_landscape'] : (!empty($b['image_path']) ? $b['image_path'] : '');
     ?>
-    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-tags="<?= htmlspecialchars(strtolower(($b['tags'] ?? '') . ' ' . ($b['category'] ?? ''))) ?>">
+    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-category="<?= htmlspecialchars(strtolower($b['category'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-tags="<?= htmlspecialchars(strtolower(($b['tags'] ?? '') . ' ' . ($b['category'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
       <div class="bm-card-img">
         <?php if ($p_img || $l_img): ?>
           <img class="bm-cover-rect" loading="lazy" src="<?= htmlspecialchars($l_img) ?>" alt="<?= htmlspecialchars($b['title']) ?>">
@@ -1260,13 +1310,46 @@ function filterByTag(tag, btn) {
   if (btn) btn.classList.add('is-on');
   const noRes = document.getElementById('no-results-msg');
   let anyVisible = false;
+  const targetTag = (tag || '').trim().toLowerCase();
+
   document.querySelectorAll('.bm-card-filter').forEach(card => {
-    const show = tag === 'all' || (card.dataset.tags || '').toLowerCase().includes(tag);
-    card.style.display = show ? '' : 'none';
-    if (show) anyVisible = true;
+    const rawTags = (card.getAttribute('data-tags') || '').toLowerCase();
+    const rawCat = (card.getAttribute('data-category') || '').toLowerCase();
+
+    let show = false;
+    if (targetTag === 'all' || targetTag === '') {
+      show = true;
+    } else {
+      const cats = rawCat.split(',').map(s => s.trim());
+      const tags = rawTags.split(',').map(s => s.trim());
+      if (cats.includes(targetTag) || tags.includes(targetTag) || rawCat.includes(targetTag) || rawTags.includes(targetTag)) {
+        show = true;
+      }
+    }
+
+    if (show) {
+      card.classList.remove('bm-card-hidden');
+      card.style.removeProperty('display');
+      anyVisible = true;
+    } else {
+      card.classList.add('bm-card-hidden');
+      card.style.setProperty('display', 'none', 'important');
+    }
   });
+
   if (noRes) noRes.style.display = anyVisible ? 'none' : 'block';
 }
+
+// Mark latest blog as seen when user visits blogs page
+<?php if (!empty($blogs[0]['id'])): ?>
+try {
+  localStorage.setItem('arigato_seen_blog_id', '<?= (int)$blogs[0]['id'] ?>');
+  // Also notify active nav indicators immediately
+  document.querySelectorAll('.nav-blog-dot, .nav-blog-badge, .mobile-nav-dot, .drawer-new-badge').forEach(function(el) {
+    el.style.display = 'none';
+  });
+} catch (e) {}
+<?php endif; ?>
 
 // Auto filter from URL query parameter (?category=... or ?tag=...)
 (function() {
@@ -1288,7 +1371,7 @@ function filterByTag(tag, btn) {
   }
 })();
 </script>
-<script src="js/blog-splash.js?v=20260756" defer></script>
+<script src="js/blog-splash.js?v=20260914" defer></script>
 <script>
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {

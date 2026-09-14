@@ -124,23 +124,71 @@ function fetch_trending_prompts(PDO $pdo, ?int $user_id = null, int $limit = 12)
 }
 
 /**
- * @return array{prompts: array, total: int, total_pages: int, page: int, tag_filter: string}
+ * @return array{prompts: array, total: int, total_pages: int, page: int, tag_filter: string, search_q: string}
  */
 function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array {
-    $page       = max(1, (int) ($opts['page'] ?? 1));
-    $per_page   = max(1, (int) ($opts['per_page'] ?? 20));
-    $tag_filter = trim(strtolower($opts['tag'] ?? ''));
-    $tag_param  = ($tag_filter && $tag_filter !== 'all') ? '%' . addcslashes($tag_filter, '%_') . '%' : null;
-    $offset     = ($page - 1) * $per_page;
-    $tag_where  = $tag_param ? ' AND LOWER(tag) LIKE ?' : '';
+    $page         = max(1, (int) ($opts['page'] ?? 1));
+    $per_page     = max(1, (int) ($opts['per_page'] ?? 20));
+    $tag_filter   = trim(strtolower($opts['tag'] ?? ''));
+    $search_query = trim((string) ($opts['q'] ?? $opts['search'] ?? ''));
 
-    $count_sql  = $tag_param
-        ? 'SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL) AND LOWER(tag) LIKE ?'
-        : 'SELECT COUNT(*) FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL)';
+    $where_clauses = ["(p.is_trial = 0 OR p.is_trial IS NULL)"];
+    $where_params  = [];
+
+    if ($tag_filter !== '' && $tag_filter !== 'all') {
+        $where_clauses[] = "LOWER(p.tag) LIKE ?";
+        $where_params[]  = '%' . addcslashes($tag_filter, '%_') . '%';
+    }
+
+    if ($search_query !== '') {
+        $clean_q = strtolower($search_query);
+        $words   = array_values(array_filter(preg_split('/\s+/', $clean_q)));
+
+        if (count($words) > 1) {
+            $phrase_param = '%' . addcslashes($clean_q, '%_') . '%';
+            $word_clauses = [];
+            $word_params  = [];
+            foreach ($words as $w) {
+                $wp = '%' . addcslashes($w, '%_') . '%';
+                $word_clauses[] = "(LOWER(p.title) LIKE ? OR LOWER(p.tag) LIKE ? OR LOWER(p.meta_keywords) LIKE ? OR LOWER(p.about_prompt) LIKE ?)";
+                $word_params[] = $wp;
+                $word_params[] = $wp;
+                $word_params[] = $wp;
+                $word_params[] = $wp;
+            }
+            $where_clauses[] = "((LOWER(p.title) LIKE ? OR LOWER(p.tag) LIKE ? OR LOWER(p.meta_keywords) LIKE ? OR LOWER(p.about_prompt) LIKE ?) OR (" . implode(' AND ', $word_clauses) . "))";
+            $where_params[] = $phrase_param;
+            $where_params[] = $phrase_param;
+            $where_params[] = $phrase_param;
+            $where_params[] = $phrase_param;
+            $where_params   = array_merge($where_params, $word_params);
+        } else {
+            $sp = '%' . addcslashes($clean_q, '%_') . '%';
+            $where_clauses[] = "(LOWER(p.title) LIKE ? OR LOWER(p.tag) LIKE ? OR LOWER(p.meta_keywords) LIKE ? OR LOWER(p.about_prompt) LIKE ?)";
+            $where_params[] = $sp;
+            $where_params[] = $sp;
+            $where_params[] = $sp;
+            $where_params[] = $sp;
+        }
+    }
+
+    $where_sql = implode(' AND ', $where_clauses);
+    $offset    = ($page - 1) * $per_page;
+
+    $count_sql  = "SELECT COUNT(*) FROM prompts p WHERE {$where_sql}";
     $count_stmt = $pdo->prepare($count_sql);
-    $count_stmt->execute($tag_param ? [$tag_param] : []);
+    $count_stmt->execute($where_params);
     $total       = (int) $count_stmt->fetchColumn();
     $total_pages = max(1, (int) ceil($total / $per_page));
+
+    // Order clause: Prioritize title match, then tag match, then likes & date
+    $order_sql = "p.created_at DESC";
+    $order_params = [];
+    if ($search_query !== '') {
+        $sp = '%' . addcslashes(strtolower($search_query), '%_') . '%';
+        $order_sql = "(CASE WHEN LOWER(p.title) LIKE ? THEN 1 WHEN LOWER(p.tag) LIKE ? THEN 2 ELSE 3 END), p.likes_count DESC, p.created_at DESC";
+        $order_params = [$sp, $sp];
+    }
 
     if ($user_id) {
         $sql = "SELECT p.*, IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
@@ -150,25 +198,19 @@ function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array
             LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
             LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
             LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
-            WHERE (p.is_trial = 0 OR p.is_trial IS NULL){$tag_where}
-            ORDER BY p.created_at DESC LIMIT {$per_page} OFFSET {$offset}";
-        $params = [$user_id, $user_id, $user_id];
-        if ($tag_param) {
-            $params[] = $tag_param;
-        }
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+            WHERE {$where_sql}
+            ORDER BY {$order_sql} LIMIT {$per_page} OFFSET {$offset}";
+        $exec_params = array_merge([$user_id, $user_id, $user_id], $where_params, $order_params);
     } else {
-        $sql = "SELECT *, 0 as is_unlocked, 0 as is_liked, 0 as is_saved
-            FROM prompts WHERE (is_trial = 0 OR is_trial IS NULL){$tag_where}
-            ORDER BY created_at DESC LIMIT {$per_page} OFFSET {$offset}";
-        $params = [];
-        if ($tag_param) {
-            $params[] = $tag_param;
-        }
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        $sql = "SELECT p.*, 0 as is_unlocked, 0 as is_liked, 0 as is_saved
+            FROM prompts p
+            WHERE {$where_sql}
+            ORDER BY {$order_sql} LIMIT {$per_page} OFFSET {$offset}";
+        $exec_params = array_merge($where_params, $order_params);
     }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($exec_params);
 
     return [
         'prompts'     => $stmt->fetchAll(PDO::FETCH_ASSOC),
@@ -176,6 +218,7 @@ function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array
         'total_pages' => $total_pages,
         'page'        => $page,
         'tag_filter'  => $tag_filter,
+        'search_q'    => $search_query,
     ];
 }
 

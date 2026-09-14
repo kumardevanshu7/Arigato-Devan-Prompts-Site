@@ -199,7 +199,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 <link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
-<link rel="stylesheet" href="css/blog-splash-loading.css?v=20260756">
+<link rel="stylesheet" href="css/blog-splash-loading.css?v=20260914">
 <link rel="stylesheet" href="css/blog-magazine.css?v=20260903tables">
 <style>
 /* Code Block: Full width wide horizontal rectangle with compact height */
@@ -3401,52 +3401,62 @@ footer .footer-links a:hover {
         color: #1e3a8a !important;
     }
     /* Mobile table: No scrollbar, fit 100% screen width, wrap words cleanly to next line */
+    /* Mobile table: Clean word wrap, no truncation, smooth touch scroll fallback */
     .blog-table-wrap {
         margin: 16px 0 !important;
         border-radius: 12px !important;
-        overflow-x: hidden !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
         overflow-y: visible !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        scrollbar-width: none !important;
+        scrollbar-width: thin !important;
     }
     .blog-table-wrap::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
+        height: 4px !important;
+    }
+    .blog-table-wrap::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        border-radius: 4px !important;
     }
     .blog-table-wrap table,
     .blog-content .blog-table-wrap table,
     .ba-content .blog-table-wrap table,
     table.blog-table {
-        min-width: 0 !important;
-        max-width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
         width: 100% !important;
         table-layout: auto !important;
         margin: 0 !important;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
     }
     .blog-content th,
     .ba-content th,
     .blog-table-wrap th,
     table.blog-table th {
-        padding: 8px 6px !important;
+        padding: 8px 8px !important;
         font-size: 0.74rem !important;
-        letter-spacing: 0.03em !important;
+        letter-spacing: 0.02em !important;
         word-break: normal !important;
         overflow-wrap: break-word !important;
         white-space: normal !important;
+        vertical-align: middle !important;
+        text-align: left !important;
     }
     .blog-content td,
     .ba-content td,
     .blog-table-wrap td,
     table.blog-table td {
-        padding: 8px 6px !important;
+        padding: 8px 8px !important;
         font-size: 0.78rem !important;
         line-height: 1.4 !important;
         word-break: normal !important;
         overflow-wrap: break-word !important;
         white-space: normal !important;
+        vertical-align: top !important;
+        text-align: left !important;
     }
     .blog-content th:first-child,
     .ba-content th:first-child,
@@ -3456,11 +3466,9 @@ footer .footer-links a:hover {
     .ba-content td:first-child,
     .blog-table-wrap td:first-child,
     table.blog-table td:first-child {
-        white-space: nowrap !important;
-        width: 1% !important;
-        min-width: 36px !important;
-        text-align: center !important;
-        padding: 8px 4px !important;
+        white-space: normal !important;
+        width: auto !important;
+        text-align: left !important;
     }
     .blog-table-wrap td:nth-child(2),
     .blog-content table td:nth-child(2),
@@ -3468,9 +3476,22 @@ footer .footer-links a:hover {
         white-space: normal !important;
         word-break: normal !important;
         overflow-wrap: break-word !important;
-        font-weight: 700 !important;
-        width: 26% !important;
-        padding: 8px 6px !important;
+        font-weight: 600 !important;
+        width: auto !important;
+        padding: 8px 8px !important;
+    }
+    /* Compact rank badge column only when cell actually has .tb-badge or is in ranking table */
+    .blog-table-wrap td.col-rank,
+    .blog-content td:first-child:has(.tb-badge),
+    .ba-content td:first-child:has(.tb-badge),
+    .blog-table-wrap td:first-child:has(.tb-badge),
+    table.blog-table-ranking td:first-child,
+    table.blog-table-ranking th:first-child {
+        white-space: nowrap !important;
+        width: 1% !important;
+        min-width: 32px !important;
+        text-align: center !important;
+        padding: 8px 4px !important;
     }
     .blog-table-wrap td strong,
     .blog-table-wrap td b,
@@ -3605,6 +3626,53 @@ footer .footer-links a:hover {
     </div>
 </div>
 <?php endif; ?>
+<script>
+(function() {
+  var isBlog = function(u) {
+    if (!u) return false;
+    try { return new URL(u, window.location.href).pathname.toLowerCase().indexOf('blog') !== -1; }
+    catch(e) { return u.toLowerCase().indexOf('blog') !== -1; }
+  };
+  var isReloadOrBack = false;
+  try {
+    var nav = (typeof performance !== 'undefined' && performance.getEntriesByType) ? performance.getEntriesByType('navigation') : [];
+    if (nav.length > 0) {
+      isReloadOrBack = (nav[0].type === 'reload' || nav[0].type === 'back_forward');
+    } else if (window.performance && window.performance.navigation) {
+      var pt = window.performance.navigation.type;
+      isReloadOrBack = (pt === 1 || pt === 2);
+    }
+  } catch(e) {}
+
+  var ref = document.referrer || '';
+  var hasFlag = false;
+  try {
+    if (sessionStorage.getItem('arigato_enter_blog') === '1') {
+      hasFlag = true;
+      sessionStorage.removeItem('arigato_enter_blog');
+    }
+  } catch(e) {}
+
+  var isInternalNonBlog = false;
+  if (ref) {
+    try {
+      var rUrl = new URL(ref, window.location.href);
+      if (rUrl.host.toLowerCase() === window.location.host.toLowerCase() && !isBlog(ref)) {
+        isInternalNonBlog = true;
+      }
+    } catch(e) {}
+  }
+
+  var shouldShow = !isReloadOrBack && !isBlog(ref) && (hasFlag || isInternalNonBlog);
+  window.__shouldShowBlogSplash = shouldShow;
+  if (!shouldShow) {
+    document.documentElement.classList.add('no-blog-splash');
+  } else {
+    document.documentElement.classList.add('no-scroll');
+    document.body.classList.add('no-scroll', 'blog-splash-active');
+  }
+})();
+</script>
 <!-- Blog portal splash loader -->
 <div id="blog-splash-screen" class="blog-splash-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="splash-content">
@@ -3980,7 +4048,7 @@ function switchLang(lang) {
   }
 }
 </script>
-<script src="js/blog-splash.js?v=20260756" defer></script>
+<script src="js/blog-splash.js?v=20260914" defer></script>
 <script>
 // Interactive Ambient Mouse Glow Tracker
 document.addEventListener('mousemove', (e) => {
@@ -4230,20 +4298,27 @@ document.querySelectorAll('.blog-toc-box').forEach(function(box) {
     }
 
     // 5. Attach sleek [Hide / Show] toggle button
-    if (!header.querySelector('.blog-toc-toggle-btn')) {
-        var toggleBtn = document.createElement('button');
+    var toggleBtn = header.querySelector('.blog-toc-toggle-btn');
+    if (!toggleBtn) {
+        toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'blog-toc-toggle-btn';
         toggleBtn.innerHTML = '<span class="toc-btn-text">Hide</span> <i class="fa-solid fa-chevron-up" style="font-size:0.7rem;"></i>';
-        toggleBtn.onclick = function() {
-            var isHidden = body.style.display === 'none';
-            body.style.display = isHidden ? '' : 'none';
-            toggleBtn.querySelector('.toc-btn-text').textContent = isHidden ? 'Hide' : 'Show';
-            var icon = toggleBtn.querySelector('i');
-            if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
-        };
         header.appendChild(toggleBtn);
     }
+    toggleBtn.onclick = function(e) {
+        if (e) e.preventDefault();
+        var isHidden = body.style.display === 'none';
+        body.style.display = isHidden ? '' : 'none';
+        var txt = toggleBtn.querySelector('.toc-btn-text');
+        if (txt) {
+            txt.textContent = isHidden ? 'Hide' : 'Show';
+        } else {
+            toggleBtn.textContent = isHidden ? 'Hide' : 'Show';
+        }
+        var icon = toggleBtn.querySelector('i');
+        if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+    };
 });
 
 // Auto-enhance code blocks with word count & copy button (flex container, zero overlap)

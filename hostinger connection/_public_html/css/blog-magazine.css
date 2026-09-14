@@ -1288,13 +1288,12 @@ blockquote strong {
   hyphens: manual !important;
 }
 
-/* 1st column: Rank / Number / Icon / Status - Never wrap */
-.ba-content th:first-child,
-.blog-content th:first-child,
-.blog-table-wrap th:first-child,
-.ba-content td:first-child,
-.blog-content td:first-child,
-.blog-table-wrap td:first-child {
+/* 1st column: Rank / Number / Icon / Status - Only for ranking tables or cells with .tb-badge */
+table.blog-table-ranking th:first-child,
+table.blog-table-ranking td:first-child,
+.ba-content td:first-child:has(.tb-badge),
+.blog-content td:first-child:has(.tb-badge),
+.blog-table-wrap td:first-child:has(.tb-badge) {
   white-space: nowrap !important;
   width: 1% !important;
   text-align: center !important;
@@ -2122,53 +2121,62 @@ blockquote strong {
     max-width: 100% !important;
     padding: 16px 14px !important;
   }
-  /* Mobile table: No scrollbar, fit 100% screen width, wrap words cleanly to next line */
+  /* Mobile table: Clean word wrap, no truncation, smooth touch scroll fallback */
   .blog-table-wrap {
     margin: 16px 0 !important;
     border-radius: 12px !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     overflow-y: visible !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    scrollbar-width: none !important;
+    scrollbar-width: thin !important;
   }
   .blog-table-wrap::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+    height: 4px !important;
+  }
+  .blog-table-wrap::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 4px !important;
   }
   .blog-table-wrap table,
   .ba-content .blog-table-wrap table,
   .blog-content .blog-table-wrap table,
   table.blog-table {
-    min-width: 0 !important;
-    max-width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
     width: 100% !important;
     table-layout: auto !important;
     margin: 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
   }
   .ba-content th,
   .blog-content th,
   .blog-table-wrap th,
   table.blog-table th {
-    padding: 8px 6px !important;
+    padding: 8px 8px !important;
     font-size: 0.74rem !important;
-    letter-spacing: 0.03em !important;
+    letter-spacing: 0.02em !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
     white-space: normal !important;
+    vertical-align: middle !important;
+    text-align: left !important;
   }
   .ba-content td,
   .blog-content td,
   .blog-table-wrap td,
   table.blog-table td {
-    padding: 8px 6px !important;
+    padding: 8px 8px !important;
     font-size: 0.78rem !important;
     line-height: 1.4 !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
     white-space: normal !important;
+    vertical-align: top !important;
+    text-align: left !important;
   }
   .ba-content th:first-child,
   .blog-content th:first-child,
@@ -2178,11 +2186,9 @@ blockquote strong {
   .blog-content td:first-child,
   .blog-table-wrap td:first-child,
   table.blog-table td:first-child {
-    white-space: nowrap !important;
-    width: 1% !important;
-    min-width: 36px !important;
-    text-align: center !important;
-    padding: 8px 4px !important;
+    white-space: normal !important;
+    width: auto !important;
+    text-align: left !important;
   }
   .blog-table-wrap td:nth-child(2),
   .blog-content table td:nth-child(2),
@@ -2190,9 +2196,22 @@ blockquote strong {
     white-space: normal !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
-    font-weight: 700 !important;
-    width: 26% !important;
-    padding: 8px 6px !important;
+    font-weight: 600 !important;
+    width: auto !important;
+    padding: 8px 8px !important;
+  }
+  /* Compact rank badge column only when cell actually has .tb-badge or is in ranking table */
+  .blog-table-wrap td.col-rank,
+  .blog-content td:first-child:has(.tb-badge),
+  .ba-content td:first-child:has(.tb-badge),
+  .blog-table-wrap td:first-child:has(.tb-badge),
+  table.blog-table-ranking td:first-child,
+  table.blog-table-ranking th:first-child {
+    white-space: nowrap !important;
+    width: 1% !important;
+    min-width: 32px !important;
+    text-align: center !important;
+    padding: 8px 4px !important;
   }
   .blog-table-wrap td strong,
   .blog-table-wrap td b,

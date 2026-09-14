@@ -208,6 +208,76 @@
     </div>
 
     <section class="home-seo-about">
+        <style>
+        .home-seo-about {
+            max-width: 800px;
+            margin: 40px auto 0;
+            padding: 36px 32px;
+            background: var(--bg-card, #ffffff);
+            border: 1.5px solid var(--border, rgba(47, 65, 86, 0.12));
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm, 0 4px 16px rgba(47, 65, 86, 0.05));
+            text-align: center;
+        }
+        .home-seo-about h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-primary, #2F4156);
+            margin: 0 0 8px;
+            letter-spacing: -0.02em;
+        }
+        .home-seo-about h2 em {
+            font-style: italic;
+            color: var(--pal-teal, #567C8D);
+        }
+        .home-seo-about h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary, #2F4156);
+            margin: 20px 0 6px;
+            text-align: left;
+        }
+        .home-seo-about p {
+            font-size: 0.88rem;
+            line-height: 1.8;
+            color: var(--text-secondary, #567C8D);
+            margin: 0 0 14px;
+            text-align: left;
+        }
+        .home-seo-about p:last-of-type { margin-bottom: 0; }
+        .home-seo-about strong { color: var(--text-primary, #2F4156); font-weight: 700; }
+        .home-seo-tags {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border, rgba(47, 65, 86, 0.15));
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .home-seo-tags a,
+        .home-seo-tags span {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 6px 13px;
+            border-radius: 999px;
+            background: var(--pal-sky, #C8D9E6);
+            color: var(--text-primary, #2F4156);
+            text-decoration: none !important;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(47, 65, 86, 0.04);
+        }
+        .home-seo-tags a:hover {
+            background: var(--pal-teal, #567C8D);
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(86, 124, 141, 0.28);
+        }
+        </style>
         <p class="hero-label" style="justify-content:center;">Why Arigato Devan</p>
         <h2>Everything About Our <em>AI Couple Prompts</em> — Gemini, ChatGPT &amp; Nano Banana</h2>
 
@@ -225,19 +295,19 @@
         <p>New prompts are added every week, existing ones are updated as Gemini and ChatGPT's image models improve, and nothing is left stale. You can copy any prompt for free without logging in — an account is only needed if you want to save your favourites, unlock premium prompts faster, or comment on our blog posts. That's the whole idea: a genuinely useful, constantly-updated <strong>couple prompt</strong> resource, not a one-time list that goes out of date in a month.</p>
 
         <div class="home-seo-tags" aria-label="Popular searches">
-            <span>couple prompt for gemini ai</span>
-            <span>couple prompt</span>
-            <span>couple prompt gemini</span>
-            <span>trending couple prompt</span>
-            <span>gemini couple prompt</span>
-            <span>couple prompt for gemini</span>
-            <span>couple prompt chatgpt</span>
-            <span>romantic couple prompt</span>
-            <span>couple prompt chatgpt indian</span>
-            <span>chatgpt couple prompt</span>
-            <span>couple prompt generator</span>
-            <span>ai couple prompts</span>
-            <span>indian wedding couple prompts</span>
+            <a href="gallery.php">couple prompt for gemini ai</a>
+            <a href="secret_code.php">couple prompt</a>
+            <a href="direct_prompts.php">couple prompt gemini</a>
+            <a href="unreleased.php">trending couple prompt</a>
+            <a href="already_uploaded.php">gemini couple prompt</a>
+            <a href="solo_prompts.php">couple prompt for gemini</a>
+            <a href="gallery.php">couple prompt chatgpt</a>
+            <a href="secret_code.php">romantic couple prompt</a>
+            <a href="direct_prompts.php">couple prompt chatgpt indian</a>
+            <a href="unreleased.php">chatgpt couple prompt</a>
+            <a href="already_uploaded.php">couple prompt generator</a>
+            <a href="solo_prompts.php">ai couple prompts</a>
+            <a href="gallery.php">indian wedding couple prompts</a>
         </div>
     </section>
 </section>

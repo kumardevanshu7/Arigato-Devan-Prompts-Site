@@ -344,9 +344,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (!empty($asset_paths)) { $asset_images_json = json_encode($asset_paths); }
         }
 
-        // Handle extra prompts (2 and 3)
+        // Handle extra prompts (2 through 10)
         $extra_prompts_data = [];
-        for ($ep = 2; $ep <= 3; $ep++) {
+        for ($ep = 2; $ep <= 10; $ep++) {
             $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
             if (empty($ep_text)) continue;
             $ep_image_path = null;

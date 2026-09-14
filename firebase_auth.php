@@ -84,6 +84,11 @@ try {
     $user_role =
         $google_id === "5RDnMAipOwZTA21JJCnkH2V4E492" ? "admin" : "user";
 
+    // Regenerate session ID to prevent Session Fixation attacks
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+
     if ($user) {
         // Only update google_id and role — do NOT overwrite avatar/profile_image.
         // If the user has already gone through onboarding, they chose a custom avatar.

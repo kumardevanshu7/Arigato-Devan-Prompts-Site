@@ -1,9 +1,9 @@
 (function () {
   'use strict';
 
-  var LOADING_MS = 2500;
-  var HOLD_MS = 1000;
-  var CHAR_MS = 52;
+  var LOADING_MS = 1500;
+  var HOLD_MS = 350;
+  var CHAR_MS = 35;
   var WORD_PROMPT = 'prompt';
   var WORD_BLOG = 'blog';
 
@@ -62,7 +62,7 @@
       if (typeof gsap !== 'undefined') {
         gsap.to(splash, {
           yPercent: -100,
-          duration: 0.45,
+          duration: 0.35,
           ease: 'power3.inOut',
           onComplete: function () {
             splash.style.setProperty('display', 'none', 'important');
@@ -74,26 +74,6 @@
       } else {
         splash.style.setProperty('display', 'none', 'important');
         unlockScroll();
-        resolve();
-      }
-    });
-  }
-
-  function dropCurtain(splash) {
-    return new Promise(function (resolve) {
-      splash.style.display = 'flex';
-      if (typeof gsap !== 'undefined') {
-        gsap.fromTo(
-          splash,
-          { yPercent: -100 },
-          {
-            yPercent: 0,
-            duration: 0.35,
-            ease: 'power3.out',
-            onComplete: resolve
-          }
-        );
-      } else {
         resolve();
       }
     });
@@ -120,77 +100,95 @@
     await hideSplash(splash);
   }
 
-  async function runReverse(splash, href) {
-    var suffix = document.getElementById('splash-suffix');
-    var fill = document.getElementById('splash-bar-fill');
-    var label = document.getElementById('splash-loading-label');
-    if (!suffix) {
-      window.location.href = href;
-      return;
+  function isBlogUrl(url) {
+    if (!url) return false;
+    try {
+      var parsed = new URL(url, window.location.href);
+      var path = parsed.pathname.toLowerCase();
+      return path.indexOf('blog') !== -1;
+    } catch (e) {
+      return url.toLowerCase().indexOf('blog') !== -1;
     }
-
-    lockScroll();
-    if (label) label.textContent = 'RETURNING TO PROMPTS';
-
-    setSuffixClass(suffix, WORD_BLOG);
-    suffix.textContent = WORD_BLOG;
-
-    await dropCurtain(splash);
-    resetBar(fill, true);
-
-    await Promise.all([
-      morphSuffix(suffix, WORD_BLOG, WORD_PROMPT),
-      sleep(LOADING_MS)
-    ]);
-
-    window.location.href = href;
   }
 
-  function isBackLink(href) {
-    if (!href || href.charAt(0) === '#') return false;
-    return href === 'index.php'
-      || href === 'index'
-      || href.indexOf('index.php') !== -1
-      || href === 'gallery.php'
-      || href.indexOf('gallery.php') !== -1
-      || href === './'
-      || href === '/';
+  function checkShouldShowBlogSplash() {
+    if (typeof window.__shouldShowBlogSplash === 'boolean') {
+      return window.__shouldShowBlogSplash;
+    }
+
+    // 1. Never show on page reload or back/forward history navigation
+    try {
+      var nav = (typeof performance !== 'undefined' && performance.getEntriesByType)
+        ? performance.getEntriesByType('navigation')
+        : [];
+      if (nav && nav.length > 0) {
+        var t = nav[0].type;
+        if (t === 'reload' || t === 'back_forward') return false;
+      } else if (window.performance && window.performance.navigation) {
+        var pt = window.performance.navigation.type;
+        if (pt === 1 || pt === 2) return false;
+      }
+    } catch (e) {}
+
+    // 2. Check referrer: if already inside blog section, never show
+    var ref = document.referrer || '';
+    if (isBlogUrl(ref)) {
+      return false;
+    }
+
+    // 3. Explicit transition flag set when clicking a blog link from any non-blog page
+    try {
+      if (sessionStorage.getItem('arigato_enter_blog') === '1') {
+        sessionStorage.removeItem('arigato_enter_blog');
+        return true;
+      }
+    } catch (e) {}
+
+    // 4. Same origin referrer from another non-blog section of the site
+    if (ref) {
+      try {
+        var refUrl = new URL(ref, window.location.href);
+        if (refUrl.host.toLowerCase() === window.location.host.toLowerCase() && !isBlogUrl(ref)) {
+          return true;
+        }
+      } catch (e) {}
+    }
+
+    // Default: do not show
+    return false;
   }
 
   function initBlogSplash() {
     var splash = document.getElementById('blog-splash-screen');
     if (!splash) return;
 
+    // Handle bfcache (browser back/forward cache)
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        splash.style.setProperty('display', 'none', 'important');
+        unlockScroll();
+      }
+    });
+
+    var shouldShow = checkShouldShowBlogSplash();
+    window.__shouldShowBlogSplash = shouldShow;
+
+    if (!shouldShow) {
+      document.documentElement.classList.add('no-blog-splash');
+      splash.style.setProperty('display', 'none', 'important');
+      unlockScroll();
+      return;
+    }
+
+    // Safety timeout in case of animation delay
     var safety = setTimeout(function () {
       splash.style.setProperty('display', 'none', 'important');
       unlockScroll();
-    }, LOADING_MS + 1500);
+    }, LOADING_MS + 1000);
 
-    function done() {
+    lockScroll();
+    runForward(splash).then(function () {
       clearTimeout(safety);
-    }
-
-    var referrer = document.referrer;
-    var isFromMainSite = referrer === '' || referrer.indexOf('index') !== -1 || referrer.indexOf('blog') === -1;
-
-    if (isFromMainSite) {
-      lockScroll();
-      runForward(splash).then(done);
-    } else {
-      splash.style.setProperty('display', 'none', 'important');
-      unlockScroll();
-      done();
-    }
-
-    document.addEventListener('click', function (e) {
-      var link = e.target.closest('a');
-      if (!link) return;
-
-      var href = link.getAttribute('href');
-      if (!isBackLink(href)) return;
-
-      e.preventDefault();
-      runReverse(splash, href);
     });
   }
 

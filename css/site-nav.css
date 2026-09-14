@@ -1831,3 +1831,62 @@ font[style] {
         gap: 4px !important;
     }
 }
+
+/* ============================================================
+   NEW BLOG NOTIFICATION INDICATORS (Desktop, Mobile Button & Drawer)
+   ============================================================ */
+.gal-nav-blog-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.nav-blog-dot {
+    width: 7px;
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    margin-left: 5px;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 8px rgba(239, 68, 68, 0.8);
+    animation: navBlogDotPulse 1.8s infinite ease-in-out;
+    display: inline-block;
+    vertical-align: middle;
+}
+.gal-mobile-menu-btn {
+    position: relative !important;
+}
+.mobile-nav-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 9px;
+    height: 9px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.9);
+    animation: navBlogDotPulse 1.8s infinite ease-in-out;
+    pointer-events: none;
+}
+.gal-drawer-blog-link {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+}
+.drawer-new-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    animation: navBlogDotPulse 1.8s infinite ease-in-out;
+}
+@keyframes navBlogDotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.18); opacity: 0.85; box-shadow: 0 0 10px rgba(239, 68, 68, 1); }
+}
+

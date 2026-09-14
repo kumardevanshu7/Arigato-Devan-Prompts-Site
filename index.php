@@ -207,7 +207,7 @@ try {
     </script>
         <?php include_once 'includes/theme_head.php'; ?>
         <?php include_once 'includes/card_skeleton_assets.php'; ?>
-    <link rel="stylesheet" href="css/home-page.css?v=20260740">
+    <link rel="stylesheet" href="css/home-page.css?v=20260914">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->

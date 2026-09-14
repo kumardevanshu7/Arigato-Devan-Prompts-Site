@@ -1753,6 +1753,7 @@ body.page-store::after {
     gap: 8px;
     justify-content: center;
 }
+.home-seo-tags a,
 .home-seo-tags span {
     font-size: 0.68rem;
     font-weight: 700;
@@ -1760,6 +1761,17 @@ body.page-store::after {
     border-radius: 999px;
     background: var(--pal-sky, #C8D9E6);
     color: var(--text-primary);
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+.home-seo-tags a:hover {
+    background: var(--pal-teal, #567C8D);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(86, 124, 141, 0.28);
 }
 
 .home-promo-banner {

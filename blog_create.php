@@ -268,7 +268,7 @@ try {
     $all_blog_categories = $pdo->query("SELECT name FROM blog_categories ORDER BY name ASC")->fetchAll(PDO::FETCH_COLUMN);
 } catch (Exception $e) {}
 if (empty($all_blog_categories)) {
-    $all_blog_categories = ['Uncategorized', 'AI Prompts', 'ChatGPT & Gemini', 'Guides & Tutorials', 'Midjourney & Image AI', 'Product Updates'];
+    $all_blog_categories = ['Uncategorized', 'AI Prompts', 'ChatGPT & Gemini', 'Guides & Tutorials', 'Nano Banana & AI Images', 'Product Updates'];
 }
 $current_blog_categories = ['Uncategorized'];
 ?><!DOCTYPE html>
@@ -1724,7 +1724,7 @@ $current_blog_categories = ['Uncategorized'];
                 <!-- Focus Keyword -->
                 <div class="be-form-group" style="margin-bottom: 8px;">
                     <label class="be-form-label">Focus Keyword</label>
-                    <input type="text" class="be-form-input" id="seo-focus-keyword" name="focus_keyword" value="<?= htmlspecialchars($_POST["focus_keyword"] ?? "") ?>" placeholder="e.g. couple prompt, midjourney..." autocomplete="off">
+                    <input type="text" class="be-form-input" id="seo-focus-keyword" name="focus_keyword" value="<?= htmlspecialchars($_POST["focus_keyword"] ?? "") ?>" placeholder="e.g. couple prompt, gemini nano banana..." autocomplete="off">
                 </div>
 
                 <!-- Live SEO Health Checklist -->
@@ -2255,6 +2255,7 @@ tinymce.init({
     selector: '#blog-editor',
     height: Math.max(760, window.innerHeight - 170),
     min_height: 600,
+    custom_undo_redo_levels: 100,
     menubar: false,
     statusbar: false,
     branding: false,
@@ -2483,6 +2484,58 @@ tinymce.init({
     setup: function (editor) {
         registerImageWriteButtons(editor);
 
+        // ── Granular Undo / Redo Snapshots (Prevents losing 3-4 edits on Ctrl+Z) ──
+        var typingUndoTimer = null;
+        editor.on('keydown', function(e) {
+            if (e.keyCode === 13 || e.keyCode === 9) { // Enter or Tab
+                editor.undoManager.add();
+            }
+        });
+        editor.on('keyup', function(e) {
+            if (e.keyCode === 32 || e.key === '.' || e.key === '!' || e.key === '?' || e.key === ',' || e.key === ':') {
+                clearTimeout(typingUndoTimer);
+                typingUndoTimer = setTimeout(function() {
+                    editor.undoManager.add();
+                }, 250);
+            } else if (e.keyCode !== 13 && e.keyCode !== 9 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                clearTimeout(typingUndoTimer);
+                typingUndoTimer = setTimeout(function() {
+                    editor.undoManager.add();
+                }, 1200);
+            }
+        });
+        editor.on('blur', function() {
+            clearTimeout(typingUndoTimer);
+            editor.undoManager.add();
+        });
+
+        // ── TOC Toggle Button Handler Inside Editor ──
+        editor.on('click', function(e) {
+            var btn = e.target.closest ? e.target.closest('.blog-toc-toggle-btn') : null;
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                var box = btn.closest('.blog-toc-box');
+                if (box) {
+                    var body = box.querySelector('.blog-toc-body');
+                    if (body) {
+                        var isHidden = body.style.display === 'none';
+                        body.style.display = isHidden ? '' : 'none';
+                        var txt = btn.querySelector('.toc-btn-text');
+                        if (txt) {
+                            txt.textContent = isHidden ? 'Hide' : 'Show';
+                        } else {
+                            btn.textContent = isHidden ? 'Hide' : 'Show';
+                        }
+                        var icon = btn.querySelector('i');
+                        if (icon) icon.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+                        editor.nodeChanged();
+                        editor.undoManager.add();
+                    }
+                }
+            }
+        });
+
         // ── Text Case Transformation Menu (Aa Capitalize & AA UPPERCASE) ─────
         function applyCaseTransform(mode) {
             var rawHtml = editor.selection.getContent();
@@ -2510,6 +2563,7 @@ tinymce.init({
             walk(tmp);
             editor.selection.setContent(tmp.innerHTML);
             editor.nodeChanged();
+            editor.undoManager.add();
         }
 
         editor.ui.registry.addMenuButton('caseTransform', {
@@ -5099,9 +5153,11 @@ function toggleHighlight() {
                 tinymce.activeEditor.formatter.toggle('highlight');
             });
             clearMultiSelections(tinymce.activeEditor);
+            tinymce.activeEditor.undoManager.add();
             return;
         }
         tinymce.activeEditor.formatter.toggle('highlight');
+        tinymce.activeEditor.undoManager.add();
     }
 }
 
@@ -5119,6 +5175,7 @@ function togglePromptVar(variant) {
             editor.formatter.toggle(fmtName);
         });
         clearMultiSelections(editor);
+        editor.undoManager.add();
         return;
     }
     
@@ -5126,10 +5183,12 @@ function togglePromptVar(variant) {
     if (editor.selection.isCollapsed()) {
         var cls = variant ? ('prompt-var prompt-var-' + variant) : 'prompt-var';
         editor.execCommand('mceInsertContent', false, `<code class="${cls}">[Your Value]</code>&nbsp;`);
+        editor.undoManager.add();
         return;
     }
     
     editor.formatter.toggle(fmtName);
+    editor.undoManager.add();
 }
 
 function removeHighlight() {
@@ -5145,11 +5204,13 @@ function removeHighlight() {
                 });
             });
             clearMultiSelections(tinymce.activeEditor);
+            tinymce.activeEditor.undoManager.add();
             return;
         }
         formatsToRemove.forEach(function(f) {
             tinymce.activeEditor.formatter.remove(f);
         });
+        tinymce.activeEditor.undoManager.add();
     }
 }
 
@@ -5600,7 +5661,7 @@ function renderCarouselSlideCards() {
         
         html += '<div>';
         html += '<label style="display:block; font-size:0.72rem; font-weight:800; color:#334155; margin-bottom:2px;">SEO Description (Alt Tag):</label>';
-        html += '<input type="text" value="' + escapeImgAttr(slide.alt || '') + '" placeholder="e.g. Prompt photo on Midjourney" oninput="window.carouselSlideData[' + idx + '].alt = this.value" style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.78rem; box-sizing:border-box;">';
+        html += '<input type="text" value="' + escapeImgAttr(slide.alt || '') + '" placeholder="e.g. Prompt photo on Gemini Nano Banana" oninput="window.carouselSlideData[' + idx + '].alt = this.value" style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.78rem; box-sizing:border-box;">';
         html += '</div>';
         
         html += '<div>';
@@ -6121,7 +6182,7 @@ function openFaqModal() {
     var list = document.getElementById('faqModalItemList');
     if (list && list.children.length === 0) {
         addFaqModalRow('How do I unlock the secret codes on Arigato Devan?', 'Comment on our Instagram post to receive the secret code in your DMs, or visit our All Codes page to unlock prompts instantly.');
-        addFaqModalRow('Which AI image generators are supported?', 'All prompts are tested and verified across ChatGPT (DALL-E 3), Midjourney v6, and Google Gemini with photorealistic output.');
+        addFaqModalRow('Which AI image generators are supported?', 'All prompts are tested and verified across ChatGPT and Google Gemini (Nano Banana) with photorealistic output.');
     }
     modal.style.display = 'flex';
 }
@@ -6414,7 +6475,7 @@ function insertTableOfContents(size) {
                   <span class="blog-toc-badge">2 Sections</span>
                 </div>
               </div>
-              <button type="button" class="blog-toc-toggle-btn" title="Toggle Table of Contents">
+              <button type="button" class="blog-toc-toggle-btn" contenteditable="false" title="Toggle Table of Contents">
                 <span class="toc-btn-text">Hide</span> <i class="fa-solid fa-chevron-up" style="font-size:0.7rem;"></i>
               </button>
             </div>
@@ -6489,7 +6550,7 @@ function insertTableOfContents(size) {
               <span class="blog-toc-badge"><span class="toc-count-val">${totalCount}</span><span class="toc-count-txt"> Sections</span></span>
             </div>
           </div>
-          <button type="button" class="blog-toc-toggle-btn" title="Toggle Table of Contents">
+          <button type="button" class="blog-toc-toggle-btn" contenteditable="false" title="Toggle Table of Contents">
             <span class="toc-btn-text">Hide</span> <i class="fa-solid fa-chevron-up" style="font-size:0.7rem;"></i>
           </button>
         </div>
@@ -6609,7 +6670,7 @@ function openImageCaptionModal(editor, img) {
 
     var defaultSuggestions = [
         '(Image Source: Google Flow)',
-        '(Image Source: Midjourney)',
+        '(Image Source: Gemini Nano Banana)',
         '(Image Source: ChatGPT / DALL-E)',
         '(Image Source: Bing Image Creator)',
         '(Image Source: Flux.1)',
@@ -7754,7 +7815,7 @@ if (descTextarea) {
                 <label style="display:block; font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:4px;">
                     Image SEO Description / Alt Text <span style="color:#ef4444;">*</span>
                 </label>
-                <input type="text" id="eimSeoAlt" placeholder="e.g. Photorealistic prompt result of couple in neon city on Midjourney v6" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+                <input type="text" id="eimSeoAlt" placeholder="e.g. Photorealistic prompt result of couple in neon city on Gemini Nano Banana" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
                 <span style="display:block; font-size:0.72rem; color:#64748b; margin-top:3px;">Important: Google uses this for image ranking & Instagram/Twitter previews.</span>
             </div>
 
@@ -7763,7 +7824,7 @@ if (descTextarea) {
                 <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:4px;">
                     Caption (Optional)
                 </label>
-                <input type="text" id="eimCaption" placeholder="e.g. Midjourney v6 prompt test with 85mm f/1.4 lens" style="width:100%; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.88rem; box-sizing:border-box;">
+                <input type="text" id="eimCaption" placeholder="e.g. Gemini prompt test with 85mm f/1.4 lens" style="width:100%; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:0.88rem; box-sizing:border-box;">
             </div>
 
             <!-- Image Alignment & Width -->

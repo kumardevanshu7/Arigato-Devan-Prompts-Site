@@ -128,10 +128,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // Handle extra prompts (2 and 3)
+    // Handle extra prompts (2 through 10)
     $extra_prompts_data = [];
     $allowed_ext_ep = ["jpg","jpeg","png","gif","webp"];
-    for ($ep = 2; $ep <= 3; $ep++) {
+    for ($ep = 2; $ep <= 10; $ep++) {
         $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
         if (empty($ep_text)) continue;
         $ep_title = trim($_POST["extra_prompt_{$ep}_title"] ?? '');
@@ -194,8 +194,10 @@ $current_asset_title = $p["asset_title"] ?? "";
 $current_asset_images = $p["asset_images"] ?? "";
 $has_current_assets = !empty($current_asset_title) || !empty($current_asset_images);
 $current_extra_arr  = json_decode($p['extra_prompts'] ?? '[]', true) ?: [];
-$ep2_data = $current_extra_arr[0] ?? null;
-$ep3_data = $current_extra_arr[1] ?? null;
+$extra_by_num = [];
+for ($i = 0; $i < 9; $i++) {
+    $extra_by_num[$i + 2] = $current_extra_arr[$i] ?? null;
+}
 ?>
 <?php $admin_name = $_SESSION['username'] ?? 'Admin'; ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -616,72 +618,42 @@ body::before, body::after { display: none !important; background-image: none !im
 
       <!-- Extra Prompts -->
       <div class="form-group">
-        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 2 more variants for this card)</span></label>
+        <label>Extra Prompts <span style="font-weight:600;color:#888;text-transform:none;font-size:.85rem;">(optional — up to 9 more variants for this card)</span></label>
 
-        <div id="ep2-section" style="<?= $ep2_data ? '' : 'display:none;' ?>">
+        <?php for ($ep = 2; $ep <= 10; $ep++):
+            $ep_data = $extra_by_num[$ep] ?? null;
+        ?>
+        <div id="ep<?= $ep ?>-section" style="<?= $ep_data ? '' : 'display:none;' ?>">
           <div class="extra-prompt-box">
             <div class="extra-prompt-header">
-              <span class="extra-prompt-num"><i class="fa-solid fa-2"></i> Prompt 2</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(2)"><i class="fa-solid fa-xmark"></i> Remove</button>
+              <span class="extra-prompt-num"><i class="fa-solid fa-layer-group"></i> Prompt <?= $ep ?></span>
+              <button type="button" class="extra-remove-btn" onclick="removeEP(<?= $ep ?>)"><i class="fa-solid fa-xmark"></i> Remove</button>
             </div>
-            <input type="hidden" name="extra_prompt_2_current_image" value="<?= htmlspecialchars($ep2_data['image_path'] ?? '') ?>">
+            <input type="hidden" name="extra_prompt_<?= $ep ?>_current_image" value="<?= htmlspecialchars($ep_data['image_path'] ?? '') ?>">
             <div class="form-group" style="margin-bottom:12px;">
-              <label>Prompt 2 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
-              <input type="text" name="extra_prompt_2_title" value="<?= htmlspecialchars($ep2_data['title'] ?? '') ?>" placeholder="e.g. Rainy Day Version">
+              <label>Prompt <?= $ep ?> Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
+              <input type="text" name="extra_prompt_<?= $ep ?>_title" value="<?= htmlspecialchars($ep_data['title'] ?? '') ?>" placeholder="Optional variant title">
             </div>
             <div class="form-group" style="margin-bottom:12px;">
-              <label>Prompt 2 Text</label>
-              <textarea name="extra_prompt_2_text" id="ep2_text" rows="4"><?= htmlspecialchars($ep2_data['prompt_text'] ?? '') ?></textarea>
+              <label>Prompt <?= $ep ?> Text</label>
+              <textarea name="extra_prompt_<?= $ep ?>_text" id="ep<?= $ep ?>_text" rows="4"><?= htmlspecialchars($ep_data['prompt_text'] ?? '') ?></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>Prompt 2 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
-              <?php if (!empty($ep2_data['image_path'])): ?>
-              <div style="margin-bottom:8px;"><img loading="lazy" src="<?= htmlspecialchars($ep2_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
+              <label>Prompt <?= $ep ?> Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
+              <?php if (!empty($ep_data['image_path'])): ?>
+              <div style="margin-bottom:8px;"><img loading="lazy" src="<?= htmlspecialchars($ep_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
               <?php endif; ?>
               <div class="file-upload-wrapper">
-                <label for="ep2_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep2_data ? 'Change' : 'Choose' ?> Image</label>
-                <span class="file-upload-name" id="ep2-fname">No file chosen</span>
-                <input type="file" id="ep2_image" name="extra_prompt_2_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep2-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+                <label for="ep<?= $ep ?>_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep_data ? 'Change' : 'Choose' ?> Image</label>
+                <span class="file-upload-name" id="ep<?= $ep ?>-fname">No file chosen</span>
+                <input type="file" id="ep<?= $ep ?>_image" name="extra_prompt_<?= $ep ?>_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep<?= $ep ?>-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
               </div>
             </div>
           </div>
         </div>
+        <?php endfor; ?>
 
-        <div id="ep3-section" style="<?= $ep3_data ? '' : 'display:none;' ?>">
-          <div class="extra-prompt-box">
-            <div class="extra-prompt-header">
-              <span class="extra-prompt-num"><i class="fa-solid fa-3"></i> Prompt 3</span>
-              <button type="button" class="extra-remove-btn" onclick="removeEP(3)"><i class="fa-solid fa-xmark"></i> Remove</button>
-            </div>
-            <input type="hidden" name="extra_prompt_3_current_image" value="<?= htmlspecialchars($ep3_data['image_path'] ?? '') ?>">
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Prompt 3 Title <span style="font-weight:600;color:#888;text-transform:none;">(optional)</span></label>
-              <input type="text" name="extra_prompt_3_title" value="<?= htmlspecialchars($ep3_data['title'] ?? '') ?>" placeholder="e.g. Sunset Version">
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Prompt 3 Text</label>
-              <textarea name="extra_prompt_3_text" id="ep3_text" rows="4"><?= htmlspecialchars($ep3_data['prompt_text'] ?? '') ?></textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Prompt 3 Image <span style="font-weight:600;color:#888;text-transform:none;">(leave blank to keep current)</span></label>
-              <?php if (!empty($ep3_data['image_path'])): ?>
-              <div style="margin-bottom:8px;"><img loading="lazy" src="<?= htmlspecialchars($ep3_data['image_path']) ?>" style="width:55px;height:75px;object-fit:cover;border-radius:8px;border:2px solid var(--text-color);"></div>
-              <?php endif; ?>
-              <div class="file-upload-wrapper">
-                <label for="ep3_image" class="file-upload-btn" style="background:var(--secondary-color);white-space:nowrap;"><i class="fa-solid fa-image"></i> <?= $ep3_data ? 'Change' : 'Choose' ?> Image</label>
-                <span class="file-upload-name" id="ep3-fname">No file chosen</span>
-                <input type="file" id="ep3_image" name="extra_prompt_3_image" accept="image/*" style="display:none;" onchange="document.getElementById('ep3-fname').textContent=this.files[0]?this.files[0].name:'No file chosen'">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="ep-add-btns">
-          <button type="button" id="ep-add2-btn" class="extra-add-btn" style="<?= $ep2_data ? 'display:none;' : '' ?>" onclick="addEP(2)"><i class="fa-solid fa-plus"></i> Add Prompt 2</button>
-          <?php if ($ep2_data): ?>
-          <button type="button" id="ep-add3-btn" class="extra-add-btn" style="<?= $ep3_data ? 'display:none;' : '' ?>" onclick="addEP(3)"><i class="fa-solid fa-plus"></i> Add Prompt 3</button>
-          <?php endif; ?>
-        </div>
+        <div id="ep-add-btns"></div>
       </div>
 
       <!-- Code field &mdash; only shown for secret -->
@@ -937,28 +909,48 @@ body::before, body::after { display: none !important; background-image: none !im
             countEl.style.color = words.length >= 200 ? '#f87171' : '';
         }
 
-        function addEP(num) {
-            document.getElementById('ep'+num+'-section').style.display = 'block';
-            document.getElementById('ep-add'+num+'-btn').style.display = 'none';
-            if (num === 2) {
-                const addBtns = document.getElementById('ep-add-btns');
-                let b3 = document.getElementById('ep-add3-btn');
-                if (!b3) {
-                    b3 = document.createElement('button');
-                    b3.type='button'; b3.id='ep-add3-btn'; b3.className='extra-add-btn';
-                    b3.innerHTML='? Add Prompt 3'; b3.onclick=function(){ addEP(3); };
-                    addBtns.appendChild(b3);
-                } else { b3.style.display=''; }
+        function updateEpAddBtn() {
+            const addBtns = document.getElementById('ep-add-btns');
+            if (!addBtns) return;
+            addBtns.innerHTML = '';
+            let nextNum = 2;
+            for (let i = 2; i <= 10; i++) {
+                const sec = document.getElementById('ep' + i + '-section');
+                if (sec && sec.style.display !== 'none') {
+                    nextNum = i + 1;
+                }
+            }
+            if (nextNum <= 10) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = 'ep-add' + nextNum + '-btn';
+                btn.className = 'extra-add-btn';
+                btn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Prompt ' + nextNum;
+                btn.onclick = function() { addEP(nextNum); };
+                addBtns.appendChild(btn);
             }
         }
-        function removeEP(num) {
-            document.getElementById('ep'+num+'-section').style.display='none';
-            const t=document.getElementById('ep'+num+'_text'); if(t) t.value='';
-            const im=document.getElementById('ep'+num+'_image'); if(im) im.value='';
-            const fn=document.getElementById('ep'+num+'-fname'); if(fn) fn.textContent='No file chosen';
-            const ab=document.getElementById('ep-add'+num+'-btn'); if(ab) ab.style.display='';
-            if(num===2){ removeEP(3); const b3=document.getElementById('ep-add3-btn'); if(b3) b3.style.display='none'; }
+
+        function addEP(num) {
+            const sec = document.getElementById('ep' + num + '-section');
+            if (sec) sec.style.display = 'block';
+            updateEpAddBtn();
         }
+
+        function removeEP(num) {
+            for (let i = 10; i >= num; i--) {
+                const sec = document.getElementById('ep' + i + '-section');
+                if (sec && sec.style.display !== 'none') {
+                    sec.style.display = 'none';
+                    const t = document.getElementById('ep' + i + '_text'); if (t) t.value = '';
+                    const title = document.getElementById('ep' + i + '_title'); if (title) title.value = '';
+                    const im = document.getElementById('ep' + i + '_image'); if (im) im.value = '';
+                    const fn = document.getElementById('ep' + i + '-fname'); if (fn) fn.textContent = 'No file chosen';
+                }
+            }
+            updateEpAddBtn();
+        }
+        document.addEventListener('DOMContentLoaded', updateEpAddBtn);
 
         function handleEditAssetFiles(input) {
             const files = Array.from(input.files).slice(0, 2);

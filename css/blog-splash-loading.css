@@ -15,6 +15,19 @@
   will-change: transform;
 }
 
+html.no-blog-splash #blog-splash-screen {
+  display: none !important;
+}
+
+html.no-blog-splash body.blog-splash-active {
+  overflow: auto !important;
+  height: auto !important;
+}
+
+html.no-blog-splash body.blog-splash-active > *:not(#blog-splash-screen) {
+  visibility: visible !important;
+}
+
 .splash-content {
   width: min(420px, 92vw);
   text-align: center;
@@ -86,12 +99,12 @@
 }
 
 .splash-loading-bar-fill.is-running {
-  animation: blog-splash-progress 2.5s linear forwards;
+  animation: blog-splash-progress 1.5s linear forwards;
 }
 
 .splash-loading-bar-fill.is-reverse {
   width: 100%;
-  animation: blog-splash-progress-reverse 2.5s linear forwards;
+  animation: blog-splash-progress-reverse 1.5s linear forwards;
 }
 
 @keyframes blog-splash-progress {
