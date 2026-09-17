@@ -144,6 +144,8 @@ $cat_count = $cat === 'all' ? $total : (int)($counts[$cat] ?? 0);
 $page_desc = $cat === 'all'
     ? $meta['tagline']
     : ($meta['meta_desc'] ?? $meta['tagline']);
+$canonical_cat_query = $cat !== 'all' ? '?cat=' . urlencode($cat) : '';
+$_page_canonical = 'https://arigatodevan.com/curated_ai_prompts.php' . $canonical_cat_query;
 ?>
 <!DOCTYPE html>
 <html lang="en" class="theme-nogoda">
@@ -153,6 +155,15 @@ $page_desc = $cat === 'all'
     <meta name="theme-color" content="<?= htmlspecialchars($meta['theme_color']) ?>">
     <title><?= htmlspecialchars($meta['title']) ?> — Arigato Devan</title>
     <meta name="description" content="<?= htmlspecialchars($page_desc) ?>">
+    <!-- Open Graph / Social Tags -->
+    <meta property="og:site_name" content="Arigato Devan Prompts">
+    <meta property="og:title" content="<?= htmlspecialchars($meta['title']) ?> — Arigato Devan">
+    <meta property="og:description" content="<?= htmlspecialchars($page_desc) ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($_page_canonical) ?>">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="<?= htmlspecialchars($meta['title']) ?> — Arigato Devan">
+    <meta name="twitter:description" content="<?= htmlspecialchars($page_desc) ?>">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260721">
     <?php include_once 'gtag.php'; ?>

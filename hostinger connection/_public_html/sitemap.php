@@ -22,12 +22,6 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
-        "url"        => "/secret_code.php",
-        "priority"   => "0.8",
-        "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
-    ],
-    [
         "url"        => "/curated_ai_prompts.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
@@ -40,19 +34,7 @@ $static_pages = [
         "lastmod"    => "2026-07-02",
     ],
     [
-        "url"        => "/already_uploaded.php",
-        "priority"   => "0.8",
-        "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
-    ],
-    [
         "url"        => "/direct_prompts.php",
-        "priority"   => "0.8",
-        "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
-    ],
-    [
-        "url"        => "/all_codes.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
         "lastmod"    => "2026-07-02",

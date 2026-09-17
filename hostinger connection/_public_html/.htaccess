@@ -10,11 +10,20 @@ ErrorDocument 404 /404.php
 # ─── sitemap.xml → sitemap.php ──────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # ─── Canonical Domain: Redirect www to non-www (301 Permanent)
+    RewriteCond %{HTTP_HOST} ^www\.arigatodevan\.com$ [NC]
+    RewriteRule ^(.*)$ https://arigatodevan.com/$1 [L,R=301]
+
     # --- 301 Redirects
     RewriteRule ^terms/?$ /terms.php [R=301,L]
     RewriteRule ^prompts/?$ /gallery.php [R=301,L]
     RewriteRule ^how_to_use/?$ /gallery.php [R=301,L]
     RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
+
+    # ─── Curated AI Prompts Hub: Clean direct 301 to curated_ai_prompts.php
+    RewriteRule ^curated-ai-prompts/?$ /curated_ai_prompts.php [R=301,L,QSA]
+
     # ─── Clean prompt URLs: /prompts/kiss-in-rain → prompt.php?slug=kiss-in-rain
     RewriteRule ^prompts/([a-z0-9-]+)/?$ prompt.php?slug=$1 [L,QSA]
     # Old Not Mine URLs stay alive → new Curated URLs

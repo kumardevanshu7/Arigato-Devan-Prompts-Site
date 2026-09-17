@@ -1,10 +1,91 @@
-# Pretty prompt URLs (optional — prompt.php?slug= also works)
+# ─── Custom Error Pages ──────────────────────────────────────────────────────
+ErrorDocument 404 /404.php
+
+# Block direct access to sensitive PHP files
+<FilesMatch "^(db\.php)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# ─── sitemap.xml → sitemap.php ──────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^prompts/([a-zA-Z0-9_-]+)/?$ prompt.php?slug=$1 [L,QSA]
-    # Curated AI Prompts — /curated-ai-prompts/{slug} (does not affect /prompts/)
+
+    # ─── Canonical Domain: Redirect www to non-www (301 Permanent)
+    RewriteCond %{HTTP_HOST} ^www\.arigatodevan\.com$ [NC]
+    RewriteRule ^(.*)$ https://arigatodevan.com/$1 [L,R=301]
+
+    # --- 301 Redirects
+    RewriteRule ^terms/?$ /terms.php [R=301,L]
+    RewriteRule ^prompts/?$ /gallery.php [R=301,L]
+    RewriteRule ^how_to_use/?$ /gallery.php [R=301,L]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
+
+    # ─── Curated AI Prompts Hub: Clean direct 301 to curated_ai_prompts.php
+    RewriteRule ^curated-ai-prompts/?$ /curated_ai_prompts.php [R=301,L,QSA]
+
+    # ─── Clean prompt URLs: /prompts/kiss-in-rain → prompt.php?slug=kiss-in-rain
+    RewriteRule ^prompts/([a-z0-9-]+)/?$ prompt.php?slug=$1 [L,QSA]
+    # Old Not Mine URLs stay alive → new Curated URLs
+    RewriteRule ^not-mine/([a-z0-9][a-z0-9-]*)/?$ /curated-ai-prompts/$1 [R=301,L,NC]
     RewriteRule ^curated-ai-prompts/([a-z0-9][a-z0-9-]*)/?$ curated-ai-prompts/prompt.php?slug=$1 [L,QSA,NC]
 </IfModule>
 
-ErrorDocument 404 /404.php
-ErrorDocument 500 /500.php
+# ─── Gzip / Deflate Compression ─────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE font/woff2
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE application/font-woff2
+</IfModule>
+
+# ─── Browser Caching ─────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images — 1 year
+    ExpiresByType image/webp             "access plus 1 year"
+    ExpiresByType image/jpeg             "access plus 1 year"
+    ExpiresByType image/png              "access plus 1 year"
+    ExpiresByType image/gif              "access plus 1 year"
+    ExpiresByType image/svg+xml         "access plus 1 year"
+
+    # CSS + JS — 1 year (versioned URLs used, safe)
+    ExpiresByType text/css               "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript        "access plus 1 year"
+
+    # Fonts — 30 days
+    ExpiresByType font/woff2             "access plus 30 days"
+    ExpiresByType font/woff              "access plus 30 days"
+    ExpiresByType application/font-woff2 "access plus 30 days"
+</IfModule>
+
+# ─── Cache-Control Headers ───────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|jpg|jpeg|png|gif|svg)$">
+        Header set Cache-Control "max-age=31536000, public, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "max-age=31536000, public, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(woff2|woff)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+
+    # Basic Security Headers (bonus — low effort, good security)
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ─── PHP file — no caching (always fresh) ────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>

@@ -6,24 +6,38 @@ if (!isset($_page_canonical)) {
 ?>
 <!-- Canonical URL -->
 <link rel="canonical" href="<?= htmlspecialchars($_page_canonical) ?>">
-<!-- Organization Schema — appears on all pages -->
+<!-- Organization & WebSite Schema — appears on all pages -->
 <script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Arigato Devan Prompts",
-    "url": "https://arigatodevan.com",
-    "logo": "https://arigatodevan.com/favicon/android-chrome-512x512.png",
-    "sameAs": ["https://www.instagram.com/arigato.devan/"]
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Arigato Devan Prompts",
-    "url": "https://arigatodevan.com"
-  }
-]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://arigatodevan.com/#website",
+      "name": "Arigato Devan Prompts",
+      "url": "https://arigatodevan.com",
+      "description": "Premium AI couple prompts for Instagram Reels. Unlock secret, viral and unreleased prompts on Arigato Devan.",
+      "publisher": {
+        "@id": "https://arigatodevan.com/#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://arigatodevan.com/#organization",
+      "name": "Arigato Devan",
+      "url": "https://arigatodevan.com",
+      "logo": "https://arigatodevan.com/toplogo/logo01.webp",
+      "sameAs": [
+        "https://www.instagram.com/arigato.devan/"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://arigatodevan.com/contact.php"
+      }
+    }
+  ]
+}
 </script>
 <!-- Font Awesome — high priority preload (LCP fix: FA icons in navbar) -->
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>

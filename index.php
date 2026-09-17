@@ -179,32 +179,6 @@ try {
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <!-- Schema Markup: WebSite + Organization -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "name": "Arigato Devan Prompts",
-          "url": "https://arigatodevan.com",
-          "description": "Premium AI couple prompts for Instagram Reels. Unlock secret, viral and unreleased prompts on Arigato Devan."
-        },
-        {
-          "@type": "Organization",
-          "name": "Arigato Devan",
-          "url": "https://arigatodevan.com",
-          "logo": "https://arigatodevan.com/toplogo/logo01.webp",
-          "sameAs": ["https://www.instagram.com/arigato.devan"],
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer support",
-            "url": "https://arigatodevan.com/contact.php"
-          }
-        }
-      ]
-    }
-    </script>
         <?php include_once 'includes/theme_head.php'; ?>
         <?php include_once 'includes/card_skeleton_assets.php'; ?>
     <link rel="stylesheet" href="css/home-page.css?v=20260914">
