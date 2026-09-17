@@ -166,7 +166,7 @@ $today = date("Y-m-d");
 
 <?php foreach ($blogs as $blog): ?>
   <url>
-    <loc><?= $base . "/blog.php?slug=" . urlencode($blog["slug"]) ?></loc>
+    <loc><?= $base . "/blog/" . htmlspecialchars($blog["slug"]) ?></loc>
     <lastmod><?= date(
         "Y-m-d",
         strtotime($blog["updated_at"] ?? $blog["created_at"]),

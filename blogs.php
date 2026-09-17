@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+require_once __DIR__ . "/slug_helper.php";
 if (isset($_SESSION["user_id"]) && empty($_SESSION["onboarding_complete"])) {
     header("Location: onboarding.php");
     exit();
@@ -1172,7 +1173,7 @@ footer .footer-links a:hover {
       $tag0 = $b['tags'] ? trim(explode(',', $b['tags'])[0]) : 'Story';
       $mins = max(1, (int) ceil(str_word_count(strip_tags($b['content'] ?? '')) / 200));
     ?>
-    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-feature">
+    <a href="<?= htmlspecialchars(blog_post_url($b['slug'])) ?>" class="bm-feature">
       <?= blog_list_cover_html($b, true) ?>
       <div class="bm-feature-body">
         <span class="bm-chip"><?= htmlspecialchars($tag0) ?> · <?= $mins ?> min read · <i class="fa-regular fa-eye"></i> <?= number_format((int)($b['view_count'] ?? 0)) ?></span>
@@ -1219,7 +1220,7 @@ footer .footer-links a:hover {
       $p_img = !empty($b['image_path']) ? $b['image_path'] : (!empty($b['image_path_landscape']) ? $b['image_path_landscape'] : '');
       $l_img = !empty($b['image_path_landscape']) ? $b['image_path_landscape'] : (!empty($b['image_path']) ? $b['image_path'] : '');
     ?>
-    <a href="blog.php?slug=<?= urlencode($b['slug']) ?>" class="bm-card bm-card-filter" data-category="<?= htmlspecialchars(strtolower($b['category'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-tags="<?= htmlspecialchars(strtolower(($b['tags'] ?? '') . ' ' . ($b['category'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
+    <a href="<?= htmlspecialchars(blog_post_url($b['slug'])) ?>" class="bm-card bm-card-filter" data-category="<?= htmlspecialchars(strtolower($b['category'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-tags="<?= htmlspecialchars(strtolower(($b['tags'] ?? '') . ' ' . ($b['category'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
       <div class="bm-card-img">
         <?php if ($p_img || $l_img): ?>
           <img class="bm-cover-rect" loading="lazy" src="<?= htmlspecialchars($l_img) ?>" alt="<?= htmlspecialchars($b['title']) ?>">

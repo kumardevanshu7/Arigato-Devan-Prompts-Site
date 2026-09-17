@@ -7,7 +7,7 @@
     <div class="home-testi-wrap">
         <div class="home-testi-head">
             <p class="hero-label">What our users say</p>
-            <h2 class="home-testi-title">Loved by <em>creators</em></h2>
+            <p class="home-testi-title">Loved by <em>creators</em></p>
         </div>
 
         <div class="home-testi-carousel" data-count="<?= (int)$testi_count ?>">
@@ -135,14 +135,14 @@
     <p class="home-sub">Powered by <strong>Gemini Nano 2</strong> + <strong>ChatGPT Image 2.0</strong></p>
 
     <div class="home-note">
-        <p id="comic-note-text">No need to login — you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts.</p>
+        <p id="comic-note-text">Free to explore &amp; unlock! Tap to unlock as a guest, or login with Google for <strong>4x faster unlocks</strong> (20 taps) &amp; permanent saves.</p>
         <a href="gallery.php" class="home-btn-outline"><i class="fa-solid fa-compass"></i> Explore Prompts &rarr;</a>
     </div>
     <script>
     (function(){
         var msgs = [
-            'No need to login — you can copy any prompt for free! Just click <strong>Explore</strong>. Login is only for liking &amp; saving prompts.',
-            'Login ki zaroorat nahi — bina login ke bhi koi bhi prompt copy kar sakte ho! Bas <strong>Explore</strong> click karo. Login sirf like &amp; save ke liye hai.'
+            'Free to explore &amp; unlock! Tap to unlock as a guest, or login with Google for <strong>4x faster unlocks</strong> (20 taps) &amp; permanent saves.',
+            'Bina login ke bhi free unlock karo! Google login karne par <strong>4x fast unlock</strong> (sirf 20 taps) aur permanent save milega.'
         ];
         var i = 0, el = document.getElementById('comic-note-text');
         if (!el) return;
@@ -292,22 +292,24 @@
         <h3>Built to Actually Rank — And Actually Work</h3>
         <p>Behind the scenes, every prompt is tagged, categorised, and written with real search intent in mind — that's why whether you land here searching <strong>couple prompts for ai</strong>, <strong>couple prompts ai</strong>, <strong>couple prompts for ai gemini</strong>, or <strong>best couple prompts for gemini</strong>, you'll find a prompt that matches what you were actually looking for, not generic filler content. Beyond the main gallery, we also run a dedicated <strong>Curated AI Prompts</strong> section of carefully refined and enhanced prompts inspired by various creative sources, a <strong>Prompt of the Day</strong> feature so you never run out of fresh ideas, and a blog where we break down prompting techniques, new AI features, and step-by-step guides — all built around the same couple-photography niche.</p>
 
-        <p>New prompts are added every week, existing ones are updated as Gemini and ChatGPT's image models improve, and nothing is left stale. You can copy any prompt for free without logging in — an account is only needed if you want to save your favourites, unlock premium prompts faster, or comment on our blog posts. That's the whole idea: a genuinely useful, constantly-updated <strong>couple prompt</strong> resource, not a one-time list that goes out of date in a month.</p>
+        <p>New prompts are added every week, existing ones are updated as Gemini and ChatGPT's image models improve, and nothing is left stale. You can unlock and copy prompts for free as a guest — or log in to unlock 4x faster (20 taps vs 90), save your favourites permanently, and access premium drops. That's the whole idea: a genuinely useful, constantly-updated <strong>couple prompt</strong> resource, not a one-time list that goes out of date in a month.</p>
 
         <div class="home-seo-tags" aria-label="Popular searches">
-            <a href="gallery.php">couple prompt for gemini ai</a>
-            <a href="secret_code.php">couple prompt</a>
-            <a href="direct_prompts.php">couple prompt gemini</a>
-            <a href="unreleased.php">trending couple prompt</a>
-            <a href="already_uploaded.php">gemini couple prompt</a>
-            <a href="solo_prompts.php">couple prompt for gemini</a>
-            <a href="gallery.php">couple prompt chatgpt</a>
-            <a href="secret_code.php">romantic couple prompt</a>
-            <a href="direct_prompts.php">couple prompt chatgpt indian</a>
-            <a href="unreleased.php">chatgpt couple prompt</a>
-            <a href="already_uploaded.php">couple prompt generator</a>
-            <a href="solo_prompts.php">ai couple prompts</a>
-            <a href="gallery.php">indian wedding couple prompts</a>
+            <a href="gallery.php?tag=romantic"><i class="fa-solid fa-heart" style="font-size:0.6rem;margin-right:5px;"></i> romantic couple prompt</a>
+            <a href="gallery.php?tag=traditional"><i class="fa-solid fa-om" style="font-size:0.6rem;margin-right:5px;"></i> indian wedding couple prompts</a>
+            <a href="gallery.php?tag=selfie"><i class="fa-solid fa-camera" style="font-size:0.6rem;margin-right:5px;"></i> couple selfie prompts</a>
+            <a href="gallery.php?tag=candid"><i class="fa-solid fa-face-smile" style="font-size:0.6rem;margin-right:5px;"></i> candid couple prompt</a>
+            <a href="gallery.php?tag=kiss"><i class="fa-solid fa-kiss-wink-heart" style="font-size:0.6rem;margin-right:5px;"></i> couple kiss prompts</a>
+            <a href="gallery.php?tag=hug"><i class="fa-solid fa-people-arrows" style="font-size:0.6rem;margin-right:5px;"></i> couple hug prompts</a>
+            <a href="gallery.php?tag=goldenhour"><i class="fa-solid fa-sun" style="font-size:0.6rem;margin-right:5px;"></i> golden hour couple prompts</a>
+            <a href="gallery.php?tag=night"><i class="fa-solid fa-moon" style="font-size:0.6rem;margin-right:5px;"></i> night couple prompts</a>
+            <a href="gallery.php?tag=closeup"><i class="fa-solid fa-eye" style="font-size:0.6rem;margin-right:5px;"></i> close-up couple prompts</a>
+            <a href="gallery.php?tag=playful"><i class="fa-solid fa-wand-magic-sparkles" style="font-size:0.6rem;margin-right:5px;"></i> playful couple prompt</a>
+            <a href="gallery.php?tag=cafe"><i class="fa-solid fa-mug-hot" style="font-size:0.6rem;margin-right:5px;"></i> cafe date prompts</a>
+            <a href="gallery.php?tag=car"><i class="fa-solid fa-car" style="font-size:0.6rem;margin-right:5px;"></i> car couple prompt</a>
+            <a href="gallery.php?tag=flash"><i class="fa-solid fa-bolt" style="font-size:0.6rem;margin-right:5px;"></i> retro 90s couple prompt</a>
+            <a href="gallery.php?tag=collage"><i class="fa-solid fa-table-cells-large" style="font-size:0.6rem;margin-right:5px;"></i> collage couple prompts</a>
+            <a href="gallery.php"><i class="fa-solid fa-images" style="font-size:0.6rem;margin-right:5px;"></i> all ai couple prompts</a>
         </div>
     </section>
 </section>

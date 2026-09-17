@@ -102,4 +102,22 @@ function nm_prompt_share_url(array $p): string
     }
     return $scheme . '://' . $host . nm_prompt_url($p);
 }
+
+/** Clean public URL for a blog post */
+function blog_post_url(string $slug): string
+{
+    $slug = trim($slug);
+    if ($slug === '') return 'blogs.php';
+    $path = '/blog/' . rawurlencode($slug);
+    if (function_exists('nm_is_local') && nm_is_local()) {
+        return nm_local_base() . $path;
+    }
+    return $path;
+}
+
+/** Canonical URL for a blog post */
+function blog_post_canonical(string $slug): string
+{
+    return 'https://arigatodevan.com/blog/' . rawurlencode(trim($slug));
+}
 ?>

@@ -120,6 +120,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['is_live_preview'])) 
     }
 }
 
+require_once __DIR__ . '/slug_helper.php';
+
+// 301 Backward-compatibility: redirect old blog.php?slug= to clean /blog/slug
+if (empty($is_preview_mode) && !empty($blog['slug'])) {
+    $req_uri = $_SERVER['REQUEST_URI'] ?? '';
+    if (strpos($req_uri, 'blog.php') !== false) {
+        header('Location: ' . blog_post_url($blog['slug']), true, 301);
+        exit();
+    }
+}
+
 // Increment view count (never in preview mode)
 if (empty($is_preview_mode) && !empty($blog['id'])) {
     try { 
@@ -193,6 +204,7 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 ?><!DOCTYPE html>
 <html lang="en" class="theme-nogoda">
 <head>
+    <base href="<?= (isset($_SERVER['HTTP_HOST']) && in_array(strtolower($_SERVER['HTTP_HOST']), ['localhost', '127.0.0.1'], true)) ? '/Arigato%20Development%20Site/' : '/' ?>">
     <meta name="theme-color" content="#c084fc">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars($blog["meta_title"] ?? $blog["title"]) ?> &ndash; Arigato Devan Prompts</title>
@@ -601,7 +613,7 @@ code.prompt-var-amber, span.prompt-var-amber,
     $blog["tags"],
 ) ?>"><?php endif; ?>
 <?php
-    $blog_url     = 'https://arigatodevan.com/blog.php?slug=' . urlencode($blog['slug']);
+    $blog_url     = blog_post_canonical($blog['slug']);
     $_page_canonical = $blog_url;
     $og_file = $cover_landscape !== '' ? $cover_landscape : ($cover_portrait !== '' ? $cover_portrait : '');
     $blog_og_img  = $og_file
@@ -3057,7 +3069,7 @@ footer .footer-links a:hover {
         'headline'      => $blog['meta_title'] ?? $blog['title'],
         'description'   => $blog['meta_description'] ?? ($blog['description'] ?? ''),
         'image'         => !empty($blog['image_path']) ? 'https://arigatodevan.com/' . ltrim($blog['image_path'], '/') : 'https://arigatodevan.com/landingpics/lan9.webp',
-        'url'           => 'https://arigatodevan.com/blog.php?slug=' . $blog['slug'],
+        'url'           => blog_post_canonical($blog['slug']),
         'author'        => ['@type' => 'Person', 'name' => $blog['author_name'] ?? 'Arigato Devan'],
         'publisher'     => ['@type' => 'Organization', 'name' => 'Arigato Devan', 'url' => 'https://arigatodevan.com'],
         'datePublished' => date('c', strtotime($blog['created_at'])),
@@ -3068,9 +3080,7 @@ footer .footer-links a:hover {
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://arigatodevan.com"},{"@type":"ListItem","position":2,"name":"Blogs","item":"https://arigatodevan.com/blogs.php"},{"@type":"ListItem","position":3,"name":"<?= htmlspecialchars(
         addslashes($blog["meta_title"] ?? $blog["title"]),
-    ) ?>","item":"https://arigatodevan.com/blog.php?slug=<?= urlencode(
-    $blog["slug"],
-) ?>"}]}
+    ) ?>","item":"<?= blog_post_canonical($blog["slug"]) ?>"}]}
     </script>
     <?php include_once "gtag.php"; ?>
 <style id="blog-article-mobile">
