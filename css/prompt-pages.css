@@ -1973,3 +1973,72 @@ body.page-store::after {
 @media (max-width: 480px) {
     .gal-search-wrap { max-width: 100%; }
 }
+
+/* Clickable Keyword Filter Capsules */
+.pp-about-kw,
+.nmp-about-kw {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    align-items: center;
+}
+.pp-about-kw .pp-kw-chip,
+.pp-about-kw a,
+.pp-about-kw span,
+.nmp-about-kw .nmp-kw-chip,
+.nmp-about-kw a,
+.nmp-about-kw span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 14px !important;
+    border-radius: 999px !important;
+    background: var(--pal-sky, #C8D9E6) !important;
+    color: var(--pal-navy, #2F4156) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(47, 65, 86, 0.16) !important;
+    box-shadow: 0 2px 6px rgba(47, 65, 86, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    user-select: none !important;
+}
+.pp-about-kw .pp-kw-chip::before,
+.pp-about-kw a::before,
+.nmp-about-kw .nmp-kw-chip::before,
+.nmp-about-kw a::before {
+    content: "#";
+    font-weight: 800;
+    opacity: 0.55;
+    font-size: 0.75rem;
+}
+.pp-about-kw .pp-kw-chip:hover,
+.pp-about-kw a:hover,
+.nmp-about-kw .nmp-kw-chip:hover,
+.nmp-about-kw a:hover {
+    background: var(--pal-navy, #2F4156) !important;
+    color: #ffffff !important;
+    border-color: var(--pal-navy, #2F4156) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(47, 65, 86, 0.22) !important;
+}
+.pp-about-kw .pp-kw-chip:hover::before,
+.pp-about-kw a:hover::before,
+.nmp-about-kw .nmp-kw-chip:hover::before,
+.nmp-about-kw a:hover::before {
+    color: #11FFC9 !important;
+    opacity: 0.95 !important;
+}
+.pp-about-kw .pp-kw-chip:active,
+.pp-about-kw a:active,
+.nmp-about-kw .nmp-kw-chip:active,
+.nmp-about-kw a:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15) !important;
+}
+

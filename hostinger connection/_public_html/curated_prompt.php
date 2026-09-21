@@ -646,32 +646,56 @@ body.nmp-preview-open { overflow: hidden; }
     margin: 0;
 }
 .nmp-about-kw {
-    margin-top: 14px;
+    margin-top: 16px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-}
-.nmp-about-kw span,
-.nmp-about-kw a {
-    font-size: .68rem;
-    font-weight: 700;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: var(--pal-sky, #C8D9E6);
-    color: var(--pal-navy);
-    text-decoration: none;
-    display: inline-flex;
+    gap: 8px 10px;
     align-items: center;
-    transition: all .2s ease;
 }
-.nmp-about-kw a {
-    cursor: pointer;
+.nmp-about-kw .nmp-kw-chip,
+.nmp-about-kw a,
+.nmp-about-kw span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 14px !important;
+    border-radius: 999px !important;
+    background: #C8D9E6 !important;
+    color: #2F4156 !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(47, 65, 86, 0.16) !important;
+    box-shadow: 0 2px 6px rgba(47, 65, 86, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    user-select: none !important;
 }
+.nmp-about-kw .nmp-kw-chip::before {
+    content: "#";
+    font-weight: 800;
+    opacity: 0.55;
+    font-size: 0.75rem;
+}
+.nmp-about-kw .nmp-kw-chip:hover,
 .nmp-about-kw a:hover {
-    background: var(--pal-navy);
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(47, 65, 86, 0.15);
+    background: #2F4156 !important;
+    color: #ffffff !important;
+    border-color: #2F4156 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(47, 65, 86, 0.22) !important;
+}
+.nmp-about-kw .nmp-kw-chip:hover::before {
+    color: #11FFC9 !important;
+    opacity: 0.95 !important;
+}
+.nmp-about-kw .nmp-kw-chip:active,
+.nmp-about-kw a:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15) !important;
 }
 
 @media (max-width: 600px) {

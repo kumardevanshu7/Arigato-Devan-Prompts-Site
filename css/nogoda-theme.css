@@ -1570,32 +1570,58 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   line-height: 1.7;
 }
 .theme-nogoda .pp-about-kw {
-  margin-top: 14px;
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 8px 10px;
+  align-items: center;
 }
+.theme-nogoda .pp-about-kw .pp-kw-chip,
 .theme-nogoda .pp-about-kw span,
 .theme-nogoda .pp-about-kw a {
-  font-size: .68rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--pal-sky, #C8D9E6);
-  color: var(--pal-navy);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  transition: all .2s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  background: var(--pal-sky, #C8D9E6) !important;
+  color: var(--pal-navy, #2F4156) !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  text-decoration: none !important;
+  border: 1px solid rgba(47, 65, 86, 0.16) !important;
+  box-shadow: 0 2px 6px rgba(47, 65, 86, 0.06) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  line-height: 1.4 !important;
+  user-select: none !important;
 }
-.theme-nogoda .pp-about-kw a {
-  cursor: pointer;
+.theme-nogoda .pp-about-kw .pp-kw-chip::before,
+.theme-nogoda .pp-about-kw a::before {
+  content: "#";
+  font-weight: 800;
+  opacity: 0.55;
+  font-size: 0.75rem;
 }
+.theme-nogoda .pp-about-kw .pp-kw-chip:hover,
 .theme-nogoda .pp-about-kw a:hover {
-  background: var(--pal-navy);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(47, 65, 86, 0.15);
+  background: var(--pal-navy, #2F4156) !important;
+  color: #ffffff !important;
+  border-color: var(--pal-navy, #2F4156) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 14px rgba(47, 65, 86, 0.22) !important;
+}
+.theme-nogoda .pp-about-kw .pp-kw-chip:hover::before,
+.theme-nogoda .pp-about-kw a:hover::before {
+  color: #11FFC9 !important;
+  opacity: 0.95 !important;
+}
+.theme-nogoda .pp-about-kw .pp-kw-chip:active,
+.theme-nogoda .pp-about-kw a:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15) !important;
 }
 
 .theme-nogoda .pp-related {

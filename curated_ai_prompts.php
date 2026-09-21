@@ -60,11 +60,22 @@ if ($tag !== '') {
 }
 
 if ($q !== '') {
-    $words = array_values(array_filter(preg_split('/\s+/', $q)));
-    $prompts = array_values(array_filter($prompts, function ($p) use ($q, $words) {
+    $clean_q   = strtolower($q);
+    $all_words = array_values(array_filter(preg_split('/\s+/', $clean_q)));
+    $stop_words = [
+        'ai', 'prompt', 'prompts', 'photo', 'photos', 'image', 'images',
+        'free', 'download', 'copy', 'paste', 'for', 'in', 'and', 'with',
+        'the', 'a', 'an', 'of', 'to', 'on', 'at', 'by'
+    ];
+    $sig_words = array_values(array_filter($all_words, function($w) use ($stop_words) {
+        return !in_array($w, $stop_words, true) && mb_strlen($w) > 1;
+    }));
+    $match_words = !empty($sig_words) ? $sig_words : $all_words;
+
+    $prompts = array_values(array_filter($prompts, function ($p) use ($clean_q, $match_words) {
         $haystack = strtolower(($p['title'] ?? '') . ' ' . ($p['tags'] ?? '') . ' ' . ($p['meta_keywords'] ?? '') . ' ' . ($p['about_prompt'] ?? ''));
-        if (str_contains($haystack, $q)) return true;
-        foreach ($words as $w) {
+        if (str_contains($haystack, $clean_q)) return true;
+        foreach ($match_words as $w) {
             if (!str_contains($haystack, $w)) return false;
         }
         return true;

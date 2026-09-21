@@ -141,14 +141,28 @@ function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array
     }
 
     if ($search_query !== '') {
-        $clean_q = strtolower($search_query);
-        $words   = array_values(array_filter(preg_split('/\s+/', $clean_q)));
+        $clean_q   = strtolower($search_query);
+        $all_words = array_values(array_filter(preg_split('/\s+/', $clean_q)));
 
-        if (count($words) > 1) {
+        // Common filler words in AI prompt keywords that shouldn't block finding matches
+        $stop_words = [
+            'ai', 'prompt', 'prompts', 'photo', 'photos', 'image', 'images',
+            'free', 'download', 'copy', 'paste', 'for', 'in', 'and', 'with',
+            'the', 'a', 'an', 'of', 'to', 'on', 'at', 'by'
+        ];
+
+        // Significant distinctive words
+        $sig_words = array_values(array_filter($all_words, function($w) use ($stop_words) {
+            return !in_array($w, $stop_words, true) && mb_strlen($w) > 1;
+        }));
+
+        $match_words = !empty($sig_words) ? $sig_words : $all_words;
+
+        if (count($all_words) > 1) {
             $phrase_param = '%' . addcslashes($clean_q, '%_') . '%';
             $word_clauses = [];
             $word_params  = [];
-            foreach ($words as $w) {
+            foreach ($match_words as $w) {
                 $wp = '%' . addcslashes($w, '%_') . '%';
                 $word_clauses[] = "(LOWER(p.title) LIKE ? OR LOWER(p.tag) LIKE ? OR LOWER(p.meta_keywords) LIKE ? OR LOWER(p.about_prompt) LIKE ?)";
                 $word_params[] = $wp;
@@ -181,13 +195,13 @@ function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array
     $total       = (int) $count_stmt->fetchColumn();
     $total_pages = max(1, (int) ceil($total / $per_page));
 
-    // Order clause: Prioritize title match, then tag match, then likes & date
+    // Order clause: Prioritize title match, then tag match, then keyword match, then likes & date
     $order_sql = "p.created_at DESC";
     $order_params = [];
     if ($search_query !== '') {
         $sp = '%' . addcslashes(strtolower($search_query), '%_') . '%';
-        $order_sql = "(CASE WHEN LOWER(p.title) LIKE ? THEN 1 WHEN LOWER(p.tag) LIKE ? THEN 2 ELSE 3 END), p.likes_count DESC, p.created_at DESC";
-        $order_params = [$sp, $sp];
+        $order_sql = "(CASE WHEN LOWER(p.title) LIKE ? THEN 1 WHEN LOWER(p.tag) LIKE ? THEN 2 WHEN LOWER(p.meta_keywords) LIKE ? THEN 3 ELSE 4 END), p.likes_count DESC, p.created_at DESC";
+        $order_params = [$sp, $sp, $sp];
     }
 
     if ($user_id) {
