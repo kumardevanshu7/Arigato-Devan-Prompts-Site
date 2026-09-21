@@ -257,7 +257,7 @@ if ($user_id) {
 }
 
 
-$cat_colors = ['boys' => '#3b82f6', 'girls' => '#ec4899', 'couple' => '#a855f7', 'family' => '#22c55e', 'creativity' => '#a855f7'];
+$cat_colors = ['boys' => '#3b82f6', 'girls' => '#ec4899', 'couple' => '#a855f7', 'creativity' => '#a855f7'];
 $cat_color = $cat_colors[$p['category']] ?? '#F5709D';
 
 $meta_desc = trim($p['meta_description'] ?? '');
@@ -273,7 +273,9 @@ $base_path = $is_local ? nm_local_base() . '/' : '/';
 $canonical = nm_prompt_canonical($p);
 $_page_canonical = $canonical;
 $og_img = 'https://arigatodevan.com/' . ltrim($p['thumbnail_image'] ?? '', '/');
-$about_text = trim($p['meta_description'] ?? '');
+$about_prompt_raw = trim($p['about_prompt'] ?? '');
+$meta_desc_raw = trim($p['meta_description'] ?? '');
+$about_text = $about_prompt_raw !== '' ? $about_prompt_raw : $meta_desc_raw;
 
 $chatgpt_logo = 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg';
 $gemini_logo = 'https://www.google.com/favicon.ico';
@@ -649,13 +651,27 @@ body.nmp-preview-open { overflow: hidden; }
     flex-wrap: wrap;
     gap: 8px;
 }
-.nmp-about-kw span {
+.nmp-about-kw span,
+.nmp-about-kw a {
     font-size: .68rem;
     font-weight: 700;
     padding: 5px 12px;
     border-radius: 999px;
     background: var(--pal-sky, #C8D9E6);
     color: var(--pal-navy);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all .2s ease;
+}
+.nmp-about-kw a {
+    cursor: pointer;
+}
+.nmp-about-kw a:hover {
+    background: var(--pal-navy);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(47, 65, 86, 0.15);
 }
 
 @media (max-width: 600px) {
@@ -821,7 +837,7 @@ body.nmp-preview-open { overflow: hidden; }
         </div>
         <?php if ($is_unlocked): ?>
             <div class="nmp-term-body">
-                <div class="nmp-term-text" id="promptText"><span class="prompt-marker">❯ </span><?= nl2br(htmlspecialchars($p['prompt_text'])) ?></div>
+                <div class="nmp-term-text" id="promptText"><span class="prompt-marker">❯ </span><?= htmlspecialchars($p['prompt_text']) ?></div>
             </div>
             <button class="nmp-copy" onclick="copyPrompt()"><i class="fa-solid fa-copy"></i> <span id="copyLabel">COPY</span></button>
         <?php else: ?>
@@ -862,13 +878,16 @@ body.nmp-preview-open { overflow: hidden; }
     <section class="nmp-about" aria-label="About this prompt">
         <h2>About this prompt</h2>
         <p><?= nl2br(htmlspecialchars($about_text)) ?></p>
+        <?php if ($about_prompt_raw !== '' && $meta_desc_raw !== '' && $meta_desc_raw !== $about_prompt_raw): ?>
+        <p style="margin-top:12px;opacity:.85;font-size:.88rem;"><?= nl2br(htmlspecialchars($meta_desc_raw)) ?></p>
+        <?php endif; ?>
         <?php
         $kw_list = array_filter(array_map('trim', explode(',', $meta_keywords)));
         if (!empty($kw_list)):
         ?>
         <div class="nmp-about-kw" aria-label="Keywords">
             <?php foreach ($kw_list as $kw): ?>
-            <span><?= htmlspecialchars($kw) ?></span>
+            <a href="curated_ai_prompts.php?q=<?= urlencode($kw) ?>" class="nmp-kw-chip" title="Explore curated prompts for <?= htmlspecialchars($kw, ENT_QUOTES) ?>"><?= htmlspecialchars($kw) ?></a>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>

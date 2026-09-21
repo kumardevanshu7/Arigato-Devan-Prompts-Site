@@ -1,20 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 $curPage = 'faq.php';
-if (isset($_SESSION['user_id'])) {
-    require_once "db.php";
-    try {
-        $stmt = $pdo->prepare("SELECT
-            SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
-            SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
-            SUM(CASE WHEN prompt_type = 'insta_viral' THEN 1 ELSE 0 END) as insta_viral,
-            SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
-            SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct
-        FROM prompts");
-        $stmt->execute();
-        $nav_counts = $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (Exception $e) { $nav_counts = []; }
-} else { $nav_counts = []; }
 ?>
 <!DOCTYPE html>
 <html lang="en">

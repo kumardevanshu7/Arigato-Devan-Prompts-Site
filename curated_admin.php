@@ -44,10 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
         $err = 'curated_prompts table missing in live DB. Run DB SQL first.';
     }
 
-    $category       = in_array($_POST['category'] ?? '', ['boys','girls','couple','family','creativity']) ? $_POST['category'] : '';
+    $category       = in_array($_POST['category'] ?? '', ['boys','girls','couple','creativity']) ? $_POST['category'] : '';
     $title          = trim($_POST['title'] ?? '');
     $raw_tags       = trim($_POST['tags'] ?? '');
     $prompt_text    = trim($_POST['prompt_text'] ?? '');
+    if ($prompt_text !== '') {
+        $prompt_text = str_replace(["\r\n", "\r"], "\n", $prompt_text);
+        $prompt_text = preg_replace("/\n{3,}/", "\n\n", $prompt_text);
+        $prompt_text = trim($prompt_text);
+    }
+    $about_prompt   = trim($_POST['about_prompt'] ?? '');
+    if ($about_prompt !== '') {
+        $about_words = preg_split('/\s+/u', $about_prompt, -1, PREG_SPLIT_NO_EMPTY);
+        $about_prompt = implode(' ', array_slice($about_words, 0, 200));
+    }
     $meta_description = trim($_POST['meta_description'] ?? '');
     $meta_keywords  = trim($_POST['meta_keywords'] ?? '');
     $credit_name    = trim($_POST['credit_name'] ?? '');
@@ -60,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
     }
     $chatgpt_failed = !empty($_POST['chatgpt_failed']) ? 1 : 0;
     $gemini_failed  = !empty($_POST['gemini_failed']) ? 1 : 0;
+    $is_trial       = !empty($_POST['is_trial']) ? 1 : 0;
 
     if (!$category || !$title || !$prompt_text) {
         $err = 'Category, Title, and Prompt Text are required.';
@@ -90,10 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
             if (!$err) {
                 $slug = uniqueCuratedSlug($pdo, $title);
                 $stmt = $pdo->prepare(
-                    'INSERT INTO curated_prompts (category, title, slug, tags, prompt_text, meta_description, meta_keywords, credit_name, credit_url, thumbnail_image, chatgpt_image, chatgpt_failed, gemini_image, gemini_failed)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                    'INSERT INTO curated_prompts (category, title, slug, tags, prompt_text, about_prompt, meta_description, meta_keywords, credit_name, credit_url, thumbnail_image, chatgpt_image, chatgpt_failed, gemini_image, gemini_failed, is_trial)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 );
-                $stmt->execute([$category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null, $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed]);
+                $stmt->execute([$category, $title, $slug, $tags_str, $prompt_text, $about_prompt ?: null, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null, $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed, $is_trial]);
                 $new_id = (int) $pdo->lastInsertId();
                 $uploaded_share = [
                     'title' => $title,
@@ -267,11 +278,6 @@ input[type="radio"].cat-radio { display: none; }
 .cat-pill-couple:hover { background: rgba(168,85,247,0.18); border-color: rgba(192,132,252,0.35); }
 .cat-pill-couple.active { background: rgba(168,85,247,0.24); border-color: #c084fc; color: #ede9fe; box-shadow: 0 0 20px rgba(168,85,247,0.18); }
 
-.cat-pill-family { background: rgba(52,211,153,0.12); border-color: rgba(110,231,183,0.22); color: #6ee7b7; }
-.cat-pill-family i { color: #34d399; }
-.cat-pill-family:hover { background: rgba(52,211,153,0.18); border-color: rgba(110,231,183,0.35); }
-.cat-pill-family.active { background: rgba(52,211,153,0.24); border-color: #34d399; color: #d1fae5; box-shadow: 0 0 20px rgba(52,211,153,0.18); }
-
 .cat-pill-creativity { background: rgba(250,204,21,0.12); border-color: rgba(250,204,21,0.28); color: #fde68a; }
 .cat-pill-creativity i { color: #facc15; }
 .cat-pill-creativity:hover { background: rgba(250,204,21,0.18); border-color: rgba(250,204,21,0.38); }
@@ -303,11 +309,12 @@ input[type="radio"].cat-radio { display: none; }
     background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; min-height: 48px;
     cursor: text; transition: border-color .2s, box-shadow .2s; }
 .tag-input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.tag-chips { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .tag-input { background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: .88rem;
     flex: 1; min-width: 100px; padding: 2px 0; }
 .tag-input::placeholder { color: var(--muted); }
 .tag-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: var(--accent-dim2);
-    border: 1px solid rgba(245,112,157,0.2); border-radius: 8px; font-size: .78rem; font-weight: 700; color: var(--accent-soft); }
+    border: 1px solid rgba(245,112,157,0.2); border-radius: 8px; font-size: .78rem; font-weight: 700; color: var(--accent-soft); margin: 2px 4px 2px 0; }
 .tag-chip-x { cursor: pointer; font-size: .9rem; opacity: .6; transition: opacity .15s; line-height: 1; }
 .tag-chip-x:hover { opacity: 1; }
 .tag-hint { font-size: .7rem; color: var(--muted); margin-top: 6px; font-weight: 600; }
@@ -339,8 +346,9 @@ input[type="radio"].cat-radio { display: none; }
 .cat-boys { background: rgba(59,130,246,0.1); color: #60a5fa; }
 .cat-girls { background: rgba(236,72,153,0.1); color: #f472b6; }
 .cat-couple { background: rgba(168,85,247,0.1); color: #c084fc; }
-.cat-family { background: rgba(52,211,153,0.1); color: var(--green); }
 .cat-creativity { background: rgba(250,204,21,0.1); color: #eab308; }
+.trial-badge { padding: 3px 8px; border-radius: 6px; font-size: .62rem; font-weight: 800; text-transform: uppercase; background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); margin-left: 6px; display: inline-block; }
+.status-ok { color: var(--green); font-size: .9rem; }
 .status-ok { color: var(--green); font-size: .9rem; }
 .status-fail { font-size: .68rem; font-weight: 800; color: var(--accent-soft); background: var(--accent-dim2);
     padding: 3px 8px; border-radius: 6px; }
@@ -578,6 +586,8 @@ input[type="radio"].cat-radio { display: none; }
       <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
       <div class="sb-sec">Users</div>
       <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+      <div class="sb-sec">Settings</div>
+      <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
       <div class="sb-sec">Tools</div>
       <a href="curated_ai_prompts.php" class="sb-link" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Curated Page</span></a>
       <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
@@ -622,7 +632,6 @@ input[type="radio"].cat-radio { display: none; }
                         'boys'       => ['icon' => 'fa-solid fa-mars', 'label' => 'Boys'],
                         'girls'      => ['icon' => 'fa-solid fa-venus', 'label' => 'Girls'],
                         'couple'     => ['icon' => 'fa-solid fa-heart', 'label' => 'Couple'],
-                        'family'     => ['icon' => 'fa-solid fa-people-group', 'label' => 'Family'],
                         'creativity' => ['icon' => 'fa-solid fa-lightbulb', 'label' => 'Creativity'],
                     ] as $val => $cat): ?>
                     <label>
@@ -651,7 +660,13 @@ input[type="radio"].cat-radio { display: none; }
 
             <div class="form-row">
                 <label class="form-label">Prompt Text</label>
-                <textarea name="prompt_text" class="form-textarea" placeholder="Paste the full prompt here..." required></textarea>
+                <textarea name="prompt_text" id="promptTextarea" class="form-textarea" placeholder="Paste the full prompt here..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">About This Prompt <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">— editorial note (max 200 words)</span></label>
+                <textarea name="about_prompt" id="aboutPromptInput" class="form-textarea" rows="5" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
+                <p class="tag-hint" id="aboutWordCount">0 / 200 words</p>
             </div>
 
             <div class="form-row">
@@ -664,6 +679,15 @@ input[type="radio"].cat-radio { display: none; }
                 <label class="form-label">SEO Keywords</label>
                 <input type="text" name="meta_keywords" class="form-input" maxlength="500" placeholder="e.g. ai boy prompt, chatgpt portrait, gemini vs chatgpt">
                 <p class="tag-hint">Comma-separated keywords for meta tags.</p>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label" style="text-transform:uppercase;letter-spacing:.5px;">Trial Reel Mode</label>
+                <label class="check-row" style="cursor:pointer;">
+                    <input type="checkbox" name="is_trial" id="is_trial" value="1">
+                    <span style="color:#fbbf24;font-weight:700;"><i class="fa-solid fa-flask"></i> Trial Mode — Hidden from site, direct link only</span>
+                </label>
+                <p class="tag-hint">When enabled, this curated prompt will NOT appear on curated_ai_prompts.php or category pages, but can be opened directly via its link.</p>
             </div>
 
             <div class="form-row">
@@ -859,6 +883,34 @@ function nmCopyShare(inputId, btn) {
         try { document.execCommand('copy'); onOk(); } catch (e) { window.prompt('Copy link:', text); }
     }
 }
+
+function updateAboutWordCount(el) {
+    var text = el.value.trim();
+    var words = text ? text.split(/\s+/).filter(function(w) { return w.length > 0; }) : [];
+    var count = words.length;
+    var hint = document.getElementById('aboutWordCount');
+    if (hint) {
+        hint.textContent = count + ' / 200 words' + (count > 200 ? ' (exceeds limit, will be trimmed to 200)' : '');
+        hint.style.color = count > 200 ? '#f87171' : 'var(--muted)';
+    }
+}
+
+function handleTextareaPasteClean(e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text');
+    if (!text) return;
+    var cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    e.preventDefault();
+    var start = this.selectionStart;
+    var end = this.selectionEnd;
+    var val = this.value;
+    this.value = val.substring(0, start) + cleaned + val.substring(end);
+    this.selectionStart = this.selectionEnd = start + cleaned.length;
+    this.dispatchEvent(new Event('input'));
+}
+var pText = document.getElementById('promptTextarea');
+if (pText) pText.addEventListener('paste', handleTextareaPasteClean);
+var aPrompt = document.getElementById('aboutPromptInput');
+if (aPrompt) aPrompt.addEventListener('paste', handleTextareaPasteClean);
 </script>
 </body>
 </html>

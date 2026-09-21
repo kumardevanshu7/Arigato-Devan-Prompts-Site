@@ -58,10 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
         if (!$row) {
             $err = 'Prompt not found.';
         } else {
-            $category = in_array($_POST['category'] ?? '', ['boys', 'girls', 'couple', 'family', 'creativity'], true) ? $_POST['category'] : '';
+            $category = in_array($_POST['category'] ?? '', ['boys', 'girls', 'couple', 'creativity'], true) ? $_POST['category'] : '';
             $title = trim($_POST['title'] ?? '');
             $raw_tags = trim($_POST['tags'] ?? '');
             $prompt_text = trim($_POST['prompt_text'] ?? '');
+            if ($prompt_text !== '') {
+                $prompt_text = str_replace(["\r\n", "\r"], "\n", $prompt_text);
+                $prompt_text = preg_replace("/\n{3,}/", "\n\n", $prompt_text);
+                $prompt_text = trim($prompt_text);
+            }
+            $about_prompt = trim($_POST['about_prompt'] ?? '');
+            if ($about_prompt !== '') {
+                $about_words = preg_split('/\s+/u', $about_prompt, -1, PREG_SPLIT_NO_EMPTY);
+                $about_prompt = implode(' ', array_slice($about_words, 0, 200));
+            }
             $meta_description = trim($_POST['meta_description'] ?? '');
             $meta_keywords = trim($_POST['meta_keywords'] ?? '');
             $credit_name = trim($_POST['credit_name'] ?? '');
@@ -74,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
             }
             $chatgpt_failed = !empty($_POST['chatgpt_failed']) ? 1 : 0;
             $gemini_failed = !empty($_POST['gemini_failed']) ? 1 : 0;
+            $is_trial = !empty($_POST['is_trial']) ? 1 : 0;
 
             if (!$category || !$title || !$prompt_text) {
                 $err = 'Category, title, and prompt text are required.';
@@ -123,11 +134,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
                         ? uniqueCuratedSlug($pdo, $title, $edit_id)
                         : $row['slug'];
                     $pdo->prepare(
-                        'UPDATE curated_prompts SET category = ?, title = ?, slug = ?, tags = ?, prompt_text = ?, meta_description = ?, meta_keywords = ?, credit_name = ?, credit_url = ?,
-                         thumbnail_image = ?, chatgpt_image = ?, chatgpt_failed = ?, gemini_image = ?, gemini_failed = ? WHERE id = ?'
+                        'UPDATE curated_prompts SET category = ?, title = ?, slug = ?, tags = ?, prompt_text = ?, about_prompt = ?, meta_description = ?, meta_keywords = ?, credit_name = ?, credit_url = ?,
+                         thumbnail_image = ?, chatgpt_image = ?, chatgpt_failed = ?, gemini_image = ?, gemini_failed = ?, is_trial = ? WHERE id = ?'
                     )->execute([
-                        $category, $title, $slug, $tags_str, $prompt_text, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null,
-                        $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed, $edit_id,
+                        $category, $title, $slug, $tags_str, $prompt_text, $about_prompt ?: null, $meta_description ?: null, $meta_keywords, $credit_name ?: null, $credit_url ?: null,
+                        $thumb, $chatgpt_img, $chatgpt_failed, $gemini_img, $gemini_failed, $is_trial, $edit_id,
                     ]);
                     header('Location: curated_manage.php?edit=' . $edit_id . '&saved=1');
                     exit();
@@ -172,6 +183,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'toggl
     exit();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'toggle_trial') {
+    $tid = (int)($_POST['tid'] ?? 0);
+    $val = (int)($_POST['val'] ?? 0) ? 1 : 0;
+    $pdo->prepare('UPDATE curated_prompts SET is_trial = ? WHERE id = ?')->execute([$val, $tid]);
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true]);
+    exit();
+}
+
 $prompts = [];
 if (nm_table_exists_manage($pdo, 'curated_prompts')) {
     try {
@@ -185,9 +205,10 @@ $f_cat = strtolower(trim($_GET['cat'] ?? 'all'));
 $f_gpt = strtolower(trim($_GET['gpt'] ?? 'all'));
 $f_gem = strtolower(trim($_GET['gem'] ?? 'all'));
 $f_vis = strtolower(trim($_GET['vis'] ?? 'all'));
+$f_trial = strtolower(trim($_GET['trial'] ?? 'all'));
 $f_q   = trim($_GET['q'] ?? '');
 
-$filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gpt, $f_gem, $f_vis, $f_q) {
+$filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gpt, $f_gem, $f_vis, $f_trial, $f_q) {
     if ($f_cat !== 'all' && ($p['category'] ?? '') !== $f_cat) return false;
     if ($f_gpt === 'ok' && !empty($p['chatgpt_failed'])) return false;
     if ($f_gpt === 'failed' && empty($p['chatgpt_failed'])) return false;
@@ -195,6 +216,8 @@ $filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gp
     if ($f_gem === 'failed' && empty($p['gemini_failed'])) return false;
     if ($f_vis === 'visible' && empty($p['is_visible'])) return false;
     if ($f_vis === 'hidden' && !empty($p['is_visible'])) return false;
+    if ($f_trial === 'yes' && empty($p['is_trial'])) return false;
+    if ($f_trial === 'no' && !empty($p['is_trial'])) return false;
     if ($f_q !== '') {
         $hay = strtolower(($p['title'] ?? '') . ' ' . ($p['tags'] ?? ''));
         if (strpos($hay, strtolower($f_q)) === false) return false;
@@ -303,7 +326,10 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 .list-table td{padding:12px 14px;border-top:1px solid var(--border);font-size:.82rem}
 .list-thumb{width:50px;height:50px;border-radius:10px;object-fit:cover;border:1px solid var(--border)}
 .cat-badge{padding:4px 10px;border-radius:999px;font-size:.65rem;font-weight:800;text-transform:uppercase}
-.cat-boys{background:rgba(59,130,246,.12);color:#60a5fa}.cat-girls{background:rgba(236,72,153,.12);color:#f472b6}.cat-couple{background:rgba(168,85,247,.12);color:#c084fc}.cat-family{background:rgba(52,211,153,.12);color:#34d399}.cat-creativity{background:rgba(250,204,21,.12);color:#eab308}
+.cat-boys{background:rgba(59,130,246,.12);color:#60a5fa}.cat-girls{background:rgba(236,72,153,.12);color:#f472b6}.cat-couple{background:rgba(168,85,247,.12);color:#c084fc}.cat-creativity{background:rgba(250,204,21,.12);color:#eab308}
+.trial-badge{padding:3px 7px;border-radius:6px;font-size:.62rem;font-weight:800;text-transform:uppercase;background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);margin-left:6px;display:inline-block}
+.btn-trial{cursor:pointer;background:transparent;border:1px dashed rgba(251,191,36,0.35);color:#fbbf24;padding:3px 8px;border-radius:6px;font-size:.65rem;font-weight:800;transition:all .2s}
+.btn-trial.active{background:rgba(251,191,36,0.18);border-style:solid}
 .toggle-vis{width:40px;height:22px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface-2);cursor:pointer;position:relative;appearance:none}
 .toggle-vis:checked{background:linear-gradient(135deg,#F5709D,#11FFC9);border-color:transparent}.toggle-vis::after{content:'';position:absolute;top:2px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;transition:left .2s}.toggle-vis:checked::after{left:19px}
 .btn-del{background:var(--surface-2);border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:8px;cursor:pointer}
@@ -328,8 +354,9 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 .cat-pill.active{border-color:var(--soft);color:var(--soft);background:rgba(17,255,201,.08)}
 .tag-wrap{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;min-height:48px;cursor:text}
 .tag-wrap:focus-within{border-color:var(--accent)}
+#tagChips{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tag-input{background:none;border:none;outline:none;color:var(--text);font-size:.85rem;flex:1;min-width:100px}
-.tag-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(245,112,157,.14);border-radius:8px;font-size:.76rem;font-weight:700;color:var(--soft)}
+.tag-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(245,112,157,.14);border-radius:8px;font-size:.76rem;font-weight:700;color:var(--soft);margin:2px 4px 2px 0}
 .tag-chip-x{cursor:pointer;opacity:.7}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .file-zone{border:2px dashed var(--border);border-radius:14px;padding:18px 14px;text-align:center;color:var(--muted);font-size:.76rem;position:relative;background:var(--surface-2);min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -375,6 +402,8 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
       <div class="sb-sec">Users</div>
       <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+      <div class="sb-sec">Settings</div>
+      <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
       <div class="sb-sec">Tools</div>
       <a href="curated_ai_prompts.php" class="sb-link" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Curated Page</span></a>
       <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
@@ -403,7 +432,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         <div class="cat-pills">
           <?php foreach ([
               'boys' => 'Boys', 'girls' => 'Girls', 'couple' => 'Couple',
-              'family' => 'Family', 'creativity' => 'Creativity',
+              'creativity' => 'Creativity',
           ] as $val => $label): ?>
           <label>
             <input type="radio" name="category" value="<?= $val ?>" class="cat-radio" <?= ($edit_row['category'] ?? '') === $val ? 'checked' : '' ?>>
@@ -434,6 +463,12 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       </div>
 
       <div class="form-row">
+        <label class="form-label" for="about_prompt">About This Prompt <span style="font-weight:400;color:var(--muted)">(optional — editorial note, max 200 words)</span></label>
+        <textarea id="about_prompt" name="about_prompt" class="form-textarea" rows="5" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"><?= htmlspecialchars($edit_row['about_prompt'] ?? '') ?></textarea>
+        <p class="form-hint" id="aboutWordCount"><?= str_word_count(strip_tags($edit_row['about_prompt'] ?? '')) ?> / 200 words</p>
+      </div>
+
+      <div class="form-row">
         <label class="form-label" for="meta_description">SEO Description</label>
         <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:90px" maxlength="500" placeholder="Google meta + page bottom About this prompt"><?= htmlspecialchars($edit_row['meta_description'] ?? '') ?></textarea>
       </div>
@@ -441,6 +476,15 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       <div class="form-row">
         <label class="form-label" for="meta_keywords">SEO Keywords</label>
         <input id="meta_keywords" type="text" name="meta_keywords" class="form-input" maxlength="500" value="<?= htmlspecialchars($edit_row['meta_keywords'] ?? '') ?>" placeholder="comma, separated, keywords">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label" style="text-transform:uppercase;letter-spacing:.5px;">Trial Reel Mode</label>
+        <label class="check-row" style="cursor:pointer;">
+          <input type="checkbox" name="is_trial" id="is_trial" value="1" <?= !empty($edit_row['is_trial']) ? 'checked' : '' ?>>
+          <span style="color:#fbbf24;font-weight:700;"><i class="fa-solid fa-flask"></i> Trial Mode — Hidden from site, direct link only</span>
+        </label>
+        <p class="form-hint">When enabled, this curated prompt will NOT appear on curated_ai_prompts.php or category pages, but can be opened directly via link.</p>
       </div>
 
       <div class="form-row">
@@ -519,7 +563,6 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         <option value="boys" <?= $f_cat === 'boys' ? 'selected' : '' ?>>Category: Boys</option>
         <option value="girls" <?= $f_cat === 'girls' ? 'selected' : '' ?>>Category: Girls</option>
         <option value="couple" <?= $f_cat === 'couple' ? 'selected' : '' ?>>Category: Couple</option>
-        <option value="family" <?= $f_cat === 'family' ? 'selected' : '' ?>>Category: Family</option>
         <option value="creativity" <?= $f_cat === 'creativity' ? 'selected' : '' ?>>Category: Creativity</option>
       </select>
       <select name="gpt">
@@ -531,6 +574,11 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         <option value="all" <?= $f_gem === 'all' ? 'selected' : '' ?>>Gemini: All</option>
         <option value="ok" <?= $f_gem === 'ok' ? 'selected' : '' ?>>Gemini: OK</option>
         <option value="failed" <?= $f_gem === 'failed' ? 'selected' : '' ?>>Gemini: Failed</option>
+      </select>
+      <select name="trial">
+        <option value="all" <?= $f_trial === 'all' ? 'selected' : '' ?>>Trial: All</option>
+        <option value="no" <?= $f_trial === 'no' ? 'selected' : '' ?>>Trial: Regular Only</option>
+        <option value="yes" <?= $f_trial === 'yes' ? 'selected' : '' ?>>Trial: Trial Only</option>
       </select>
       <select name="vis">
         <option value="all" <?= $f_vis === 'all' ? 'selected' : '' ?>>Visibility: All</option>
@@ -546,15 +594,19 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       <div style="padding:30px;color:var(--muted)">No prompts uploaded yet.</div>
     <?php else: ?>
     <table class="list-table">
-      <thead><tr><th>Thumb</th><th>Title</th><th>Category</th><th>GPT</th><th>Gemini</th><th>Visible</th><th></th></tr></thead>
+      <thead><tr><th>Thumb</th><th>Title</th><th>Category</th><th>GPT</th><th>Gemini</th><th>Trial</th><th>Visible</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($filtered as $p): ?>
         <tr>
           <td><img src="<?= htmlspecialchars($p['thumbnail_image']) ?>" class="list-thumb" alt=""></td>
-          <td style="font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($p['title']) ?></td>
+          <td style="font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            <?= htmlspecialchars($p['title']) ?>
+            <?= !empty($p['is_trial']) ? '<span class="trial-badge">TRIAL</span>' : '' ?>
+          </td>
           <td><span class="cat-badge cat-<?= htmlspecialchars($p['category']) ?>"><?= htmlspecialchars(ucfirst($p['category'])) ?></span></td>
           <td><?= $p['chatgpt_failed'] ? '<span style="color:#fda4af;font-weight:700;font-size:.72rem">FAILED</span>' : '<i class="fa-solid fa-check" style="color:#34d399"></i>' ?></td>
           <td><?= $p['gemini_failed'] ? '<span style="color:#fda4af;font-weight:700;font-size:.72rem">FAILED</span>' : '<i class="fa-solid fa-check" style="color:#34d399"></i>' ?></td>
+          <td><button type="button" class="btn-trial <?= !empty($p['is_trial']) ? 'active' : '' ?>" onclick="toggleTrial(<?= (int)$p['id'] ?>, this)"><?= !empty($p['is_trial']) ? 'TRIAL' : '+ Trial' ?></button></td>
           <td><input type="checkbox" class="toggle-vis" <?= $p['is_visible'] ? 'checked' : '' ?> onchange="toggleVis(<?= (int)$p['id'] ?>, this.checked)"></td>
           <td>
             <a href="curated_manage.php?edit=<?= (int) $p['id'] ?>" class="btn-edit<?= $edit_id === (int) $p['id'] ? ' active' : '' ?>" title="Edit prompt"><i class="fa-solid fa-pen"></i></a>
@@ -587,6 +639,35 @@ function toggleVis(id, checked) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'action=toggle&tid=' + id + '&val=' + (checked ? 1 : 0)
   });
+}
+
+function toggleTrial(id, btn) {
+  fetch('curated_manage.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'action=toggle_trial&tid=' + id
+  }).then(function(res) { return res.json(); }).then(function(data) {
+    if (data && data.status === 'ok') {
+      if (data.is_trial) {
+        btn.classList.add('active');
+        btn.textContent = 'TRIAL';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '+ Trial';
+      }
+    }
+  }).catch(function() {});
+}
+
+function updateAboutWordCount(el) {
+  var val = el.value.trim();
+  var words = val ? val.split(/\s+/).filter(Boolean) : [];
+  if (words.length > 200) {
+    words = words.slice(0, 200);
+    el.value = words.join(' ');
+  }
+  var cnt = document.getElementById('aboutWordCount');
+  if (cnt) cnt.textContent = words.length + ' / 200 words';
 }
 
 <?php if ($edit_row): ?>
@@ -675,6 +756,23 @@ function toggleVis(id, checked) {
     gemFile.disabled = this.checked;
     document.getElementById('zoneGem').classList.toggle('dim', this.checked);
   });
+
+  function handleTextareaPasteClean(e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text');
+    if (!text) return;
+    var cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    e.preventDefault();
+    var start = this.selectionStart;
+    var end = this.selectionEnd;
+    var val = this.value;
+    this.value = val.substring(0, start) + cleaned + val.substring(end);
+    this.selectionStart = this.selectionEnd = start + cleaned.length;
+    this.dispatchEvent(new Event('input'));
+  }
+  var pText = document.getElementById('edit_prompt_text');
+  if (pText) pText.addEventListener('paste', handleTextareaPasteClean);
+  var aPrompt = document.getElementById('about_prompt');
+  if (aPrompt) aPrompt.addEventListener('paste', handleTextareaPasteClean);
 })();
 <?php endif; ?>
 </script>

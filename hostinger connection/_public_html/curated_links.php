@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
 
 $prompts = [];
 try {
-    $prompts = $pdo->query('SELECT id, slug, title, thumbnail_image, category, is_visible, created_at FROM curated_prompts ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
+    $prompts = $pdo->query('SELECT id, slug, title, thumbnail_image, category, is_visible, is_trial, created_at FROM curated_prompts ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $prompts = [];
 }
@@ -60,6 +60,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 .link-slug{font-size:.68rem;color:var(--muted);font-family:ui-monospace,Consolas,monospace;margin-top:3px}
 .cat-badge{padding:4px 10px;border-radius:999px;font-size:.65rem;font-weight:800;text-transform:uppercase}
 .cat-boys{background:rgba(59,130,246,.12);color:#60a5fa}.cat-girls{background:rgba(236,72,153,.12);color:#f472b6}.cat-couple{background:rgba(168,85,247,.12);color:#c084fc}.cat-family{background:rgba(52,211,153,.12);color:#34d399}.cat-creativity{background:rgba(250,204,21,.12);color:#eab308}
+.trial-badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.35);margin-left:6px;vertical-align:middle}
 .copy-link-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid rgba(245,112,157,.25);background:rgba(245,112,157,.1);color:var(--soft);font-weight:800;font-size:.74rem;cursor:pointer;font-family:inherit}
 .copy-link-btn:hover{filter:brightness(1.06)}
 .copy-link-btn.copied{color:var(--green);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
@@ -96,6 +97,8 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       <a href="curated_links.php" class="sb-link nm-dash-brand active"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
       <div class="sb-sec">Users</div>
       <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+      <div class="sb-sec">Settings</div>
+      <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
       <div class="sb-sec">Tools</div>
       <a href="curated_ai_prompts.php" class="sb-link" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Curated Page</span></a>
       <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
@@ -122,16 +125,27 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         <?php foreach ($prompts as $lp): ?>
           <?php
             $share_url = nm_prompt_share_url($lp);
-            $search_key = strtolower(($lp['title'] ?? '') . ' ' . ($lp['slug'] ?? ''));
+            $search_key = strtolower(($lp['title'] ?? '') . ' ' . ($lp['slug'] ?? '') . (!empty($lp['is_trial']) ? ' trial' : ''));
           ?>
           <tr data-search="<?= htmlspecialchars($search_key) ?>">
             <td><img src="<?= htmlspecialchars($lp['thumbnail_image'] ?? '') ?>" class="list-thumb" alt=""></td>
             <td style="max-width:280px">
-              <div style="font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= htmlspecialchars($lp['title'] ?? '') ?></div>
+              <div style="font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <?= htmlspecialchars($lp['title'] ?? '') ?>
+                <?= !empty($lp['is_trial']) ? '<span class="trial-badge">TRIAL</span>' : '' ?>
+              </div>
               <div class="link-slug">/curated-ai-prompts/<?= htmlspecialchars($lp['slug'] ?? '') ?></div>
             </td>
             <td><span class="cat-badge cat-<?= htmlspecialchars($lp['category'] ?? '') ?>"><?= htmlspecialchars(ucfirst($lp['category'] ?? '')) ?></span></td>
-            <td><?= !empty($lp['is_visible']) ? '<span style="color:var(--green);font-weight:700;font-size:.72rem">Live</span>' : '<span class="vis-off">Hidden</span>' ?></td>
+            <td>
+              <?php if (!empty($lp['is_trial'])): ?>
+                <span style="color:#fbbf24;font-weight:700;font-size:.72rem"><i class="fa-solid fa-flask"></i> Trial</span>
+              <?php elseif (!empty($lp['is_visible'])): ?>
+                <span style="color:var(--green);font-weight:700;font-size:.72rem">Live</span>
+              <?php else: ?>
+                <span class="vis-off">Hidden</span>
+              <?php endif; ?>
+            </td>
             <td>
               <input type="hidden" id="link-<?= (int) $lp['id'] ?>" value="<?= htmlspecialchars($share_url) ?>">
               <button type="button" class="copy-link-btn" onclick="nmCopyShare('link-<?= (int) $lp['id'] ?>', this)"><i class="fa-solid fa-copy"></i> Copy Link</button>

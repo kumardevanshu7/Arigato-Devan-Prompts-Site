@@ -29,7 +29,16 @@ $nb = function (string $path) use ($nav_base): string {
 };
 $curPage    = basename($_SERVER['PHP_SELF'] ?? '');
 
-if (!isset($nav_counts) && isset($pdo)) {
+require_once __DIR__ . '/settings_helper.php';
+$nav_insta_count = site_setting('insta_follower_count', '17K+');
+$nav_insta_handle = site_setting('insta_handle', '@arigato.devan');
+$nav_insta_url = site_setting('insta_url', 'https://www.instagram.com/arigato.devan/');
+
+if (!isset($pdo)) {
+    @require_once __DIR__ . '/../db.php';
+}
+
+if (isset($pdo)) {
     try {
         $nc = $pdo->query("SELECT
             SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
@@ -42,6 +51,8 @@ if (!isset($nav_counts) && isset($pdo)) {
     } catch (Exception $e) {
         $nav_counts = [];
     }
+} else {
+    $nav_counts = [];
 }
 $nav_counts = $nav_counts ?? [];
 $nav_brand_words = $nav_brand_words ?? ['devan', 'prompt', 'myra'];
@@ -125,11 +136,11 @@ if (isset($pdo)) {
                     </div>
                 </div>
 
-                <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener" class="gal-insta-link">
+                <a href="<?= htmlspecialchars($nav_insta_url) ?>" target="_blank" rel="noopener" class="gal-insta-link">
                     <i class="fa-brands fa-instagram"></i>
-                    @arigato.devan
+                    <?= htmlspecialchars($nav_insta_handle) ?>
                     <span class="pulse-dot"></span>
-                    <span class="gal-insta-count">17K+</span>
+                    <span class="gal-insta-count"><?= htmlspecialchars($nav_insta_count) ?></span>
                 </a>
             </nav>
 
@@ -205,8 +216,8 @@ if (isset($pdo)) {
             <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link"><i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span></a>
             <a href="<?= $nb('all_codes.php') ?>">All Secret Codes</a>
         </div>
-        <a href="https://www.instagram.com/arigato.devan/" target="_blank" rel="noopener">
-            <i class="fa-brands fa-instagram"></i> @arigato.devan
+        <a href="<?= htmlspecialchars($nav_insta_url) ?>" target="_blank" rel="noopener">
+            <i class="fa-brands fa-instagram"></i> <?= htmlspecialchars($nav_insta_handle) ?>
         </a>
         <div class="gal-mobile-lang-box notranslate" translate="no">
             <div class="gal-mobile-lang-header notranslate" translate="no">

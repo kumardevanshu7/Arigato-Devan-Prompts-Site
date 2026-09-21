@@ -519,6 +519,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+    <div class="sb-sec">Settings</div>
+    <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
     <div class="sb-sec">Tools</div>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>
@@ -549,6 +551,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
     <div class="pill"><i class="fa-solid fa-heart" style="color:var(--red)"></i><span class="pill-num" style="color:var(--red)"><?= number_format($total_likes) ?></span><span style="color:var(--muted)">Likes</span></div>
     <div class="pill"><i class="fa-solid fa-bookmark" style="color:var(--yellow)"></i><span class="pill-num" style="color:var(--yellow)"><?= $total_saves ?></span><span style="color:var(--muted)">Saves</span></div>
     <div class="pill"><i class="fa-solid fa-pen-nib" style="color:var(--green)"></i><span class="pill-num" style="color:var(--green)"><?= $total_blogs ?></span><span style="color:var(--muted)">Blogs</span></div>
+  </div>
+
+  <?php
+  require_once __DIR__ . '/includes/settings_helper.php';
+  $dash_insta_count = site_setting('insta_follower_count', '17K+');
+  ?>
+  <div style="background:linear-gradient(135deg,rgba(244,114,182,0.1),rgba(139,92,246,0.1));border:1px solid rgba(244,114,182,0.25);border-radius:14px;padding:14px 20px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;">
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+      <div>
+        <div style="font-size:.84rem;font-weight:800;color:var(--text);">Instagram Follower Badge: <span style="color:var(--pink);font-size:.95rem;font-weight:900;"><?= htmlspecialchars($dash_insta_count) ?></span></div>
+        <div style="font-size:.72rem;color:var(--muted);">Displayed in site header navigation next to @arigato.devan</div>
+      </div>
+    </div>
+    <a href="site_settings.php" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-size:.78rem;font-weight:800;text-decoration:none;box-shadow:0 2px 10px rgba(139,92,246,0.3);"><i class="fa-solid fa-gear"></i> Change Badge Setting</a>
   </div>
 
   <div class="stats-grid">

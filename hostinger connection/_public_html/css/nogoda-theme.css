@@ -1575,13 +1575,27 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   flex-wrap: wrap;
   gap: 8px;
 }
-.theme-nogoda .pp-about-kw span {
+.theme-nogoda .pp-about-kw span,
+.theme-nogoda .pp-about-kw a {
   font-size: .68rem;
   font-weight: 700;
   padding: 5px 12px;
   border-radius: 999px;
   background: var(--pal-sky, #C8D9E6);
   color: var(--pal-navy);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all .2s ease;
+}
+.theme-nogoda .pp-about-kw a {
+  cursor: pointer;
+}
+.theme-nogoda .pp-about-kw a:hover {
+  background: var(--pal-navy);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(47, 65, 86, 0.15);
 }
 
 .theme-nogoda .pp-related {

@@ -21,7 +21,8 @@ function nm_table_exists(PDO $pdo, string $table): bool
 
 $cat = strtolower(trim($_GET['cat'] ?? 'all'));
 $tag = strtolower(trim($_GET['tag'] ?? ''));
-$valid_cats = ['all', 'boys', 'girls', 'couple', 'family', 'creativity'];
+$q   = strtolower(trim($_GET['q'] ?? $_GET['search'] ?? ''));
+$valid_cats = ['all', 'boys', 'girls', 'couple', 'creativity'];
 if (!in_array($cat, $valid_cats)) $cat = 'all';
 
 if (!nm_table_exists($pdo, 'curated_prompts')) {
@@ -29,18 +30,18 @@ if (!nm_table_exists($pdo, 'curated_prompts')) {
 } else {
     try {
         if ($cat === 'all') {
-            $prompts = $pdo->query('SELECT nm.*, COALESCE(lc.cnt,0) AS like_count FROM curated_prompts nm LEFT JOIN (SELECT prompt_id, COUNT(*) as cnt FROM curated_likes GROUP BY prompt_id) lc ON lc.prompt_id = nm.id WHERE nm.is_visible = 1 ORDER BY nm.created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
+            $prompts = $pdo->query('SELECT nm.*, COALESCE(lc.cnt,0) AS like_count FROM curated_prompts nm LEFT JOIN (SELECT prompt_id, COUNT(*) as cnt FROM curated_likes GROUP BY prompt_id) lc ON lc.prompt_id = nm.id WHERE nm.is_visible = 1 AND (nm.is_trial = 0 OR nm.is_trial IS NULL) ORDER BY nm.created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $stmt = $pdo->prepare('SELECT nm.*, COALESCE(lc.cnt,0) AS like_count FROM curated_prompts nm LEFT JOIN (SELECT prompt_id, COUNT(*) as cnt FROM curated_likes GROUP BY prompt_id) lc ON lc.prompt_id = nm.id WHERE nm.is_visible = 1 AND nm.category = ? ORDER BY nm.created_at DESC');
+            $stmt = $pdo->prepare('SELECT nm.*, COALESCE(lc.cnt,0) AS like_count FROM curated_prompts nm LEFT JOIN (SELECT prompt_id, COUNT(*) as cnt FROM curated_likes GROUP BY prompt_id) lc ON lc.prompt_id = nm.id WHERE nm.is_visible = 1 AND (nm.is_trial = 0 OR nm.is_trial IS NULL) AND nm.category = ? ORDER BY nm.created_at DESC');
             $stmt->execute([$cat]);
             $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } catch (PDOException $e) {
         // Backward compatibility for live DBs where curated_likes table is missing.
         if ($cat === 'all') {
-            $prompts = $pdo->query('SELECT nm.*, 0 AS like_count FROM curated_prompts nm WHERE nm.is_visible = 1 ORDER BY nm.created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
+            $prompts = $pdo->query('SELECT nm.*, 0 AS like_count FROM curated_prompts nm WHERE nm.is_visible = 1 AND (nm.is_trial = 0 OR nm.is_trial IS NULL) ORDER BY nm.created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $stmt = $pdo->prepare('SELECT nm.*, 0 AS like_count FROM curated_prompts nm WHERE nm.is_visible = 1 AND nm.category = ? ORDER BY nm.created_at DESC');
+            $stmt = $pdo->prepare('SELECT nm.*, 0 AS like_count FROM curated_prompts nm WHERE nm.is_visible = 1 AND (nm.is_trial = 0 OR nm.is_trial IS NULL) AND nm.category = ? ORDER BY nm.created_at DESC');
             $stmt->execute([$cat]);
             $prompts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -58,6 +59,18 @@ if ($tag !== '') {
     }));
 }
 
+if ($q !== '') {
+    $words = array_values(array_filter(preg_split('/\s+/', $q)));
+    $prompts = array_values(array_filter($prompts, function ($p) use ($q, $words) {
+        $haystack = strtolower(($p['title'] ?? '') . ' ' . ($p['tags'] ?? '') . ' ' . ($p['meta_keywords'] ?? '') . ' ' . ($p['about_prompt'] ?? ''));
+        if (str_contains($haystack, $q)) return true;
+        foreach ($words as $w) {
+            if (!str_contains($haystack, $w)) return false;
+        }
+        return true;
+    }));
+}
+
 $subtags = [];
 foreach ($prompts as $p) {
     foreach (explode(',', strtolower($p['tags'] ?? '')) as $t) {
@@ -70,7 +83,7 @@ ksort($subtags);
 $counts = [];
 try {
     if (nm_table_exists($pdo, 'curated_prompts')) {
-        $cs = $pdo->query("SELECT category, COUNT(*) as cnt FROM curated_prompts WHERE is_visible = 1 GROUP BY category");
+        $cs = $pdo->query("SELECT category, COUNT(*) as cnt FROM curated_prompts WHERE is_visible = 1 AND (is_trial = 0 OR is_trial IS NULL) GROUP BY category");
         while ($r = $cs->fetch(PDO::FETCH_ASSOC)) $counts[$r['category']] = (int)$r['cnt'];
     } else {
         $counts = [];
@@ -118,16 +131,6 @@ $cat_meta = [
         'theme_color' => '#e11d48',
         'count_label' => 'Couple prompts',
     ],
-    'family' => [
-        'title' => 'Family Prompts — Curated AI Prompts',
-        'hero' => 'Family',
-        'tagline' => 'Family & group prompts — warm vibes, real comparison.',
-        'seo_desc' => 'Group portraits aur emotional family scenes ke liye AI prompts.',
-        'meta_desc' => 'Family AI prompts — group photo & portrait prompts. ChatGPT vs Gemini compare karke unlock.',
-        'icon' => 'fa-people-group',
-        'theme_color' => '#16a34a',
-        'count_label' => 'Family prompts',
-    ],
     'creativity' => [
         'title' => 'Creativity Prompts — Curated AI Prompts',
         'hero' => 'Creativity',
@@ -173,7 +176,6 @@ $_page_canonical = 'https://arigatodevan.com/curated_ai_prompts.php' . $canonica
 .nm-page.nm-cat-boys { --nm-accent:#2563eb; --nm-accent-soft:rgba(37,99,235,.1); --nm-accent-border:rgba(37,99,235,.22); --nm-page-bg:linear-gradient(180deg,#eff6ff 0%,#f8fbff 42%,#f5efeb 100%); }
 .nm-page.nm-cat-girls { --nm-accent:#db2777; --nm-accent-soft:rgba(219,39,119,.1); --nm-accent-border:rgba(219,39,119,.22); --nm-page-bg:linear-gradient(180deg,#fdf2f8 0%,#fff7fb 42%,#f5efeb 100%); }
 .nm-page.nm-cat-couple { --nm-accent:#e11d48; --nm-accent-soft:rgba(225,29,72,.1); --nm-accent-border:rgba(244,63,94,.24); --nm-page-bg:linear-gradient(180deg,#fff1f2 0%,#ffe4e6 38%,#fdf2f8 68%,#f5efeb 100%); }
-.nm-page.nm-cat-family { --nm-accent:#16a34a; --nm-accent-soft:rgba(22,163,74,.1); --nm-accent-border:rgba(22,163,74,.22); --nm-page-bg:linear-gradient(180deg,#ecfdf5 0%,#f4fdf8 42%,#f5efeb 100%); }
 .nm-page.nm-cat-creativity { --nm-accent:#7c3aed; --nm-accent-soft:rgba(124,58,237,.1); --nm-accent-border:rgba(124,58,237,.22); --nm-page-bg:linear-gradient(180deg,#f5f3ff 0%,#faf8ff 42%,#f5efeb 100%); }
 body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important; min-height: 100vh; }
 
@@ -302,7 +304,6 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 .nm-cat-card-boys .nm-cat-card-icon { background: rgba(37,99,235,.14); color: #2563eb; }
 .nm-cat-card-girls .nm-cat-card-icon { background: rgba(219,39,119,.14); color: #db2777; }
 .nm-cat-card-couple .nm-cat-card-icon { background: rgba(225,29,72,.14); color: #e11d48; }
-.nm-cat-card-family .nm-cat-card-icon { background: rgba(22,163,74,.14); color: #16a34a; }
 .nm-cat-card-creativity .nm-cat-card-icon { background: rgba(124,58,237,.14); color: #7c3aed; }
 .nm-cat-card:hover .nm-cat-card-icon { filter: brightness(0.97); }
 
@@ -402,7 +403,6 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 .nm-badge.boys { background: linear-gradient(135deg, #3b82f6, #2563eb); }
 .nm-badge.girls { background: linear-gradient(135deg, #f472b6, #ec4899); }
 .nm-badge.couple { background: linear-gradient(135deg, #fb7185, #e11d48); }
-.nm-badge.family { background: linear-gradient(135deg, #4ade80, #22c55e); }
 .nm-badge.creativity { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
 
 /* AI status pills */
@@ -519,7 +519,7 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 
 <?php $nav_active = ''; include 'includes/site_nav.php'; ?>
 
-<?php if ($cat === 'all'): ?>
+<?php if ($cat === 'all' && $q === '' && $tag === ''): ?>
 <div class="nm-hero">
     <h1><em>Curated</em> AI Prompts</h1>
     <p><?= htmlspecialchars($meta['tagline']) ?></p>
@@ -528,7 +528,7 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 <div class="nm-cat-hub">
     <p class="nm-cat-hub-title">Choose a category page</p>
     <div class="nm-cat-grid">
-        <?php foreach (['boys','girls','couple','family','creativity'] as $hub_key):
+        <?php foreach (['boys','girls','couple','creativity'] as $hub_key):
             $hub = $cat_meta[$hub_key];
             $hub_cnt = (int)($counts[$hub_key] ?? 0);
         ?>
@@ -544,25 +544,27 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 </div>
 <?php else: ?>
 <div class="nm-cat-hero">
-    <a href="?cat=all" class="nm-back-all"><i class="fa-solid fa-arrow-left"></i> All Categories</a>
-    <div class="nm-cat-hero-icon"><i class="fa-solid <?= htmlspecialchars($meta['icon']) ?>"></i></div>
-    <h1><?= htmlspecialchars($meta['hero']) ?> Prompts</h1>
-    <p><?= htmlspecialchars($meta['tagline']) ?></p>
-    <?php if (!empty($meta['seo_desc'])): ?>
+    <a href="curated_ai_prompts.php?cat=all" class="nm-back-all"><i class="fa-solid fa-arrow-left"></i> All Categories</a>
+    <div class="nm-cat-hero-icon"><i class="fa-solid <?= $q !== '' ? 'fa-magnifying-glass' : htmlspecialchars($meta['icon']) ?>"></i></div>
+    <h1><?= $q !== '' ? 'Search: <em>&ldquo;' . htmlspecialchars($q) . '&rdquo;</em>' : htmlspecialchars($meta['hero']) . ' Prompts' ?></h1>
+    <p><?= $q !== '' ? 'Curated AI prompts matching &ldquo;' . htmlspecialchars($q) . '&rdquo;' : htmlspecialchars($meta['tagline']) ?></p>
+    <?php if ($q === '' && !empty($meta['seo_desc'])): ?>
     <p class="nm-cat-hero-seo"><?= htmlspecialchars($meta['seo_desc']) ?></p>
     <?php endif; ?>
-    <span class="nm-cat-hero-count"><i class="fa-solid fa-layer-group"></i> <?= $cat_count ?> <?= strtolower($meta['count_label']) ?></span>
+    <span class="nm-cat-hero-count"><i class="fa-solid fa-layer-group"></i> <?= count($prompts) ?> <?= $q !== '' ? 'matching prompt' . (count($prompts) === 1 ? '' : 's') : strtolower($meta['count_label']) ?></span>
 </div>
 
+<?php if ($q === ''): ?>
 <div class="nm-cat-switch">
     <a href="?cat=all">All</a>
-    <?php foreach (['boys','girls','couple','family','creativity'] as $sw): ?>
+    <?php foreach (['boys','girls','couple','creativity'] as $sw): ?>
     <a href="?cat=<?= urlencode($sw) ?>" class="<?= $cat === $sw ? 'is-active' : '' ?>"><?= ucfirst($sw) ?></a>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
+<?php endif; ?>
 
-<?php if (!empty($subtags)): ?>
+<?php if ($q === '' && !empty($subtags)): ?>
 <div class="nm-subtags">
     <a href="?cat=<?= urlencode($cat) ?>" class="nm-subtag-btn <?= $tag === '' ? 'active' : '' ?>">All Tags</a>
     <?php foreach ($subtags as $st => $stCount): ?>
@@ -575,8 +577,11 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
 
 <?php if (empty($prompts)): ?>
 <div class="nm-empty">
-    <i class="fa-solid fa-folder-open"></i>
-    <p>No prompts in this category yet — check back soon!</p>
+    <i class="fa-solid <?= $q !== '' ? 'fa-magnifying-glass' : 'fa-folder-open' ?>"></i>
+    <p><?= $q !== '' ? 'No curated prompts found matching &ldquo;' . htmlspecialchars($q) . '&rdquo;.' : 'No prompts in this category yet — check back soon!' ?></p>
+    <?php if ($q !== ''): ?>
+    <p style="margin-top:14px;"><a href="gallery.php?search=<?= urlencode($q) ?>" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;background:var(--nm-accent-soft);border:1px solid var(--nm-accent-border);color:var(--nm-accent);font-weight:700;font-size:.82rem;text-decoration:none;"><i class="fa-solid fa-search"></i> Search in Main Gallery &rarr;</a></p>
+    <?php endif; ?>
 </div>
 <?php else: ?>
 <div class="nm-grid">

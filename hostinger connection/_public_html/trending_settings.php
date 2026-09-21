@@ -123,6 +123,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
     <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
     <div class="sb-sec">Users</div>
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
+    <div class="sb-sec">Settings</div>
+    <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
     <div class="sb-sec">Tools</div>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>

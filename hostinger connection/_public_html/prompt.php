@@ -378,7 +378,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             <?php if (!empty($pp_kw_list)): ?>
             <div class="pp-about-kw" aria-label="Keywords">
                 <?php foreach ($pp_kw_list as $kw): ?>
-                <span><?= htmlspecialchars($kw) ?></span>
+                <a href="gallery.php?search=<?= urlencode($kw) ?>" class="pp-kw-chip" title="Explore prompts for <?= htmlspecialchars($kw, ENT_QUOTES) ?>"><?= htmlspecialchars($kw) ?></a>
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>

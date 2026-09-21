@@ -133,7 +133,7 @@ try {
 $curated_prompts = [];
 try {
     $nm_stmt = $pdo->query(
-        "SELECT slug, created_at FROM curated_prompts WHERE is_visible = 1 AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
+        "SELECT slug, created_at FROM curated_prompts WHERE is_visible = 1 AND (is_trial = 0 OR is_trial IS NULL) AND slug IS NOT NULL AND slug != '' ORDER BY created_at DESC",
     );
     $curated_prompts = $nm_stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

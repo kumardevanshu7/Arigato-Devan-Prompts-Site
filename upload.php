@@ -100,6 +100,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = trim($_POST["title"] ?? "");
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text = trim($_POST["prompt_text"] ?? "");
+    if ($prompt_text !== "") {
+        $prompt_text = str_replace(["\r\n", "\r"], "\n", $prompt_text);
+        $prompt_text = preg_replace("/\n{3,}/", "\n\n", $prompt_text);
+        $prompt_text = trim($prompt_text);
+    }
     $reel_link = trim($_POST["reel_link"] ?? "");
     $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // secret, unreleased, already_uploaded, direct, solo
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
@@ -349,6 +354,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         for ($ep = 2; $ep <= 10; $ep++) {
             $ep_text = trim($_POST["extra_prompt_{$ep}_text"] ?? '');
             if (empty($ep_text)) continue;
+            $ep_text = str_replace(["\r\n", "\r"], "\n", $ep_text);
+            $ep_text = preg_replace("/\n{3,}/", "\n\n", $ep_text);
+            $ep_text = trim($ep_text);
             $ep_image_path = null;
             if (isset($_FILES["extra_prompt_{$ep}_image"]) && $_FILES["extra_prompt_{$ep}_image"]["error"] === UPLOAD_ERR_OK) {
                 $ep_ext = strtolower(pathinfo($_FILES["extra_prompt_{$ep}_image"]["name"], PATHINFO_EXTENSION));

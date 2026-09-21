@@ -818,6 +818,20 @@ function updateAboutWordCount(el){
   countEl.textContent=words.length;
   countEl.style.color=words.length>=200?'var(--red)':'';
 }
+function handleTextareaPasteClean(e) {
+  var text = (e.clipboardData || window.clipboardData).getData('text');
+  if (!text) return;
+  var cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  e.preventDefault();
+  var start = this.selectionStart;
+  var end = this.selectionEnd;
+  var val = this.value;
+  this.value = val.substring(0, start) + cleaned + val.substring(end);
+  this.selectionStart = this.selectionEnd = start + cleaned.length;
+  this.dispatchEvent(new Event('input'));
+}
+var pText = document.getElementById('prompt_text');
+if (pText) pText.addEventListener('paste', handleTextareaPasteClean);
 </script>
 </html>
 

@@ -27,20 +27,6 @@ $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ?");
 $stmt->execute([$_SESSION["user_id"]]);
 $likes_count = (int)$stmt->fetchColumn();
 
-// Fetch nav counts for header
-$nav_counts = [];
-try {
-    $stmt = $pdo->prepare("SELECT
-        SUM(CASE WHEN prompt_type = 'secret' THEN 1 ELSE 0 END) as secret_code,
-        SUM(CASE WHEN prompt_type = 'unreleased' THEN 1 ELSE 0 END) as unreleased,
-        SUM(CASE WHEN prompt_type = 'insta_viral' THEN 1 ELSE 0 END) as insta_viral,
-        SUM(CASE WHEN prompt_type = 'already_uploaded' THEN 1 ELSE 0 END) as already_uploaded,
-        SUM(CASE WHEN prompt_type = 'direct' THEN 1 ELSE 0 END) as direct
-    FROM prompts");
-    $stmt->execute();
-    $nav_counts = $stmt->fetch(PDO::FETCH_ASSOC);
-} catch (Exception $e) { $nav_counts = []; }
-
 // --- Avatar Pool ---
 $male_avatars        = profile_avatars_anime_male();
 $female_avatars      = profile_avatars_anime_female();

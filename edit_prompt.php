@@ -17,6 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = trim($_POST["title"] ?? "");
     $tag = trim($_POST["tag"] ?? "");
     $prompt_text  = trim($_POST["prompt_text"] ?? "");
+    if ($prompt_text !== "") {
+        $prompt_text = str_replace(["\r\n", "\r"], "\n", $prompt_text);
+        $prompt_text = preg_replace("/\n{3,}/", "\n\n", $prompt_text);
+        $prompt_text = trim($prompt_text);
+    }
     $description   = trim($_POST["description"] ?? "");
     if (mb_strlen($description) > 160) {
         $description = mb_substr($description, 0, 160);
@@ -996,6 +1001,21 @@ body::before, body::after { display: none !important; background-image: none !im
             document.getElementById('sideDrawer').classList.remove('open');
             document.getElementById('drawerOverlay').classList.remove('open');
         }
+
+        function handleTextareaPasteClean(e) {
+            var text = (e.clipboardData || window.clipboardData).getData('text');
+            if (!text) return;
+            var cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+            e.preventDefault();
+            var start = this.selectionStart;
+            var end = this.selectionEnd;
+            var val = this.value;
+            this.value = val.substring(0, start) + cleaned + val.substring(end);
+            this.selectionStart = this.selectionEnd = start + cleaned.length;
+            this.dispatchEvent(new Event('input'));
+        }
+        var pText = document.getElementById('prompt_text');
+        if (pText) pText.addEventListener('paste', handleTextareaPasteClean);
 </script>
 </main>
 </body></html>
