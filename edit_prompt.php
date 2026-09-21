@@ -2,6 +2,84 @@
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
 require_once "slug_helper.php";
+
+if (!function_exists('resizeToWebP')) {
+    function resizeToWebP(string $src, int $maxW = 1200, int $maxH = 1600, int $quality = 85): string {
+        $info = @getimagesize($src);
+        if (!$info) return $src;
+        [$origW, $origH, $type] = [$info[0], $info[1], $info[2]];
+        $gdInfo      = function_exists('gd_info') ? gd_info() : [];
+        $webpSupport = !empty($gdInfo['WebP Support']);
+
+        if ($type === IMAGETYPE_JPEG) {
+            $img = @imagecreatefromjpeg($src);
+        } elseif ($type === IMAGETYPE_PNG) {
+            $img = @imagecreatefrompng($src);
+        } elseif ($type === IMAGETYPE_GIF) {
+            $img = @imagecreatefromgif($src);
+        } elseif ($type === IMAGETYPE_WEBP && $webpSupport) {
+            $img = @imagecreatefromwebp($src);
+        } else {
+            return $src;
+        }
+        if (!$img) return $src;
+
+        $ratio = min($maxW / $origW, $maxH / $origH, 1.0);
+        $newW = (int)round($origW * $ratio);
+        $newH = (int)round($origH * $ratio);
+        $resized = imagecreatetruecolor($newW, $newH);
+        imagealphablending($resized, false);
+        imagesavealpha($resized, true);
+        imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+        imagedestroy($img);
+
+        if ($webpSupport) {
+            $dest = preg_replace('/\.[^.]+$/', '.webp', $src);
+            imagewebp($resized, $dest, $quality);
+        } else {
+            $dest = preg_replace('/\.[^.]+$/', '.jpg', $src);
+            imagejpeg($resized, $dest, $quality);
+        }
+        imagedestroy($resized);
+        if ($dest !== $src && file_exists($src)) @unlink($src);
+        return $dest;
+    }
+}
+
+if (!function_exists('storePromptImage')) {
+    function storePromptImage(array $file, string $directory, string $prefix): string {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            throw new RuntimeException('Image upload failed. Please choose the image again.');
+        }
+        if (($file['size'] ?? 0) > 5 * 1024 * 1024) {
+            throw new RuntimeException('Image too large. Maximum allowed size is 5MB per image.');
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = $finfo ? finfo_file($finfo, $file['tmp_name']) : false;
+        if ($finfo) finfo_close($finfo);
+        $mime_to_ext = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        ];
+        if (!$mime || !isset($mime_to_ext[$mime])) {
+            throw new RuntimeException('Invalid image format. Use JPG, PNG, GIF or WebP.');
+        }
+
+        if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+            throw new RuntimeException('Image folder could not be created.');
+        }
+
+        $path = rtrim($directory, '/\\') . '/' . uniqid($prefix, true) . '.' . $mime_to_ext[$mime];
+        if (!move_uploaded_file($file['tmp_name'], $path)) {
+            throw new RuntimeException('Failed to save uploaded image.');
+        }
+
+        return resizeToWebP($path);
+    }
+}
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     header("Location: index.php");
     exit();
@@ -104,33 +182,95 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    $image_path = $_POST["current_image"];
-    if (
-        isset($_FILES["image"]) &&
-        $_FILES["image"]["error"] === UPLOAD_ERR_OK
-    ) {
-        $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+    $image_path = $_POST["current_image"] ?? "";
+    $solo_before_image = trim($_POST["current_solo_before_image"] ?? "");
+    $solo_examples_json = null;
 
-        // Security Checks: File Size and MIME type
-        if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
-            $_SESSION["edit_error"] = "Image too large! Maximum allowed size is 5MB.";
-            header("Location: edit_prompt.php?id=$id");
-            exit();
-        }
-        
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
-        if (!str_starts_with($mime, 'image/')) {
-            $_SESSION["edit_error"] = "Invalid file type. Only actual images are allowed.";
+    try {
+        // Handle solo after image or standard cover image
+        if ($prompt_type === "solo" && isset($_FILES["solo_after_image"]) && $_FILES["solo_after_image"]["error"] === UPLOAD_ERR_OK) {
+            $image_path = storePromptImage($_FILES["solo_after_image"], "uploads/solo/after/", "solo_after_");
+        } elseif (isset($_FILES["image"]) && $_FILES["image"]["error"] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
+
+            if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+                $_SESSION["edit_error"] = "Image too large! Maximum allowed size is 5MB.";
+                header("Location: edit_prompt.php?id=$id");
+                exit();
+            }
+            
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+            if (!str_starts_with($mime, 'image/')) {
+                $_SESSION["edit_error"] = "Invalid file type. Only actual images are allowed.";
+                finfo_close($finfo);
+                header("Location: edit_prompt.php?id=$id");
+                exit();
+            }
             finfo_close($finfo);
-            header("Location: edit_prompt.php?id=$id");
-            exit();
+            $fn = "uploads/" . uniqid("prompt_") . "." . $ext;
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
+                $image_path = resizeToWebP($fn);
+            }
         }
-        finfo_close($finfo);
-        $fn = "uploads/" . uniqid("prompt_") . "." . $ext;
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $fn)) {
-            $image_path = $fn;
+
+        // Handle solo before image
+        if ($prompt_type === "solo" && isset($_FILES["solo_before_image"]) && $_FILES["solo_before_image"]["error"] === UPLOAD_ERR_OK) {
+            $solo_before_image = storePromptImage($_FILES["solo_before_image"], "uploads/solo/before/", "solo_before_");
         }
+
+        // Handle solo examples
+        if ($prompt_type === "solo") {
+            $existing_befores = $_POST['existing_example_before'] ?? [];
+            $existing_afters  = $_POST['existing_example_after'] ?? [];
+            $before_files     = $_FILES['solo_example_before'] ?? null;
+            $after_files      = $_FILES['solo_example_after'] ?? null;
+
+            $example_pairs = [];
+            $count = max(
+                count($existing_befores),
+                is_array($before_files['name'] ?? null) ? count($before_files['name']) : 0
+            );
+
+            for ($i = 0; $i < $count && count($example_pairs) < 5; $i++) {
+                $b_path = $existing_befores[$i] ?? '';
+                $a_path = $existing_afters[$i] ?? '';
+
+                if (isset($before_files['error'][$i]) && $before_files['error'][$i] === UPLOAD_ERR_OK) {
+                    $b_file = [
+                        'name'     => $before_files['name'][$i],
+                        'type'     => $before_files['type'][$i],
+                        'tmp_name' => $before_files['tmp_name'][$i],
+                        'error'    => $before_files['error'][$i],
+                        'size'     => $before_files['size'][$i],
+                    ];
+                    $b_path = storePromptImage($b_file, 'uploads/solo/examples/before/', 'solo_ex_before_');
+                }
+
+                if (isset($after_files['error'][$i]) && $after_files['error'][$i] === UPLOAD_ERR_OK) {
+                    $a_file = [
+                        'name'     => $after_files['name'][$i],
+                        'type'     => $after_files['type'][$i],
+                        'tmp_name' => $after_files['tmp_name'][$i],
+                        'error'    => $after_files['error'][$i],
+                        'size'     => $after_files['size'][$i],
+                    ];
+                    $a_path = storePromptImage($a_file, 'uploads/solo/examples/after/', 'solo_ex_after_');
+                }
+
+                if (!empty($b_path) && !empty($a_path)) {
+                    $example_pairs[] = [
+                        'before' => $b_path,
+                        'after'  => $a_path,
+                    ];
+                }
+            }
+            $solo_examples_json = !empty($example_pairs) ? json_encode($example_pairs) : null;
+        }
+    } catch (RuntimeException $e) {
+        $_SESSION["edit_error"] = $e->getMessage();
+        header("Location: edit_prompt.php?id=$id");
+        exit();
     }
 
     // Handle extra prompts (2 through 10)
@@ -156,7 +296,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $updated_slug = uniqueSlug($pdo, $title, $id);
     $pdo->prepare(
-        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, about_prompt=?, meta_keywords=?, extra_prompts=?, is_trial=? WHERE id=?",
+        "UPDATE prompts SET title=?, slug=?, tag=?, prompt_text=?, unlock_code=?, reel_link=?, image_path=?, prompt_type=?, best_works_in=?, asset_title=?, asset_images=?, description=?, about_prompt=?, meta_keywords=?, extra_prompts=?, is_trial=?, solo_before_image=?, solo_examples=? WHERE id=?",
     )->execute([
         $title,
         $updated_slug,
@@ -174,6 +314,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $meta_keywords,
         $extra_prompts_json,
         $is_trial,
+        $solo_before_image ?: null,
+        $solo_examples_json,
         $id,
     ]);
 
@@ -203,6 +345,8 @@ $extra_by_num = [];
 for ($i = 0; $i < 9; $i++) {
     $extra_by_num[$i + 2] = $current_extra_arr[$i] ?? null;
 }
+$current_solo_before = $p['solo_before_image'] ?? '';
+$current_solo_examples = json_decode($p['solo_examples'] ?? '[]', true) ?: [];
 ?>
 <?php $admin_name = $_SESSION['username'] ?? 'Admin'; ?><!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -359,6 +503,33 @@ body{background:var(--adm-bg);color:var(--adm-text);font-family:var(--adm-font);
 @media(max-width:700px){.type-selector{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.form-row{grid-template-columns:1fr}.edit-card{padding:18px 14px}}
 body::before, body::after { display: none !important; background-image: none !important; }
+
+/* ── SOLO Styles ── */
+.solo-main-upload{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:14px;align-items:stretch;margin-top:14px;}
+.solo-upload-panel{border:1px solid var(--adm-border);border-radius:14px;padding:16px;background:rgba(255,255,255,0.02);}
+.solo-upload-panel.after{border-color:rgba(74,222,128,0.25);background:rgba(74,222,128,0.035);}
+.solo-upload-title{display:flex;align-items:center;gap:7px;color:var(--adm-accent2);font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.solo-upload-panel.after .solo-upload-title{color:var(--adm-green);}
+.solo-image-preview{display:none;margin-top:13px;overflow:hidden;border:1px solid var(--adm-border);border-radius:12px;background:#07060f;}
+.solo-image-preview.show{display:block;}
+.solo-image-preview img{display:block;width:100%;aspect-ratio:9/16;max-height:360px;object-fit:cover;}
+.solo-arrow{display:flex;align-items:center;justify-content:center;color:var(--adm-green);font-size:1.5rem;}
+.solo-help{font-size:.72rem;line-height:1.55;color:var(--adm-muted);margin-top:9px;}
+.solo-example{border:1px solid var(--adm-border2);border-radius:14px;padding:16px;margin-top:12px;background:rgba(255,255,255,0.02);}
+.solo-example-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.solo-example-title{font-size:.76rem;font-weight:900;color:var(--adm-text);}
+.solo-example-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.solo-example-side{min-width:0;}
+.solo-example-preview{display:none;margin-top:10px;overflow:hidden;border:1px solid var(--adm-border2);border-radius:11px;background:#07060f;}
+.solo-example-preview.show{display:block;}
+.solo-example-preview img{display:block;width:100%;aspect-ratio:9/16;max-height:300px;object-fit:cover;}
+.solo-example-remove{border:1px solid rgba(248,113,113,.25);background:rgba(248,113,113,.07);color:var(--adm-red);border-radius:8px;padding:6px 10px;font-weight:800;font-size:.7rem;cursor:pointer;font-family:var(--adm-font);}
+.solo-example-remove:hover{background:rgba(248,113,113,.15);}
+.solo-add-example{margin-top:14px;display:inline-flex;align-items:center;gap:7px;border:1px dashed rgba(74,222,128,.35);background:rgba(74,222,128,.06);color:var(--adm-green);border-radius:11px;padding:10px 15px;font-family:var(--adm-font);font-size:.78rem;font-weight:900;cursor:pointer;}
+.solo-add-example:hover{background:rgba(74,222,128,.14);}
+.solo-add-example:disabled{opacity:.45;cursor:not-allowed;}
+.solo-count{font-size:.75rem;color:var(--adm-muted);margin-left:8px;font-weight:700;}
+@media(max-width:700px){.solo-main-upload{grid-template-columns:1fr;}.solo-arrow{transform:rotate(90deg);min-height:34px;}.solo-example-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -758,7 +929,113 @@ body::before, body::after { display: none !important; background-image: none !im
         </div>
       </div>
 
-      <div class="form-group">
+      <!-- SOLO BEFORE / AFTER + EXAMPLES -->
+      <div class="form-group" id="solo-media-card" style="<?= $current_prompt_type === 'solo' ? 'display:block;' : 'display:none;' ?>;border:1px solid rgba(74,222,128,0.25);border-radius:16px;padding:20px;background:rgba(74,222,128,0.02);margin-bottom:22px;">
+        <div style="font-weight:900;font-size:1rem;color:#4ade80;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i> SOLO Before &amp; After
+        </div>
+        
+        <div class="solo-main-upload">
+          <!-- Before Image Panel -->
+          <div class="solo-upload-panel">
+            <div class="solo-upload-title"><i class="fa-solid fa-image"></i> Before Image</div>
+            <input type="hidden" name="current_solo_before_image" value="<?= htmlspecialchars($current_solo_before) ?>">
+            <?php if (!empty($current_solo_before)): ?>
+            <div style="margin-bottom:10px;">
+              <img loading="lazy" src="<?= htmlspecialchars($current_solo_before) ?>" alt="Current before" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--adm-border);">
+              <div style="font-size:0.75rem;color:var(--adm-muted);margin-top:4px;">Current Before image</div>
+            </div>
+            <?php endif; ?>
+            <label class="file-upload-btn">
+              <input type="file" name="solo_before_image" id="solo-before-image" accept="image/*" style="display:none" onchange="previewSoloMain(this,'solo-before-name','solo-before-preview')">
+              <i class="fa-solid fa-upload"></i> <?= !empty($current_solo_before) ? 'Replace Before' : 'Choose Before' ?>
+            </label>
+            <div class="file-upload-name" id="solo-before-name" style="margin-top:9px">No file chosen</div>
+            <div class="solo-image-preview" id="solo-before-preview"><img alt="Before image preview"></div>
+            <p class="solo-help">Upload the original/reference photo.</p>
+          </div>
+
+          <!-- Arrow -->
+          <div class="solo-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <!-- After Image Panel -->
+          <div class="solo-upload-panel after">
+            <div class="solo-upload-title"><i class="fa-solid fa-wand-magic-sparkles"></i> After / Result Image</div>
+            <?php if (!empty($p['image_path'])): ?>
+            <div style="margin-bottom:10px;">
+              <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" alt="Current after" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--adm-border);">
+              <div style="font-size:0.75rem;color:var(--adm-muted);margin-top:4px;">Current After / Cover image</div>
+            </div>
+            <?php endif; ?>
+            <label class="file-upload-btn">
+              <input type="file" name="solo_after_image" id="solo-after-image" accept="image/*" style="display:none" onchange="previewSoloMain(this,'solo-after-name','solo-after-preview')">
+              <i class="fa-solid fa-upload"></i> <?= !empty($p['image_path']) ? 'Replace Result' : 'Choose Result' ?>
+            </label>
+            <div class="file-upload-name" id="solo-after-name" style="margin-top:9px">No file chosen</div>
+            <div class="solo-image-preview" id="solo-after-preview"><img alt="After result preview"></div>
+            <p class="solo-help">This result image will also become the public gallery cover.</p>
+          </div>
+        </div>
+
+        <!-- Set Examples Section -->
+        <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--adm-border2)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-weight:800;font-size:.88rem;color:var(--adm-text);"><i class="fa-solid fa-images" style="color:var(--adm-green);margin-right:6px;"></i> Set Examples (Optional)</div>
+            <span class="solo-count" id="solo-example-count" style="font-size:0.75rem;color:var(--adm-muted);font-weight:700;"><?= count($current_solo_examples) ?> / 5</span>
+          </div>
+          <p class="solo-help" style="margin:0 0 12px 0;">Each example contains one before and one after image. Maximum 5 examples.</p>
+          
+          <div id="solo-examples">
+            <?php foreach ($current_solo_examples as $ex_idx => $ex_pair): ?>
+            <div class="solo-example">
+              <div class="solo-example-head">
+                <div class="solo-example-title"><i class="fa-solid fa-layer-group" style="color:var(--adm-green);margin-right:6px"></i>Example <span class="solo-example-number"><?= $ex_idx + 1 ?></span></div>
+                <button type="button" class="solo-example-remove" onclick="removeSoloExample(this)"><i class="fa-solid fa-trash"></i> Remove</button>
+              </div>
+              <div class="solo-example-grid">
+                <div class="solo-example-side">
+                  <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.75rem;font-weight:700;color:var(--adm-muted);">Before Picture</label>
+                  <input type="hidden" name="existing_example_before[]" value="<?= htmlspecialchars($ex_pair['before'] ?? '') ?>">
+                  <?php if (!empty($ex_pair['before'])): ?>
+                  <div style="margin-bottom:8px;">
+                    <img src="<?= htmlspecialchars($ex_pair['before']) ?>" alt="Example before" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--adm-border);">
+                  </div>
+                  <?php endif; ?>
+                  <label class="file-upload-btn">
+                    <input type="file" name="solo_example_before[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+                    <i class="fa-solid fa-image"></i> <?= !empty($ex_pair['before']) ? 'Change Before' : 'Choose Before' ?>
+                  </label>
+                  <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+                  <div class="solo-example-preview"><img alt="Example before preview"></div>
+                </div>
+                <div class="solo-example-side">
+                  <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.75rem;font-weight:700;color:var(--adm-muted);">After Picture</label>
+                  <input type="hidden" name="existing_example_after[]" value="<?= htmlspecialchars($ex_pair['after'] ?? '') ?>">
+                  <?php if (!empty($ex_pair['after'])): ?>
+                  <div style="margin-bottom:8px;">
+                    <img src="<?= htmlspecialchars($ex_pair['after']) ?>" alt="Example after" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--adm-border);">
+                  </div>
+                  <?php endif; ?>
+                  <label class="file-upload-btn">
+                    <input type="file" name="solo_example_after[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <?= !empty($ex_pair['after']) ? 'Change After' : 'Choose After' ?>
+                  </label>
+                  <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+                  <div class="solo-example-preview"><img alt="Example after preview"></div>
+                </div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          </div>
+
+          <button type="button" class="solo-add-example" id="solo-add-example" onclick="addSoloExample()" <?= count($current_solo_examples) >= 5 ? 'disabled' : '' ?>>
+            <i class="fa-solid fa-plus"></i> Add Example
+          </button>
+        </div>
+      </div>
+
+      <!-- Standard Cover Image Group (hidden when solo) -->
+      <div class="form-group" id="standard-cover-group" style="<?= $current_prompt_type === 'solo' ? 'display:none;' : '' ?>">
         <label>Cover Image (leave blank to keep current)</label>
         <div class="img-preview">
           <img loading="lazy" src="<?= htmlspecialchars(
@@ -873,6 +1150,88 @@ body::before, body::after { display: none !important; background-image: none !im
             if (directTapsGroup) {
                 directTapsGroup.style.display = (selectedType === 'direct' || selectedType === 'solo') ? 'block' : 'none';
             }
+            const isSolo = (selectedType === 'solo');
+            const soloMediaCard = document.getElementById('solo-media-card');
+            const standardCoverGroup = document.getElementById('standard-cover-group');
+            if (soloMediaCard) soloMediaCard.style.display = isSolo ? 'block' : 'none';
+            if (standardCoverGroup) standardCoverGroup.style.display = isSolo ? 'none' : 'block';
+        }
+
+        function readSoloPreview(input, preview) {
+            const file = input.files[0];
+            const img = preview?.querySelector('img');
+            if (!file || !preview || !img) {
+                if (preview) preview.classList.remove('show');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                img.src = e.target.result;
+                preview.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previewSoloMain(input, nameId, previewId) {
+            document.getElementById(nameId).textContent = input.files[0]?.name || 'No file chosen';
+            readSoloPreview(input, document.getElementById(previewId));
+        }
+
+        function previewSoloExample(input) {
+            const side = input.closest('.solo-example-side');
+            if (!side) return;
+            side.querySelector('.solo-example-fname').textContent = input.files[0]?.name || 'No file chosen';
+            readSoloPreview(input, side.querySelector('.solo-example-preview'));
+        }
+
+        function addSoloExample() {
+            const wrap = document.getElementById('solo-examples');
+            if (!wrap || wrap.querySelectorAll('.solo-example').length >= 5) return;
+            const item = document.createElement('div');
+            item.className = 'solo-example';
+            item.innerHTML = `
+              <div class="solo-example-head">
+                <div class="solo-example-title"><i class="fa-solid fa-layer-group" style="color:var(--adm-green);margin-right:6px"></i>Example <span class="solo-example-number"></span></div>
+                <button type="button" class="solo-example-remove" onclick="removeSoloExample(this)"><i class="fa-solid fa-trash"></i> Remove</button>
+              </div>
+              <div class="solo-example-grid">
+                <div class="solo-example-side">
+                  <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.75rem;font-weight:700;color:var(--adm-muted);">Before Picture</label>
+                  <input type="hidden" name="existing_example_before[]" value="">
+                  <label class="file-upload-btn">
+                    <input type="file" name="solo_example_before[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+                    <i class="fa-solid fa-image"></i> Choose Before
+                  </label>
+                  <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+                  <div class="solo-example-preview"><img alt="Example before preview"></div>
+                </div>
+                <div class="solo-example-side">
+                  <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.75rem;font-weight:700;color:var(--adm-muted);">After Picture</label>
+                  <input type="hidden" name="existing_example_after[]" value="">
+                  <label class="file-upload-btn">
+                    <input type="file" name="solo_example_after[]" accept="image/*" style="display:none" onchange="previewSoloExample(this)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Choose After
+                  </label>
+                  <div class="file-upload-name solo-example-fname" style="margin-top:7px">No file chosen</div>
+                  <div class="solo-example-preview"><img alt="Example after preview"></div>
+                </div>
+              </div>`;
+            wrap.appendChild(item);
+            renumberSoloExamples();
+        }
+
+        function removeSoloExample(btn) {
+            btn.closest('.solo-example').remove();
+            renumberSoloExamples();
+        }
+
+        function renumberSoloExamples() {
+            const items = Array.from(document.querySelectorAll('#solo-examples .solo-example'));
+            items.forEach((item, i) => item.querySelector('.solo-example-number').textContent = i + 1);
+            const countEl = document.getElementById('solo-example-count');
+            if (countEl) countEl.textContent = items.length + ' / 5';
+            const addBtn = document.getElementById('solo-add-example');
+            if (addBtn) addBtn.disabled = items.length >= 5;
         }
 
         function onTapChange(val){
