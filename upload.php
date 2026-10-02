@@ -123,6 +123,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $about_prompt = implode(' ', array_slice($about_words, 0, 200));
         }
     }
+    require_once __DIR__ . '/includes/step_pics_helper.php';
+    $how_to_use_arr = [];
+    if (!empty($_POST["how_step_text"]) && is_array($_POST["how_step_text"])) {
+        foreach ($_POST["how_step_text"] as $s_idx => $s_text) {
+            $s_text = trim((string)$s_text);
+            $s_imgs = [];
+            if (!empty($_POST["how_step_images"][$s_idx]) && is_array($_POST["how_step_images"][$s_idx])) {
+                foreach ($_POST["how_step_images"][$s_idx] as $img_path) {
+                    $img_path = trim((string)$img_path);
+                    if ($img_path !== '' && count($s_imgs) < 5) {
+                        $s_imgs[] = $img_path;
+                        record_step_pic_usage($img_path, $s_text, $pdo);
+                    }
+                }
+            }
+            if ($s_text !== "" || !empty($s_imgs)) {
+                $how_to_use_arr[] = [
+                    'text'   => $s_text,
+                    'images' => $s_imgs
+                ];
+            }
+        }
+    } elseif (!empty($_POST["how_to_use"]) && is_array($_POST["how_to_use"])) {
+        foreach ($_POST["how_to_use"] as $step) {
+            if (is_array($step)) {
+                $how_to_use_arr[] = $step;
+            } else {
+                $step_clean = trim((string)$step);
+                if ($step_clean !== "") {
+                    $how_to_use_arr[] = [
+                        'text'   => $step_clean,
+                        'images' => []
+                    ];
+                }
+            }
+        }
+    }
+    $how_to_use_json = !empty($how_to_use_arr) ? json_encode(array_values($how_to_use_arr), JSON_UNESCAPED_UNICODE) : null;
     $meta_keywords = trim($_POST["meta_keywords"] ?? "");
     if ($meta_keywords !== "") {
         $kw_parts = array_values(array_filter(array_map("trim", explode(",", $meta_keywords)), static function ($k) {
@@ -377,7 +415,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $new_slug = uniqueSlug($pdo, $title);
         try {
             $stmt = $pdo->prepare(
-                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, about_prompt, meta_keywords, solo_before_image, solo_examples) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO prompts (title, slug, tag, prompt_text, unlock_code, image_path, reel_link, prompt_type, best_works_in, asset_title, asset_images, extra_prompts, is_trial, description, about_prompt, how_to_use, meta_keywords, solo_before_image, solo_examples) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             );
             $stmt->execute([
                 $title,
@@ -395,6 +433,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $is_trial,
                 $description ?: null,
                 $about_prompt ?: null,
+                $how_to_use_json,
                 $meta_keywords,
                 $solo_before_image,
                 $solo_examples_json,

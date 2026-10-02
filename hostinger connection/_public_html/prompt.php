@@ -78,6 +78,9 @@ $meta_desc    = !empty($p['description'])
 $meta_keywords = !empty($p['meta_keywords']) ? htmlspecialchars($p['meta_keywords']) : htmlspecialchars($tags_str);
 $meta_desc_raw = trim($p['description'] ?? '');
 $about_prompt_raw = trim($p['about_prompt'] ?? '');
+require_once __DIR__ . '/includes/step_pics_helper.php';
+$how_to_use_raw = trim((string)($p['how_to_use'] ?? ''));
+$how_to_use_steps = parse_how_to_use_steps($how_to_use_raw);
 $pp_kw_list    = array_filter(array_map('trim', explode(',', $p['meta_keywords'] ?? '')));
 $type_page    = match($ptype) {
     'insta_viral'      => 'curated_ai_prompts.php',
@@ -191,6 +194,353 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         transform: translateY(0) !important;
         box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15) !important;
     }
+
+    /* Footer & Page Layout Overrides */
+    body.page-prompt {
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+    }
+    .theme-nogoda .pp-wrap {
+        flex: 1 0 auto !important;
+    }
+    body.page-prompt .store-footer,
+    .theme-nogoda.page-prompt .store-footer {
+        display: block !important;
+        position: relative !important;
+        z-index: 10 !important;
+        width: 100% !important;
+        margin-top: clamp(32px, 5vw, 60px) !important;
+        background: var(--pal-white, #FFFFFF) !important;
+        border-top: 1px solid var(--pal-sky, #C8D9E6) !important;
+        padding: clamp(28px, 5vw, 40px) clamp(20px, 4vw, 80px) calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+        box-sizing: border-box !important;
+        clear: both !important;
+    }
+    body.page-prompt .store-footer-inner,
+    .theme-nogoda.page-prompt .store-footer-inner {
+        display: flex !important;
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        text-align: left !important;
+    }
+
+    /* Mobile view footer & scrolling guarantee */
+    @media (max-width: 768px) {
+        html,
+        body.page-prompt,
+        body.page-prompt.theme-nogoda {
+            overflow-x: hidden !important;
+        }
+        body.page-prompt,
+        body.page-prompt.theme-nogoda {
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            height: auto !important;
+        }
+        .theme-nogoda .pp-wrap {
+            flex: 1 0 auto !important;
+            width: 100% !important;
+            padding-bottom: 24px !important;
+        }
+        .theme-nogoda .pp-related {
+            margin-bottom: 20px !important;
+        }
+        body.page-prompt .store-footer,
+        .theme-nogoda.page-prompt .store-footer {
+            display: block !important;
+            flex-shrink: 0 !important;
+            position: relative !important;
+            z-index: 10 !important;
+            width: 100% !important;
+            margin-top: 36px !important;
+            margin-bottom: 0 !important;
+            padding: 32px 16px calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+            background: #FFFFFF !important;
+            border-top: 1px solid var(--pal-sky, #C8D9E6) !important;
+            clear: both !important;
+            box-sizing: border-box !important;
+        }
+        body.page-prompt .store-footer-inner,
+        .theme-nogoda.page-prompt .store-footer-inner {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            text-align: left !important;
+            width: 100% !important;
+        }
+        body.page-prompt .footer-links,
+        .theme-nogoda.page-prompt .footer-links {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px 16px !important;
+            width: 100% !important;
+        }
+        body.page-prompt .footer-links a,
+        .theme-nogoda.page-prompt .footer-links a {
+            font-size: 0.78rem !important;
+            white-space: nowrap !important;
+        }
+    }
+
+    /* Prevent drag ghost on touch/mouse to ensure smooth downward scrolling */
+    .pp-rel-card img,
+    .pp-prompt-img,
+    .pp-rel-card,
+    .pp-img-frame {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    /* How to Use Box */
+    .pp-how-to-use {
+        margin-top: 32px;
+        padding: 22px 24px;
+        background: var(--bg-card, #ffffff);
+        border: 1.5px solid var(--pal-sky, #C8D9E6);
+        border-radius: 18px;
+        box-shadow: 0 2px 12px rgba(47, 65, 86, 0.08);
+    }
+    .pp-how-to-use h2 {
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--pal-teal, #567C8D);
+        margin: 0 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pp-how-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .pp-how-step-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .pp-how-step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #2F4156;
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        margin-top: 0 !important;
+        box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15);
+    }
+    .pp-how-step-text {
+        font-size: .88rem;
+        line-height: 1.7;
+        color: var(--pal-navy, #2F4156);
+        flex: 0 1 auto !important;
+    }
+    .pp-how-step-content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        flex: 1;
+        min-width: 0;
+    }
+    .pp-step-pics-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        padding: 4px 6px;
+    }
+    .pp-step-pic-plus {
+        font-size: 0.85rem;
+        font-weight: 900;
+        color: var(--pal-teal, #567C8D);
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        opacity: 0.85;
+    }
+    .pp-step-pic-thumb {
+        display: inline-block !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        border-radius: 9px !important;
+        border: 1.5px solid var(--pal-sky, #C8D9E6) !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+        position: relative !important;
+        box-shadow: 0 2px 7px rgba(47, 65, 86, 0.1) !important;
+        transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        text-decoration: none !important;
+    }
+    /* Playful tilt for step thumbnail boxes */
+    .pp-step-pic-thumb:nth-of-type(1) {
+        transform: rotate(-3.5deg);
+    }
+    .pp-step-pic-thumb:nth-of-type(2) {
+        transform: rotate(3.5deg);
+    }
+    .pp-step-pic-thumb:nth-of-type(3) {
+        transform: rotate(2.5deg);
+    }
+    .pp-step-pic-thumb:nth-of-type(4) {
+        transform: rotate(-3deg);
+    }
+    .pp-step-pic-thumb:nth-of-type(5) {
+        transform: rotate(3deg);
+    }
+    .pp-step-pic-thumb:hover {
+        transform: translateY(-2px) scale(1.15) rotate(0deg) !important;
+        border-color: var(--pal-teal, #567C8D) !important;
+        box-shadow: 0 6px 16px rgba(47, 65, 86, 0.22) !important;
+        z-index: 5 !important;
+    }
+    .pp-step-pic-thumb img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+        border-radius: 7px !important;
+    }
+    .pp-step-pic-zoom {
+        position: absolute;
+        inset: 0;
+        background: rgba(47, 65, 86, 0.45);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+    }
+    .pp-step-pic-thumb:hover .pp-step-pic-zoom {
+        opacity: 1;
+    }
+    @media (max-width: 640px) {
+        .pp-how-step-item {
+            align-items: flex-start !important;
+        }
+        .pp-how-step-num {
+            margin-top: 2px !important;
+        }
+        .pp-how-step-content {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .pp-how-step-text {
+            width: 100% !important;
+        }
+        .pp-step-pics-wrap {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            margin-top: 6px !important;
+            width: 100% !important;
+            padding: 4px 2px !important;
+        }
+        .pp-step-pic-thumb {
+            width: 52px !important;
+            height: 52px !important;
+            min-width: 52px !important;
+            min-height: 52px !important;
+            max-width: 52px !important;
+            max-height: 52px !important;
+            border-radius: 11px !important;
+            border-width: 1.5px !important;
+        }
+        .pp-step-pic-thumb img {
+            border-radius: 9px !important;
+        }
+        .pp-step-pic-plus {
+            font-size: 1rem !important;
+            width: 16px !important;
+        }
+    }
+    .pp-tag {
+        font-size: 0.72rem;
+        padding: 5px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--pal-sky, #C8D9E6);
+        background: var(--pal-white, #ffffff);
+        color: var(--pal-teal, #567C8D);
+        text-transform: capitalize;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    a.pp-tag:hover {
+        background: var(--pal-teal, #567C8D);
+        color: #ffffff;
+        border-color: var(--pal-teal, #567C8D);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(47, 65, 86, 0.1);
+    }
+
+    /* Floating Little Hearts Canvas (Instagram / TikTok Live Engine) */
+    .pp-love-area {
+        position: relative !important;
+        overflow: visible !important;
+    }
+    .pp-love-canvas {
+        position: absolute !important;
+        left: 50% !important;
+        top: -180px !important;
+        transform: translateX(-50%) !important;
+        width: 320px !important;
+        height: 260px !important;
+        pointer-events: none !important;
+        z-index: 20 !important;
+    }
+    .pp-love-btn {
+        position: relative !important;
+        z-index: 10 !important;
+        outline: none !important;
+        user-select: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.15s ease !important;
+    }
+    .pp-love-btn:active {
+        transform: scale(0.92) !important;
+    }
     </style>
     <?php include_once "gtag.php"; ?>
 </head>
@@ -208,17 +558,17 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 <div class="pp-solo-compare" aria-label="Before and after comparison">
                     <figure class="pp-solo-shot before pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview before image">
                         <span class="pp-solo-label">Before</span>
-                        <img loading="eager" src="<?= htmlspecialchars($solo_before_image) ?>" class="pp-prompt-img" alt="Before — <?= htmlspecialchars($p['title']) ?>">
+                        <img loading="eager" draggable="false" src="<?= htmlspecialchars($solo_before_image) ?>" class="pp-prompt-img" alt="Before — <?= htmlspecialchars($p['title']) ?>">
                     </figure>
                     <div class="pp-solo-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
                     <figure class="pp-solo-shot after pp-solo-zoom" role="button" tabindex="0" data-solo-lb aria-label="Preview after image">
                         <span class="pp-solo-label">After</span>
-                        <img loading="eager" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="After — <?= htmlspecialchars($p['title']) ?>">
+                        <img loading="eager" draggable="false" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="After — <?= htmlspecialchars($p['title']) ?>">
                     </figure>
                 </div>
                 <?php else: ?>
                 <div class="pp-img-frame">
-                    <img loading="lazy" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
+                    <img loading="lazy" draggable="false" src="<?= htmlspecialchars($p['image_path']) ?>" class="pp-prompt-img" id="pp-main-img" alt="<?= htmlspecialchars($p['title']) ?>">
                     <span class="pp-badge"><?= $tinfo['label'] ?></span>
                 </div>
                 <?php endif; ?>
@@ -230,7 +580,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                     <?php if (!empty($tags_arr)): ?>
                     <div class="pp-tags">
                         <?php foreach ($tags_arr as $t): ?>
-                            <span class="pp-tag"><?= htmlspecialchars(ucfirst($t)) ?></span>
+                            <a href="gallery.php?tag=<?= urlencode(strtolower(trim($t))) ?>" class="pp-tag" title="Filter prompts by tag <?= htmlspecialchars($t) ?>"><?= htmlspecialchars(ucfirst($t)) ?></a>
                         <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
@@ -421,6 +771,42 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         </section>
         <?php endif; ?>
 
+        <?php if (!empty($how_to_use_steps)): ?>
+        <section class="pp-how-to-use" aria-label="How to use this prompt">
+            <h2><i class="fa-solid fa-list-check" style="font-size:0.85rem;"></i> How to use this prompt</h2>
+            <ol class="pp-how-steps">
+                <?php foreach ($how_to_use_steps as $step_i => $step_item): 
+                    $step_text = $step_item['text'] ?? '';
+                    $step_imgs = !empty($step_item['images']) && is_array($step_item['images']) ? $step_item['images'] : [];
+                ?>
+                <li class="pp-how-step-item">
+                    <span class="pp-how-step-num"><?= $step_i + 1 ?></span>
+                    <div class="pp-how-step-content">
+                        <?php if ($step_text !== ''): ?>
+                        <div class="pp-how-step-text"><?= nl2br(htmlspecialchars($step_text)) ?></div>
+                        <?php endif; ?>
+                        <?php if (!empty($step_imgs)): ?>
+                        <div class="pp-step-pics-wrap" aria-label="Step sample pictures">
+                            <?php foreach ($step_imgs as $img_idx => $s_img): 
+                                $img_url = (preg_match('#^https?://#i', $s_img)) ? $s_img : ltrim($s_img, '/');
+                            ?>
+                                <?php if ($img_idx > 0): ?>
+                                    <span class="pp-step-pic-plus" aria-hidden="true">+</span>
+                                <?php endif; ?>
+                                <a href="<?= htmlspecialchars($img_url) ?>" class="pp-step-pic-thumb" target="_blank" rel="noopener" title="Click to view sample picture" onclick="openStepPicModal(event, '<?= htmlspecialchars($img_url, ENT_QUOTES) ?>')">
+                                    <img src="<?= htmlspecialchars($img_url) ?>" alt="Step <?= $step_i + 1 ?> sample <?= $img_idx + 1 ?>" loading="lazy">
+                                    <span class="pp-step-pic-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </li>
+                <?php endforeach; ?>
+            </ol>
+        </section>
+        <?php endif; ?>
+
         <?php if ($about_prompt_raw !== '' || $meta_desc_raw !== '' || !empty($pp_kw_list)): ?>
         <section class="pp-about" aria-label="About this prompt">
             <?php if ($about_prompt_raw !== ''): ?>
@@ -455,7 +841,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 }
                 ?>
                 <a href="<?= htmlspecialchars($related_url) ?>" class="pp-rel-card">
-                    <img loading="lazy" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>">
+                    <img loading="lazy" draggable="false" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>">
                     <div class="pp-rel-card-foot">
                         <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
                         <div class="pp-rel-card-likes"><i class="fa-solid fa-heart" aria-hidden="true"></i><span><?= (int)($r['likes_count'] ?? 0) ?></span></div>
@@ -554,28 +940,253 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         });
     }
 
+    // ============================================================
+    // HARDWARE-ACCELERATED 60FPS CANVAS FLOATING HEARTS ENGINE
+    // ============================================================
+    const heartSvgPath = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
+    let heartPath2D = null;
+    try { heartPath2D = new Path2D(heartSvgPath); } catch (e) {}
+
+    class HeartCanvasManager {
+        constructor(area) {
+            this.area = area;
+            this.canvas = area.querySelector('.pp-love-canvas');
+            if (!this.canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'pp-love-canvas';
+                this.area.prepend(this.canvas);
+            }
+            this.ctx = this.canvas.getContext('2d');
+            this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+            this.width = 320;
+            this.height = 260;
+            this.canvas.width = this.width * this.dpr;
+            this.canvas.height = this.height * this.dpr;
+            this.ctx.scale(this.dpr, this.dpr);
+            this.particles = [];
+            this.animId = null;
+            this.lastTime = 0;
+            this.colors = ['#FF3366', '#FF5388', '#F5709D', '#FF7597', '#FF85A1', '#C084FC', '#E879F9', '#FF4D6D', '#FB7185', '#F43F5E'];
+            this.celebrateColors = ['#FF3366', '#FF5388', '#F5709D', '#11FFC9', '#FFD166', '#C084FC', '#38BDF8', '#FB7185'];
+        }
+
+        spawn(btn, count = 4) {
+            const btnRect = btn ? btn.getBoundingClientRect() : null;
+            const canvasRect = this.canvas.getBoundingClientRect();
+            const originX = btnRect ? (btnRect.left + (btnRect.width / 2) - canvasRect.left) : (this.width / 2);
+            const originY = btnRect ? (btnRect.top + (btnRect.height / 2) - canvasRect.top) : (this.height - 50);
+
+            for (let i = 0; i < count; i++) {
+                const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                const size = 16 + Math.random() * 12;
+                const p = {
+                    x: originX + (Math.random() - 0.5) * 12,
+                    y: originY + (Math.random() - 0.5) * 6,
+                    size: size,
+                    color: color,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: -(2.6 + Math.random() * 2.0),
+                    swayFreq: 0.04 + Math.random() * 0.03,
+                    swayAmp: 1.2 + Math.random() * 1.4,
+                    swayPhase: Math.random() * Math.PI * 2,
+                    rotation: (Math.random() - 0.5) * 0.4,
+                    rotSpeed: (Math.random() - 0.5) * 0.02,
+                    scale: 0.15,
+                    maxScale: 1.0,
+                    opacity: 1.0,
+                    age: 0
+                };
+                this.particles.push(p);
+            }
+            if (!this.animId) {
+                this.lastTime = performance.now();
+                this.loop();
+            }
+        }
+
+        celebrate(btn) {
+            const btnRect = btn ? btn.getBoundingClientRect() : null;
+            const canvasRect = this.canvas.getBoundingClientRect();
+            const originX = btnRect ? (btnRect.left + (btnRect.width / 2) - canvasRect.left) : (this.width / 2);
+            const originY = btnRect ? (btnRect.top + (btnRect.height / 2) - canvasRect.top) : (this.height - 50);
+            const count = 30;
+
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+                const speed = 3.2 + Math.random() * 3.8;
+                const color = this.celebrateColors[i % this.celebrateColors.length];
+                const size = 16 + Math.random() * 14;
+                const p = {
+                    x: originX,
+                    y: originY,
+                    size: size,
+                    color: color,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1.2,
+                    swayFreq: 0,
+                    swayAmp: 0,
+                    swayPhase: 0,
+                    rotation: (Math.random() - 0.5) * 0.6,
+                    rotSpeed: (Math.random() - 0.5) * 0.04,
+                    scale: 0.3,
+                    maxScale: 1.2,
+                    opacity: 1.0,
+                    isBurst: true,
+                    age: 0
+                };
+                this.particles.push(p);
+            }
+            if (!this.animId) {
+                this.lastTime = performance.now();
+                this.loop();
+            }
+        }
+
+        loop() {
+            const now = performance.now();
+            const dt = Math.min((now - this.lastTime) / 16.66, 2.5);
+            this.lastTime = now;
+
+            this.ctx.clearRect(0, 0, this.width, this.height);
+
+            for (let i = this.particles.length - 1; i >= 0; i--) {
+                const p = this.particles[i];
+                p.age += dt;
+
+                if (p.isBurst) {
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+                    p.vx *= 0.95;
+                    p.vy = (p.vy * 0.95) + 0.08 * dt;
+                    p.rotation += p.rotSpeed * dt;
+                    if (p.scale < p.maxScale) p.scale += 0.08 * dt;
+                    p.opacity -= 0.018 * dt;
+                } else {
+                    p.y += p.vy * dt;
+                    p.vy *= Math.pow(0.992, dt);
+                    p.x += (p.vx + Math.sin(p.age * p.swayFreq + p.swayPhase) * p.swayAmp) * dt;
+                    p.rotation += p.rotSpeed * dt;
+                    if (p.scale < p.maxScale) p.scale = Math.min(p.maxScale, p.scale + 0.15 * dt);
+
+                    if (p.y < 80) {
+                        p.opacity -= 0.025 * dt;
+                    }
+                }
+
+                if (p.opacity <= 0.01 || p.y < -30 || p.x < -30 || p.x > this.width + 30) {
+                    this.particles.splice(i, 1);
+                    continue;
+                }
+
+                this.ctx.save();
+                this.ctx.translate(p.x, p.y);
+                this.ctx.rotate(p.rotation);
+                const s = (p.size / 24) * p.scale;
+                this.ctx.scale(s, s);
+                this.ctx.translate(-12, -12);
+                this.ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+                this.ctx.fillStyle = p.color;
+                this.ctx.shadowColor = 'rgba(245, 112, 157, 0.45)';
+                this.ctx.shadowBlur = 6;
+
+                if (heartPath2D) {
+                    this.ctx.fill(heartPath2D);
+                } else {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(12, 21.35);
+                    this.ctx.bezierCurveTo(10.55, 20.03, 2, 12.28, 2, 8.5);
+                    this.ctx.bezierCurveTo(2, 5.42, 4.42, 3, 7.5, 3);
+                    this.ctx.bezierCurveTo(9.24, 3, 10.91, 3.81, 12, 5.09);
+                    this.ctx.bezierCurveTo(13.09, 3.81, 14.76, 3, 16.5, 3);
+                    this.ctx.bezierCurveTo(19.58, 3, 22, 5.42, 22, 8.5);
+                    this.ctx.bezierCurveTo(22, 12.28, 13.45, 20.03, 12, 21.35);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                }
+                this.ctx.restore();
+            }
+
+            if (this.particles.length > 0) {
+                this.animId = requestAnimationFrame(() => this.loop());
+            } else {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                this.animId = null;
+            }
+        }
+    }
+
+    const heartManagers = new WeakMap();
+    function getHeartManager(area) {
+        if (!area) return null;
+        if (!heartManagers.has(area)) {
+            heartManagers.set(area, new HeartCanvasManager(area));
+        }
+        return heartManagers.get(area);
+    }
+
+    function spawnFloatingHearts(btn, count = 4) {
+        if (!btn) return;
+        const area = btn.closest('.pp-love-area') || btn.parentElement;
+        if (!area) return;
+
+        btn.style.transform = 'scale(' + (1.28 + Math.random() * 0.08) + ') rotate(' + ((Math.random() - 0.5) * 6) + 'deg)';
+        btn.style.filter = 'drop-shadow(0 0 16px rgba(245, 112, 157, 0.8))';
+        clearTimeout(btn._heartTimer);
+        btn._heartTimer = setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.filter = '';
+        }, 110);
+
+        const mgr = getHeartManager(area);
+        if (mgr) mgr.spawn(btn, count);
+    }
+
+    function spawnCelebrationHearts(btn) {
+        if (!btn) return;
+        const area = btn.closest('.pp-love-area') || btn.parentElement;
+        if (!area) return;
+
+        btn.style.transform = 'scale(1.45) rotate(0deg)';
+        btn.style.filter = 'drop-shadow(0 0 24px rgba(245, 112, 157, 0.95))';
+        setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.filter = '';
+        }, 280);
+
+        const mgr = getHeartManager(area);
+        if (mgr) mgr.celebrate(btn);
+    }
+
     // -- UNRELEASED (20 taps logged in / 90 taps guest) --
     const loveBtn = document.getElementById('pp-love-btn');
     if (loveBtn) {
         let tapCount = 0;
         const TAPS = (typeof isLoggedIn !== 'undefined' && isLoggedIn) ? 20 : 90;
         document.getElementById('pp-tap-total').textContent = TAPS;
-        loveBtn.addEventListener('click', async function() {
+        loveBtn.addEventListener('click', function() {
             if (tapCount === 0) {
                 const fd = new FormData(); fd.append('action', 'init_love'); fd.append('prompt_id', promptId);
-                await fetch('unlock.php', { method: 'POST', body: fd });
+                fetch('unlock.php', { method: 'POST', body: fd });
             }
             tapCount++;
             document.getElementById('pp-tap-count').textContent = tapCount;
             document.getElementById('pp-progress-fill').style.width = (tapCount / TAPS * 100) + '%';
-            this.style.transform = 'scale(1.35)';
-            setTimeout(() => this.style.transform = '', 120);
+            spawnFloatingHearts(this, 4);
             if (tapCount >= TAPS) {
+                spawnCelebrationHearts(this);
                 this.disabled = true;
                 const fd = new FormData(); fd.append('action', 'unreleased'); fd.append('prompt_id', promptId);
-                const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
-                else { tapCount = 0; document.getElementById('pp-tap-count').textContent = '0'; document.getElementById('pp-progress-fill').style.width = '0%'; this.disabled = false; showError(res.message); }
+                fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json()).then(res => {
+                    if (res.success) { 
+                        setTimeout(() => revealPrompt(res.prompt_text, res.extra_prompts), 450); 
+                    } else { 
+                        tapCount = 0; 
+                        document.getElementById('pp-tap-count').textContent = '0'; 
+                        document.getElementById('pp-progress-fill').style.width = '0%'; 
+                        this.disabled = false; 
+                        showError(res.message); 
+                    }
+                });
             }
         });
     }
@@ -585,18 +1196,26 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     if (loveBtnAu) {
         let tapCountAu = 0;
         const TAPS_AU = 9;
-        loveBtnAu.addEventListener('click', async function() {
+        loveBtnAu.addEventListener('click', function() {
             tapCountAu++;
             document.getElementById('pp-tap-count-au').textContent = tapCountAu;
             document.getElementById('pp-progress-fill-au').style.width = (tapCountAu / TAPS_AU * 100) + '%';
-            this.style.transform = 'scale(1.35)';
-            setTimeout(() => this.style.transform = '', 120);
+            spawnFloatingHearts(this, 4);
             if (tapCountAu >= TAPS_AU) {
+                spawnCelebrationHearts(this);
                 this.disabled = true;
                 const fd = new FormData(); fd.append('action', 'already_uploaded'); fd.append('prompt_id', promptId);
-                const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
-                else { tapCountAu = 0; document.getElementById('pp-tap-count-au').textContent = '0'; document.getElementById('pp-progress-fill-au').style.width = '0%'; this.disabled = false; showError(res.message); }
+                fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json()).then(res => {
+                    if (res.success) { 
+                        setTimeout(() => revealPrompt(res.prompt_text, res.extra_prompts), 450); 
+                    } else { 
+                        tapCountAu = 0; 
+                        document.getElementById('pp-tap-count-au').textContent = '0'; 
+                        document.getElementById('pp-progress-fill-au').style.width = '0%'; 
+                        this.disabled = false; 
+                        showError(res.message); 
+                    }
+                });
             }
         });
     }
@@ -606,19 +1225,27 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     if (loveBtnDir) {
         let tapCountDir = 0;
         const TAPS_DIR = typeof DIR_REQ_TAPS !== 'undefined' ? DIR_REQ_TAPS : 9;
-        loveBtnDir.addEventListener('click', async function() {
+        loveBtnDir.addEventListener('click', function() {
             tapCountDir++;
             document.getElementById('pp-tap-count-dir').textContent = tapCountDir;
             document.getElementById('pp-progress-fill-dir').style.width = (tapCountDir / TAPS_DIR * 100) + '%';
-            this.style.transform = 'scale(1.35)';
-            setTimeout(() => this.style.transform = '', 120);
+            spawnFloatingHearts(this, 4);
             if (tapCountDir >= TAPS_DIR) {
+                spawnCelebrationHearts(this);
                 this.disabled = true;
                 const reqAction = ptype === 'solo' ? 'solo' : 'direct';
                 const fd = new FormData(); fd.append('action', reqAction); fd.append('prompt_id', promptId);
-                const res = await fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json());
-                if (res.success) { revealPrompt(res.prompt_text, res.extra_prompts); }
-                else { tapCountDir = 0; document.getElementById('pp-tap-count-dir').textContent = '0'; document.getElementById('pp-progress-fill-dir').style.width = '0%'; this.disabled = false; showError(res.message); }
+                fetch('unlock.php', { method: 'POST', body: fd }).then(r => r.json()).then(res => {
+                    if (res.success) { 
+                        setTimeout(() => revealPrompt(res.prompt_text, res.extra_prompts), 450); 
+                    } else { 
+                        tapCountDir = 0; 
+                        document.getElementById('pp-tap-count-dir').textContent = '0'; 
+                        document.getElementById('pp-progress-fill-dir').style.width = '0%'; 
+                        this.disabled = false; 
+                        showError(res.message); 
+                    }
+                });
             }
         });
     }
@@ -709,6 +1336,9 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 document.getElementById('pp-like-icon').classList.toggle('liked-heart', isLiked);
                 document.getElementById('pp-like-count').textContent = res.likes_count;
                 document.getElementById('pp-like-count-mini').textContent = res.likes_count;
+                if (isLiked) {
+                    spawnFloatingHearts(this, 5);
+                }
             }
         });
     }
@@ -824,6 +1454,35 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     })();
     </script>
     <?php endif; ?>
+    <!-- Step Picture Lightbox Modal -->
+    <div id="stepPicModal" class="pp-step-modal" aria-hidden="true" onclick="closeStepPicModal()">
+        <div class="pp-step-modal-box" onclick="event.stopPropagation()">
+            <button type="button" class="pp-step-modal-close" onclick="closeStepPicModal()" aria-label="Close picture">&times;</button>
+            <img id="stepPicModalImg" src="" alt="Sample step picture">
+        </div>
+    </div>
+    <script>
+    function openStepPicModal(e, url) {
+        if (e) e.preventDefault();
+        var m = document.getElementById('stepPicModal');
+        var img = document.getElementById('stepPicModalImg');
+        if (m && img) {
+            img.src = url;
+            m.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    function closeStepPicModal() {
+        var m = document.getElementById('stepPicModal');
+        if (m) {
+            m.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeStepPicModal();
+    });
+    </script>
 </body>
 </html>
 

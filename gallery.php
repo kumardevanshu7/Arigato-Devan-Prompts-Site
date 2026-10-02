@@ -723,12 +723,113 @@ function promptPageUrl(card) {
 (function() {
     var row = document.getElementById('gal-trending-scroll');
     if (!row) return;
-    var step = Math.min(320, row.clientWidth * 0.75);
+
+    var cards = row.querySelectorAll('.trending-card');
+    if (cards.length <= 1) return;
+
+    function getCardStep() {
+        var firstCard = row.querySelector('.trending-card');
+        if (!firstCard) return Math.min(320, row.clientWidth * 0.75);
+        var cs = window.getComputedStyle(row);
+        var gap = parseFloat(cs.columnGap || cs.gap) || 18;
+        return firstCard.offsetWidth + gap;
+    }
+
+    var isAutoScrolling = false;
+    var autoTimer = null;
+    var resumeTimer = null;
+    var AUTO_DELAY = 2000;   // 2 seconds per slide
+    var RESUME_DELAY = 3000; // 3 seconds pause after user interaction
+
+    function slideNext() {
+        if (!row) return;
+        var step = getCardStep();
+        var maxScroll = row.scrollWidth - row.clientWidth;
+        isAutoScrolling = true;
+        if (row.scrollLeft >= maxScroll - 8) {
+            row.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            row.scrollBy({ left: step, behavior: 'smooth' });
+        }
+        setTimeout(function() {
+            isAutoScrolling = false;
+        }, 500);
+    }
+
+    function startAutoSlide() {
+        stopAutoSlide();
+        autoTimer = setInterval(slideNext, AUTO_DELAY);
+    }
+
+    function stopAutoSlide() {
+        if (autoTimer) {
+            clearInterval(autoTimer);
+            autoTimer = null;
+        }
+    }
+
+    function handleUserInteraction() {
+        stopAutoSlide();
+        if (resumeTimer) {
+            clearTimeout(resumeTimer);
+        }
+        resumeTimer = setTimeout(function() {
+            startAutoSlide();
+        }, RESUME_DELAY);
+    }
+
     var prev = document.querySelector('.gal-trend-prev');
     var next = document.querySelector('.gal-trend-next');
-    if (prev) prev.addEventListener('click', function() { row.scrollBy({ left: -step, behavior: 'smooth' }); });
-    if (next) next.addEventListener('click', function() { row.scrollBy({ left: step, behavior: 'smooth' }); });
-    document.querySelectorAll('.trending-card').forEach(function(card) {
+
+    if (prev) {
+        prev.addEventListener('click', function() {
+            isAutoScrolling = true;
+            row.scrollBy({ left: -getCardStep(), behavior: 'smooth' });
+            setTimeout(function() { isAutoScrolling = false; }, 500);
+            handleUserInteraction();
+        });
+    }
+
+    if (next) {
+        next.addEventListener('click', function() {
+            isAutoScrolling = true;
+            row.scrollBy({ left: getCardStep(), behavior: 'smooth' });
+            setTimeout(function() { isAutoScrolling = false; }, 500);
+            handleUserInteraction();
+        });
+    }
+
+    // Touch & pointer interaction for mobile swiping
+    row.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    row.addEventListener('touchmove', handleUserInteraction, { passive: true });
+    row.addEventListener('pointerdown', handleUserInteraction, { passive: true });
+    row.addEventListener('wheel', handleUserInteraction, { passive: true });
+
+    // Native scroll event when user manually scrolls / trackpad
+    row.addEventListener('scroll', function() {
+        if (isAutoScrolling) return;
+        handleUserInteraction();
+    }, { passive: true });
+
+    // Pause on desktop mouse hover over the carousel
+    row.addEventListener('mouseenter', function() {
+        stopAutoSlide();
+    });
+    row.addEventListener('mouseleave', function() {
+        handleUserInteraction();
+    });
+
+    // Pause when user switches browser tab
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopAutoSlide();
+        } else {
+            handleUserInteraction();
+        }
+    });
+
+    // Card click navigation
+    cards.forEach(function(card) {
         card.addEventListener('click', function() {
             var url = promptPageUrl(card);
             document.body.style.transition = 'opacity 0.15s ease';
@@ -736,6 +837,9 @@ function promptPageUrl(card) {
             setTimeout(function() { window.location.href = url; }, 150);
         });
     });
+
+    // Start auto-slide
+    startAutoSlide();
 })();
 </script>
 

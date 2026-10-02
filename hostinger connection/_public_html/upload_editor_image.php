@@ -21,10 +21,29 @@ if (isset($_FILES["file"]) && $_FILES["file"]["error"] === UPLOAD_ERR_OK) {
         exit();
     }
 
-    $ext = pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION);
-    $filename = "blogpostimg/" . uniqid() . "." . $ext;
+    $ext = strtolower(pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION));
+    $rawBase = pathinfo($_FILES["file"]["name"], PATHINFO_FILENAME);
+    $cleanSlug = preg_replace('/[^a-zA-Z0-9\-_]/', '-', strtolower($rawBase));
+    $cleanSlug = preg_replace('/-+/', '-', trim($cleanSlug, '-'));
+    if ($cleanSlug === '') {
+        $cleanSlug = 'blog-img-' . uniqid();
+    }
 
-    if (move_uploaded_file($_FILES["file"]["tmp_name"], $filename)) {
+    $uploadDir = __DIR__ . '/blogpostimg';
+    if (!is_dir($uploadDir)) {
+        @mkdir($uploadDir, 0755, true);
+    }
+
+    $targetFile = $uploadDir . '/' . $cleanSlug . '.' . $ext;
+    $filename = "blogpostimg/" . $cleanSlug . "." . $ext;
+
+    if (file_exists($targetFile)) {
+        $suffix = substr(uniqid(), -4);
+        $targetFile = $uploadDir . '/' . $cleanSlug . '-' . $suffix . '.' . $ext;
+        $filename = "blogpostimg/" . $cleanSlug . '-' . $suffix . "." . $ext;
+    }
+
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
         echo json_encode(["url" => $filename]);
     } else {
         echo json_encode(["error" => "Failed to save file"]);

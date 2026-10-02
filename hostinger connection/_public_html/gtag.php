@@ -50,6 +50,7 @@ if (!isset($_page_canonical)) {
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"></noscript>
 <!-- Favicons -->
 <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon/favicon-48x48.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon/android-chrome-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/favicon/android-chrome-512x512.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">

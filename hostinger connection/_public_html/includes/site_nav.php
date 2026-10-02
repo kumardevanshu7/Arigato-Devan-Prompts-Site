@@ -294,7 +294,7 @@ if (isset($pdo)) {
         reelsBtn.addEventListener('click', function() { reelsSub.classList.toggle('open'); });
     }
 
-    /* Brand title typewriter: arigato.prompt ↔ arigato.devan (↔ heroines on some pages) */
+    /* Brand title typewriter: arigato.prompt ↔ arigato.devan */
     var suffixEl = document.getElementById('brandSuffix');
     var brandWrap = document.getElementById('brandTypewriter');
     if (suffixEl && brandWrap) {

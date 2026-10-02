@@ -249,6 +249,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
     <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
     <div class="sb-sec">Settings</div>
     <a href="site_settings.php" class="sb-link active"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
+    <a href="footer_admin.php" class="sb-link"><i class="fa-solid fa-table-columns" style="color:#2dd4bf;"></i> <span style="color:#2dd4bf; font-weight:700;">Footer Manager</span></a>
     <div class="sb-sec">Tools</div>
     <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
   </nav>

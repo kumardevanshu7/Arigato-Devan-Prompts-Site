@@ -14,12 +14,17 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
     exit();
 }
 
-$prompt_id = (int)($_POST['prompt_id'] ?? 0);
+$item_type = trim((string)($_POST['item_type'] ?? 'prompt'));
+if (!in_array($item_type, ['prompt', 'blog', 'page'], true)) {
+    $item_type = 'prompt';
+}
+
+$raw_id = trim((string)($_POST['item_id'] ?? $_POST['prompt_id'] ?? ''));
 $status = trim((string)($_POST['status'] ?? ''));
 $req_attempt = isset($_POST['attempt']) ? (int)$_POST['attempt'] : 0;
 
-if ($prompt_id <= 0 || empty($status)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid prompt ID or status.']);
+if ($raw_id === '' || empty($status)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid item ID or status.']);
     exit();
 }
 
@@ -62,16 +67,47 @@ function nd_gsc_ordinal($n) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT id, gsc_status, gsc_indexed_at FROM prompts WHERE id = ?");
-    $stmt->execute([$prompt_id]);
-    $prompt = $stmt->fetch(PDO::FETCH_ASSOC);
+    $current_gsc_status = 'pending';
+    $current_gsc_indexed_at = null;
 
-    if (!$prompt) {
-        echo json_encode(['success' => false, 'message' => 'Prompt not found.']);
-        exit();
+    if ($item_type === 'prompt') {
+        $prompt_id = (int)$raw_id;
+        $stmt = $pdo->prepare("SELECT id, gsc_status, gsc_indexed_at FROM prompts WHERE id = ?");
+        $stmt->execute([$prompt_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            echo json_encode(['success' => false, 'message' => 'Prompt not found.']);
+            exit();
+        }
+        $current_gsc_status = $row['gsc_status'] ?? 'pending';
+        $current_gsc_indexed_at = $row['gsc_indexed_at'] ?? null;
+    } elseif ($item_type === 'blog') {
+        $blog_id = (int)$raw_id;
+        $stmt = $pdo->prepare("SELECT id, gsc_status, gsc_indexed_at FROM blogs WHERE id = ?");
+        $stmt->execute([$blog_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            echo json_encode(['success' => false, 'message' => 'Blog post not found.']);
+            exit();
+        }
+        $current_gsc_status = $row['gsc_status'] ?? 'pending';
+        $current_gsc_indexed_at = $row['gsc_indexed_at'] ?? null;
+    } elseif ($item_type === 'page') {
+        $page_key = preg_replace('/[^a-zA-Z0-9_\-]/', '', $raw_id);
+        $setting_key = 'gsc_page_' . $page_key;
+        $stmt = $pdo->prepare("SELECT setting_value FROM site_settings WHERE setting_key = ?");
+        $stmt->execute([$setting_key]);
+        $val = $stmt->fetchColumn();
+        if ($val) {
+            $parsed_setting = json_decode($val, true);
+            if (is_array($parsed_setting)) {
+                $current_gsc_status = $parsed_setting['gsc_status'] ?? 'pending';
+                $current_gsc_indexed_at = $parsed_setting['gsc_indexed_at'] ?? null;
+            }
+        }
     }
 
-    $curr_parsed = nd_gsc_parse_status($prompt['gsc_status'] ?? '');
+    $curr_parsed = nd_gsc_parse_status($current_gsc_status);
     $curr_attempt = $req_attempt > 0 ? $req_attempt : $curr_parsed['attempt'];
 
     $now = date('Y-m-d H:i:s');
@@ -82,39 +118,56 @@ try {
 
     if ($status === 'trigger_verify') {
         $is_verify_mode = true;
-        $indexed_at = $prompt['gsc_indexed_at'] ?: $now;
+        $indexed_at = $current_gsc_indexed_at ?: $now;
         $target_attempt = $curr_attempt;
         $new_status = ($target_attempt > 1) ? "indexed_now_{$target_attempt}" : 'indexed_now';
     } elseif ($status === 'reset_pending') {
         $new_status = 'pending';
         $target_attempt = 1;
-        $upd = $pdo->prepare("UPDATE prompts SET gsc_status = 'pending', gsc_indexed_at = NULL WHERE id = ?");
-        $upd->execute([$prompt_id]);
         $indexed_at = null;
     } elseif ($status === 'retry_needed') {
-        // Increment attempt to N+1 for next try
         $target_attempt = max(2, $curr_attempt + 1);
         $new_status = "retry_needed_{$target_attempt}";
-        $upd = $pdo->prepare("UPDATE prompts SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?");
-        $upd->execute([$new_status, $now, $prompt_id]);
     } elseif (str_starts_with($status, 'already_indexed')) {
-        // Parse explicit attempt from status (e.g. already_indexed_3) or use target
         if (preg_match('/^already_indexed_(\d+)$/', $status, $sm)) {
             $target_attempt = (int)$sm[1];
         }
         $new_status = ($target_attempt > 1) ? "already_indexed_{$target_attempt}" : 'already_indexed';
-        $upd = $pdo->prepare("UPDATE prompts SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?");
-        $upd->execute([$new_status, $now, $prompt_id]);
     } elseif (str_starts_with($status, 'indexed_now')) {
         if (preg_match('/^indexed_now_(\d+)$/', $status, $sm)) {
             $target_attempt = (int)$sm[1];
         }
         $new_status = ($target_attempt > 1) ? "indexed_now_{$target_attempt}" : 'indexed_now';
-        $upd = $pdo->prepare("UPDATE prompts SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?");
-        $upd->execute([$new_status, $now, $prompt_id]);
-    } else {
-        $upd = $pdo->prepare("UPDATE prompts SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?");
-        $upd->execute([$new_status, $now, $prompt_id]);
+    }
+
+    // Persist changes based on item type
+    if (!$is_verify_mode) {
+        if ($item_type === 'prompt') {
+            $prompt_id = (int)$raw_id;
+            if ($new_status === 'pending') {
+                $pdo->prepare("UPDATE prompts SET gsc_status = 'pending', gsc_indexed_at = NULL WHERE id = ?")->execute([$prompt_id]);
+            } else {
+                $pdo->prepare("UPDATE prompts SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?")->execute([$new_status, $now, $prompt_id]);
+            }
+        } elseif ($item_type === 'blog') {
+            $blog_id = (int)$raw_id;
+            if ($new_status === 'pending') {
+                $pdo->prepare("UPDATE blogs SET gsc_status = 'pending', gsc_indexed_at = NULL WHERE id = ?")->execute([$blog_id]);
+            } else {
+                $pdo->prepare("UPDATE blogs SET gsc_status = ?, gsc_indexed_at = ? WHERE id = ?")->execute([$new_status, $now, $blog_id]);
+            }
+        } elseif ($item_type === 'page') {
+            $page_key = preg_replace('/[^a-zA-Z0-9_\-]/', '', $raw_id);
+            $setting_key = 'gsc_page_' . $page_key;
+            $save_data = [
+                'gsc_status' => $new_status,
+                'gsc_indexed_at' => ($new_status === 'pending' ? null : $now)
+            ];
+            $save_json = json_encode($save_data);
+            $pdo->prepare(
+                "INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)"
+            )->execute([$setting_key, $save_json]);
+        }
     }
 
     $formatted_date = !empty($indexed_at) ? date('M j, Y \a\t g:i A', strtotime($indexed_at)) : 'Just now';
@@ -122,7 +175,9 @@ try {
 
     echo json_encode([
         'success' => true,
-        'prompt_id' => $prompt_id,
+        'item_type' => $item_type,
+        'item_id' => $raw_id,
+        'prompt_id' => $raw_id,
         'status' => $new_status,
         'attempt' => $target_attempt,
         'ordinal' => $ordinal,

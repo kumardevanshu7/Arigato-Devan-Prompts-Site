@@ -966,12 +966,11 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 }
 
 .theme-nogoda .store-footer-inner {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: clamp(20px, 4vw, 28px);
+  align-items: stretch;
+  text-align: left;
 }
 
 .theme-nogoda .footer-copy {
@@ -1016,12 +1015,313 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 /* ============================================================
    PROMPT DETAIL PAGE
    ============================================================ */
-body.page-prompt.theme-nogoda { min-height: 100vh; }
+body.page-prompt.theme-nogoda {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex !important;
+  flex-direction: column !important;
+}
 
 .theme-nogoda .pp-wrap {
+  flex: 1 0 auto;
   max-width: 1100px;
   margin: 0 auto;
-  padding: clamp(20px, 3vw, 36px) clamp(16px, 4vw, 40px) 100px;
+  padding: clamp(20px, 3vw, 36px) clamp(16px, 4vw, 40px) 48px;
+}
+
+body.page-prompt .store-footer,
+.theme-nogoda.page-prompt .store-footer {
+  display: block !important;
+  position: relative !important;
+  z-index: 10 !important;
+  width: 100% !important;
+  margin-top: clamp(32px, 5vw, 60px) !important;
+  background: var(--pal-white, #FFFFFF) !important;
+  border-top: 1px solid var(--pal-sky, #C8D9E6) !important;
+  padding: clamp(28px, 5vw, 40px) clamp(20px, 4vw, 80px) calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+  box-sizing: border-box !important;
+  clear: both !important;
+}
+
+body.page-prompt .store-footer-inner,
+.theme-nogoda.page-prompt .store-footer-inner {
+  display: flex !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: clamp(16px, 3vw, 24px) !important;
+}
+
+/* ---- How To Use This Prompt Box ---- */
+.theme-nogoda .pp-how-to-use {
+  margin-top: 32px;
+  padding: 22px 24px;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid var(--pal-sky, #C8D9E6);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-nogoda .pp-how-to-use h2 {
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--pal-teal);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-nogoda .pp-how-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theme-nogoda .pp-how-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-nogoda .pp-how-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2F4156;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 0;
+  box-shadow: 0 2px 6px rgba(47, 65, 86, 0.15);
+}
+
+.theme-nogoda .pp-how-step-text {
+  font-size: .88rem;
+  line-height: 1.7;
+  color: var(--pal-navy);
+  flex: 0 1 auto;
+}
+
+.theme-nogoda .pp-how-step-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.theme-nogoda .pp-step-pics-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  padding: 4px 6px;
+}
+
+.theme-nogoda .pp-step-pic-plus {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--pal-teal, #567C8D);
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+}
+
+.theme-nogoda .pp-step-pic-thumb {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  border: 1.5px solid var(--pal-sky, #C8D9E6);
+  background: var(--pal-white, #FFFFFF);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 2px 7px rgba(47, 65, 86, 0.1);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Playful tilt for step thumbnail boxes */
+.theme-nogoda .pp-step-pic-thumb:nth-of-type(1) {
+  transform: rotate(-3.5deg);
+}
+.theme-nogoda .pp-step-pic-thumb:nth-of-type(2) {
+  transform: rotate(3.5deg);
+}
+.theme-nogoda .pp-step-pic-thumb:nth-of-type(3) {
+  transform: rotate(2.5deg);
+}
+.theme-nogoda .pp-step-pic-thumb:nth-of-type(4) {
+  transform: rotate(-3deg);
+}
+.theme-nogoda .pp-step-pic-thumb:nth-of-type(5) {
+  transform: rotate(3deg);
+}
+
+.theme-nogoda .pp-step-pic-thumb:hover {
+  transform: translateY(-2px) scale(1.15) rotate(0deg);
+  border-color: var(--pal-teal, #567C8D);
+  box-shadow: 0 6px 16px rgba(47, 65, 86, 0.22);
+  z-index: 5;
+}
+
+.theme-nogoda .pp-step-pic-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 7px;
+}
+
+.theme-nogoda .pp-step-pic-zoom {
+  position: absolute;
+  inset: 0;
+  background: rgba(47, 65, 86, 0.45);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.theme-nogoda .pp-step-pic-thumb:hover .pp-step-pic-zoom {
+  opacity: 1;
+}
+
+/* Lightbox Modal for Step Picture */
+.pp-step-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.pp-step-modal.is-open {
+  display: flex;
+  animation: ppModalFade 0.22s ease-out;
+}
+
+.pp-step-modal-box {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pp-step-modal-box img {
+  display: block;
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+}
+
+.pp-step-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.pp-step-modal-close:hover {
+  background: #e11d48;
+  transform: rotate(90deg);
+}
+
+@keyframes ppModalFade {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile responsive layout for step pictures */
+@media (max-width: 640px) {
+  .theme-nogoda .pp-how-step-item {
+    align-items: flex-start;
+  }
+
+  .theme-nogoda .pp-how-step-num {
+    margin-top: 2px;
+  }
+
+  .theme-nogoda .pp-how-step-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .theme-nogoda .pp-how-step-text {
+    width: 100%;
+  }
+
+  .theme-nogoda .pp-step-pics-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    width: 100%;
+    padding: 4px 2px;
+  }
+
+  .theme-nogoda .pp-step-pic-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 11px;
+    border-width: 1.5px;
+  }
+
+  .theme-nogoda .pp-step-pic-thumb img {
+    border-radius: 9px;
+  }
+
+  .theme-nogoda .pp-step-pic-plus {
+    font-size: 1rem;
+    width: 16px;
+  }
 }
 
 .theme-nogoda .pp-layout {
@@ -1125,6 +1425,19 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   background: var(--pal-white);
   color: var(--pal-teal);
   text-transform: capitalize;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-nogoda a.pp-tag:hover,
+.theme-nogoda .pp-tag:hover {
+  background: var(--pal-teal);
+  color: var(--pal-white);
+  border-color: var(--pal-teal);
+  transform: translateY(-1px);
 }
 
 .theme-nogoda .pp-like-mini { color: var(--pal-teal); font-size: 0.84rem; }
@@ -1239,6 +1552,18 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   align-items: center;
   gap: 12px;
   margin: 8px 0 20px;
+  position: relative;
+  overflow: visible;
+}
+.theme-nogoda .pp-love-canvas {
+  position: absolute;
+  left: 50%;
+  top: -180px;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 260px;
+  pointer-events: none;
+  z-index: 20;
 }
 .theme-nogoda .pp-love-btn {
   font-size: 3.2rem;
@@ -1248,6 +1573,15 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   color: var(--nogoda-pink);
   padding: 0;
   line-height: 1;
+  position: relative;
+  z-index: 10;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.15s ease;
+}
+.theme-nogoda .pp-love-btn:active {
+  transform: scale(0.92);
 }
 .theme-nogoda .pp-progress-bar {
   width: 220px;
@@ -1790,7 +2124,42 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
     margin-bottom: 16px;
     text-align: left;
   }
-  .theme-nogoda .pp-wrap { padding: 16px 16px 80px; }
+  .theme-nogoda .pp-wrap {
+    flex: none !important;
+    width: 100% !important;
+    padding: 16px 16px 24px;
+  }
+  body.page-prompt.theme-nogoda {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+  }
+  body.page-prompt .store-footer,
+  .theme-nogoda.page-prompt .store-footer {
+    display: block !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    z-index: 10 !important;
+    width: 100% !important;
+    margin-top: 36px !important;
+    margin-bottom: 0 !important;
+    padding: 32px 16px calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    clear: both !important;
+  }
+  body.page-prompt .store-footer-inner,
+  .theme-nogoda.page-prompt .store-footer-inner {
+    gap: 16px !important;
+  }
+  .theme-nogoda .pp-rel-card img,
+  .theme-nogoda .pp-prompt-img,
+  .theme-nogoda .pp-rel-card {
+    -webkit-user-drag: none;
+    user-drag: none;
+    user-select: none;
+  }
   .theme-nogoda .pp-task-card { padding: 24px 18px; border-radius: 18px; }
 
   .theme-nogoda .pp-content-section { gap: 18px; }
@@ -1808,6 +2177,7 @@ body.page-prompt.theme-nogoda { min-height: 100vh; }
   .theme-nogoda .pp-related {
     margin-top: 28px;
     padding-top: 20px;
+    margin-bottom: 16px;
   }
 
   .theme-nogoda .pp-related h2 {

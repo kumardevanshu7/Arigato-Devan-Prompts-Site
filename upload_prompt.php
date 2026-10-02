@@ -477,6 +477,18 @@ body::before, body::after { display: none !important; background-image: none !im
       </div>
     </div>
 
+    <!-- HOW TO USE THIS PROMPT -->
+    <div class="card" id="how-to-use-card">
+      <div class="section-label"><i class="fa-solid fa-list-check"></i> How to use this prompt? <span style="font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0;font-size:.78rem;">(step-by-step instructions with sample pics)</span></div>
+      <p style="font-size:.82rem;color:var(--muted);margin:-8px 0 14px 0;">Add actionable step-by-step tips. You can upload up to 5 sample pics per point (e.g. Upload Image 1 as boy + Image 2 as girl) or reuse previously uploaded pics with 1 click.</p>
+      
+      <div id="how-to-use-container" style="display:flex;flex-direction:column;gap:12px;margin-bottom:12px;"></div>
+
+      <button type="button" class="btn-add-step" id="btn-add-how-step" onclick="addHowStep()" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px dashed var(--border);color:var(--text);font-weight:700;font-size:0.82rem;padding:9px 18px;border-radius:10px;cursor:pointer;transition:all .2s ease;">
+        <i class="fa-solid fa-plus" style="color:#10b981;"></i> Add Next Step
+      </button>
+    </div>
+
     <!-- ABOUT + SEO -->
     <div class="card">
       <div class="section-label"><i class="fa-solid fa-magnifying-glass-chart"></i> About &amp; SEO (applies to all prompt types)</div>
@@ -832,7 +844,305 @@ function handleTextareaPasteClean(e) {
 }
 var pText = document.getElementById('prompt_text');
 if (pText) pText.addEventListener('paste', handleTextareaPasteClean);
+
+var activeStepIdxForPic = null;
+
+function triggerStepPicUpload(stepIdx) {
+  activeStepIdxForPic = stepIdx;
+  var fileInput = document.getElementById('stepPicFileInput');
+  if (fileInput) {
+    fileInput.value = '';
+    fileInput.click();
+  }
+}
+
+function handleStepPicSelected(input) {
+  if (!input.files || !input.files[0] || activeStepIdxForPic === null) return;
+  var file = input.files[0];
+  var row = document.querySelector(`.how-step-row[data-step-idx="${activeStepIdxForPic}"]`);
+  var pointText = '';
+  if (row) {
+    var ta = row.querySelector('.how-step-input');
+    if (ta) pointText = ta.value.trim();
+  }
+
+  var formData = new FormData();
+  formData.append('action', 'upload');
+  formData.append('image', file);
+  formData.append('point_text', pointText);
+
+  var slots = row ? row.querySelector('.how-step-slots') : null;
+  var loadingBox = document.createElement('div');
+  loadingBox.className = 'how-step-pic-box is-loading';
+  loadingBox.style.cssText = 'position:relative;width:58px;height:58px;border-radius:10px;border:1.5px dashed #10b981;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;color:#10b981;font-size:0.8rem;flex-shrink:0;';
+  loadingBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  if (slots) slots.appendChild(loadingBox);
+
+  fetch('ajax_step_pic.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (loadingBox) loadingBox.remove();
+    if (data.success && data.image_path) {
+      appendStepPicBox(activeStepIdxForPic, data.image_path);
+    } else {
+      alert(data.message || 'Image upload failed.');
+    }
+  })
+  .catch(err => {
+    if (loadingBox) loadingBox.remove();
+    alert('Upload error. Please try again.');
+  });
+}
+
+function appendStepPicBox(stepIdx, imagePath) {
+  var row = document.querySelector(`.how-step-row[data-step-idx="${stepIdx}"]`);
+  if (!row) return;
+  var slots = row.querySelector('.how-step-slots');
+  if (!slots) return;
+
+  var currentBoxes = slots.querySelectorAll('.how-step-pic-box:not(.is-loading)');
+  if (currentBoxes.length >= 5) {
+    alert('Maximum 5 pictures allowed per step.');
+    return;
+  }
+
+  var box = document.createElement('div');
+  box.className = 'how-step-pic-box';
+  box.style.cssText = 'position:relative;width:58px;height:58px;border-radius:10px;border:1.5px solid #38bdf8;background:#0f172a;overflow:hidden;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.3);';
+  box.innerHTML = `
+    <img src="${imagePath}" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <input type="hidden" name="how_step_images[${stepIdx}][]" value="${imagePath}">
+    <button type="button" onclick="removeStepPic(this)" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(239,68,68,0.92);color:#fff;border:none;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s ease;" title="Remove picture">&times;</button>
+  `;
+  slots.appendChild(box);
+  updateStepPicButtons(row);
+}
+
+function removeStepPic(btn) {
+  var box = btn.closest('.how-step-pic-box');
+  if (!box) return;
+  var row = box.closest('.how-step-row');
+  box.remove();
+  if (row) updateStepPicButtons(row);
+}
+
+function updateStepPicButtons(row) {
+  var slots = row.querySelector('.how-step-slots');
+  var addBtn = row.querySelector('.btn-add-step-pic');
+  if (!slots || !addBtn) return;
+  var count = slots.querySelectorAll('.how-step-pic-box:not(.is-loading)').length;
+  if (count >= 5) {
+    addBtn.style.display = 'none';
+  } else {
+    addBtn.style.display = 'inline-flex';
+  }
+}
+
+// Previous Pics Modal
+var currentModalStepIdx = null;
+
+function openPreviousPicsModal(stepIdx) {
+  currentModalStepIdx = stepIdx;
+  var modal = document.getElementById('previousPicsModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  var search = document.getElementById('prevPicSearchInput');
+  if (search) search.value = '';
+  loadPreviousPicsList();
+}
+
+function closePreviousPicsModal() {
+  var modal = document.getElementById('previousPicsModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function loadPreviousPicsList(query = '') {
+  var grid = document.getElementById('previousPicsGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading previous pics...</div>';
+
+  fetch('ajax_step_pic.php?action=list&q=' + encodeURIComponent(query))
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.pics) {
+      renderPreviousPics(data.pics);
+    } else {
+      grid.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);">Failed to load pictures.</div>';
+    }
+  })
+  .catch(() => {
+    grid.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);">Error loading pictures.</div>';
+  });
+}
+
+function renderPreviousPics(pics) {
+  var grid = document.getElementById('previousPicsGrid');
+  if (!grid) return;
+  if (!pics || pics.length === 0) {
+    grid.innerHTML = `
+      <div style="padding:40px 20px;text-align:center;color:var(--muted);">
+        <i class="fa-solid fa-images" style="font-size:2rem;margin-bottom:10px;opacity:0.4;"></i>
+        <div style="font-weight:700;">No previous step pictures found.</div>
+        <p style="font-size:0.8rem;margin:6px 0 0 0;">Upload sample pictures in any step, and they will automatically show up here for instant reuse!</p>
+      </div>
+    `;
+    return;
+  }
+
+  var html = '';
+  pics.forEach(p => {
+    var pt = p.point_text ? p.point_text : '(No text recorded)';
+    var escPt = pt.replace(/"/g, '&quot;');
+    html += `
+      <div class="prev-pic-card" style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;">
+        <img src="${p.image_path}" style="width:62px;height:62px;border-radius:10px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.1);flex-shrink:0;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;" title="${escPt}">${pt}</div>
+          <div style="font-size:0.72rem;color:var(--muted);"><i class="fa-solid fa-repeat"></i> Used ${p.times_used} times</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button type="button" onclick="selectPreviousPic('${p.image_path}', '${escPt}', true)" style="padding:6px 12px;background:#38bdf8;color:#0f172a;font-weight:700;font-size:0.75rem;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;" title="Insert this pic and auto-fill point text">
+            <i class="fa-solid fa-check-double"></i> Use Pic &amp; Text
+          </button>
+          <button type="button" onclick="selectPreviousPic('${p.image_path}', '', false)" style="padding:5px 12px;background:rgba(255,255,255,0.08);color:var(--text);font-weight:600;font-size:0.72rem;border-radius:7px;border:1px solid var(--border);cursor:pointer;white-space:nowrap;" title="Insert only this pic without changing text">
+            Use Pic Only
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  grid.innerHTML = html;
+}
+
+function selectPreviousPic(imagePath, pointText, fillText) {
+  if (currentModalStepIdx === null) return;
+  var row = document.querySelector(`.how-step-row[data-step-idx="${currentModalStepIdx}"]`);
+  if (!row) return;
+
+  if (fillText && pointText && pointText !== '(No text recorded)') {
+    var ta = row.querySelector('.how-step-input');
+    if (ta) {
+      ta.value = pointText;
+      ta.dispatchEvent(new Event('input'));
+    }
+  }
+
+  appendStepPicBox(currentModalStepIdx, imagePath);
+  closePreviousPicsModal();
+}
+
+function addHowStep(val = '', images = []) {
+  const container = document.getElementById('how-to-use-container');
+  if (!container) return;
+  const count = container.querySelectorAll('.how-step-row').length;
+  const idx = count;
+  const row = document.createElement('div');
+  row.className = 'how-step-row';
+  row.setAttribute('data-step-idx', idx);
+  row.style.cssText = 'background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;';
+  row.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <span class="how-step-badge" style="display:inline-flex;align-items:center;justify-content:center;min-width:68px;padding:9px 10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;font-size:0.75rem;font-weight:800;color:var(--text);flex-shrink:0;">Step ${idx + 1}</span>
+      <textarea name="how_step_text[]" class="form-input how-step-input" rows="2" placeholder="e.g. Upload your reference image (Image 1 as boy and Image 2 as girl)..." style="flex:1;resize:vertical;">${val}</textarea>
+      <button type="button" class="btn-remove-step" onclick="removeHowStep(this)" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:10px;width:38px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s ease;" title="Remove this step"><i class="fa-solid fa-trash-can"></i></button>
+    </div>
+    <div class="how-step-pics-container" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:8px 12px;background:rgba(0,0,0,0.18);border-radius:10px;border:1px dashed rgba(255,255,255,0.12);">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;">
+        <i class="fa-solid fa-camera"></i> Sample Pics (Max 5):
+      </div>
+      <div class="how-step-slots" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"></div>
+      <button type="button" class="btn-add-step-pic" onclick="triggerStepPicUpload(${idx})" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;font-size:0.75rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.15s ease;">
+        <i class="fa-solid fa-plus"></i> Add Sample Pic
+      </button>
+      <button type="button" class="btn-reuse-step-pic" onclick="openPreviousPicsModal(${idx})" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.35);color:#38bdf8;font-size:0.75rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.15s ease;margin-left:auto;">
+        <i class="fa-solid fa-clock-rotate-left"></i> Previous pics use karo
+      </button>
+    </div>
+  `;
+  container.appendChild(row);
+
+  if (Array.isArray(images)) {
+    images.forEach(img => {
+      appendStepPicBox(idx, img);
+    });
+  }
+
+  const ta = row.querySelector('textarea');
+  if (ta && val === '') ta.focus();
+}
+
+function removeHowStep(btn) {
+  const container = document.getElementById('how-to-use-container');
+  if (!container) return;
+  const row = btn.closest('.how-step-row');
+  if (row) {
+    row.remove();
+    reindexHowSteps();
+  }
+}
+
+function reindexHowSteps() {
+  const container = document.getElementById('how-to-use-container');
+  if (!container) return;
+  const rows = container.querySelectorAll('.how-step-row');
+  if (rows.length === 0) {
+    addHowStep();
+    return;
+  }
+  rows.forEach((r, idx) => {
+    r.setAttribute('data-step-idx', idx);
+    const badge = r.querySelector('.how-step-badge');
+    if (badge) badge.textContent = `Step ${idx + 1}`;
+    const addBtn = r.querySelector('.btn-add-step-pic');
+    if (addBtn) addBtn.setAttribute('onclick', `triggerStepPicUpload(${idx})`);
+    const reuseBtn = r.querySelector('.btn-reuse-step-pic');
+    if (reuseBtn) reuseBtn.setAttribute('onclick', `openPreviousPicsModal(${idx})`);
+    const inputs = r.querySelectorAll('input[type="hidden"]');
+    inputs.forEach(inp => {
+      inp.name = `how_step_images[${idx}][]`;
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.querySelectorAll('.how-step-row').length === 0) {
+    addHowStep();
+  }
+});
 </script>
+
+<!-- Hidden Step Pic File Input -->
+<input type="file" id="stepPicFileInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="handleStepPicSelected(this)">
+
+<!-- Previous Pics Modal -->
+<div id="previousPicsModal" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
+  <div style="position:relative;background:#1e293b;border:1px solid #334155;border-radius:16px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #334155;background:rgba(0,0,0,0.2);">
+      <div style="font-weight:800;font-size:0.95rem;color:#f8fafc;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8;"></i> Previous Step Pics Library
+      </div>
+      <button type="button" onclick="closePreviousPicsModal()" style="background:none;border:none;color:#94a3b8;font-size:1.4rem;cursor:pointer;line-height:1;" aria-label="Close">&times;</button>
+    </div>
+    
+    <div style="padding:14px 20px;border-bottom:1px solid #334155;background:rgba(0,0,0,0.1);">
+      <div style="position:relative;">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#64748b;font-size:0.85rem;"></i>
+        <input type="text" id="prevPicSearchInput" placeholder="Search by point text..." style="width:100%;padding:9px 12px 9px 36px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:0.82rem;box-sizing:border-box;" oninput="loadPreviousPicsList(this.value)">
+      </div>
+    </div>
+
+    <div id="previousPicsGrid" style="padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex:1;max-height:55vh;"></div>
+    
+    <div style="padding:12px 20px;border-top:1px solid #334155;display:flex;justify-content:flex-end;background:rgba(0,0,0,0.2);">
+      <button type="button" onclick="closePreviousPicsModal()" style="padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid #475569;color:#f8fafc;font-size:0.8rem;font-weight:600;cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
 </html>
 
 

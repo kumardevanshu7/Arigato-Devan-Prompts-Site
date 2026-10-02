@@ -230,13 +230,65 @@ if (!function_exists('nd_gsc_ordinal')) {
     }
 }
 
-// GSC Checklist Counters
-$gsc_pending_cnt = 0;
-$gsc_already_cnt = 0;
-$gsc_now_cnt = 0;
-$gsc_retry_cnt = 0;
+if (!function_exists('nd_gsc_compute_state')) {
+    function nd_gsc_compute_state($gsc_st, $gsc_at) {
+        $gsc_parsed = nd_gsc_parse_status($gsc_st);
+        $gsc_attempt = $gsc_parsed['attempt'];
+        $gsc_type = $gsc_parsed['type'];
+        $gsc_ordinal_str = nd_gsc_ordinal($gsc_attempt);
+        $gsc_time_left_str = '';
+        $gsc_days_left = 0;
+        $gsc_hours_left = 0;
+        $gsc_state = 'pending';
 
+        if ($gsc_type === 'already_indexed') {
+            $gsc_state = 'already_indexed';
+        } elseif ($gsc_type === 'indexed_now') {
+            $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
+            $elapsed = time() - $created_ts;
+            $four_days = 4 * 86400; // 4 days in seconds
+            if ($elapsed < $four_days) {
+                $gsc_state = 'indexed_timer_running';
+                $remaining = $four_days - $elapsed;
+                $gsc_days_left = ceil($remaining / 86400);
+                $gsc_hours_left = ceil($remaining / 3600);
+                $gsc_time_left_str = $gsc_days_left > 1 ? "{$gsc_days_left}d left" : "{$gsc_hours_left}h left";
+            } else {
+                $gsc_state = 'indexed_ready_to_verify';
+            }
+        } elseif ($gsc_type === 'retry_needed') {
+            $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
+            $elapsed = time() - $created_ts;
+            $one_day = 86400; // 24 hours in seconds
+            if ($elapsed < $one_day) {
+                $gsc_state = 'retry_wait_running';
+                $remaining = $one_day - $elapsed;
+                $gsc_hours_left = ceil($remaining / 3600);
+                $gsc_time_left_str = "{$gsc_hours_left}h left";
+            } else {
+                $gsc_state = 'retry_ready';
+            }
+        } else {
+            $gsc_state = 'pending';
+        }
+
+        return [
+            'type' => $gsc_type,
+            'state' => $gsc_state,
+            'attempt' => $gsc_attempt,
+            'ordinal' => $gsc_ordinal_str,
+            'time_left_str' => $gsc_time_left_str,
+            'days_left' => $gsc_days_left,
+            'hours_left' => $gsc_hours_left,
+            'date_formatted' => !empty($gsc_at) ? date('M j, Y \a\t g:i A', strtotime($gsc_at)) : ''
+        ];
+    }
+}
+
+// 1. Process Prompts
 $seo_prompt_list = [];
+$gsc_checklist_items = [];
+
 foreach ($seo_raw_prompts as $sp) {
     $ab_text = trim((string)($sp['about_prompt'] ?? ''));
     $de_text = trim((string)($sp['description'] ?? ''));
@@ -277,51 +329,6 @@ foreach ($seo_raw_prompts as $sp) {
         $status_type = 'zero';
     }
 
-    // Universal GSC counting & dynamic attempt computation
-    $gsc_parsed = nd_gsc_parse_status($gsc_st);
-    $gsc_attempt = $gsc_parsed['attempt'];
-    $gsc_type = $gsc_parsed['type'];
-    $gsc_ordinal_str = nd_gsc_ordinal($gsc_attempt);
-    $gsc_time_left_str = '';
-    $gsc_days_left = 0;
-    $gsc_hours_left = 0;
-    $gsc_state = 'pending';
-
-    if ($gsc_type === 'already_indexed') {
-        $gsc_already_cnt++;
-        $gsc_state = 'already_indexed';
-    } elseif ($gsc_type === 'indexed_now') {
-        $gsc_now_cnt++;
-        $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
-        $elapsed = time() - $created_ts;
-        $four_days = 4 * 86400; // 4 days in seconds
-        if ($elapsed < $four_days) {
-            $gsc_state = 'indexed_timer_running';
-            $remaining = $four_days - $elapsed;
-            $gsc_days_left = ceil($remaining / 86400);
-            $gsc_hours_left = ceil($remaining / 3600);
-            $gsc_time_left_str = $gsc_days_left > 1 ? "{$gsc_days_left}d left" : "{$gsc_hours_left}h left";
-        } else {
-            $gsc_state = 'indexed_ready_to_verify';
-        }
-    } elseif ($gsc_type === 'retry_needed') {
-        $gsc_retry_cnt++;
-        $created_ts = !empty($gsc_at) ? strtotime($gsc_at) : time();
-        $elapsed = time() - $created_ts;
-        $one_day = 86400; // 24 hours in seconds
-        if ($elapsed < $one_day) {
-            $gsc_state = 'retry_wait_running';
-            $remaining = $one_day - $elapsed;
-            $gsc_hours_left = ceil($remaining / 3600);
-            $gsc_time_left_str = "{$gsc_hours_left}h left";
-        } else {
-            $gsc_state = 'retry_ready';
-        }
-    } else {
-        $gsc_pending_cnt++;
-        $gsc_state = 'pending';
-    }
-
     // Compute live canonical URL for GSC
     $slug_clean = trim((string)($sp['slug'] ?? ''));
     $p_type_clean = trim((string)($sp['prompt_type'] ?? ''));
@@ -335,11 +342,20 @@ foreach ($seo_raw_prompts as $sp) {
 
     $gsc_inspect_url = 'https://search.google.com/search-console/inspect?resource_id=' . urlencode('https://arigatodevan.com/') . '&id=' . urlencode($canonical_url);
 
-    $seo_prompt_list[] = [
+    $g_comp = nd_gsc_compute_state($gsc_st, $gsc_at);
+
+    $prompt_item = [
         'id' => (int)$sp['id'],
+        'unique_key' => 'prompt-' . $sp['id'],
+        'item_type' => 'prompt',
         'title' => $sp['title'] ?? 'Untitled',
         'prompt_type' => $sp['prompt_type'] ?? 'secret',
+        'filter_type' => $sp['prompt_type'] ?? 'secret',
+        'badge_label' => nd_type_label($sp['prompt_type'] ?? 'secret'),
+        'badge_class' => nd_type_class($sp['prompt_type'] ?? 'secret'),
+        'sub_label' => !empty($sp['created_at']) ? date('M j, Y', strtotime($sp['created_at'])) : '',
         'image_path' => $sp['image_path'] ?? '',
+        'icon' => null,
         'slug' => $sp['slug'] ?? '',
         'likes_count' => (int)($sp['likes_count'] ?? 0),
         'created_at' => $sp['created_at'] ?? '',
@@ -356,25 +372,175 @@ foreach ($seo_raw_prompts as $sp) {
         'canonical_url' => $canonical_url,
         'gsc_inspect_url' => $gsc_inspect_url,
         'gsc_status' => $gsc_st,
-        'gsc_state' => $gsc_state,
-        'gsc_attempt' => $gsc_attempt,
-        'gsc_ordinal' => $gsc_ordinal_str,
-        'gsc_time_left_str' => $gsc_time_left_str,
-        'gsc_days_left' => $gsc_days_left,
-        'gsc_hours_left' => $gsc_hours_left,
+        'gsc_type' => $g_comp['type'],
+        'gsc_state' => $g_comp['state'],
+        'gsc_attempt' => $g_comp['attempt'],
+        'gsc_ordinal' => $g_comp['ordinal'],
+        'gsc_time_left_str' => $g_comp['time_left_str'],
+        'gsc_days_left' => $g_comp['days_left'],
+        'gsc_hours_left' => $g_comp['hours_left'],
         'gsc_indexed_at' => $gsc_at,
-        'gsc_date_formatted' => !empty($gsc_at) ? date('M j, Y \a\t g:i A', strtotime($gsc_at)) : ''
+        'gsc_date_formatted' => $g_comp['date_formatted']
     ];
+
+    $seo_prompt_list[] = $prompt_item;
+    $gsc_checklist_items[] = $prompt_item;
 }
 
-$seo_full_pct = $seo_total_count > 0 ? round(($seo_full_cnt / $seo_total_count) * 100, 1) : 0;
+// 2. Process Published Blogs
+$gsc_blog_items = [];
+try {
+    $raw_blogs_gsc = sqAll($pdo, "
+        SELECT id, title, slug, image_path, likes_count, category, created_at, gsc_status, gsc_indexed_at
+        FROM blogs
+        WHERE is_published = 1
+        ORDER BY id DESC
+    ");
+    foreach ($raw_blogs_gsc as $bg) {
+        $b_slug = trim((string)($bg['slug'] ?? ''));
+        $b_url = $b_slug !== '' ? ('https://arigatodevan.com/blog/' . $b_slug) : ('https://arigatodevan.com/blog.php?id=' . (int)$bg['id']);
+        $b_inspect = 'https://search.google.com/search-console/inspect?resource_id=' . urlencode('https://arigatodevan.com/') . '&id=' . urlencode($b_url);
+        $b_comp = nd_gsc_compute_state($bg['gsc_status'] ?? '', $bg['gsc_indexed_at'] ?? '');
+
+        $b_item = [
+            'id' => (int)$bg['id'],
+            'unique_key' => 'blog-' . $bg['id'],
+            'item_type' => 'blog',
+            'title' => $bg['title'] ?? 'Untitled Blog',
+            'prompt_type' => 'blog',
+            'filter_type' => 'blog',
+            'badge_label' => 'BLOG',
+            'badge_class' => 'nd-tag-blue',
+            'sub_label' => !empty($bg['category']) && $bg['category'] !== 'Uncategorized' ? $bg['category'] : (!empty($bg['created_at']) ? date('M j, Y', strtotime($bg['created_at'])) : ''),
+            'image_path' => !empty($bg['image_path']) ? $bg['image_path'] : 'landingpics/lan9.webp',
+            'icon' => null,
+            'slug' => $bg['slug'] ?? '',
+            'likes_count' => (int)($bg['likes_count'] ?? 0),
+            'created_at' => $bg['created_at'] ?? '',
+            'canonical_url' => $b_url,
+            'gsc_inspect_url' => $b_inspect,
+            'gsc_status' => $bg['gsc_status'] ?? 'pending',
+            'gsc_type' => $b_comp['type'],
+            'gsc_state' => $b_comp['state'],
+            'gsc_attempt' => $b_comp['attempt'],
+            'gsc_ordinal' => $b_comp['ordinal'],
+            'gsc_time_left_str' => $b_comp['time_left_str'],
+            'gsc_days_left' => $b_comp['days_left'],
+            'gsc_hours_left' => $b_comp['hours_left'],
+            'gsc_indexed_at' => $bg['gsc_indexed_at'] ?? '',
+            'gsc_date_formatted' => $b_comp['date_formatted']
+        ];
+        $gsc_blog_items[] = $b_item;
+        $gsc_checklist_items[] = $b_item;
+    }
+} catch (Exception $e) {
+    // Graceful fallback if blogs table is unavailable
+}
+
+// 3. Process Important Site Pages
+$site_static_pages = [
+    ['key' => 'home', 'title' => 'Home Page', 'url' => 'https://arigatodevan.com/', 'icon' => 'fa-solid fa-house', 'cat' => 'Core'],
+    ['key' => 'gallery', 'title' => 'Prompt Gallery', 'url' => 'https://arigatodevan.com/gallery.php', 'icon' => 'fa-solid fa-images', 'cat' => 'Core'],
+    ['key' => 'blogs_hub', 'title' => 'Blog Magazine Hub', 'url' => 'https://arigatodevan.com/blogs.php', 'icon' => 'fa-solid fa-newspaper', 'cat' => 'Content'],
+    ['key' => 'about', 'title' => 'About Us', 'url' => 'https://arigatodevan.com/about.php', 'icon' => 'fa-solid fa-circle-info', 'cat' => 'Info'],
+    ['key' => 'contact', 'title' => 'Contact Us', 'url' => 'https://arigatodevan.com/contact.php', 'icon' => 'fa-solid fa-envelope', 'cat' => 'Info'],
+    ['key' => 'faq', 'title' => 'FAQ', 'url' => 'https://arigatodevan.com/faq.php', 'icon' => 'fa-solid fa-circle-question', 'cat' => 'Support'],
+    ['key' => 'feedback', 'title' => 'Feedback', 'url' => 'https://arigatodevan.com/feedback.php', 'icon' => 'fa-solid fa-comment-dots', 'cat' => 'Support'],
+    ['key' => 'happy_users', 'title' => 'Happy Users (Wall of Love)', 'url' => 'https://arigatodevan.com/happy_users.php', 'icon' => 'fa-solid fa-face-smile-beam', 'cat' => 'Trust'],
+    ['key' => 'privacy', 'title' => 'Privacy Policy', 'url' => 'https://arigatodevan.com/privacy.php', 'icon' => 'fa-solid fa-shield-halved', 'cat' => 'Legal'],
+    ['key' => 'disclaimer', 'title' => 'Disclaimer', 'url' => 'https://arigatodevan.com/disclaimer.php', 'icon' => 'fa-solid fa-triangle-exclamation', 'cat' => 'Legal'],
+    ['key' => 'terms', 'title' => 'Terms & Conditions', 'url' => 'https://arigatodevan.com/terms.php', 'icon' => 'fa-solid fa-scale-balanced', 'cat' => 'Legal'],
+    ['key' => 'secret_code', 'title' => 'Secret Code Prompts', 'url' => 'https://arigatodevan.com/secret_code.php', 'icon' => 'fa-solid fa-lock', 'cat' => 'Category'],
+    ['key' => 'unreleased', 'title' => 'Unreleased Prompts', 'url' => 'https://arigatodevan.com/unreleased.php', 'icon' => 'fa-solid fa-star', 'cat' => 'Category'],
+    ['key' => 'direct', 'title' => 'Direct Prompts', 'url' => 'https://arigatodevan.com/direct_prompts.php', 'icon' => 'fa-solid fa-hand-pointer', 'cat' => 'Category'],
+    ['key' => 'already_uploaded', 'title' => 'Already Uploaded Prompts', 'url' => 'https://arigatodevan.com/already_uploaded.php', 'icon' => 'fa-solid fa-clock-rotate-left', 'cat' => 'Category'],
+    ['key' => 'solo', 'title' => 'SOLO Prompts', 'url' => 'https://arigatodevan.com/solo_prompts.php', 'icon' => 'fa-solid fa-user', 'cat' => 'Category'],
+    ['key' => 'curated', 'title' => 'Curated AI Prompts', 'url' => 'https://arigatodevan.com/curated_ai_prompts.php', 'icon' => 'fa-solid fa-wand-magic-sparkles', 'cat' => 'Showcase'],
+];
+
+$page_gsc_settings = [];
+try {
+    $stmt_pg = $pdo->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'gsc_page_%'");
+    while ($pg_row = $stmt_pg->fetch(PDO::FETCH_ASSOC)) {
+        $k = str_replace('gsc_page_', '', $pg_row['setting_key']);
+        $decoded = json_decode($pg_row['setting_value'] ?? '', true);
+        if (is_array($decoded)) {
+            $page_gsc_settings[$k] = $decoded;
+        }
+    }
+} catch (Exception $e) {
+    // Graceful fallback
+}
+
+$gsc_site_pages = [];
+foreach ($site_static_pages as $spg) {
+    $pg_key = $spg['key'];
+    $pg_data = $page_gsc_settings[$pg_key] ?? [];
+    $pg_st = $pg_data['gsc_status'] ?? 'pending';
+    $pg_at = $pg_data['gsc_indexed_at'] ?? '';
+    $pg_comp = nd_gsc_compute_state($pg_st, $pg_at);
+    $pg_inspect = 'https://search.google.com/search-console/inspect?resource_id=' . urlencode('https://arigatodevan.com/') . '&id=' . urlencode($spg['url']);
+
+    $pg_item = [
+        'id' => $pg_key,
+        'unique_key' => 'page-' . $pg_key,
+        'item_type' => 'page',
+        'title' => $spg['title'],
+        'prompt_type' => 'page',
+        'filter_type' => 'page',
+        'badge_label' => 'SITE PAGE',
+        'badge_class' => 'nd-tag-purple',
+        'sub_label' => $spg['cat'],
+        'image_path' => null,
+        'icon' => $spg['icon'],
+        'slug' => $pg_key,
+        'likes_count' => null,
+        'created_at' => '',
+        'canonical_url' => $spg['url'],
+        'gsc_inspect_url' => $pg_inspect,
+        'gsc_status' => $pg_st,
+        'gsc_type' => $pg_comp['type'],
+        'gsc_state' => $pg_comp['state'],
+        'gsc_attempt' => $pg_comp['attempt'],
+        'gsc_ordinal' => $pg_comp['ordinal'],
+        'gsc_time_left_str' => $pg_comp['time_left_str'],
+        'gsc_days_left' => $pg_comp['days_left'],
+        'gsc_hours_left' => $pg_comp['hours_left'],
+        'gsc_indexed_at' => $pg_at,
+        'gsc_date_formatted' => $pg_comp['date_formatted']
+    ];
+    $gsc_site_pages[] = $pg_item;
+    $gsc_checklist_items[] = $pg_item;
+}
+
+// 4. Combined GSC Counters
+$gsc_total_count = count($gsc_checklist_items);
+$gsc_pending_cnt = 0;
+$gsc_already_cnt = 0;
+$gsc_now_cnt     = 0;
+$gsc_retry_cnt   = 0;
+
+foreach ($gsc_checklist_items as $gi) {
+    $gt = $gi['gsc_type'] ?? 'pending';
+    if ($gt === 'already_indexed') {
+        $gsc_already_cnt++;
+    } elseif ($gt === 'indexed_now') {
+        $gsc_now_cnt++;
+    } elseif ($gt === 'retry_needed') {
+        $gsc_retry_cnt++;
+    } else {
+        $gsc_pending_cnt++;
+    }
+}
+
+$seo_full_pct  = $seo_total_count > 0 ? round(($seo_full_cnt / $seo_total_count) * 100, 1) : 0;
 $seo_about_pct = $seo_total_count > 0 ? round(($seo_about_cnt / $seo_total_count) * 100, 1) : 0;
-$seo_desc_pct = $seo_total_count > 0 ? round(($seo_desc_cnt / $seo_total_count) * 100, 1) : 0;
-$seo_kw_pct = $seo_total_count > 0 ? round(($seo_kw_cnt / $seo_total_count) * 100, 1) : 0;
-$seo_bwi_pct = $seo_total_count > 0 ? round(($seo_bwi_cnt / $seo_total_count) * 100, 1) : 0;
+$seo_desc_pct  = $seo_total_count > 0 ? round(($seo_desc_cnt / $seo_total_count) * 100, 1) : 0;
+$seo_kw_pct    = $seo_total_count > 0 ? round(($seo_kw_cnt / $seo_total_count) * 100, 1) : 0;
+$seo_bwi_pct   = $seo_total_count > 0 ? round(($seo_bwi_cnt / $seo_total_count) * 100, 1) : 0;
 
 $gsc_checked_cnt = $gsc_already_cnt + $gsc_now_cnt;
-$gsc_checked_pct = $seo_total_count > 0 ? round(($gsc_checked_cnt / $seo_total_count) * 100, 1) : 0;
+$gsc_checked_pct = $gsc_total_count > 0 ? round(($gsc_checked_cnt / $gsc_total_count) * 100, 1) : 0;
 
 // --- TAGS AGGREGATION & AUDIT DATA ---
 $all_prompts_tags_raw = sqAll($pdo, "
@@ -1081,18 +1247,51 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         .nd-dd-menu {
             display: none;
             position: absolute;
-            z-index: 40;
+            z-index: 60;
             top: calc(100% + 8px);
             left: 0;
             right: 0;
-            min-width: 220px;
+            min-width: 270px;
+            max-width: 380px;
             background: #fff;
             border: 1px solid var(--nd-border);
             border-radius: 16px;
             padding: 6px;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, .12);
-            max-height: 260px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, .14);
+            max-height: min(440px, 65vh);
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .nd-dd-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        .nd-dd-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .nd-dd-menu::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .nd-dd-group-header {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+            padding: 9px 12px 5px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin: 6px 0 3px;
+            pointer-events: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #f1f5f9;
+        }
+        .nd-dd-opt.nd-dd-opt-grouped {
+            padding-left: 18px;
         }
         .nd-dd.is-open .nd-dd-menu { display: block; }
         .nd-dd-opt {
@@ -2808,13 +3007,13 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: 38px 20px;
+                padding: 36px 20px 32px;
                 background: #ffffff;
                 border: 1px solid var(--nd-border);
                 border-radius: 22px;
                 box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
-                margin: 8px 0 24px;
-                gap: 14px;
+                margin: 12px 0 32px;
+                gap: 12px;
             }
             .nd-desktop-notice-icon {
                 width: 64px;
@@ -2850,14 +3049,16 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 margin: 0;
             }
             .nd-desktop-notice-desc {
-                font-size: 0.84rem;
+                font-size: 0.86rem;
                 color: #64748b;
-                line-height: 1.55;
-                max-width: 320px;
-                margin: 0;
+                line-height: 1.6;
+                max-width: 340px;
+                margin: 4px 0 20px;
+                padding: 0 6px;
             }
             .nd-desktop-notice-btn {
                 margin-top: 4px;
+                margin-bottom: 4px;
                 display: inline-flex;
                 align-items: center;
                 gap: 8px;
@@ -2865,7 +3066,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 color: var(--nd-lime-text);
                 font-weight: 800;
                 font-size: 0.84rem;
-                padding: 12px 20px;
+                padding: 13px 22px;
                 border-radius: 12px;
                 text-decoration: none;
                 box-shadow: 0 4px 14px rgba(212, 249, 56, 0.35);
@@ -4152,7 +4353,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 </div>
                 <div class="nd-topbar-tools">
                     <span class="nd-tag-pill nd-tag-sky" style="font-size:0.75rem; padding:6px 12px;">
-                        <i class="fa-solid fa-list-check"></i> <strong id="gscTotalCheckedCount"><?= $gsc_checked_cnt ?> / <?= $seo_total_count ?></strong> (<?= $gsc_checked_pct ?>%) Processed
+                        <i class="fa-solid fa-list-check"></i> <strong id="gscTotalCheckedCount"><?= $gsc_checked_cnt ?> / <?= $gsc_total_count ?></strong> (<?= $gsc_checked_pct ?>%) Processed
                     </span>
                 </div>
             </div>
@@ -4182,11 +4383,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <div class="nd-gsc-kpi-card" style="background:#fffbeb; border-color:#fde68a;">
                     <div class="nd-seo-kpi-head">
                         <div class="nd-seo-kpi-title" style="color:#b45309;"><i class="fa-solid fa-hourglass-half"></i> Pending Check</div>
-                        <div class="nd-seo-kpi-badge" id="gscPendingBadge" style="background:#fef3c7; color:#92400e;"><?= $seo_total_count > 0 ? round(($gsc_pending_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                        <div class="nd-seo-kpi-badge" id="gscPendingBadge" style="background:#fef3c7; color:#92400e;"><?= $gsc_total_count > 0 ? round(($gsc_pending_cnt / $gsc_total_count) * 100, 1) : 0 ?>%</div>
                     </div>
-                    <div class="nd-seo-kpi-val" style="color:#92400e;" id="gscPendingVal"><?= $gsc_pending_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-kpi-val" style="color:#92400e;" id="gscPendingVal"><?= $gsc_pending_cnt ?><span class="nd-seo-kpi-total">/<?= $gsc_total_count ?></span></div>
                     <div class="nd-seo-progress-bg">
-                        <div class="nd-seo-progress-fill" id="gscPendingProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_pending_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#f59e0b;"></div>
+                        <div class="nd-seo-progress-fill" id="gscPendingProgress" style="width:<?= $gsc_total_count > 0 ? round(($gsc_pending_cnt / $gsc_total_count) * 100, 1) : 0 ?>%; background:#f59e0b;"></div>
                     </div>
                     <div class="nd-seo-kpi-sub">Needs inspection in GSC</div>
                 </div>
@@ -4194,11 +4395,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <div class="nd-gsc-kpi-card" style="background:#f5f3ff; border-color:#ddd6fe;">
                     <div class="nd-seo-kpi-head">
                         <div class="nd-seo-kpi-title" style="color:#6d28d9;"><i class="fa-solid fa-rocket"></i> In 4-Day Check</div>
-                        <div class="nd-seo-kpi-badge" id="gscNowBadge" style="background:#ede9fe; color:#5b21b6;"><?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                        <div class="nd-seo-kpi-badge" id="gscNowBadge" style="background:#ede9fe; color:#5b21b6;"><?= $gsc_total_count > 0 ? round(($gsc_now_cnt / $gsc_total_count) * 100, 1) : 0 ?>%</div>
                     </div>
-                    <div class="nd-seo-kpi-val" style="color:#5b21b6;" id="gscNowVal"><?= $gsc_now_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-kpi-val" style="color:#5b21b6;" id="gscNowVal"><?= $gsc_now_cnt ?><span class="nd-seo-kpi-total">/<?= $gsc_total_count ?></span></div>
                     <div class="nd-seo-progress-bg">
-                        <div class="nd-seo-progress-fill" id="gscNowProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_now_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#8b5cf6;"></div>
+                        <div class="nd-seo-progress-fill" id="gscNowProgress" style="width:<?= $gsc_total_count > 0 ? round(($gsc_now_cnt / $gsc_total_count) * 100, 1) : 0 ?>%; background:#8b5cf6;"></div>
                     </div>
                     <div class="nd-seo-kpi-sub">Requested, waiting verification</div>
                 </div>
@@ -4206,11 +4407,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <div class="nd-gsc-kpi-card" style="background:#fff1f2; border-color:#fecdd3;">
                     <div class="nd-seo-kpi-head">
                         <div class="nd-seo-kpi-title" style="color:#be123c;"><i class="fa-solid fa-rotate-right"></i> 2nd Try Needed</div>
-                        <div class="nd-seo-kpi-badge" id="gscRetryBadge" style="background:#ffe4e6; color:#9f1239;"><?= $seo_total_count > 0 ? round(($gsc_retry_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                        <div class="nd-seo-kpi-badge" id="gscRetryBadge" style="background:#ffe4e6; color:#9f1239;"><?= $gsc_total_count > 0 ? round(($gsc_retry_cnt / $gsc_total_count) * 100, 1) : 0 ?>%</div>
                     </div>
-                    <div class="nd-seo-kpi-val" style="color:#9f1239;" id="gscRetryVal"><?= $gsc_retry_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-kpi-val" style="color:#9f1239;" id="gscRetryVal"><?= $gsc_retry_cnt ?><span class="nd-seo-kpi-total">/<?= $gsc_total_count ?></span></div>
                     <div class="nd-seo-progress-bg">
-                        <div class="nd-seo-progress-fill" id="gscRetryProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_retry_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#f43f5e;"></div>
+                        <div class="nd-seo-progress-fill" id="gscRetryProgress" style="width:<?= $gsc_total_count > 0 ? round(($gsc_retry_cnt / $gsc_total_count) * 100, 1) : 0 ?>%; background:#f43f5e;"></div>
                     </div>
                     <div class="nd-seo-kpi-sub">Not indexed, 24h wait cycle</div>
                 </div>
@@ -4218,11 +4419,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 <div class="nd-gsc-kpi-card" style="background:#ecfdf5; border-color:#a7f3d0;">
                     <div class="nd-seo-kpi-head">
                         <div class="nd-seo-kpi-title" style="color:#047857;"><i class="fa-solid fa-circle-check"></i> Already Indexed</div>
-                        <div class="nd-seo-kpi-badge" id="gscAlreadyBadge" style="background:#d1fae5; color:#065f46;"><?= $seo_total_count > 0 ? round(($gsc_already_cnt / $seo_total_count) * 100, 1) : 0 ?>%</div>
+                        <div class="nd-seo-kpi-badge" id="gscAlreadyBadge" style="background:#d1fae5; color:#065f46;"><?= $gsc_total_count > 0 ? round(($gsc_already_cnt / $gsc_total_count) * 100, 1) : 0 ?>%</div>
                     </div>
-                    <div class="nd-seo-kpi-val" style="color:#065f46;" id="gscAlreadyVal"><?= $gsc_already_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-kpi-val" style="color:#065f46;" id="gscAlreadyVal"><?= $gsc_already_cnt ?><span class="nd-seo-kpi-total">/<?= $gsc_total_count ?></span></div>
                     <div class="nd-seo-progress-bg">
-                        <div class="nd-seo-progress-fill" id="gscAlreadyProgress" style="width:<?= $seo_total_count > 0 ? round(($gsc_already_cnt / $seo_total_count) * 100, 1) : 0 ?>%; background:#10b981;"></div>
+                        <div class="nd-seo-progress-fill" id="gscAlreadyProgress" style="width:<?= $gsc_total_count > 0 ? round(($gsc_already_cnt / $gsc_total_count) * 100, 1) : 0 ?>%; background:#10b981;"></div>
                     </div>
                     <div class="nd-seo-kpi-sub">Verified live in Google SERP</div>
                 </div>
@@ -4232,11 +4433,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             <section class="nd-card">
                 <!-- Filter & Search Toolbar -->
                 <div class="nd-filter-bar">
-                    <input type="text" id="gscSearchInput" class="nd-search-input" placeholder="Search by prompt title or link..." onkeyup="filterGscTable()">
+                    <input type="text" id="gscSearchInput" class="nd-search-input" placeholder="Search by prompt, blog, or page title / link..." onkeyup="filterGscTable()">
                     
                     <div class="nd-filter-group">
                         <select id="gscStatusFilter" class="nd-select-filter" onchange="filterGscTable()">
-                            <option value="">All GSC Status (<?= $seo_total_count ?>)</option>
+                            <option value="">All GSC Status (<?= $gsc_total_count ?>)</option>
                             <option value="pending">Pending Check (<?= $gsc_pending_cnt ?>)</option>
                             <option value="indexed_now">In 4-Day Check (<?= $gsc_now_cnt ?>)</option>
                             <option value="retry_needed">2nd Try Needed (<?= $gsc_retry_cnt ?>)</option>
@@ -4244,12 +4445,48 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         </select>
 
                         <select id="gscTypeFilter" class="nd-select-filter" onchange="filterGscTable()">
-                            <option value="">All Prompt Types</option>
-                            <option value="secret">Secret Code</option>
-                            <option value="unreleased">Unreleased</option>
-                            <option value="already_uploaded">Already Uploaded</option>
-                            <option value="direct">Direct Prompt</option>
-                            <option value="solo">SOLO</option>
+                            <option value="">All Content Types (<?= $gsc_total_count ?>)</option>
+                            
+                            <optgroup label="Prompts (<?= count($seo_prompt_list) ?>)">
+                                <option value="all_prompts">All Prompts (<?= count($seo_prompt_list) ?>)</option>
+                                <option value="secret">Secret Code</option>
+                                <option value="unreleased">Unreleased</option>
+                                <option value="already_uploaded">Already Uploaded</option>
+                                <option value="direct">Direct Prompt</option>
+                                <option value="solo">SOLO</option>
+                            </optgroup>
+                            
+                            <optgroup label="Blog Posts (<?= count($gsc_blog_items) ?>)">
+                                <option value="blog">All Blog Posts (<?= count($gsc_blog_items) ?>)</option>
+                                <?php foreach ($gsc_blog_items as $b_opt): ?>
+                                    <option value="blog_<?= (int)$b_opt['id'] ?>"><?= htmlspecialchars(mb_strimwidth($b_opt['title'], 0, 36, '...')) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+
+                            <optgroup label="Legal &amp; Policy Pages (<?= count(array_filter($site_static_pages, fn($p) => $p['cat'] === 'Legal')) ?>)">
+                                <?php foreach ($site_static_pages as $spg): ?>
+                                    <?php if ($spg['cat'] === 'Legal'): ?>
+                                        <option value="page_<?= $spg['key'] ?>"><?= htmlspecialchars($spg['title']) ?></option>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </optgroup>
+
+                            <optgroup label="Core &amp; Info Pages (<?= count(array_filter($site_static_pages, fn($p) => in_array($p['cat'], ['Core', 'Content', 'Info', 'Support', 'Trust']))) ?>)">
+                                <option value="page">All Site Pages (<?= count($site_static_pages) ?>)</option>
+                                <?php foreach ($site_static_pages as $spg): ?>
+                                    <?php if (in_array($spg['cat'], ['Core', 'Content', 'Info', 'Support', 'Trust'])): ?>
+                                        <option value="page_<?= $spg['key'] ?>"><?= htmlspecialchars($spg['title']) ?></option>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </optgroup>
+
+                            <optgroup label="Category Hubs (<?= count(array_filter($site_static_pages, fn($p) => in_array($p['cat'], ['Category', 'Showcase']))) ?>)">
+                                <?php foreach ($site_static_pages as $spg): ?>
+                                    <?php if (in_array($spg['cat'], ['Category', 'Showcase'])): ?>
+                                        <option value="page_<?= $spg['key'] ?>"><?= htmlspecialchars($spg['title']) ?></option>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                     </div>
                 </div>
@@ -4259,66 +4496,84 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     <table class="nd-table" id="gscDataTable">
                         <thead>
                             <tr>
-                                <th>Prompt</th>
+                                <th>Item / Page</th>
                                 <th>Likes</th>
                                 <th>Live Page URL</th>
                                 <th>GSC Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($seo_prompt_list as $sp):
-                                $g_status = $sp['gsc_status'];
+                            <?php foreach ($gsc_checklist_items as $item):
+                                $g_status = $item['gsc_status'];
                                 $row_filter_status = !empty($g_status) ? $g_status : 'pending';
+                                $u_key = $item['unique_key'];
                             ?>
-                            <tr id="gsc-row-<?= $sp['id'] ?>"
-                                data-title="<?= htmlspecialchars(strtolower($sp['title'] . ' ' . $sp['canonical_url'])) ?>"
+                            <tr id="gsc-row-<?= $u_key ?>"
+                                data-title="<?= htmlspecialchars(strtolower($item['title'] . ' ' . $item['canonical_url'])) ?>"
                                 data-status="<?= $row_filter_status ?>"
-                                data-type="<?= htmlspecialchars($sp['prompt_type']) ?>">
+                                data-type="<?= htmlspecialchars($item['filter_type']) ?>"
+                                data-group="<?= htmlspecialchars($item['item_type']) ?>"
+                                data-id="<?= htmlspecialchars((string)$item['id']) ?>"
+                                data-page-key="<?= htmlspecialchars($item['slug'] ?? '') ?>">
                                 <td>
                                     <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                                        <img loading="lazy" src="<?= htmlspecialchars($sp['image_path']) ?>" class="nd-prompt-thumb" style="width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0;" alt="">
-                                        <div style="min-width:0; flex:1; overflow:hidden;">
-                                            <div class="nd-title-clip" style="max-width:100%; min-width:0;" title="<?= htmlspecialchars($sp['title']) ?>">
-                                                <?= htmlspecialchars($sp['title']) ?>
+                                        <?php if (!empty($item['image_path'])): ?>
+                                            <img loading="lazy" src="<?= htmlspecialchars($item['image_path']) ?>" class="nd-prompt-thumb" style="width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0;" alt="">
+                                        <?php else: ?>
+                                            <div style="width:34px; height:34px; border-radius:8px; background:<?= $item['item_type'] === 'page' ? '#f0fdf4' : '#f1f5f9' ?>; border:1px solid <?= $item['item_type'] === 'page' ? '#bbf7d0' : '#cbd5e1' ?>; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:<?= $item['item_type'] === 'page' ? '#166534' : '#475569' ?>; font-size:0.92rem;">
+                                                <i class="<?= htmlspecialchars($item['icon'] ?? 'fa-solid fa-file') ?>"></i>
                                             </div>
-                                            <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
-                                                <span class="nd-tag-pill <?= nd_type_class($sp['prompt_type']) ?>" style="font-size:0.62rem; padding:1px 6px;">
-                                                    <?= nd_type_label($sp['prompt_type']) ?>
+                                        <?php endif; ?>
+                                        <div style="min-width:0; flex:1; overflow:hidden;">
+                                            <div class="nd-title-clip" style="max-width:100%; min-width:0;" title="<?= htmlspecialchars($item['title']) ?>">
+                                                <?= htmlspecialchars($item['title']) ?>
+                                            </div>
+                                            <div style="display:flex; align-items:center; gap:5px; margin-top:2px; flex-wrap:wrap;">
+                                                <span class="nd-tag-pill <?= htmlspecialchars($item['badge_class']) ?>" style="font-size:0.62rem; padding:1px 6px;">
+                                                    <?= htmlspecialchars($item['badge_label']) ?>
                                                 </span>
+                                                <?php if (!empty($item['sub_label'])): ?>
                                                 <span style="font-size:0.66rem; color:var(--nd-text-muted); white-space:nowrap;">
-                                                    <?= date('M j, Y', strtotime($sp['created_at'])) ?>
+                                                    <?= htmlspecialchars($item['sub_label']) ?>
                                                 </span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
+                                    <?php if ($item['likes_count'] !== null): ?>
                                     <span style="font-size:0.75rem; font-weight:700; color:#e11d48; display:inline-flex; align-items:center; gap:3px;">
-                                        <i class="fa-solid fa-heart"></i> <?= number_format($sp['likes_count']) ?>
+                                        <i class="fa-solid fa-heart"></i> <?= number_format($item['likes_count']) ?>
                                     </span>
+                                    <?php else: ?>
+                                    <span style="font-size:0.75rem; color:var(--nd-text-muted);">—</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="nd-gsc-url-box">
                                         <i class="fa-solid fa-link" style="color:#94a3b8; font-size:0.72rem; flex-shrink:0;"></i>
-                                        <span class="nd-gsc-url-text" title="<?= htmlspecialchars($sp['canonical_url']) ?>">
-                                            <?= htmlspecialchars($sp['canonical_url']) ?>
+                                        <span class="nd-gsc-url-text" title="<?= htmlspecialchars($item['canonical_url']) ?>">
+                                            <?= htmlspecialchars($item['canonical_url']) ?>
                                         </span>
                                         <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                                            <button type="button" class="nd-gsc-btn-copy" onclick="copyPromptUrl('<?= htmlspecialchars($sp['canonical_url'], ENT_QUOTES) ?>', this)" title="Copy full URL to clipboard">
+                                            <button type="button" class="nd-gsc-btn-copy" onclick="copyPromptUrl('<?= htmlspecialchars($item['canonical_url'], ENT_QUOTES) ?>', this)" title="Copy full URL to clipboard">
                                                 <i class="fa-regular fa-copy"></i> <span>Copy</span>
                                             </button>
-                                            <a href="<?= htmlspecialchars($sp['canonical_url']) ?>" target="_blank" class="nd-gsc-btn-copy" title="Open page in new tab">
+                                            <a href="<?= htmlspecialchars($item['canonical_url']) ?>" target="_blank" class="nd-gsc-btn-copy" title="Open page in new tab">
                                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                             </a>
                                         </div>
                                     </div>
                                 </td>
-                                <td id="gsc-action-cell-<?= $sp['id'] ?>">
+                                <td id="gsc-action-cell-<?= $u_key ?>">
                                     <?php
-                                        $att = (int)($sp['gsc_attempt'] ?? 1);
-                                        $ord = $sp['gsc_ordinal'] ?? ($att . 'th');
+                                        $att = (int)($item['gsc_attempt'] ?? 1);
+                                        $ord = $item['gsc_ordinal'] ?? ($att . 'th');
+                                        $i_id = $item['id'];
+                                        $i_type = $item['item_type'];
                                     ?>
-                                    <?php if ($sp['gsc_state'] === 'already_indexed'): ?>
+                                    <?php if ($item['gsc_state'] === 'already_indexed'): ?>
                                         <div class="nd-gsc-locked-wrap">
                                             <span class="nd-gsc-badge-already <?= $att > 1 ? 'nd-gsc-badge-2nd-indexed' : '' ?>">
                                                 <i class="fa-solid fa-circle-check" <?= $att > 1 ? 'style="color:#059669;"' : '' ?>></i>
@@ -4326,77 +4581,77 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                                 <span class="nd-gsc-label-short"><?= $att > 1 ? "{$ord} Try" : 'Indexed' ?></span>
                                             </span>
                                             <div class="nd-gsc-timestamp">
-                                                <i class="fa-regular fa-calendar-check"></i> <?= htmlspecialchars($sp['gsc_date_formatted']) ?>
+                                                <i class="fa-regular fa-calendar-check"></i> <?= htmlspecialchars($item['gsc_date_formatted']) ?>
                                             </div>
                                         </div>
-                                    <?php elseif ($sp['gsc_state'] === 'indexed_timer_running'): ?>
+                                    <?php elseif ($item['gsc_state'] === 'indexed_timer_running'): ?>
                                         <div class="nd-gsc-status-block">
                                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
-                                                <span class="nd-gsc-badge-now" <?= $att > 1 ? 'style="background:#fce7f3; color:#be185d; border-color:#fbcfe8;"' : '' ?> title="<?= $att > 1 ? "{$ord} Try Requested" : 'Requested' ?> on <?= htmlspecialchars($sp['gsc_date_formatted']) ?>">
+                                                <span class="nd-gsc-badge-now" <?= $att > 1 ? 'style="background:#fce7f3; color:#be185d; border-color:#fbcfe8;"' : '' ?> title="<?= $att > 1 ? "{$ord} Try Requested" : 'Requested' ?> on <?= htmlspecialchars($item['gsc_date_formatted']) ?>">
                                                     <i class="fa-solid fa-rocket"></i>
                                                     <span><?= $att > 1 ? "{$ord} Try" : 'Requested' ?></span>
                                                 </span>
                                                 <span class="nd-gsc-badge-timer" title="4-day verification countdown">
-                                                    <i class="fa-regular fa-clock"></i> Check in <?= htmlspecialchars($sp['gsc_time_left_str']) ?>
+                                                    <i class="fa-regular fa-clock"></i> Check in <?= htmlspecialchars($item['gsc_time_left_str']) ?>
                                                 </span>
                                             </div>
                                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
-                                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus(<?= $sp['id'] ?>, 'trigger_verify', <?= $att ?>, this)" title="Check now without waiting 4 days">
+                                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus('<?= $i_id ?>', 'trigger_verify', <?= $att ?>, this, '<?= $i_type ?>')" title="Check now without waiting 4 days">
                                                     <i class="fa-solid fa-clipboard-check"></i> Verify Early
                                                 </button>
                                             </div>
                                         </div>
-                                    <?php elseif ($sp['gsc_state'] === 'indexed_ready_to_verify'): ?>
+                                    <?php elseif ($item['gsc_state'] === 'indexed_ready_to_verify'): ?>
                                         <div class="nd-gsc-verify-box">
                                             <div class="nd-gsc-verify-label">
                                                 <i class="fa-solid fa-circle-question" style="color:#f59e0b;"></i> <?= $att > 1 ? "{$ord} Try: Is it indexed?" : '4d passed: Is it indexed?' ?>
                                             </div>
                                             <div class="nd-gsc-verify-actions">
-                                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed_<?= $att ?>', <?= $att ?>, this)" title="Yes, page is indexed in Google">
+                                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus('<?= $i_id ?>', 'already_indexed_<?= $att ?>', <?= $att ?>, this, '<?= $i_type ?>')" title="Yes, page is indexed in Google">
                                                     <i class="fa-solid fa-check"></i> <?= $att > 1 ? "Indexed ({$ord} Try)" : 'Indexed' ?>
                                                 </button>
-                                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus(<?= $sp['id'] ?>, 'retry_needed', <?= $att ?>, this)" title="No, page is not indexed -> move to next try">
+                                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus('<?= $i_id ?>', 'retry_needed', <?= $att ?>, this, '<?= $i_type ?>')" title="No, page is not indexed -> move to next try">
                                                     <i class="fa-solid fa-xmark"></i> Not Indexed
                                                 </button>
                                             </div>
                                         </div>
-                                    <?php elseif ($sp['gsc_state'] === 'retry_wait_running'): ?>
+                                    <?php elseif ($item['gsc_state'] === 'retry_wait_running'): ?>
                                         <div class="nd-gsc-status-block">
                                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
                                                 <span class="nd-gsc-badge-retry">
                                                     <i class="fa-solid fa-rotate-right"></i> <?= $ord ?> Try
                                                 </span>
                                                 <span class="nd-gsc-badge-timer nd-gsc-timer-amber" title="Wait 24h before re-submitting in GSC">
-                                                    <i class="fa-regular fa-clock"></i> Wait <?= htmlspecialchars($sp['gsc_time_left_str']) ?>
+                                                    <i class="fa-regular fa-clock"></i> Wait <?= htmlspecialchars($item['gsc_time_left_str']) ?>
                                                 </span>
                                             </div>
                                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
-                                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', <?= $att ?>, this)">
+                                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus('<?= $i_id ?>', 'indexed_now', <?= $att ?>, this, '<?= $i_type ?>')">
                                                     <i class="fa-solid fa-paper-plane"></i> Re-Index Now
                                                 </button>
                                             </div>
                                         </div>
-                                    <?php elseif ($sp['gsc_state'] === 'retry_ready'): ?>
+                                    <?php elseif ($item['gsc_state'] === 'retry_ready'): ?>
                                         <div class="nd-gsc-actions">
                                             <span class="nd-gsc-badge-retry" style="margin-right:2px;">
                                                 <i class="fa-solid fa-rotate-right"></i> <?= $ord ?> Try
                                             </span>
-                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', <?= $att ?>, this)" title="Re-submit URL to GSC (Restarts 4-day cycle)">
+                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus('<?= $i_id ?>', 'indexed_now', <?= $att ?>, this, '<?= $i_type ?>')" title="Re-submit URL to GSC (Restarts 4-day cycle)">
                                                 <i class="fa-solid fa-rocket"></i>
                                                 <span>Re-Index</span>
                                             </button>
-                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed_<?= $att ?>', <?= $att ?>, this)" title="Mark as indexed on <?= $ord ?> try">
+                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus('<?= $i_id ?>', 'already_indexed_<?= $att ?>', <?= $att ?>, this, '<?= $i_type ?>')" title="Mark as indexed on <?= $ord ?> try">
                                                 <i class="fa-solid fa-check"></i>
                                             </button>
                                         </div>
                                     <?php else: ?>
                                         <div class="nd-gsc-actions">
-                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus(<?= $sp['id'] ?>, 'already_indexed', 1, this)">
+                                            <button type="button" class="nd-gsc-btn-already" onclick="markGscStatus('<?= $i_id ?>', 'already_indexed', 1, this, '<?= $i_type ?>')">
                                                 <i class="fa-solid fa-circle-check"></i>
                                                 <span class="nd-gsc-label-full">Already Indexed</span>
                                                 <span class="nd-gsc-label-short">Indexed</span>
                                             </button>
-                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus(<?= $sp['id'] ?>, 'indexed_now', 1, this)">
+                                            <button type="button" class="nd-gsc-btn-now" onclick="markGscStatus('<?= $i_id ?>', 'indexed_now', 1, this, '<?= $i_type ?>')">
                                                 <i class="fa-solid fa-rocket"></i>
                                                 <span class="nd-gsc-label-full">I Indexed Now</span>
                                                 <span class="nd-gsc-label-short">Request</span>
@@ -5756,9 +6011,44 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
     }
 
     // --- 9. Mark GSC Status (Dynamic Multi-stage 4-Day Timer & N-th Retry) -------------
-    async function markGscStatus(promptId, status, attempt, btn) {
-        if (!promptId || !status) return;
-        const cell = document.getElementById('gsc-action-cell-' + promptId);
+    function recomputeGscKpis() {
+        const rows = document.querySelectorAll('#gscDataTable tbody tr');
+        const total = rows.length;
+        if (!total) return;
+        let pending = 0, now = 0, retry = 0, already = 0;
+        rows.forEach(r => {
+            const st = r.getAttribute('data-status') || 'pending';
+            if (st.startsWith('already_indexed')) already++;
+            else if (st.startsWith('indexed_now')) now++;
+            else if (st.startsWith('retry_needed')) retry++;
+            else pending++;
+        });
+        const pPct = ((pending / total) * 100).toFixed(1);
+        const nPct = ((now / total) * 100).toFixed(1);
+        const rPct = ((retry / total) * 100).toFixed(1);
+        const aPct = ((already / total) * 100).toFixed(1);
+
+        const setKpi = (idVal, idBadge, idProg, val, pct) => {
+            const elVal = document.getElementById(idVal);
+            if (elVal) elVal.innerHTML = `${val}<span class="nd-seo-kpi-total">/${total}</span>`;
+            const elBadge = document.getElementById(idBadge);
+            if (elBadge) elBadge.textContent = `${pct}%`;
+            const elProg = document.getElementById(idProg);
+            if (elProg) elProg.style.width = `${pct}%`;
+        };
+
+        setKpi('gscPendingVal', 'gscPendingBadge', 'gscPendingProgress', pending, pPct);
+        setKpi('gscNowVal', 'gscNowBadge', 'gscNowProgress', now, nPct);
+        setKpi('gscRetryVal', 'gscRetryBadge', 'gscRetryProgress', retry, rPct);
+        setKpi('gscAlreadyVal', 'gscAlreadyBadge', 'gscAlreadyProgress', already, aPct);
+    }
+
+    async function markGscStatus(itemId, status, attempt, btn, itemType = 'prompt') {
+        if (!itemId || !status) return;
+        if (!itemType) itemType = 'prompt';
+
+        const uKey = (!String(itemId).startsWith(itemType + '-')) ? `${itemType}-${itemId}` : itemId;
+        const cell = document.getElementById('gsc-action-cell-' + uKey) || document.getElementById('gsc-action-cell-' + itemId);
         if (!cell) return;
 
         const originalBtnHtml = btn.innerHTML;
@@ -5767,7 +6057,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 
         try {
             const fd = new FormData();
-            fd.append('prompt_id', promptId);
+            fd.append('item_id', itemId);
+            fd.append('item_type', itemType);
+            fd.append('prompt_id', itemId);
             fd.append('status', status);
             if (attempt) fd.append('attempt', attempt);
 
@@ -5810,10 +6102,10 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 <i class="fa-solid fa-circle-question" style="color:#f59e0b;"></i> ${promptQ}
                             </div>
                             <div class="nd-gsc-verify-actions">
-                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus(${promptId}, '${idxAction}', ${curAtt}, this)" title="Yes, page is indexed">
+                                <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus('${itemId}', '${idxAction}', ${curAtt}, this, '${itemType}')" title="Yes, page is indexed">
                                     <i class="fa-solid fa-check"></i> ${idxLabel}
                                 </button>
-                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus(${promptId}, 'retry_needed', ${curAtt}, this)" title="No, page is not indexed -> move to next try">
+                                <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus('${itemId}', 'retry_needed', ${curAtt}, this, '${itemType}')" title="No, page is not indexed -> move to next try">
                                     <i class="fa-solid fa-xmark"></i> Not Indexed
                                 </button>
                             </div>
@@ -5835,7 +6127,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 </span>
                             </div>
                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
-                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus(${promptId}, 'trigger_verify', ${curAtt}, this)" title="Check now without waiting 4 days">
+                                <button type="button" class="nd-gsc-btn-verify-early" onclick="markGscStatus('${itemId}', 'trigger_verify', ${curAtt}, this, '${itemType}')" title="Check now without waiting 4 days">
                                     <i class="fa-solid fa-clipboard-check"></i> Verify Early
                                 </button>
                             </div>
@@ -5853,7 +6145,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 </span>
                             </div>
                             <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:3px;">
-                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus(${promptId}, 'indexed_now', ${curAtt}, this)">
+                                <button type="button" class="nd-gsc-btn-now" style="padding:3px 7px; font-size:0.67rem;" onclick="markGscStatus('${itemId}', 'indexed_now', ${curAtt}, this, '${itemType}')">
                                     <i class="fa-solid fa-paper-plane"></i> Re-Index Now
                                 </button>
                             </div>
@@ -5862,10 +6154,11 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 }
 
                 // Update row data-status attribute for filter
-                const row = document.getElementById('gsc-row-' + promptId);
+                const row = document.getElementById('gsc-row-' + uKey) || document.getElementById('gsc-row-' + itemId);
                 if (row) {
                     row.setAttribute('data-status', res.status);
                 }
+                recomputeGscKpis();
             } else {
                 alert(res.message || 'Could not update GSC status.');
                 btn.disabled = false;
@@ -5894,10 +6187,39 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             const title = row.getAttribute('data-title') || '';
             const rowStatus = row.getAttribute('data-status') || '';
             const rowType = row.getAttribute('data-type') || '';
+            const rowGroup = row.getAttribute('data-group') || '';
+            const rowId = row.getAttribute('data-id') || '';
+            const rowPageKey = row.getAttribute('data-page-key') || '';
 
             const matchesQuery = (query === '' || title.includes(query));
-            const matchesStatus = (status === '' || rowStatus === status);
-            const matchesType = (type === '' || rowType === type);
+            
+            let matchesStatus = false;
+            if (status === '') {
+                matchesStatus = true;
+            } else if (status === 'pending') {
+                matchesStatus = (rowStatus === '' || rowStatus === 'pending');
+            } else {
+                matchesStatus = rowStatus.startsWith(status);
+            }
+
+            let matchesType = false;
+            if (type === '') {
+                matchesType = true;
+            } else if (type === 'all_prompts') {
+                matchesType = (rowGroup === 'prompt');
+            } else if (type === 'blog') {
+                matchesType = (rowGroup === 'blog' || rowType === 'blog');
+            } else if (type.startsWith('blog_')) {
+                const bId = type.replace('blog_', '');
+                matchesType = (rowGroup === 'blog' && String(rowId) === String(bId));
+            } else if (type === 'page') {
+                matchesType = (rowGroup === 'page' || rowType === 'page');
+            } else if (type.startsWith('page_')) {
+                const pKey = type.replace('page_', '');
+                matchesType = (rowGroup === 'page' && (rowId === pKey || rowPageKey === pKey));
+            } else {
+                matchesType = (rowType === type);
+            }
 
             if (matchesQuery && matchesStatus && matchesType) {
                 matchingRows.push(row);
@@ -6539,36 +6861,79 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
       var opt = sel.options[sel.selectedIndex];
       return prettyLabel(opt ? opt.textContent : '');
     }
+
+    function createOptionButton(opt, isGrouped) {
+      var item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'nd-dd-opt' + (opt.index === sel.selectedIndex ? ' is-on' : '') + (isGrouped ? ' nd-dd-opt-grouped' : '');
+      var raw = prettyLabel(opt.textContent);
+      var m = raw.match(/^(.*)\s+\((\d+)\)\s*$/);
+      if (m) {
+        item.innerHTML = '<span>' + m[1] + '</span><span class="nd-dd-count">' + m[2] + '</span>';
+      } else {
+        item.textContent = raw;
+      }
+      item.addEventListener('click', function () {
+        sel.selectedIndex = opt.index;
+        sel.dispatchEvent(new Event('change'));
+        render();
+        wrap.classList.remove('is-open');
+      });
+      return item;
+    }
+
     function render() {
       btn.innerHTML = '<span>' + selectedText() + '</span><i class="fa-solid fa-chevron-down"></i>';
       menu.innerHTML = '';
-      Array.from(sel.options).forEach(function (opt, idx) {
-        var item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'nd-dd-opt' + (idx === sel.selectedIndex ? ' is-on' : '');
-        var raw = prettyLabel(opt.textContent);
-        var m = raw.match(/^(.*)\s+\((\d+)\)\s*$/);
-        if (m) {
-          item.innerHTML = '<span>' + m[1] + '</span><span class="nd-dd-count">' + m[2] + '</span>';
-        } else {
-          item.textContent = raw;
-        }
-        item.addEventListener('click', function () {
-          sel.selectedIndex = idx;
-          sel.dispatchEvent(new Event('change'));
-          render();
-          wrap.classList.remove('is-open');
+
+      var hasOptgroup = Array.from(sel.children).some(function (c) { return c.tagName === 'OPTGROUP'; });
+
+      if (hasOptgroup) {
+        Array.from(sel.children).forEach(function (child) {
+          if (child.tagName === 'OPTGROUP') {
+            var header = document.createElement('div');
+            header.className = 'nd-dd-group-header';
+            var gLabel = prettyLabel(child.label || '');
+            var gm = gLabel.match(/^(.*)\s+\((\d+)\)\s*$/);
+            if (gm) {
+              header.innerHTML = '<span>' + gm[1] + '</span><span class="nd-dd-count" style="font-size:0.65rem; padding:1px 6px; border-radius:999px; background:#e2e8f0; color:#475569; font-weight:700;">' + gm[2] + '</span>';
+            } else {
+              header.textContent = gLabel;
+            }
+            menu.appendChild(header);
+            Array.from(child.children).forEach(function (subOpt) {
+              if (subOpt.tagName === 'OPTION') {
+                menu.appendChild(createOptionButton(subOpt, true));
+              }
+            });
+          } else if (child.tagName === 'OPTION') {
+            menu.appendChild(createOptionButton(child, false));
+          }
         });
-        menu.appendChild(item);
-      });
+      } else {
+        Array.from(sel.options).forEach(function (opt) {
+          menu.appendChild(createOptionButton(opt, false));
+        });
+      }
     }
+
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       document.querySelectorAll('.nd-dd.is-open').forEach(function (other) {
         if (other !== wrap) other.classList.remove('is-open');
       });
       wrap.classList.toggle('is-open');
+      if (wrap.classList.contains('is-open')) {
+        var on = menu.querySelector('.nd-dd-opt.is-on');
+        if (on) {
+          try {
+            on.scrollIntoView({ block: 'nearest' });
+          } catch(e) {}
+        }
+      }
     });
+
+    sel.addEventListener('change', render);
     render();
   }
   document.querySelectorAll('.nd-select-filter').forEach(enhanceSelect);
