@@ -31,7 +31,8 @@ function prompt_resolve_type(string $db_type): array {
 
 function render_prompt_card(array $p, int $index = 0, array $opts = []): void {
     $clickable = $opts['clickable'] ?? true;
-    $card_class = $clickable ? 'product-card prompt-card card' : 'product-card prompt-card';
+    $extra_class = !empty($opts['extra_class']) ? ' ' . trim($opts['extra_class']) : '';
+    $card_class = ($clickable ? 'product-card prompt-card card' : 'product-card prompt-card') . $extra_class;
     $db_type = $p['prompt_type'] ?? 'secret';
     $type    = prompt_resolve_type($db_type);
     $ptype   = $type['ptype'];
@@ -105,15 +106,6 @@ function render_prompt_grid(array $prompts, array $opts = []): void {
 }
 
 function render_trending_row(array $prompts, array $opts = []): void {
-    $type_short = [
-        'scp' => 'Secret',
-        'urp' => 'Unreleased',
-        'ivp' => 'Viral',
-        'aup' => 'Uploaded',
-        'dir' => 'Direct',
-        'sol' => 'Solo',
-        'prm' => 'Premium',
-    ];
     ?>
     <section class="gal-trending-section" id="gal-trending">
         <div class="gal-section-head">
@@ -134,48 +126,8 @@ function render_trending_row(array $prompts, array $opts = []): void {
             <button type="button" class="gal-trend-edge gal-trend-next" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
             <div class="gal-trending-scroll" id="gal-trending-scroll">
         <?php foreach ($prompts as $rank => $p):
-            $db_type = $p['prompt_type'] ?? 'secret';
-            $type    = prompt_resolve_type($db_type);
-            $is_unlocked = !empty($p['is_unlocked']);
-            $year = !empty($p['created_at']) ? date('Y', strtotime($p['created_at'])) : '';
-            $blur = ($type['ptype'] === 'unreleased' && !$is_unlocked) ? 'filter:blur(4px);transform:scale(1.05);' : '';
-            $tags_arr = array_map('trim', explode(',', strtolower($p['tag'] ?? '')));
-            $short_label = $type_short[$type['cls']] ?? 'Prompt';
-        ?>
-            <article class="trending-card"
-                 data-id="<?= (int)$p['id'] ?>"
-                 data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
-                 data-image="<?= htmlspecialchars($p['image_path']) ?>"
-                 data-title="<?= htmlspecialchars($p['title']) ?>"
-                 data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
-                 data-prompt-type="<?= htmlspecialchars($type['ptype']) ?>"
-                 data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-                 data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>"
-                 data-saved="<?= !empty($p['is_saved']) ? 'true' : 'false' ?>"
-                 <?= $is_unlocked ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
-                <div class="trending-card-poster">
-                    <img src="<?= htmlspecialchars($p['image_path']) ?>" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy" style="<?= $blur ?>">
-                    <div class="trending-card-shade"></div>
-                    <span class="trend-type trend-type-<?= $type['cls'] ?>"><?= htmlspecialchars($short_label) ?></span>
-                    <?php if (!$is_unlocked): ?>
-                        <span class="trending-lock" title="Locked"><i class="fa-solid fa-lock"></i></span>
-                    <?php endif; ?>
-                    <div class="trending-card-hover">
-                        <span class="trending-play"><i class="fa-solid fa-arrow-right"></i></span>
-                    </div>
-                </div>
-                <div class="trending-card-info">
-                    <p class="trending-card-title"><?= htmlspecialchars($p['title']) ?></p>
-                    <div class="trending-card-meta">
-                        <span class="trend-year"><?= $year ?></span>
-                        <div class="trend-stats">
-                            <span class="trend-views" title="<?= (int)($p['view_count'] ?? 0) ?> views"><i class="fa-regular fa-eye"></i> <?= (int)($p['view_count'] ?? 0) ?></span>
-                            <span class="likes"><i class="fa-solid fa-heart"></i> <?= (int)($p['likes_count'] ?? 0) ?></span>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        <?php endforeach; ?>
+            render_prompt_card($p, $rank, ['clickable' => true, 'extra_class' => 'trending-card']);
+        endforeach; ?>
             </div>
         </div>
         <?php endif; ?>

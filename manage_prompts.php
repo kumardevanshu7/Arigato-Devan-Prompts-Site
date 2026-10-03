@@ -476,8 +476,13 @@ function toggleMainCard(id){
         if(btn){btn.className='btn btn-purple';btn.innerHTML='<i class="fa-solid fa-bolt"></i> <span>+ Main Card</span>';}
         if(badge){badge.style.display='none';}
       }
+    } else {
+      alert('Error toggling Main Card: ' + (d && d.error ? d.error : 'Unknown error'));
     }
-  }).catch(e=>console.error(e));
+  }).catch(e=>{
+    console.error(e);
+    alert('Server error toggling Main Card. Please check your connection.');
+  });
 }
 
 function confirmDelete(id,name){document.getElementById('delete-prompt-id').value=id;document.getElementById('delete-modal-name').textContent='"'+name+'"';document.getElementById('delete-modal').style.display='flex'}

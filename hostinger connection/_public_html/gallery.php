@@ -828,15 +828,28 @@ function promptPageUrl(card) {
         }
     });
 
-    // Card click navigation
-    cards.forEach(function(card) {
-        card.addEventListener('click', function() {
-            var url = promptPageUrl(card);
-            document.body.style.transition = 'opacity 0.15s ease';
-            document.body.style.opacity = '0';
-            setTimeout(function() { window.location.href = url; }, 150);
-        });
-    });
+    // Drag detection to prevent accidental card modal open while swiping carousel
+    var touchStartX = 0;
+    row.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length) {
+            touchStartX = e.touches[0].clientX;
+            window.isSwiping = false;
+        }
+        handleUserInteraction();
+    }, { passive: true });
+    row.addEventListener('touchmove', function(e) {
+        if (e.touches && e.touches.length) {
+            if (Math.abs(e.touches[0].clientX - touchStartX) > 8) {
+                window.isSwiping = true;
+            }
+        }
+        handleUserInteraction();
+    }, { passive: true });
+    row.addEventListener('touchend', function() {
+        setTimeout(function() {
+            window.isSwiping = false;
+        }, 120);
+    }, { passive: true });
 
     // Start auto-slide
     startAutoSlide();

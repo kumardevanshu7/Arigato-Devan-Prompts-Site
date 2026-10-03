@@ -762,8 +762,13 @@ function toggleCuratedMainCard(id, btn) {
         btn.innerHTML = '<i class="fa-solid fa-bolt"></i> + Card';
         if (badge) badge.style.display = 'none';
       }
+    } else {
+      alert('Error: ' + (data && data.error ? data.error : 'Could not toggle'));
     }
-  }).catch(function() {});
+  }).catch(function(err) {
+    console.error(err);
+    alert('Server error toggling Main Card');
+  });
 }
 
 function updateAboutWordCount(el) {

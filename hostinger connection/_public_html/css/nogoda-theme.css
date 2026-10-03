@@ -2128,8 +2128,11 @@ body.page-prompt .store-footer-inner,
   .theme-nogoda .pp-img-col {
     width: 100%;
     max-width: 100%;
-    margin: 0;
+    margin: 0 auto;
     position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .theme-nogoda .pp-img-frame {

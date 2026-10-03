@@ -307,26 +307,23 @@ body.page-gallery {
 }
 .gal-trending-scroll::-webkit-scrollbar { display: none; }
 
-/* Premium trending card */
+/* Premium trending card sizing in scroll row */
+.gal-trending-scroll .trending-card,
+.gal-trending-scroll .product-card.prompt-card {
+  flex: 0 0 clamp(165px, 22vw, 215px) !important;
+  width: clamp(165px, 22vw, 215px) !important;
+  max-width: clamp(165px, 22vw, 215px) !important;
+  scroll-snap-align: start !important;
+  box-sizing: border-box !important;
+}
+
 .trending-card {
-  flex: 0 0 clamp(148px, 22vw, 196px);
+  flex: 0 0 clamp(165px, 22vw, 215px);
   scroll-snap-align: start;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s;
-  border: 1px solid rgba(47, 65, 86, 0.12);
-  border-radius: 16px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(47, 65, 86, 0.1);
-  padding: 0;
-}
-.trending-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  z-index: 2;
-  box-shadow: 0 18px 40px rgba(47, 65, 86, 0.18);
-  border-color: rgba(245, 112, 157, 0.4);
+  box-sizing: border-box;
 }
 
 .trending-card-poster {
@@ -822,8 +819,11 @@ body.page-gallery {
   .gal-trend-prev { left: 0; }
   .gal-trend-next { right: 0; }
 
-  .trending-card {
-    flex: 0 0 clamp(128px, 40vw, 150px);
+  .gal-trending-scroll .trending-card,
+  .gal-trending-scroll .product-card.prompt-card {
+    flex: 0 0 clamp(145px, 44vw, 175px) !important;
+    width: clamp(145px, 44vw, 175px) !important;
+    max-width: clamp(145px, 44vw, 175px) !important;
   }
 
   .gal-section-head h2 {
@@ -968,8 +968,11 @@ body.page-gallery {
     font-size: 1.45rem !important;
   }
 
-  .trending-card {
-    flex: 0 0 118px;
+  .gal-trending-scroll .trending-card,
+  .gal-trending-scroll .product-card.prompt-card {
+    flex: 0 0 138px !important;
+    width: 138px !important;
+    max-width: 138px !important;
   }
 }
 

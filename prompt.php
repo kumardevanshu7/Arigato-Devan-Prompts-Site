@@ -244,11 +244,13 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         width: 100% !important;
         box-sizing: border-box !important;
     }
-    .theme-nogoda .pp-img-col:not(.pp-solo-img-col) {
-        width: clamp(280px, 26vw, 340px) !important;
-        flex-shrink: 0 !important;
-        position: sticky !important;
-        top: calc(var(--nav-sticky-offset, 80px) + 12px) !important;
+    @media (min-width: 769px) {
+        .theme-nogoda .pp-img-col:not(.pp-solo-img-col) {
+            width: clamp(280px, 26vw, 340px) !important;
+            flex-shrink: 0 !important;
+            position: sticky !important;
+            top: calc(var(--nav-sticky-offset, 80px) + 12px) !important;
+        }
     }
     .theme-nogoda .pp-info-col {
         flex: 1 1 0% !important;
@@ -277,6 +279,34 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         }
     }
     @media (max-width: 768px) {
+        .theme-nogoda .pp-layout {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 20px !important;
+        }
+        .theme-nogoda .pp-img-col:not(.pp-solo-img-col),
+        .theme-nogoda .pp-img-col {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            position: static !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+        .theme-nogoda .pp-img-frame {
+            max-width: 280px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+        }
+        .theme-nogoda .pp-img-meta {
+            max-width: 280px !important;
+            width: 100% !important;
+            margin: 12px auto 0 !important;
+        }
+        .theme-nogoda .pp-info-col {
+            width: 100% !important;
+        }
         .theme-nogoda .pp-rel-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 12px !important;

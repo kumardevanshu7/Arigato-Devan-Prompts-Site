@@ -19,6 +19,20 @@ if ($id <= 0) {
 }
 
 try {
+    // Auto-create column if missing in database (useful on live Hostinger DB)
+    try {
+        $c1 = $pdo->query("SHOW COLUMNS FROM prompts LIKE 'is_main_card'")->fetch();
+        if (!$c1) {
+            $pdo->exec("ALTER TABLE prompts ADD COLUMN is_main_card TINYINT(1) NOT NULL DEFAULT 0");
+        }
+    } catch (Exception $ex) {}
+    try {
+        $c2 = $pdo->query("SHOW COLUMNS FROM curated_prompts LIKE 'is_main_card'")->fetch();
+        if (!$c2) {
+            $pdo->exec("ALTER TABLE curated_prompts ADD COLUMN is_main_card TINYINT(1) NOT NULL DEFAULT 0");
+        }
+    } catch (Exception $ex) {}
+
     if ($source === 'curated') {
         $cur = $pdo->prepare("SELECT is_main_card FROM curated_prompts WHERE id = ?");
         $cur->execute([$id]);
