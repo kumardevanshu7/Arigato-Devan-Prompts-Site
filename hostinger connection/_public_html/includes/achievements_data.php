@@ -1,10 +1,35 @@
 <?php
 /**
- * Arigato AI Platform - 100 Gamified Achievements Engine
+ * Arigato AI Platform - 150 Gamified Achievements Engine
  * Categorized across Starter, Unlocks, Streaks, Community, and Grandmaster Tiers
  */
 
-function get_100_platform_achievements($pdo) {
+if (!function_exists('sqAll')) {
+    function sqAll($pdo, $sql, $params = []) {
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+}
+
+if (!function_exists('sqOne')) {
+    function sqOne($pdo, $sql, $params = [], $default = 0) {
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $v = $stmt->fetchColumn();
+            return ($v !== false && $v !== null) ? $v : $default;
+        } catch (Exception $e) {
+            return $default;
+        }
+    }
+}
+
+function get_150_platform_achievements($pdo) {
     // 1. Fetch user metrics snapshot for real-time evaluations
     $users = sqAll($pdo, "
         SELECT u.id, u.username, u.email, u.gender, u.avatar, u.profile_image, u.streak_count, u.created_at,
@@ -157,6 +182,74 @@ function get_100_platform_achievements($pdo) {
         98 => ['title' => 'Diamond Status User', 'desc' => 'Earn over 50 unlocks, 30-day streak, and 50 likes.', 'cat' => 'mastery', 'tier' => 'diamond', 'icon' => 'fa-solid fa-diamond', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 50 && $u['streak_count'] >= 30 && $u['likes'] >= 50],
         99 => ['title' => 'Hall of Fame Inductee', 'desc' => 'Top 3 rank + 100 unlocks + 50-day active streak.', 'cat' => 'mastery', 'tier' => 'legendary', 'icon' => 'fa-solid fa-landmark', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 100 && $u['streak_count'] >= 50],
         100 => ['title' => 'Supreme Grandmaster', 'desc' => 'Unlock 50+ total achievements across all tiers.', 'cat' => 'mastery', 'tier' => 'legendary', 'icon' => 'fa-solid fa-chess-king', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 150],
+
+        // =====================================================================
+        // EXPANDED TIER (101–150): PLATFORM MASTER COLLECTION
+        // =====================================================================
+        // Starter & Exploration (101–108)
+        101 => ['title' => 'Profile Perfectionist', 'desc' => 'Complete both avatar and gender identity verification.', 'cat' => 'starter', 'tier' => 'bronze', 'icon' => 'fa-solid fa-user-check', 'rep' => false, 'eval' => fn($u) => (!empty($u['avatar']) || !empty($u['profile_image'])) && !empty($u['gender'])],
+        102 => ['title' => 'First Light', 'desc' => 'Unlock prompts during morning sunshine hours.', 'cat' => 'starter', 'tier' => 'bronze', 'icon' => 'fa-solid fa-cloud-sun', 'rep' => true, 'eval' => fn($u) => $u['unlocks'] > 0, 'mult' => 1],
+        103 => ['title' => 'Catalog Navigator', 'desc' => 'Browse across multiple prompt taxonomies in a single visit.', 'cat' => 'starter', 'tier' => 'bronze', 'icon' => 'fa-solid fa-map-location-dot', 'rep' => true, 'eval' => fn($u) => ($u['unlocks'] > 0 || $u['saves'] > 0), 'mult' => 1],
+        104 => ['title' => 'Dual Action', 'desc' => 'Both unlock a prompt and save a favorite bookmark.', 'cat' => 'starter', 'tier' => 'bronze', 'icon' => 'fa-solid fa-arrows-split-up-and-left', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 1 && $u['saves'] >= 1],
+        105 => ['title' => 'Prompt Reader', 'desc' => 'Read and inspect detailed how-to-use prompt guidelines.', 'cat' => 'starter', 'tier' => 'bronze', 'icon' => 'fa-solid fa-book-open-reader', 'rep' => true, 'eval' => fn($u) => $u['unlocks'] > 0, 'mult' => 1],
+        106 => ['title' => 'Search Specialist', 'desc' => 'Search and discover prompts across distinct query categories.', 'cat' => 'starter', 'tier' => 'silver', 'icon' => 'fa-solid fa-magnifying-glass-plus', 'rep' => true, 'eval' => fn($u) => count($category_unlocks_by_user[$u['id']] ?? []) >= 2, 'mult' => 1],
+        107 => ['title' => 'Speed Runner', 'desc' => 'Unlock 2 prompts in your onboarding session.', 'cat' => 'starter', 'tier' => 'silver', 'icon' => 'fa-solid fa-stopwatch', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 2],
+        108 => ['title' => 'Onboarding Master', 'desc' => 'Complete profile setup, initial unlock, and first community like.', 'cat' => 'starter', 'tier' => 'silver', 'icon' => 'fa-solid fa-clipboard-check', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 1 && $u['likes'] >= 1],
+
+        // Prompt Unlocks & AI Discoveries (109–126)
+        109 => ['title' => 'Prompt Novice 2.0', 'desc' => 'Unlock 8 AI prompts from the curated repository.', 'cat' => 'unlocks', 'tier' => 'bronze', 'icon' => 'fa-solid fa-feather', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 8],
+        110 => ['title' => 'Prompt Artisan', 'desc' => 'Unlock 20 AI prompts across categories.', 'cat' => 'unlocks', 'tier' => 'silver', 'icon' => 'fa-solid fa-palette', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 20],
+        111 => ['title' => 'Vault Pioneer', 'desc' => 'Unlock 35 AI prompts from the studio.', 'cat' => 'unlocks', 'tier' => 'silver', 'icon' => 'fa-solid fa-door-open', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 35],
+        112 => ['title' => 'Seventy Club', 'desc' => 'Unlock 70 AI prompts in total.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-award', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 70],
+        113 => ['title' => 'One-Twenty Vault', 'desc' => 'Unlock 120 AI prompts across the platform.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-box-archive', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 120],
+        114 => ['title' => 'Two-Fifty Milestone', 'desc' => 'Unlock 250 AI prompts across all engines.', 'cat' => 'unlocks', 'tier' => 'platinum', 'icon' => 'fa-solid fa-microchip', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 250],
+        115 => ['title' => 'Four-Hundred Elite', 'desc' => 'Unlock 400 AI prompts from the library.', 'cat' => 'unlocks', 'tier' => 'platinum', 'icon' => 'fa-solid fa-server', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 400],
+        116 => ['title' => 'Six-Hundred Titan', 'desc' => 'Unlock 600 AI prompts platform-wide.', 'cat' => 'unlocks', 'tier' => 'diamond', 'icon' => 'fa-solid fa-layer-group', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 600],
+        117 => ['title' => 'Nine-Hundred Legend', 'desc' => 'Unlock 900 AI prompts into your creator repository.', 'cat' => 'unlocks', 'tier' => 'legendary', 'icon' => 'fa-solid fa-infinity', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 900],
+        118 => ['title' => 'Insta Viral Specialist', 'desc' => 'Unlock 5 Insta Viral prompts.', 'cat' => 'unlocks', 'tier' => 'bronze', 'icon' => 'fa-solid fa-hashtag', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['insta_viral'] ?? 0) >= 5],
+        119 => ['title' => 'Insta Viral Champion', 'desc' => 'Unlock 15 Insta Viral prompts.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-film', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['insta_viral'] ?? 0) >= 15],
+        120 => ['title' => 'Secret Vault Agent', 'desc' => 'Unlock 5 Secret AI Prompts.', 'cat' => 'unlocks', 'tier' => 'bronze', 'icon' => 'fa-solid fa-user-secret', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['secret'] ?? 0) >= 5],
+        121 => ['title' => 'Secret Vault Commander', 'desc' => 'Unlock 15 Secret AI Prompts.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-shield-virus', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['secret'] ?? 0) >= 15],
+        122 => ['title' => 'Solo AI Master', 'desc' => 'Unlock 5 Solo AI Prompts.', 'cat' => 'unlocks', 'tier' => 'bronze', 'icon' => 'fa-solid fa-user', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['solo'] ?? 0) >= 5],
+        123 => ['title' => 'Solo AI Legend', 'desc' => 'Unlock 15 Solo AI Prompts.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-user-tie', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['solo'] ?? 0) >= 15],
+        124 => ['title' => 'Unreleased Scout', 'desc' => 'Unlock 5 Unreleased Exclusive Prompts.', 'cat' => 'unlocks', 'tier' => 'silver', 'icon' => 'fa-solid fa-wand-magic-sparkles', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['unreleased'] ?? 0) >= 5],
+        125 => ['title' => 'Unreleased Overlord', 'desc' => 'Unlock 15 Unreleased Exclusive Prompts.', 'cat' => 'unlocks', 'tier' => 'platinum', 'icon' => 'fa-solid fa-gem', 'rep' => false, 'eval' => fn($u) => ($category_unlocks_by_user[$u['id']]['unreleased'] ?? 0) >= 15],
+        126 => ['title' => 'Triple Threat Unlocker', 'desc' => 'Unlock at least 3 prompts in 3 different categories.', 'cat' => 'unlocks', 'tier' => 'gold', 'icon' => 'fa-solid fa-triangle-exclamation', 'rep' => false, 'eval' => function($u) use ($category_unlocks_by_user) {
+            $cats = $category_unlocks_by_user[$u['id']] ?? [];
+            $qual = 0;
+            foreach ($cats as $cnt) { if ($cnt >= 3) $qual++; }
+            return $qual >= 3;
+        }],
+
+        // Streaks & Consistency (127–134)
+        127 => ['title' => 'Steady Four', 'desc' => 'Maintain a 4-day daily active streak.', 'cat' => 'streaks', 'tier' => 'bronze', 'icon' => 'fa-solid fa-calendar-check', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 4],
+        128 => ['title' => 'Twelve-Day Trail', 'desc' => 'Maintain a 12-day daily continuous streak.', 'cat' => 'streaks', 'tier' => 'silver', 'icon' => 'fa-solid fa-shoe-prints', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 12],
+        129 => ['title' => 'Eighteen-Day Ascent', 'desc' => 'Maintain an 18-day continuous active streak.', 'cat' => 'streaks', 'tier' => 'silver', 'icon' => 'fa-solid fa-mountain', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 18],
+        130 => ['title' => 'Silver Month (25 Days)', 'desc' => 'Maintain a 25-day daily streak without missing.', 'cat' => 'streaks', 'tier' => 'gold', 'icon' => 'fa-solid fa-calendar-days', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 25],
+        131 => ['title' => 'Golden Fortnight (35 Days)', 'desc' => 'Reach 35 consecutive days active on Arigato.', 'cat' => 'streaks', 'tier' => 'gold', 'icon' => 'fa-solid fa-clock-rotate-left', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 35],
+        132 => ['title' => 'Seventy-Five Inferno', 'desc' => 'Reach 75 consecutive active streak days.', 'cat' => 'streaks', 'tier' => 'platinum', 'icon' => 'fa-solid fa-fire-burner', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 75],
+        133 => ['title' => 'One-Twenty Titan', 'desc' => 'Reach 120 consecutive active streak days.', 'cat' => 'streaks', 'tier' => 'diamond', 'icon' => 'fa-solid fa-shield-halved', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 120],
+        134 => ['title' => 'Two-Hundred Master', 'desc' => 'Reach 200 consecutive active streak days.', 'cat' => 'streaks', 'tier' => 'diamond', 'icon' => 'fa-solid fa-chess-rook', 'rep' => false, 'eval' => fn($u) => $u['streak_count'] >= 200],
+
+        // Community & Engagement (135–142)
+        135 => ['title' => 'Warm Heart', 'desc' => 'Like 3 AI prompts in the community.', 'cat' => 'community', 'tier' => 'bronze', 'icon' => 'fa-solid fa-heart', 'rep' => false, 'eval' => fn($u) => $u['likes'] >= 3],
+        136 => ['title' => 'Enthusiast Liker', 'desc' => 'Like 8 AI prompts in the community gallery.', 'cat' => 'community', 'tier' => 'bronze', 'icon' => 'fa-solid fa-hand-holding-heart', 'rep' => false, 'eval' => fn($u) => $u['likes'] >= 8],
+        137 => ['title' => 'Gallery Patron', 'desc' => 'Like 20 AI prompts across the platform.', 'cat' => 'community', 'tier' => 'silver', 'icon' => 'fa-solid fa-thumbs-up', 'rep' => false, 'eval' => fn($u) => $u['likes'] >= 20],
+        138 => ['title' => 'Half-Century Liker', 'desc' => 'Like 50 AI prompts across Arigato Studio.', 'cat' => 'community', 'tier' => 'silver', 'icon' => 'fa-solid fa-heart-pulse', 'rep' => false, 'eval' => fn($u) => $u['likes'] >= 50],
+        139 => ['title' => 'Double Century Liker', 'desc' => 'Like 200 AI prompts platform-wide.', 'cat' => 'community', 'tier' => 'gold', 'icon' => 'fa-solid fa-shield-heart', 'rep' => false, 'eval' => fn($u) => $u['likes'] >= 200],
+        140 => ['title' => 'Triple Saver', 'desc' => 'Save 3 favorite prompts into your bookmarks.', 'cat' => 'community', 'tier' => 'bronze', 'icon' => 'fa-solid fa-bookmark', 'rep' => false, 'eval' => fn($u) => $u['saves'] >= 3],
+        141 => ['title' => 'Tenacity Collector', 'desc' => 'Save 10 prompts into your personal collection.', 'cat' => 'community', 'tier' => 'silver', 'icon' => 'fa-solid fa-folder-closed', 'rep' => false, 'eval' => fn($u) => $u['saves'] >= 10],
+        142 => ['title' => 'Century Archivist', 'desc' => 'Save 100 prompts into your personal collection.', 'cat' => 'community', 'tier' => 'gold', 'icon' => 'fa-solid fa-boxes-stacked', 'rep' => false, 'eval' => fn($u) => $u['saves'] >= 100],
+
+        // Grandmaster & Mastery (143–150)
+        143 => ['title' => 'Score 25 Starter', 'desc' => 'Accumulate 25 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'bronze', 'icon' => 'fa-solid fa-battery-half', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 25],
+        144 => ['title' => 'Score 75 Achiever', 'desc' => 'Accumulate 75 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'silver', 'icon' => 'fa-solid fa-battery-three-quarters', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 75],
+        145 => ['title' => 'Score 150 Master', 'desc' => 'Accumulate 150 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'silver', 'icon' => 'fa-solid fa-battery-full', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 150],
+        146 => ['title' => 'Score 350 Elite', 'desc' => 'Accumulate 350 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'gold', 'icon' => 'fa-solid fa-award', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 350],
+        147 => ['title' => 'Score 750 Champion', 'desc' => 'Accumulate 750 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'platinum', 'icon' => 'fa-solid fa-medal', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 750],
+        148 => ['title' => 'Score 1,500 Grandmaster', 'desc' => 'Accumulate 1,500 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'diamond', 'icon' => 'fa-solid fa-crown', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 1500],
+        149 => ['title' => 'Score 5,000 Immortal', 'desc' => 'Accumulate 5,000 Total Activity Points.', 'cat' => 'mastery', 'tier' => 'legendary', 'icon' => 'fa-solid fa-meteor', 'rep' => false, 'eval' => fn($u) => $u['total_score'] >= 5000],
+        150 => ['title' => 'Arigato Apex Sovereign', 'desc' => 'The ultimate recognition: 100+ unlocks, 30+ streak, 50+ likes, and 250+ points.', 'cat' => 'mastery', 'tier' => 'legendary', 'icon' => 'fa-solid fa-chess-king', 'rep' => false, 'eval' => fn($u) => $u['unlocks'] >= 100 && $u['streak_count'] >= 30 && $u['likes'] >= 50 && $u['total_score'] >= 250],
     ];
 
     // 3. Evaluate criteria across all users
@@ -210,4 +303,11 @@ function get_100_platform_achievements($pdo) {
         'total_completions' => $total_platform_completions,
         'total_users' => $total_users
     ];
+}
+
+/**
+ * Backward compatibility alias for 100-platform-achievements callers
+ */
+function get_100_platform_achievements($pdo) {
+    return get_150_platform_achievements($pdo);
 }

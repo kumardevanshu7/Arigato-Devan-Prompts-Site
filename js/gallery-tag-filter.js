@@ -27,11 +27,18 @@
       card.dataset.galBound = '1';
       card.addEventListener('click', function (e) {
         if (e.target.closest('.card-like-display')) return;
+        if (e.target.closest('.card-prompt-btn')) {
+          e.preventDefault();
+          var url = promptPageUrl(card);
+          document.body.style.transition = 'opacity 0.15s ease';
+          document.body.style.opacity = '0';
+          setTimeout(function () { window.location.href = url; }, 150);
+          return;
+        }
         e.preventDefault();
-        var url = promptPageUrl(card);
-        document.body.style.transition = 'opacity 0.15s ease';
-        document.body.style.opacity = '0';
-        setTimeout(function () { window.location.href = url; }, 150);
+        if (window.openPromptImagePreview) {
+          window.openPromptImagePreview(card);
+        }
       });
       card.addEventListener('mouseenter', function () {
         var url = promptPageUrl(card);

@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/includes/session_bootstrap.php'; ?>
+<?php 
+require_once __DIR__ . '/includes/session_bootstrap.php';
+require_once __DIR__ . '/includes/settings_helper.php';
+$social_cfg = get_contact_social_config();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,27 +45,41 @@
 
     <div class="contact-layout">
         <div class="contact-info-grid">
-            <a href="mailto:devansh.grow@gmail.com" class="contact-info-card">
+            <a href="mailto:<?= htmlspecialchars($social_cfg['contact_email']) ?>" class="contact-info-card">
                 <span class="ci-card-icon ci-card-icon--email"><i class="fa-solid fa-envelope"></i></span>
                 <span class="ci-card-body">
                     <span class="ci-card-label">Email</span>
-                    <span class="ci-card-value">devansh.grow@gmail.com</span>
+                    <span class="ci-card-value"><?= htmlspecialchars($social_cfg['contact_email']) ?></span>
                 </span>
             </a>
-            <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="contact-info-card">
+            <a href="<?= htmlspecialchars($social_cfg['profile_handle_url'] ?: 'https://instagram.com/arigato.devan') ?>" target="_blank" rel="noopener" class="contact-info-card">
                 <span class="ci-card-icon ci-card-icon--insta"><i class="fa-brands fa-instagram"></i></span>
                 <span class="ci-card-body">
                     <span class="ci-card-label">Instagram</span>
-                    <span class="ci-card-value">@arigato.devan</span>
+                    <span class="ci-card-value"><?= htmlspecialchars($social_cfg['profile_handle']) ?></span>
                 </span>
             </a>
             <div class="contact-info-card contact-info-card--static">
                 <span class="ci-card-icon ci-card-icon--time"><i class="fa-solid fa-clock"></i></span>
                 <span class="ci-card-body">
                     <span class="ci-card-label">Response Time</span>
-                    <span class="ci-card-value">Within 24 hours</span>
+                    <span class="ci-card-value"><?= htmlspecialchars($social_cfg['response_time']) ?></span>
                 </span>
             </div>
+            <?php foreach ($social_cfg['social_links'] as $s): ?>
+                <?php if (!empty($s['enabled']) && !empty($s['url']) && !in_array($s['id'], ['instagram', 'email', 'gallery'])): 
+                    $s_url = trim($s['url']);
+                    $s_target = (strpos($s_url, 'mailto:') === 0 || strpos($s_url, '/') === 0) ? '_self' : '_blank';
+                ?>
+                <a href="<?= htmlspecialchars($s_url) ?>" target="<?= $s_target ?>" <?= $s_target === '_blank' ? 'rel="noopener"' : '' ?> class="contact-info-card">
+                    <span class="ci-card-icon"><i class="<?= htmlspecialchars($s['icon']) ?>"></i></span>
+                    <span class="ci-card-body">
+                        <span class="ci-card-label"><?= htmlspecialchars($s['name']) ?></span>
+                        <span class="ci-card-value">Connect &rarr;</span>
+                    </span>
+                </a>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
 
         <div class="contact-form-card">

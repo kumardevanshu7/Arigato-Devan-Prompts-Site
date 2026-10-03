@@ -1022,28 +1022,19 @@ button.gallery-tag-btn {
   margin-top: auto !important;
 }
 
-.card-views-display,
-.prompt-card .card-views-display,
-.theme-nogoda .prompt-card .card-views-display {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  width: fit-content !important;
-  padding: 4px 10px !important;
-  border-radius: 999px !important;
-  background: rgba(86, 124, 141, 0.08) !important;
-  border: 1px solid rgba(86, 124, 141, 0.2) !important;
-  color: var(--pal-navy, #2F4156) !important;
-  font-size: 0.72rem !important;
-  font-weight: 700 !important;
-  flex-shrink: 0 !important;
-  margin-left: auto !important;
+.card-views-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  color: var(--pal-navy, #2F4156);
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.card-views-display i,
-.prompt-card .card-views-display i,
-.theme-nogoda .prompt-card .card-views-display i {
-  color: var(--pal-teal, #567C8D) !important;
-  font-size: 0.68rem !important;
+.card-views-display i {
+  color: var(--pal-teal, #567C8D);
+  font-size: 0.68rem;
 }
 

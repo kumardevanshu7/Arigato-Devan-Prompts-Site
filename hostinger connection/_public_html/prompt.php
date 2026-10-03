@@ -50,13 +50,38 @@ $tinfo = [
     "solo"             => ["label" => "SOLO",               "bg" => "#dcfce7", "color" => "#166534"],
 ][$ptype];
 
-$rel_stmt = $pdo->prepare("SELECT id, slug, title, image_path, likes_count, prompt_type FROM prompts WHERE prompt_type = ? AND id != ? AND is_trial = 0 ORDER BY RAND() LIMIT 4");
-$rel_stmt->execute([$db_type, $id]);
+require_once __DIR__ . '/includes/prompt_cards.php';
+
+if (isset($_SESSION["user_id"])) {
+    $rel_stmt = $pdo->prepare("
+        SELECT p.id, p.slug, p.title, p.image_path, p.likes_count, p.view_count, p.prompt_type, p.tag, p.created_at, p.reel_link, p.best_works_in,
+               IF(u.id IS NOT NULL, 1, 0) as is_unlocked,
+               IF(l.id IS NOT NULL, 1, 0) as is_liked,
+               IF(sv.id IS NOT NULL, 1, 0) as is_saved
+        FROM prompts p
+        LEFT JOIN unlocked_prompts u ON p.id = u.prompt_id AND u.user_id = ?
+        LEFT JOIN likes l ON p.id = l.prompt_id AND l.user_id = ?
+        LEFT JOIN saved_prompts sv ON p.id = sv.prompt_id AND sv.user_id = ?
+        WHERE p.prompt_type = ? AND p.id != ? AND p.is_trial = 0
+        ORDER BY RAND() LIMIT 4
+    ");
+    $rel_stmt->execute([$_SESSION["user_id"], $_SESSION["user_id"], $_SESSION["user_id"], $db_type, $id]);
+} else {
+    $rel_stmt = $pdo->prepare("
+        SELECT id, slug, title, image_path, likes_count, view_count, prompt_type, tag, created_at, reel_link, best_works_in,
+               0 as is_unlocked, 0 as is_liked, 0 as is_saved
+        FROM prompts
+        WHERE prompt_type = ? AND id != ? AND is_trial = 0
+        ORDER BY RAND() LIMIT 4
+    ");
+    $rel_stmt->execute([$db_type, $id]);
+}
 $related = $rel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $is_unlocked  = (bool)$p["is_unlocked"];
 // Track view
 $pdo->prepare("UPDATE prompts SET view_count = view_count + 1 WHERE id = ?")->execute([$id]);
+$p['view_count'] = (int)($p['view_count'] ?? 0) + 1;
 $asset_images = json_decode($p['asset_images'] ?? '[]', true) ?: [];
 $solo_before_image = trim($p['solo_before_image'] ?? '');
 $solo_examples = json_decode($p['solo_examples'] ?? '[]', true) ?: [];
@@ -201,9 +226,61 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         flex-direction: column !important;
         min-height: 100vh !important;
         min-height: 100dvh !important;
+        width: 100% !important;
+        align-items: stretch !important;
     }
     .theme-nogoda .pp-wrap {
         flex: 1 0 auto !important;
+        width: 100% !important;
+        max-width: 1240px !important;
+        margin: 0 auto !important;
+        padding: clamp(20px, 3vw, 36px) clamp(16px, 4vw, 40px) 48px !important;
+        box-sizing: border-box !important;
+    }
+    .theme-nogoda .pp-layout {
+        display: flex !important;
+        gap: clamp(24px, 3.5vw, 40px) !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .theme-nogoda .pp-img-col:not(.pp-solo-img-col) {
+        width: clamp(280px, 26vw, 340px) !important;
+        flex-shrink: 0 !important;
+        position: sticky !important;
+        top: calc(var(--nav-sticky-offset, 80px) + 12px) !important;
+    }
+    .theme-nogoda .pp-info-col {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .theme-nogoda .pp-related {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-top: clamp(32px, 4vw, 48px) !important;
+        padding-top: 24px !important;
+        border-top: 1px solid rgba(200, 217, 230, 0.85) !important;
+    }
+    .theme-nogoda .pp-rel-grid {
+        display: grid !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: clamp(14px, 2vw, 22px) !important;
+    }
+    @media (max-width: 960px) {
+        .theme-nogoda .pp-rel-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 16px !important;
+        }
+    }
+    @media (max-width: 768px) {
+        .theme-nogoda .pp-rel-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+        }
     }
     body.page-prompt .store-footer,
     .theme-nogoda.page-prompt .store-footer {
@@ -573,9 +650,15 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 </div>
                 <?php endif; ?>
                 <div class="pp-img-meta">
-                    <div class="pp-like-mini">
-                        <i class="fa-solid fa-heart"></i>
-                        <span id="pp-like-count-mini"><?= (int)$p['likes_count'] ?></span> likes
+                    <div class="pp-stats-row">
+                        <div class="pp-like-mini">
+                            <i class="fa-solid fa-heart"></i>
+                            <span id="pp-like-count-mini"><?= (int)$p['likes_count'] ?></span> likes
+                        </div>
+                        <div class="pp-views-mini" title="<?= (int)$p['view_count'] ?> views">
+                            <i class="fa-regular fa-eye"></i>
+                            <span id="pp-view-count-mini"><?= (int)$p['view_count'] ?></span> views
+                        </div>
                     </div>
                     <?php if (!empty($tags_arr)): ?>
                     <div class="pp-tags">
@@ -831,22 +914,8 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         <div class="pp-related">
             <h2>More <?= htmlspecialchars($tinfo['label']) ?> Prompts</h2>
             <div class="pp-rel-grid">
-                <?php foreach ($related as $r): ?>
-                <?php
-                $related_url = 'prompt.php?id=' . (int)$r['id'];
-                if (!empty($r['slug']) && ($r['prompt_type'] ?? '') === 'solo') {
-                    $related_url = 'prompts/solo/' . $r['slug'];
-                } elseif (!$is_local && !empty($r['slug'])) {
-                    $related_url = '/prompts/' . $r['slug'];
-                }
-                ?>
-                <a href="<?= htmlspecialchars($related_url) ?>" class="pp-rel-card">
-                    <img loading="lazy" draggable="false" src="<?= htmlspecialchars($r['image_path']) ?>" alt="<?= htmlspecialchars($r['title']) ?>">
-                    <div class="pp-rel-card-foot">
-                        <div class="pp-rel-card-title"><?= htmlspecialchars($r['title']) ?></div>
-                        <div class="pp-rel-card-likes"><i class="fa-solid fa-heart" aria-hidden="true"></i><span><?= (int)($r['likes_count'] ?? 0) ?></span></div>
-                    </div>
-                </a>
+                <?php foreach ($related as $index => $r): ?>
+                    <?php render_prompt_card($r, $index); ?>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -854,6 +923,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     </div>
 
     <?php include 'footer.php'; ?>
+    <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <script>
     const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
@@ -1320,7 +1390,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         });
     }
 
-    // -- LIKE --
+    // -- LIKE (Main Prompt) --
     const likeBtn = document.getElementById('pp-like-btn');
     if (likeBtn) {
         likeBtn.addEventListener('click', async function() {
@@ -1342,6 +1412,49 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             }
         });
     }
+
+    // -- CARD LIKE DELEGATION FOR RELATED PROMPTS --
+    document.addEventListener('click', async function(e) {
+        const likeDisplay = e.target.closest('.card-like-display');
+        if (!likeDisplay) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const pid = likeDisplay.dataset.promptId;
+        if (!pid) return;
+
+        <?php if (!isset($_SESSION['user_id'])): ?>
+        window.location.href = 'login.php';
+        return;
+        <?php endif; ?>
+
+        const heartIcon = likeDisplay.querySelector('.fa-heart');
+        const countSpan = likeDisplay.querySelector('.like-count');
+        const isCurrentlyLiked = likeDisplay.dataset.liked === 'true';
+
+        // Optimistic UI
+        likeDisplay.dataset.liked = isCurrentlyLiked ? 'false' : 'true';
+        if (heartIcon) heartIcon.classList.toggle('liked-heart', !isCurrentlyLiked);
+        if (countSpan) {
+            const currentCount = parseInt(countSpan.textContent, 10) || 0;
+            countSpan.textContent = isCurrentlyLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+        }
+
+        const fd = new FormData();
+        fd.append('prompt_id', pid);
+
+        try {
+            const res = await fetch('like.php', { method: 'POST', body: fd }).then(r => r.json());
+            if (res.success) {
+                const isLiked = res.action === 'liked';
+                likeDisplay.dataset.liked = isLiked ? 'true' : 'false';
+                if (heartIcon) heartIcon.classList.toggle('liked-heart', isLiked);
+                if (countSpan) countSpan.textContent = res.likes_count;
+            }
+        } catch(err) {
+            console.error('Like error:', err);
+        }
+    });
     </script>
 
     <?php if ($ptype === 'solo'): ?>

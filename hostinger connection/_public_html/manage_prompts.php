@@ -149,6 +149,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:.72rem;font-weight:800;border:1px solid;transition:all .2s;cursor:pointer;background:transparent;font-family:var(--font);text-decoration:none}
 .btn-purple{color:var(--accent2);border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.07)}
 .btn-purple:hover{background:rgba(139,92,246,0.15)}
+.btn-green{color:var(--green);border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.1)}
+.btn-green:hover{background:rgba(74,222,128,0.2)}
+.btn-green.active-main-card{background:rgba(74,222,128,0.22);border-color:var(--green);box-shadow:0 0 10px rgba(74,222,128,0.2)}
 .btn-yellow{color:var(--yellow);border-color:rgba(251,191,36,0.25);background:rgba(251,191,36,0.07)}
 .btn-yellow:hover{background:rgba(251,191,36,0.15)}
 .btn-cyan{color:var(--cyan);border-color:rgba(34,211,238,0.2);background:rgba(34,211,238,0.05)}
@@ -250,50 +253,6 @@ body::before, body::after { display: none !important; background-image: none !im
 <div id="sp"></div>
 <canvas id="pc"></canvas>
 
-<!-- MOBILE DRAWER -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="sideDrawer">
-  <div class="drawer-head">
-    <div class="drawer-brand">Arigato Admin</div>
-    <div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div>
-  </div>
-  <div class="drawer-user">
-    <div class="d-av-ph2"><?= strtoupper(substr($__sn,0,1)) ?></div>
-    <div><div class="d-uname"><?= htmlspecialchars($__sn) ?></div><div class="d-role2">Admin</div></div>
-  </div>
-  <nav class="drawer-nav2">
-    <div class="d-sec2">Overview</div>
-    <a href="dashboard.php" class="d-link2"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="analytics.php" class="d-link2"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
-    <div class="d-sec2">Content</div>
-    <a href="upload_prompt.php" class="d-link2"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
-    <a href="manage_prompts.php" class="d-link2 active"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
-    <a href="prompt_links.php" class="d-link2"><i class="fa-solid fa-link"></i> Prompt Links</a>
-    <a href="potd_manager.php" class="d-link2"><i class="fa-solid fa-sun"></i> POTD Manager</a>
-    <a href="trending_settings.php" class="d-link2"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
-    <a href="gallery_carousel_manager.php" class="d-link2"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
-    <div class="d-sec2">Blog</div>
-    <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
-    <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
-    <div class="d-sec2">Community</div>
-    <a href="feedback_admin.php" class="d-link2"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
-    <div class="d-sec2">Happy Users</div>
-    <a href="happy_users_admin.php?tab=upload" class="d-link2"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
-    <a href="happy_users_admin.php?tab=manage" class="d-link2"><i class="fa-solid fa-images"></i> Manage Pics</a>
-    <div class="d-sec2 nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-upload" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Upload</span></a>
-    <a href="curated_manage.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-table-list" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Manage</span></a>
-    <a href="curated_links.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
-    <div class="d-sec2">Users</div>
-    <a href="user_management.php" class="d-link2"><i class="fa-solid fa-users"></i> Users</a>
-    <div class="d-sec2">Tools</div>
-    <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
-  </nav>
-  <div class="drawer-bot">
-    <a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-  </div>
-</div>
-
 <!-- MOBILE TOP BAR -->
 <div class="mob-topbar">
   <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
@@ -301,43 +260,7 @@ body::before, body::after { display: none !important; background-image: none !im
   <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
 </div>
 
-<aside class="sidebar">
-  <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
-  <div class="sb-admin">
-    <?php if(!empty($__sa)): ?><img src="<?= htmlspecialchars($__sa) ?>" class="sb-av" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0" alt="">
-    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($__sn,0,1)) ?></div><?php endif; ?>
-    <div><div class="sb-uname"><?= htmlspecialchars($__sn) ?></div><div class="sb-role">Administrator</div></div>
-  </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Overview</div>
-    <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
-    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
-    <div class="sb-sec">Content</div>
-    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
-    <a href="manage_prompts.php" class="sb-link active"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
-    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
-    <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
-    <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
-    <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
-    <div class="sb-sec">Blog</div>
-    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
-    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
-    <div class="sb-sec">Community</div>
-    <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
-    <div class="sb-sec">Happy Users</div>
-    <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
-    <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
-    <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-upload" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Upload</span></a>
-    <a href="curated_manage.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-table-list" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Manage</span></a>
-    <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
-    <div class="sb-sec">Users</div>
-    <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
-    <div class="sb-sec">Tools</div>
-    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
-  </nav>
-  <div class="sb-bottom"><a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></div>
-</aside>
+<?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
 
 <main class="main">
   <div class="topbar">
@@ -378,12 +301,14 @@ body::before, body::after { display: none !important; background-image: none !im
           <?php if($ptype === 'secret' && !empty($p['secret_code'])): ?><span class="type-badge" style="background:rgba(192,132,252,0.1);color:#c084fc;border-color:rgba(192,132,252,0.25);font-family:monospace;cursor:pointer;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($p['secret_code']) ?>');alert('Code copied!');" title="Click to copy code"><?= htmlspecialchars($p['secret_code']) ?></span><?php endif; ?>
           <span class="type-badge tb-trial" style="cursor:pointer;<?= empty($p['is_trial']) ? 'opacity:0.4;background:transparent;border-style:dashed;' : '' ?>" onclick="openTrialModal(<?= $item_id ?>, <?= empty($p['is_trial']) ? '0' : '1' ?>)"><?= empty($p['is_trial']) ? '+ Trial' : 'TRIAL' ?></span>
           <?php if(!empty($p['is_featured'])): ?><span class="type-badge" style="background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.25)"><i class="fa-solid fa-star" style="font-size:.55rem"></i> POTD</span><?php endif; ?>
+          <span id="main-card-badge-<?= $item_id ?>" class="type-badge" style="<?= !empty($p['is_main_card']) ? '' : 'display:none;' ?>background:rgba(74,222,128,0.12);color:var(--green);border-color:rgba(74,222,128,0.3)"><i class="fa-solid fa-bolt" style="font-size:.55rem"></i> Main Card</span>
           <?php if(!empty($p['likes_count'])): ?><span style="font-size:.68rem;color:var(--muted)"><i class="fa-solid fa-heart" style="color:var(--red)"></i> <?= $p['likes_count'] ?></span><?php endif; ?>
           <?php foreach(array_filter(array_map('trim',explode(',',$p['tag']??''))) as $tg): ?><span class="p-tag-pill"><?= htmlspecialchars($tg) ?></span><?php endforeach; ?>
         </div>
       </div>
       <div class="p-actions-wrap">
         <div class="p-actions">
+          <button id="main-card-btn-<?= $item_id ?>" onclick="toggleMainCard(<?= $item_id ?>)" class="btn <?= !empty($p['is_main_card']) ? 'btn-green active-main-card' : 'btn-purple' ?>" title="Toggle Main Page Card"><i class="fa-solid fa-bolt"></i> <span><?= !empty($p['is_main_card']) ? 'Main Card' : '+ Main Card' ?></span></button>
           <button id="feat-btn-<?= $item_id ?>" onclick="featurePrompt(<?= $item_id ?>)" class="btn btn-yellow"><i class="fa-solid fa-star"></i> <span>POTD</span></button>
           <a href="edit_prompt.php?id=<?= $item_id ?>" class="btn btn-cyan"><i class="fa-solid fa-pen"></i> <span>Edit</span></a>
           <button onclick="confirmDelete(<?= $item_id ?>, '<?= addslashes($p['title']??'') ?>')" class="btn btn-red"><i class="fa-solid fa-trash"></i></button>
@@ -391,6 +316,7 @@ body::before, body::after { display: none !important; background-image: none !im
         <div class="p-dot-wrap">
           <button class="p-dot-btn" onclick="togglePDrop(this)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
           <div class="p-dropdown">
+            <button class="pd-item" onclick="toggleMainCard(<?= $item_id ?>);closePDrops()"><i class="fa-solid fa-bolt" style="color:var(--green)"></i> Toggle Main Card</button>
             <a href="edit_prompt.php?id=<?= $item_id ?>" class="pd-item"><i class="fa-solid fa-pen" style="color:var(--cyan)"></i> Edit Prompt</a>
             <button class="pd-item" onclick="featurePrompt(<?= $item_id ?>);closePDrops()"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Toggle POTD</button>
             <button class="pd-item pd-del" onclick="confirmDelete(<?= $item_id ?>,'<?= addslashes($p['title']??'') ?>');closePDrops()"><i class="fa-solid fa-trash" style="color:var(--red)"></i> Delete</button>
@@ -535,6 +461,23 @@ function featurePrompt(id){
       if(b){b.innerHTML='<i class="fa-solid fa-star"></i> <span>Un-POTD</span>';b.style.background='rgba(251,191,36,0.2)'}
     }
   });
+}
+
+function toggleMainCard(id){
+  fetch('ajax_toggle_main_card.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'prompt_id='+id+'&source=regular'})
+  .then(r=>r.json()).then(d=>{
+    if(d&&d.success){
+      const btn=document.getElementById('main-card-btn-'+id);
+      const badge=document.getElementById('main-card-badge-'+id);
+      if(d.is_main_card){
+        if(btn){btn.className='btn btn-green active-main-card';btn.innerHTML='<i class="fa-solid fa-bolt"></i> <span>Main Card</span>';}
+        if(badge){badge.style.display='inline-flex';}
+      }else{
+        if(btn){btn.className='btn btn-purple';btn.innerHTML='<i class="fa-solid fa-bolt"></i> <span>+ Main Card</span>';}
+        if(badge){badge.style.display='none';}
+      }
+    }
+  }).catch(e=>console.error(e));
 }
 
 function confirmDelete(id,name){document.getElementById('delete-prompt-id').value=id;document.getElementById('delete-modal-name').textContent='"'+name+'"';document.getElementById('delete-modal').style.display='flex'}

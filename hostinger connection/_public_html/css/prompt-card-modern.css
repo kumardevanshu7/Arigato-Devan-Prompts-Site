@@ -1,0 +1,852 @@
+/* ============================================================
+   ARIGATO DEVAN — MODERN PROMPT CARD (9:16 FRAMED INSET)
+   Inspired by Framer / Minimalist UI (Raxit Pethani concept)
+   Only applies to category & gallery prompt cards (.prompt-card)
+   ============================================================ */
+
+/* 1. Outer Card Container (Inset Bezel Frame) */
+.product-card.prompt-card,
+.prompt-card {
+  position: relative !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(86, 124, 141, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 10px 10px 12px 10px !important;
+  box-shadow: 0 3px 14px -2px rgba(47, 65, 86, 0.06), 0 1px 3px rgba(47, 65, 86, 0.04) !important;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.product-card.prompt-card::before,
+.prompt-card::before {
+  display: none !important;
+}
+
+.product-card.prompt-card:hover,
+.prompt-card:hover {
+  transform: translateY(-5px) !important;
+  border-color: rgba(86, 124, 141, 0.38) !important;
+  box-shadow: 0 14px 32px -4px rgba(47, 65, 86, 0.14), 0 4px 10px rgba(47, 65, 86, 0.05) !important;
+}
+
+/* 2. Inner Image Container (Framed 9:16 Window) */
+.prompt-card .card-image-wrap {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 9 / 16 !important;
+  padding-bottom: 0 !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background: #edf2f7 !important;
+  flex-shrink: 0 !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+}
+
+.prompt-card .card-image-wrap img,
+.prompt-card .card-image-wrap img.skeleton-img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.prompt-card:hover .card-image-wrap img {
+  transform: scale(1.04) !important;
+}
+
+/* 3. Floating Badges inside Image */
+.prompt-card .card-badge {
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 22px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+  z-index: 3 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.prompt-card .card-badge.aup {
+  background: linear-gradient(135deg, #06b6d4 0%, #059669 100%) !important;
+  color: #ffffff !important;
+}
+
+.prompt-card .card-lock-icon {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  color: var(--pal-navy, #2F4156) !important;
+  font-size: 0.68rem !important;
+  z-index: 3 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.2s ease !important;
+}
+
+.prompt-card:hover .card-lock-icon {
+  transform: scale(1.06) !important;
+}
+
+.prompt-card .card-lock-icon.unlocked {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Hide legacy dark hover overlay so photo stays crisp & modern */
+.prompt-card .card-overlay {
+  display: none !important;
+}
+
+/* 4. Card Info Section */
+.prompt-card .card-info {
+  padding: 10px 4px 2px 4px !important;
+  background: transparent !important;
+  border-top: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  flex: 1 1 auto !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* 5. Prompt Title */
+.prompt-card .card-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: var(--pal-navy, #2F4156) !important;
+  letter-spacing: -0.012em !important;
+  line-height: 1.34 !important;
+  margin: 0 !important;
+  min-height: 2.3em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: normal !important;
+}
+
+/* 6. Footer Row (Meta Stats on left, CTA on right) */
+.prompt-card .card-footer-row,
+.prompt-card .card-meta-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-top: auto !important;
+  padding-top: 4px !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* 7. Stats Stack (Left side) */
+.prompt-card .card-stats-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  flex-shrink: 0 !important;
+}
+
+.prompt-card .card-stat-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+  color: #64748b !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  width: fit-content !important;
+}
+
+.prompt-card .card-stat-item i {
+  font-size: 0.7rem !important;
+  width: 13px !important;
+  text-align: center !important;
+}
+
+.prompt-card .card-like-display {
+  cursor: pointer !important;
+}
+
+.prompt-card .card-like-display i {
+  color: var(--nogoda-pink, #F5709D) !important;
+  transition: transform 0.18s ease !important;
+}
+
+.prompt-card .card-like-display:hover i {
+  transform: scale(1.25) !important;
+}
+
+.prompt-card .card-like-display .liked-heart {
+  color: #e11d48 !important;
+}
+
+.prompt-card .card-views-display i {
+  color: var(--pal-teal, #567C8D) !important;
+}
+
+.prompt-card .card-views-display {
+  margin-left: 0 !important; /* override legacy margin-left: auto */
+}
+
+.prompt-card .card-stat-item span {
+  font-variant-numeric: tabular-nums !important;
+  font-size: 0.72rem !important;
+  color: #475569 !important;
+}
+
+/* 8. Call To Action Pill Button (Right side) */
+.prompt-card .card-prompt-btn-wrap {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+.prompt-card .card-prompt-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  padding: 6px 13px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(145deg, #242b35 0%, #0d1219 100%) !important;
+  color: #ffffff !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 3px 8px rgba(13, 18, 25, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+  cursor: pointer !important;
+}
+
+.prompt-card:hover .card-prompt-btn,
+.prompt-card .card-prompt-btn:hover {
+  background: linear-gradient(145deg, #2e3744 0%, #131a23 100%) !important;
+  transform: translateY(-1px) scale(1.02) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 6px 16px rgba(13, 18, 25, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.prompt-card .card-prompt-btn .prompt-btn-arrow {
+  width: 10px !important;
+  height: 10px !important;
+  stroke: #ffffff !important;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  flex-shrink: 0 !important;
+}
+
+.prompt-card:hover .card-prompt-btn .prompt-btn-arrow,
+.prompt-card .card-prompt-btn:hover .prompt-btn-arrow {
+  transform: translate(2px, -2px) !important;
+}
+
+/* Skeleton Loading State Shimmer Compatibility */
+.prompt-card.skeleton .card-prompt-btn {
+  opacity: 0.55 !important;
+  pointer-events: none !important;
+}
+
+/* 9. Mobile Responsive Scaling */
+@media (max-width: 480px) {
+  .product-card.prompt-card,
+  .prompt-card {
+    padding: 8px 8px 10px 8px !important;
+    border-radius: 16px !important;
+  }
+
+  .prompt-card .card-image-wrap {
+    border-radius: 12px !important;
+  }
+
+  .prompt-card .card-image-wrap img,
+  .prompt-card .card-image-wrap img.skeleton-img {
+    border-radius: 12px !important;
+  }
+
+  .prompt-card .card-badge {
+    top: 8px !important;
+    left: 8px !important;
+    font-size: 0.52rem !important;
+    padding: 3px 7px !important;
+  }
+
+  .prompt-card .card-lock-icon {
+    top: 8px !important;
+    right: 8px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .prompt-card .card-info {
+    padding: 8px 2px 2px 2px !important;
+    gap: 6px !important;
+  }
+
+  .prompt-card .card-title {
+    font-size: 0.76rem !important;
+    line-height: 1.25 !important;
+    min-height: 2.1em !important;
+  }
+
+  .prompt-card .card-footer-row,
+  .prompt-card .card-meta-row {
+    gap: 6px !important;
+    padding-top: 2px !important;
+  }
+
+  .prompt-card .card-stats-col {
+    gap: 2px !important;
+  }
+
+  .prompt-card .card-stat-item {
+    font-size: 0.65rem !important;
+    gap: 4px !important;
+  }
+
+  .prompt-card .card-stat-item i {
+    font-size: 0.62rem !important;
+    width: 11px !important;
+  }
+
+  .prompt-card .card-stat-item span {
+    font-size: 0.65rem !important;
+  }
+
+  .prompt-card .card-prompt-btn {
+    padding: 5px 10px !important;
+    font-size: 0.66rem !important;
+    gap: 4px !important;
+  }
+
+  .prompt-card .card-prompt-btn .prompt-btn-arrow {
+    width: 9px !important;
+    height: 9px !important;
+  }
+}
+
+/* ============================================================
+   PROMPT IMAGE PREVIEW LIGHTBOX MODAL
+   ============================================================ */
+body.pip-modal-open {
+  overflow: hidden !important;
+}
+
+.pip-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.24s ease, visibility 0.24s ease;
+  user-select: none;
+  overflow: hidden !important;
+}
+
+.pip-modal.is-open {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.pip-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(8, 12, 20, 0.9) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+}
+
+/* 3D Stage Container */
+.pip-stage {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+}
+
+.pip-carousel-track {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  perspective: 1200px !important;
+  perspective-origin: center center !important;
+  transform-style: preserve-3d !important;
+  pointer-events: none !important;
+}
+
+/* Base Carousel Slot (9:16 vertical card frame) */
+.pip-slot {
+  position: absolute !important;
+  top: calc(50% - 24px) !important;
+  left: 50% !important;
+  width: min(calc((74vh - 70px) * 9 / 16), 310px) !important;
+  aspect-ratio: 9 / 16 !important;
+  border-radius: 22px !important;
+  transform-origin: center center !important;
+  transform-style: preserve-3d !important;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease, filter 0.42s ease !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Card Visual Frame */
+.pip-card-frame {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  background: #0d1219 !important;
+  box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.pip-slot-active .pip-card-frame {
+  box-shadow: 0 32px 64px -8px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.22) !important;
+}
+
+.pip-card-img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 22px !important;
+  pointer-events: none !important;
+}
+
+/* Side Cards Dark Ambient Glass Overlay */
+.pip-card-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(10, 15, 26, 0.38) !important;
+  backdrop-filter: blur(1.5px) !important;
+  -webkit-backdrop-filter: blur(1.5px) !important;
+  transition: opacity 0.3s ease, background 0.2s ease !important;
+  border-radius: 22px !important;
+  pointer-events: none !important;
+}
+
+.pip-slot-active .pip-card-overlay {
+  opacity: 0 !important;
+}
+
+.pip-slot:not(.pip-slot-active) .pip-card-overlay {
+  opacity: 1 !important;
+}
+
+.pip-slot:not(.pip-slot-active):hover .pip-card-overlay {
+  background: rgba(10, 15, 26, 0.16) !important;
+}
+
+/* ============================================================
+   3D COVERFLOW SPATIAL POSITIONS (GENEROUS AIRY SPACING)
+   ============================================================ */
+/* Center Card: Active, sharp, prominent */
+.pip-slot-active {
+  transform: translate3d(-50%, -50%, 0) scale(1) rotateY(0deg) !important;
+  opacity: 1 !important;
+  z-index: 20 !important;
+  cursor: default !important;
+  filter: none !important;
+}
+
+.pip-slot-active .pip-close-btn {
+  display: flex !important;
+}
+
+.pip-slot:not(.pip-slot-active) .pip-close-btn {
+  display: none !important;
+}
+
+/* Left Card (Slot -1): Generously spaced to the left */
+.pip-slot-prev {
+  transform: translate3d(calc(-50% - clamp(340px, 30vw, 420px)), -50%, -80px) scale(0.80) rotateY(12deg) !important;
+  opacity: 0.55 !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+  filter: brightness(0.75) !important;
+}
+
+/* Right Card (Slot +1): Generously spaced to the right */
+.pip-slot-next {
+  transform: translate3d(calc(-50% + clamp(340px, 30vw, 420px)), -50%, -80px) scale(0.80) rotateY(-12deg) !important;
+  opacity: 0.55 !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+  filter: brightness(0.75) !important;
+}
+
+/* Far Left Card (Slot -2) */
+.pip-slot-far-left {
+  transform: translate3d(calc(-50% - clamp(590px, 52vw, 700px)), -50%, -160px) scale(0.64) rotateY(20deg) !important;
+  opacity: 0.22 !important;
+  z-index: 5 !important;
+  cursor: pointer !important;
+  filter: brightness(0.5) !important;
+}
+
+/* Far Right Card (Slot +2) */
+.pip-slot-far-right {
+  transform: translate3d(calc(-50% + clamp(590px, 52vw, 700px)), -50%, -160px) scale(0.64) rotateY(-20deg) !important;
+  opacity: 0.22 !important;
+  z-index: 5 !important;
+  cursor: pointer !important;
+  filter: brightness(0.5) !important;
+}
+
+/* Hover highlights on side cards */
+.pip-slot-prev:hover {
+  opacity: 0.85 !important;
+  filter: brightness(0.92) !important;
+}
+.pip-slot-next:hover {
+  opacity: 0.85 !important;
+  filter: brightness(0.92) !important;
+}
+
+/* ============================================================
+   BADGES & CONTROLS INSIDE CARD
+   ============================================================ */
+.pip-card-badge {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 22px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  pointer-events: none !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%) !important;
+}
+
+.pip-card-badge.aup {
+  background: linear-gradient(135deg, #06b6d4 0%, #059669 100%) !important;
+  color: #ffffff !important;
+}
+.pip-card-badge.ivp {
+  background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%) !important;
+  color: #ffffff !important;
+}
+.pip-card-badge.urp {
+  background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%) !important;
+  color: #ffffff !important;
+}
+.pip-card-badge.scp {
+  background: linear-gradient(135deg, #475569 0%, #1e293b 100%) !important;
+  color: #ffffff !important;
+}
+.pip-card-badge.sol {
+  background: linear-gradient(135deg, #16a34a 0%, #0d9488 100%) !important;
+  color: #ffffff !important;
+}
+.pip-card-badge.dir {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Close Button (Upper Right of Center Card) */
+.pip-close-btn {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+  padding: 0 !important;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease !important;
+}
+
+.pip-close-btn:hover {
+  transform: scale(1.08) !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  color: #ffffff !important;
+}
+
+.pip-close-btn svg {
+  display: block !important;
+  stroke: #ffffff !important;
+}
+
+/* ============================================================
+   SIDE NAVIGATION ARROWS (IN THE SPACIOUS AIRY GAP)
+   ============================================================ */
+.pip-nav-btn {
+  position: absolute !important;
+  top: calc(50% - 24px) !important;
+  transform: translateY(-50%) !important;
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 50% !important;
+  background: rgba(15, 23, 42, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 40 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75) !important;
+  padding: 0 !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+  pointer-events: auto !important;
+}
+
+.pip-prev {
+  left: calc(50% - min(calc((74vh - 70px) * 9 / 32 + 68px), 232px)) !important;
+  right: auto !important;
+}
+
+.pip-next {
+  right: calc(50% - min(calc((74vh - 70px) * 9 / 32 + 68px), 232px)) !important;
+  left: auto !important;
+}
+
+.pip-nav-btn:hover {
+  transform: translateY(-50%) scale(1.12) !important;
+  background: rgba(30, 41, 59, 0.98) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85) !important;
+}
+
+.pip-nav-btn:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.pip-nav-btn svg {
+  display: block !important;
+  stroke: #ffffff !important;
+}
+
+/* ============================================================
+   CENTER CARD FLOATING FOOTER BAR
+   ============================================================ */
+.pip-footer {
+  position: absolute !important;
+  bottom: clamp(14px, 3vh, 26px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: min(calc((74vh - 70px) * 9 / 16), 310px) !important;
+  gap: 10px !important;
+  padding: 8px 10px 8px 16px !important;
+  background: rgba(18, 24, 38, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65) !important;
+  box-sizing: border-box !important;
+  z-index: 30 !important;
+  pointer-events: auto !important;
+  transition: opacity 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.pip-info {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.pip-title {
+  margin: 0 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #f8fafc !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+  letter-spacing: -0.01em !important;
+}
+
+.pip-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(145deg, #242b35 0%, #0d1219 100%) !important;
+  color: #ffffff !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.pip-action-btn:hover {
+  transform: translateY(-1px) scale(1.03) !important;
+  background: linear-gradient(145deg, #2f3847 0%, #131922 100%) !important;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55) !important;
+  color: #ffffff !important;
+}
+
+.pip-action-btn svg {
+  stroke: #ffffff !important;
+  transition: transform 0.2s ease !important;
+}
+
+.pip-action-btn:hover svg {
+  transform: translate(2px, -2px) !important;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN (LAPTOP, TABLET & MOBILE)
+   ============================================================ */
+/* Tablet screens (768px - 1100px): Spacious 3-card layout */
+@media (max-width: 1100px) {
+  .pip-slot-far-left,
+  .pip-slot-far-right {
+    display: none !important;
+  }
+  .pip-slot-prev {
+    transform: translate3d(calc(-50% - clamp(260px, 30vw, 320px)), -50%, -80px) scale(0.78) rotateY(12deg) !important;
+  }
+  .pip-slot-next {
+    transform: translate3d(calc(-50% + clamp(260px, 30vw, 320px)), -50%, -80px) scale(0.78) rotateY(-12deg) !important;
+  }
+}
+
+/* Mobile screens (< 768px): Clean Single Card Mode */
+@media (max-width: 767px) {
+  .pip-slot-prev,
+  .pip-slot-next,
+  .pip-slot-far-left,
+  .pip-slot-far-right {
+    display: none !important;
+  }
+
+  .pip-slot-active {
+    width: min(calc(100vw - 96px), calc((74vh - 65px) * 9 / 16), 320px) !important;
+    top: calc(50% - 24px) !important;
+  }
+
+  .pip-footer {
+    width: min(calc(100vw - 96px), calc((74vh - 65px) * 9 / 16), 320px) !important;
+    padding: 6px 8px 6px 14px !important;
+  }
+
+  .pip-title {
+    font-size: 0.8rem !important;
+  }
+
+  .pip-action-btn {
+    padding: 6px 12px !important;
+    font-size: 0.7rem !important;
+  }
+
+  .pip-nav-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .pip-prev {
+    left: calc(50% - min(calc((100vw - 96px) / 2 + 28px), 180px)) !important;
+  }
+
+  .pip-next {
+    right: calc(50% - min(calc((100vw - 96px) / 2 + 28px), 180px)) !important;
+  }
+}

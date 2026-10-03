@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/session_bootstrap.php';
 require_once "db.php";
+require_once __DIR__ . '/includes/settings_helper.php';
 
+$social_cfg = get_contact_social_config();
 $total_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
 $total_followers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $total_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
@@ -53,13 +55,26 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
             <div class="about-verified-badge"><i class="fa-solid fa-check"></i></div>
         </div>
         <div class="flip-hint"><i class="fa-solid fa-rotate"></i> Click to flip</div>
-        <h2 class="about-name">Arigato Devan</h2>
-        <div class="about-title">AI Prompt Creator &amp; Digital Artist</div>
-        <div class="about-handle"><a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> @arigato.devan</a></div>
+        <h2 class="about-name"><?= htmlspecialchars($social_cfg['profile_name']) ?></h2>
+        <div class="about-title"><?= htmlspecialchars($social_cfg['profile_title']) ?></div>
+        <?php if (!empty($social_cfg['profile_handle'])): ?>
+        <div class="about-handle">
+            <a href="<?= htmlspecialchars($social_cfg['profile_handle_url'] ?: 'https://instagram.com/arigato.devan') ?>" target="_blank" rel="noopener">
+                <i class="fa-brands fa-instagram"></i> <?= htmlspecialchars($social_cfg['profile_handle']) ?>
+            </a>
+        </div>
+        <?php endif; ?>
         <div class="about-social-row">
-            <a href="https://instagram.com/arigato.devan" target="_blank" rel="noopener" class="social-icon-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="mailto:devansh.grow@gmail.com" class="social-icon-btn" title="Email"><i class="fa-solid fa-envelope"></i></a>
-            <a href="gallery.php" class="social-icon-btn" title="Gallery"><i class="fa-solid fa-images"></i></a>
+            <?php foreach ($social_cfg['social_links'] as $s): ?>
+                <?php if (!empty($s['enabled']) && !empty($s['url'])): 
+                    $s_url = trim($s['url']);
+                    $s_target = (strpos($s_url, 'mailto:') === 0 || strpos($s_url, 'gallery.php') === 0 || strpos($s_url, '/') === 0) ? '_self' : '_blank';
+                ?>
+                <a href="<?= htmlspecialchars($s_url) ?>" target="<?= $s_target ?>" <?= $s_target === '_blank' ? 'rel="noopener"' : '' ?> class="social-icon-btn" title="<?= htmlspecialchars($s['name']) ?>">
+                    <i class="<?= htmlspecialchars($s['icon']) ?>"></i>
+                </a>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
         <div class="about-tags-row">
             <span class="about-tag">#CouplePrompts</span>

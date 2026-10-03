@@ -168,9 +168,11 @@ $dead_prompts = sqAll($pdo, "
 ");
 
 // Prompt SEO, AI Engine & GSC Checklist Coverage Analytics
+require_once __DIR__ . '/includes/step_pics_helper.php';
 $seo_raw_prompts = sqAll($pdo, "
     SELECT p.id, p.title, p.prompt_type, p.image_path, p.slug, p.created_at,
            p.about_prompt, p.description, p.meta_keywords, p.best_works_in,
+           p.how_to_use,
            p.view_count, p.likes_count, p.gsc_status, p.gsc_indexed_at
     FROM prompts p
     ORDER BY p.created_at DESC
@@ -183,6 +185,7 @@ $seo_kw_cnt = 0;
 $seo_bwi_cnt = 0;
 $seo_bwi_chatgpt_cnt = 0;
 $seo_bwi_gemini_cnt = 0;
+$seo_steps_cnt = 0;
 $seo_full_cnt = 0;
 $seo_partial_cnt = 0;
 $seo_zero_cnt = 0;
@@ -302,6 +305,17 @@ foreach ($seo_raw_prompts as $sp) {
     $has_kw = ($kw_text !== '');
     $has_bwi = ($bwi_val !== '');
 
+    $how_raw = trim((string)($sp['how_to_use'] ?? ''));
+    $how_steps_arr = parse_how_to_use_steps($how_raw);
+    $valid_steps_count = 0;
+    foreach ($how_steps_arr as $st) {
+        if (!empty(trim((string)($st['text'] ?? '')))) {
+            $valid_steps_count++;
+        }
+    }
+    $has_steps = ($valid_steps_count > 0);
+    if ($has_steps) $seo_steps_cnt++;
+
     $ab_words = $has_ab ? count(preg_split('/\s+/', $ab_text)) : 0;
     $de_chars = mb_strlen($de_text);
     $kw_items = array_filter(array_map('trim', explode(',', $kw_text)));
@@ -365,6 +379,8 @@ foreach ($seo_raw_prompts as $sp) {
         'desc_chars' => $de_chars,
         'has_kw' => $has_kw,
         'kw_count' => $kw_count,
+        'has_steps' => $has_steps,
+        'steps_count' => $valid_steps_count,
         'has_bwi' => $has_bwi,
         'bwi' => $bwi_val,
         'seo_score' => $seo_score,
@@ -538,6 +554,7 @@ $seo_about_pct = $seo_total_count > 0 ? round(($seo_about_cnt / $seo_total_count
 $seo_desc_pct  = $seo_total_count > 0 ? round(($seo_desc_cnt / $seo_total_count) * 100, 1) : 0;
 $seo_kw_pct    = $seo_total_count > 0 ? round(($seo_kw_cnt / $seo_total_count) * 100, 1) : 0;
 $seo_bwi_pct   = $seo_total_count > 0 ? round(($seo_bwi_cnt / $seo_total_count) * 100, 1) : 0;
+$seo_steps_pct = $seo_total_count > 0 ? round(($seo_steps_cnt / $seo_total_count) * 100, 1) : 0;
 
 $gsc_checked_cnt = $gsc_already_cnt + $gsc_now_cnt;
 $gsc_checked_pct = $gsc_total_count > 0 ? round(($gsc_checked_cnt / $gsc_total_count) * 100, 1) : 0;
@@ -624,13 +641,23 @@ $top20_leaderboard = sqAll($pdo, "
     LIMIT 20
 ");
 
-// --- 100 Gamified Platform Achievements Engine ---
+// --- 150 Gamified Platform Achievements Engine ---
 require_once __DIR__ . '/includes/achievements_data.php';
-$achievements_package = get_100_platform_achievements($pdo);
+$achievements_package = get_150_platform_achievements($pdo);
 $achievements_list = $achievements_package['list'];
 $achievements_unlocked_types = $achievements_package['unlocked_types_count'];
 $achievements_total_completions = $achievements_package['total_completions'];
 $achievements_total_count = $achievements_package['total_count'];
+
+// Calculate category, tier & repeatable counts dynamically
+$tier_counts = ['bronze' => 0, 'silver' => 0, 'gold' => 0, 'platinum' => 0, 'diamond' => 0, 'legendary' => 0];
+$cat_counts = ['starter' => 0, 'unlocks' => 0, 'streaks' => 0, 'community' => 0, 'mastery' => 0];
+$repeatable_cnt = 0;
+foreach ($achievements_list as $a) {
+    if (isset($tier_counts[$a['tier']])) $tier_counts[$a['tier']]++;
+    if (isset($cat_counts[$a['category']])) $cat_counts[$a['category']]++;
+    if (!empty($a['repeatable'])) $repeatable_cnt++;
+}
 
 // Admin Info
 $admin_name = $_SESSION["username"] ?? "Admin";
@@ -708,7 +735,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             width: 240px;
             background: var(--nd-surface);
             border-radius: var(--nd-radius-lg);
-            padding: 24px 18px;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
@@ -717,73 +744,161 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             height: calc(100vh - 32px);
             position: sticky;
             top: 16px;
+            overflow: hidden;
+            transition: width 0.28s cubic-bezier(0.2, 0, 0, 1), padding 0.28s cubic-bezier(0.2, 0, 0, 1);
+            z-index: 30;
+        }
+
+        .nd-sidebar-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--nd-border);
+            width: 100%;
+            min-height: 44px;
+            gap: 8px;
+            transition: all 0.28s ease;
+        }
+
+        /* Sleek collapse/expand button (100% inside sidebar) */
+        .nd-sidebar-toggle-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--nd-border);
+            background: #f8fafc;
+            color: var(--nd-text-sec);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            flex-shrink: 0;
+            font-size: 0.78rem;
+            padding: 0;
+        }
+
+        .nd-sidebar-toggle-btn:hover {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            transform: scale(1.05);
         }
 
         .nd-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 0 8px 24px;
-            border-bottom: 1px solid var(--nd-border);
+            padding: 0;
+            border-bottom: none;
             text-decoration: none;
             color: var(--nd-text-main);
+            min-width: 0;
+            flex: 1;
+            transition: gap 0.28s ease, justify-content 0.28s ease;
         }
+
         .nd-brand-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             background: #0f172a;
             color: #ffffff;
-            border-radius: 10px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.95rem;
             overflow: hidden;
             flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
         }
         .nd-brand-icon img,
         .nd-brand-logo {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             object-fit: cover;
             display: block;
         }
+
+        /* ── Fluid Smooth Text Collapse Transitions ── */
+        .nd-brand-name,
+        .nd-nav-item span,
+        .nd-back-dash span,
+        .nd-user-details,
+        .nd-btn-logout span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip;
+            opacity: 1;
+            max-width: 170px;
+            transform: translateX(0);
+            transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1),
+                        max-width 0.28s cubic-bezier(0.2, 0, 0, 1),
+                        transform 0.2s cubic-bezier(0.2, 0, 0, 1),
+                        margin 0.2s ease;
+        }
+
         .nd-brand-name {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             font-weight: 800;
             letter-spacing: -0.02em;
+            color: var(--nd-text-main);
         }
+
         .nd-nav-short { display: none; }
 
+        /* ── Navigation list with hidden scrollbars ── */
         .nd-nav {
             flex: 1;
-            padding: 20px 0;
+            padding: 16px 0;
             display: flex;
             flex-direction: column;
             gap: 6px;
             overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .nd-nav::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }
 
         .nd-nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 11px 16px;
+            padding: 10px 14px;
             border-radius: var(--nd-radius-sm);
             text-decoration: none;
             font-size: 0.88rem;
             font-weight: 600;
             color: var(--nd-text-sec);
-            transition: all 0.15s ease;
+            transition: background 0.15s ease, color 0.15s ease, padding 0.28s ease, width 0.28s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
         }
         .nd-nav-item i {
-            font-size: 1rem;
-            width: 20px;
+            font-size: 1.05rem;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             text-align: center;
+            transition: transform 0.15s ease;
         }
         .nd-nav-item:hover {
             color: var(--nd-text-main);
             background: #f8fafc;
+        }
+        .nd-nav-item:hover i {
+            transform: scale(1.08);
         }
         .nd-nav-item.active {
             background: var(--nd-lime);
@@ -794,17 +909,52 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             color: var(--nd-lime-text);
         }
 
+        .nd-back-dash {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--nd-radius-sm);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--nd-text-muted);
+            background: #f8fafc;
+            border: 1px solid var(--nd-border);
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .nd-back-dash i {
+            font-size: 0.95rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .nd-back-dash:hover {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
         .nd-sidebar-user {
-            padding-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid var(--nd-border);
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
+            transition: all 0.28s ease;
         }
         .nd-user-info {
             display: flex;
             align-items: center;
             gap: 10px;
+            white-space: nowrap;
+            overflow: hidden;
         }
         .nd-user-avatar {
             width: 38px;
@@ -812,6 +962,12 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        .nd-user-details {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
         .nd-user-name {
             font-size: 0.86rem;
@@ -835,10 +991,129 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             padding: 8px 12px;
             border-radius: var(--nd-radius-sm);
             background: #fef2f2;
-            transition: all 0.15s;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .nd-btn-logout i {
+            font-size: 0.95rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .nd-btn-logout:hover {
             background: #fee2e2;
+        }
+
+        /* ── Collapsed Sidebar (Modern Icon Rail) ── */
+        .nd-sidebar.is-collapsed {
+            width: 72px;
+            padding: 20px 10px;
+            align-items: center;
+        }
+
+        .nd-sidebar.is-collapsed .nd-sidebar-head {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding-bottom: 14px;
+            width: 100%;
+        }
+
+        .nd-sidebar.is-collapsed .nd-brand {
+            justify-content: center;
+            flex: 0 0 auto;
+            gap: 0;
+            width: auto;
+        }
+
+        .nd-sidebar.is-collapsed .nd-sidebar-toggle-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .nd-sidebar.is-collapsed .nd-brand-name,
+        .nd-sidebar.is-collapsed .nd-nav-item span,
+        .nd-sidebar.is-collapsed .nd-back-dash span,
+        .nd-sidebar.is-collapsed .nd-user-details,
+        .nd-sidebar.is-collapsed .nd-btn-logout span {
+            opacity: 0;
+            max-width: 0;
+            transform: translateX(-8px);
+            pointer-events: none;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .nd-sidebar.is-collapsed .nd-nav {
+            padding: 12px 0;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nd-sidebar.is-collapsed .nd-nav-item {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 12px;
+            margin: 0 auto;
+            gap: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-nav-item i {
+            font-size: 1.15rem;
+            width: 24px;
+            height: 24px;
+            margin: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-back-dash {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 12px;
+            margin: 8px auto;
+            gap: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-back-dash i {
+            font-size: 1.05rem;
+            margin: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-sidebar-user {
+            width: 100%;
+            align-items: center;
+            padding-top: 14px;
+            gap: 10px;
+        }
+
+        .nd-sidebar.is-collapsed .nd-user-info {
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-btn-logout {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 12px;
+            margin: 0 auto;
+            gap: 0;
+        }
+
+        .nd-sidebar.is-collapsed .nd-btn-logout i {
+            font-size: 1.05rem;
+            margin: 0;
         }
 
         /* ── Main Content Area ── */
@@ -1415,13 +1690,13 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         /* ── Prompt SEO Tracker Styles ── */
         .nd-seo-kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
             gap: 14px;
             margin-bottom: 20px;
         }
         @media (min-width: 1440px) {
             .nd-seo-kpi-grid {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(6, 1fr);
             }
         }
         .nd-seo-kpi-card {
@@ -2944,7 +3219,9 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             .nd-nav-item span,
             .nd-user-name,
             .nd-user-role,
-            .nd-btn-logout span { display: none; }
+            .nd-sidebar-edge-toggle,
+            .nd-sidebar-toggle-btn,
+            .nd-btn-logout span { display: none !important; }
             .nd-nav {
                 width: 100%;
                 align-items: stretch;
@@ -3092,6 +3369,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 padding: 16px 14px 14px;
                 gap: 0;
             }
+            .nd-sidebar-edge-toggle,
+            .nd-sidebar-toggle-btn { display: none !important; }
             .nd-brand {
                 padding: 0 2px 14px;
                 gap: 10px;
@@ -3464,59 +3743,68 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         <div class="nd-splash-label">Loading live intelligence</div>
     </div>
 </div>
-    <aside class="nd-sidebar">
-        <a href="dashboard.php" class="nd-brand">
-            <div class="nd-brand-icon">
-                <img src="toplogo/logo01.webp" alt="Arigato" class="nd-brand-logo" width="36" height="36">
-            </div>
-            <div class="nd-brand-name">Arigato Studio</div>
-        </a>
+    <aside class="nd-sidebar" id="appSidebar">
+        <script>
+            if (localStorage.getItem('nd_sidebar_collapsed') === 'true') {
+                document.getElementById('appSidebar').classList.add('is-collapsed');
+            }
+        </script>
+        <div class="nd-sidebar-head">
+            <a href="dashboard.php" class="nd-brand" title="Arigato Studio">
+                <div class="nd-brand-icon">
+                    <img src="toplogo/logo01.webp" alt="Arigato" class="nd-brand-logo" width="38" height="38">
+                </div>
+                <div class="nd-brand-name">Arigato Studio</div>
+            </a>
+            <button type="button" class="nd-sidebar-toggle-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">
+                <i class="fa-solid fa-chevron-left" id="sidebarToggleIcon"></i>
+            </button>
+        </div>
+        <script>
+            if (localStorage.getItem('nd_sidebar_collapsed') === 'true') {
+                var sIcon = document.getElementById('sidebarToggleIcon');
+                var sBtn = document.getElementById('sidebarCollapseBtn');
+                if (sIcon) sIcon.className = 'fa-solid fa-chevron-right';
+                if (sBtn) sBtn.title = 'Expand sidebar';
+            }
+        </script>
 
         <nav class="nd-nav" aria-label="Analytics sections">
             <a href="analytics.php?tab=dashboard<?= $range_days !== 30 ? '&range=' . $range_days : '' ?>" class="nd-nav-item <?= $active_tab === 'dashboard' ? 'active' : '' ?>" title="Dashboard">
                 <i class="fa-solid fa-table-columns"></i>
                 <span class="nd-nav-full">Dashboard</span>
-                <span class="nd-nav-short">Home</span>
             </a>
             <a href="analytics.php?tab=prompts" class="nd-nav-item <?= $active_tab === 'prompts' ? 'active' : '' ?>" title="Top Prompts">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span class="nd-nav-full">Top Prompts</span>
-                <span class="nd-nav-short">Prompts</span>
             </a>
             <a href="analytics.php?tab=blogs" class="nd-nav-item <?= $active_tab === 'blogs' ? 'active' : '' ?>" title="Blog Insights">
                 <i class="fa-solid fa-newspaper"></i>
                 <span class="nd-nav-full">Blog Insights</span>
-                <span class="nd-nav-short">Blogs</span>
             </a>
             <a href="analytics.php?tab=seo" class="nd-nav-item <?= $active_tab === 'seo' ? 'active' : '' ?>" title="SEO & AI Engine">
                 <i class="fa-solid fa-magnifying-glass-chart"></i>
                 <span class="nd-nav-full">SEO &amp; Content</span>
-                <span class="nd-nav-short">SEO</span>
             </a>
             <a href="analytics.php?tab=gsc" class="nd-nav-item <?= $active_tab === 'gsc' ? 'active' : '' ?>" title="GSC Checklist">
                 <i class="fa-brands fa-google"></i>
                 <span class="nd-nav-full">GSC Checklist</span>
-                <span class="nd-nav-short">GSC</span>
             </a>
             <a href="analytics.php?tab=tags" class="nd-nav-item <?= $active_tab === 'tags' ? 'active' : '' ?>" title="Prompt Tags & Taxonomies">
                 <i class="fa-solid fa-tags"></i>
                 <span class="nd-nav-full">Prompt Tags</span>
-                <span class="nd-nav-short">Tags</span>
             </a>
             <a href="analytics.php?tab=users" class="nd-nav-item <?= $active_tab === 'users' ? 'active' : '' ?>" title="Users & Retention">
                 <i class="fa-solid fa-users"></i>
                 <span class="nd-nav-full">Users &amp; Retention</span>
-                <span class="nd-nav-short">Users</span>
             </a>
             <a href="analytics.php?tab=leaderboard" class="nd-nav-item <?= $active_tab === 'leaderboard' ? 'active' : '' ?>" title="Top 20 Leaderboard">
                 <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i>
                 <span class="nd-nav-full">Leaderboard</span>
-                <span class="nd-nav-short">Ranks</span>
             </a>
-            <a href="analytics.php?tab=achievements" class="nd-nav-item <?= $active_tab === 'achievements' ? 'active' : '' ?>" title="100 Gamified Achievements">
+            <a href="analytics.php?tab=achievements" class="nd-nav-item <?= $active_tab === 'achievements' ? 'active' : '' ?>" title="150 Gamified Achievements">
                 <i class="fa-solid fa-medal" style="color:#ec4899;"></i>
                 <span class="nd-nav-full">Achievements</span>
-                <span class="nd-nav-short">Badges</span>
             </a>
         </nav>
         <a href="dashboard.php" class="nd-back-dash" title="Back to old dashboard">
@@ -3525,14 +3813,14 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         </a>
 
         <div class="nd-sidebar-user">
-            <div class="nd-user-info">
+            <div class="nd-user-info" title="<?= htmlspecialchars($admin_name) ?> (Super Admin)">
                 <img src="<?= htmlspecialchars($admin_avatar) ?>" class="nd-user-avatar" alt="Admin">
-                <div>
+                <div class="nd-user-details">
                     <div class="nd-user-name"><?= htmlspecialchars($admin_name) ?></div>
                     <div class="nd-user-role">Super Admin</div>
                 </div>
             </div>
-            <a href="login.php?logout=1" class="nd-btn-logout">
+            <a href="login.php?logout=1" class="nd-btn-logout" title="Log Out">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Log Out</span>
             </a>
@@ -4185,6 +4473,21 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <span><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini: <strong><?= $seo_bwi_gemini_cnt ?></strong></span>
                     </div>
                 </div>
+
+                <div class="nd-seo-kpi-card" style="background:#fdf2f8; border-color:#fbcfe8; cursor:pointer;" onclick="quickFilterStepsMissing()" title="Click to filter prompts missing steps">
+                    <div class="nd-seo-kpi-head">
+                        <div class="nd-seo-kpi-title" style="color:#be185d;"><i class="fa-solid fa-list-check"></i> How-to Steps</div>
+                        <div class="nd-seo-kpi-badge" style="background:#fce7f3; color:#9d174d;"><?= $seo_steps_pct ?>%</div>
+                    </div>
+                    <div class="nd-seo-kpi-val" style="color:#9d174d;"><?= $seo_steps_cnt ?><span class="nd-seo-kpi-total">/<?= $seo_total_count ?></span></div>
+                    <div class="nd-seo-progress-bg">
+                        <div class="nd-seo-progress-fill" style="width:<?= $seo_steps_pct ?>%; background:#db2777;"></div>
+                    </div>
+                    <div class="nd-seo-kpi-sub">
+                        <?php $miss_steps = $seo_total_count - $seo_steps_cnt; ?>
+                        <?= $miss_steps > 0 ? ('<span style="color:#e11d48; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> ' . $miss_steps . ' missing steps</span>') : '<span style="color:#059669; font-weight:700;"><i class="fa-solid fa-check"></i> All have steps</span>' ?>
+                    </div>
+                </div>
             </div>
 
             <!-- SEO Table Card -->
@@ -4199,6 +4502,12 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                             <option value="full">Fully Optimized 3/3 (<?= $seo_full_cnt ?>)</option>
                             <option value="partial">Partially Filled (<?= $seo_partial_cnt ?>)</option>
                             <option value="zero">Missing SEO (<?= $seo_zero_cnt ?>)</option>
+                        </select>
+
+                        <select id="seoStepsFilter" class="nd-select-filter" onchange="filterSeoTable()">
+                            <option value="">All Steps (<?= $seo_total_count ?>)</option>
+                            <option value="missing">⚠️ Missing Steps (<?= $seo_total_count - $seo_steps_cnt ?>)</option>
+                            <option value="has">✓ Has Steps (<?= $seo_steps_cnt ?>)</option>
                         </select>
 
                         <select id="seoBwiFilter" class="nd-select-filter" onchange="filterSeoTable()">
@@ -4220,6 +4529,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <select id="seoSortFilter" class="nd-select-filter" onchange="sortSeoTable(this.value)">
                             <option value="score_asc">Sort: Needs Attention First (0/3 → 3/3)</option>
                             <option value="score_desc">Sort: Highest Score First (3/3 → 0/3)</option>
+                            <option value="steps_missing">Sort: Missing Steps First</option>
                             <option value="newest">Sort: Newest Uploads</option>
                         </select>
                     </div>
@@ -4234,6 +4544,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 <th>About Note</th>
                                 <th>Meta Description</th>
                                 <th>Keywords</th>
+                                <th>How to Use</th>
                                 <th>Best Works In</th>
                                 <th>SEO Score</th>
                                 <th>Action</th>
@@ -4257,6 +4568,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                 data-status="<?= $sp['status_type'] ?>"
                                 data-bwi="<?= htmlspecialchars($sp['bwi'] ?: 'none') ?>"
                                 data-type="<?= htmlspecialchars($sp['prompt_type']) ?>"
+                                data-steps="<?= $sp['has_steps'] ? 'has' : 'missing' ?>"
                                 data-score="<?= $sp['seo_score'] ?>"
                                 data-date="<?= strtotime($sp['created_at']) ?>">
                                 <td>
@@ -4306,6 +4618,17 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                         </span>
                                     <?php else: ?>
                                         <span class="nd-seo-chip nd-seo-chip-miss" title="Missing SEO keywords">
+                                            <i class="fa-solid fa-xmark"></i> Missing
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($sp['has_steps']): ?>
+                                        <span class="nd-seo-chip nd-seo-chip-ok" title="<?= $sp['steps_count'] ?> step instruction(s) present">
+                                            <i class="fa-solid fa-check"></i> <?= $sp['steps_count'] ?> steps
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="nd-seo-chip nd-seo-chip-miss" title="Missing step-by-step instructions. Click Edit to add.">
                                             <i class="fa-solid fa-xmark"></i> Missing
                                         </span>
                                     <?php endif; ?>
@@ -5411,18 +5734,18 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 
         <?php elseif ($active_tab === 'achievements'): ?>
         <!-- ========================================== -->
-        <!-- TAB 9: 100 GAMIFIED ACHIEVEMENTS MATRIX    -->
+        <!-- TAB 9: 150 GAMIFIED ACHIEVEMENTS MATRIX   -->
         <!-- ========================================== -->
         <header class="nd-topbar">
             <div class="nd-topbar-lead">
                 <div>
-                    <h1 class="nd-page-title">100 Platform Achievements</h1>
+                    <h1 class="nd-page-title">150 Platform Achievements</h1>
                     <p class="nd-page-subtitle">Complete milestone catalog spanning Starter, Unlocks, Streaks, Community, and Grandmaster tiers.</p>
                 </div>
             </div>
             <div class="nd-topbar-tools">
                 <span class="nd-tag-pill" style="background:#fae8ff; color:#a855f7; border:1px solid #f0abfc;">
-                    <i class="fa-solid fa-medal"></i> 100 Gamified Badges
+                    <i class="fa-solid fa-medal"></i> 150 Gamified Badges
                 </span>
                 <span class="nd-tag-pill" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd;">
                     <i class="fa-solid fa-arrows-rotate"></i> Multi-Completion Enabled
@@ -5438,10 +5761,10 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <span class="nd-kpi-dot"></span>
                         <span>Total Achievements</span>
                     </div>
-                    <div class="nd-kpi-val">100</div>
+                    <div class="nd-kpi-val"><?= $achievements_total_count ?></div>
                 </div>
                 <div class="nd-kpi-sub">
-                    <i class="fa-solid fa-award"></i> 5 Rarity Tiers across Platform
+                    <i class="fa-solid fa-award"></i> 6 Rarity Tiers across Platform
                 </div>
             </div>
 
@@ -5451,10 +5774,10 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                         <span class="nd-kpi-dot"></span>
                         <span>Active / Unlocked</span>
                     </div>
-                    <div class="nd-kpi-val"><?= $achievements_unlocked_types ?> <span style="font-size:0.9rem; font-weight:700;">/ 100</span></div>
+                    <div class="nd-kpi-val"><?= $achievements_unlocked_types ?> <span style="font-size:0.9rem; font-weight:700;">/ <?= $achievements_total_count ?></span></div>
                 </div>
                 <div class="nd-kpi-sub">
-                    <i class="fa-solid fa-circle-check"></i> <?= round(($achievements_unlocked_types / 100) * 100) ?>% of badges claimed
+                    <i class="fa-solid fa-circle-check"></i> <?= $achievements_total_count > 0 ? round(($achievements_unlocked_types / $achievements_total_count) * 100) : 0 ?>% of badges claimed
                 </div>
             </div>
 
@@ -5485,40 +5808,40 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
             </div>
         </section>
 
-        <!-- 100 Achievements Catalog Section -->
+        <!-- 150 Achievements Catalog Section -->
         <section class="nd-card" style="margin-top:20px;">
             <div class="nd-card-head">
                 <div>
-                    <h2 class="nd-card-title"><i class="fa-solid fa-cubes-stacked"></i> Achievements Catalog (100 Badges)</h2>
+                    <h2 class="nd-card-title"><i class="fa-solid fa-cubes-stacked"></i> Achievements Catalog (<?= $achievements_total_count ?> Badges)</h2>
                     <p style="font-size:0.75rem; color:var(--nd-text-muted); margin-top:2px;">Filter by category, rarity tier, or search badge criteria.</p>
                 </div>
             </div>
 
             <!-- Filter Controls -->
             <div class="nd-filter-bar">
-                <input type="text" id="achievementSearchInput" class="nd-search-input" placeholder="Search 100 achievements by title, description or tier..." onkeyup="filterAchievementsGrid()" autocomplete="off">
+                <input type="text" id="achievementSearchInput" class="nd-search-input" placeholder="Search <?= $achievements_total_count ?> achievements by title, description or tier..." onkeyup="filterAchievementsGrid()" autocomplete="off">
                 <select id="achievementCatSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
-                    <option value="">Category: All (100)</option>
-                    <option value="starter">Starter &amp; Onboarding (15)</option>
-                    <option value="unlocks">Prompt Unlocks &amp; Discoveries (35)</option>
-                    <option value="streaks">Streaks &amp; Consistency (20)</option>
-                    <option value="community">Community &amp; Engagement (15)</option>
-                    <option value="mastery">Grandmaster &amp; Mastery (15)</option>
+                    <option value="">Category: All (<?= $achievements_total_count ?>)</option>
+                    <option value="starter">Starter &amp; Onboarding (<?= $cat_counts['starter'] ?>)</option>
+                    <option value="unlocks">Prompt Unlocks &amp; Discoveries (<?= $cat_counts['unlocks'] ?>)</option>
+                    <option value="streaks">Streaks &amp; Consistency (<?= $cat_counts['streaks'] ?>)</option>
+                    <option value="community">Community &amp; Engagement (<?= $cat_counts['community'] ?>)</option>
+                    <option value="mastery">Grandmaster &amp; Mastery (<?= $cat_counts['mastery'] ?>)</option>
                 </select>
                 <select id="achievementTierSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
-                    <option value="">Tier: All Tiers (100)</option>
-                    <option value="bronze">Bronze Tier (30)</option>
-                    <option value="silver">Silver Tier (30)</option>
-                    <option value="gold">Gold Tier (20)</option>
-                    <option value="platinum">Platinum Tier (10)</option>
-                    <option value="diamond">Diamond Tier (5)</option>
-                    <option value="legendary">Legendary Tier (5)</option>
+                    <option value="">Tier: All Tiers (<?= $achievements_total_count ?>)</option>
+                    <option value="bronze">Bronze Tier (<?= $tier_counts['bronze'] ?>)</option>
+                    <option value="silver">Silver Tier (<?= $tier_counts['silver'] ?>)</option>
+                    <option value="gold">Gold Tier (<?= $tier_counts['gold'] ?>)</option>
+                    <option value="platinum">Platinum Tier (<?= $tier_counts['platinum'] ?>)</option>
+                    <option value="diamond">Diamond Tier (<?= $tier_counts['diamond'] ?>)</option>
+                    <option value="legendary">Legendary Tier (<?= $tier_counts['legendary'] ?>)</option>
                 </select>
                 <select id="achievementStatusSelect" class="nd-select-filter" onchange="filterAchievementsGrid()">
-                    <option value="">Status: All Badges (100)</option>
+                    <option value="">Status: All Badges (<?= $achievements_total_count ?>)</option>
                     <option value="unlocked">Unlocked by Users (<?= $achievements_unlocked_types ?>)</option>
-                    <option value="locked">Currently Locked (<?= 100 - $achievements_unlocked_types ?>)</option>
-                    <option value="repeatable">Repeatable Only (18)</option>
+                    <option value="locked">Currently Locked (<?= $achievements_total_count - $achievements_unlocked_types ?>)</option>
+                    <option value="repeatable">Repeatable Only (<?= $repeatable_cnt ?>)</option>
                 </select>
             </div>
 
@@ -5917,6 +6240,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         if (resetPage) currentSeoPage = 1;
         const query = (document.getElementById('seoSearchInput')?.value || '').toLowerCase().trim();
         const status = document.getElementById('seoStatusFilter')?.value || '';
+        const steps = document.getElementById('seoStepsFilter')?.value || '';
         const bwi = document.getElementById('seoBwiFilter')?.value || '';
         const type = document.getElementById('seoTypeFilter')?.value || '';
         const rows = Array.from(document.querySelectorAll('#seoDataTable tbody tr'));
@@ -5925,15 +6249,17 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         rows.forEach(row => {
             const title = row.getAttribute('data-title') || '';
             const rowStatus = row.getAttribute('data-status') || '';
+            const rowSteps = row.getAttribute('data-steps') || '';
             const rowBwi = row.getAttribute('data-bwi') || '';
             const rowType = row.getAttribute('data-type') || '';
 
             const matchesQuery = (query === '' || title.includes(query));
             const matchesStatus = (status === '' || rowStatus === status);
+            const matchesSteps = (steps === '' || rowSteps === steps);
             const matchesBwi = (bwi === '' || rowBwi === bwi);
             const matchesType = (type === '' || rowType === type);
 
-            if (matchesQuery && matchesStatus && matchesBwi && matchesType) {
+            if (matchesQuery && matchesStatus && matchesSteps && matchesBwi && matchesType) {
                 matchingRows.push(row);
             } else {
                 row.style.display = 'none';
@@ -5969,6 +6295,10 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 return parseInt(a.getAttribute('data-score') || 0, 10) - parseInt(b.getAttribute('data-score') || 0, 10);
             } else if (sortBy === 'score_desc') {
                 return parseInt(b.getAttribute('data-score') || 0, 10) - parseInt(a.getAttribute('data-score') || 0, 10);
+            } else if (sortBy === 'steps_missing') {
+                const aMiss = a.getAttribute('data-steps') === 'missing' ? 0 : 1;
+                const bMiss = b.getAttribute('data-steps') === 'missing' ? 0 : 1;
+                return aMiss - bMiss;
             } else if (sortBy === 'newest') {
                 return parseInt(b.getAttribute('data-date') || 0, 10) - parseInt(a.getAttribute('data-date') || 0, 10);
             }
@@ -5977,6 +6307,18 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
 
         rows.forEach(row => tbody.appendChild(row));
         filterSeoTable(false);
+    }
+
+    function quickFilterStepsMissing() {
+        const select = document.getElementById('seoStepsFilter');
+        if (select) {
+            select.value = 'missing';
+            filterSeoTable(true);
+            const table = document.getElementById('seoDataTable');
+            if (table) {
+                table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
     }
 
     // --- 8. Copy Prompt URL to Clipboard ----------------------------------
@@ -6787,8 +7129,36 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
         window['__paginate_' + containerId] = onPageChange;
     }
 
+    function toggleSidebarCollapse() {
+        const sidebar = document.getElementById('appSidebar');
+        const icon = document.getElementById('sidebarToggleIcon');
+        const btn = document.getElementById('sidebarCollapseBtn');
+        if (!sidebar) return;
+
+        const isCollapsed = sidebar.classList.toggle('is-collapsed');
+        localStorage.setItem('nd_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+
+        if (icon) {
+            if (isCollapsed) {
+                icon.className = 'fa-solid fa-chevron-right';
+                if (btn) btn.title = 'Expand sidebar';
+            } else {
+                icon.className = 'fa-solid fa-chevron-left';
+                if (btn) btn.title = 'Collapse sidebar';
+            }
+        }
+    }
+
     // Auto-init pagination on page load
     document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('appSidebar');
+        const icon = document.getElementById('sidebarToggleIcon');
+        const btn = document.getElementById('sidebarCollapseBtn');
+        if (sidebar && sidebar.classList.contains('is-collapsed')) {
+            if (icon) icon.className = 'fa-solid fa-chevron-right';
+            if (btn) btn.title = 'Expand sidebar';
+        }
+
         if (document.getElementById('promptsDataTable') || document.getElementById('promptsMobileCards')) {
             filterPromptsTable(true);
         }

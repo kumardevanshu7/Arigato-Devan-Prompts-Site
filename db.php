@@ -39,6 +39,19 @@ try {
         // blogs table may not exist on a fresh install
     }
 
+    try {
+        $mc1 = $pdo->query("SHOW COLUMNS FROM prompts LIKE 'is_main_card'")->fetch();
+        if (!$mc1) {
+            $pdo->exec("ALTER TABLE prompts ADD COLUMN is_main_card TINYINT(1) NOT NULL DEFAULT 0");
+        }
+        $mc2 = $pdo->query("SHOW COLUMNS FROM curated_prompts LIKE 'is_main_card'")->fetch();
+        if (!$mc2) {
+            $pdo->exec("ALTER TABLE curated_prompts ADD COLUMN is_main_card TINYINT(1) NOT NULL DEFAULT 0");
+        }
+    } catch (Exception $e) {
+        // tables may not exist yet
+    }
+
     // Create users table
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,

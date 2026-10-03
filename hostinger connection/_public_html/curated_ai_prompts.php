@@ -180,6 +180,7 @@ $_page_canonical = 'https://arigatodevan.com/curated_ai_prompts.php' . $canonica
     <meta name="twitter:description" content="<?= htmlspecialchars($page_desc) ?>">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260721">
+    <link rel="stylesheet" href="css/category-seo.css?v=20261002">
     <?php include_once 'gtag.php'; ?>
 <style>
 /* ── Page shell ── */
@@ -635,6 +636,11 @@ body.page-store.theme-nogoda.nm-page { background: var(--nm-page-bg) !important;
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
+
+<?php
+require_once __DIR__ . '/includes/category_seo_renderer.php';
+render_category_seo_section('curated');
+?>
 
 <?php include 'footer.php'; ?>
 </body>

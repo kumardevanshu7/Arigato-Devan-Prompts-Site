@@ -29,70 +29,77 @@ function prompt_resolve_type(string $db_type): array {
     return ['ptype' => $ptype, 'label' => $tinfo['label'], 'cls' => $tinfo['cls']];
 }
 
-function render_prompt_grid(array $prompts, array $opts = []): void {
-    $grid_id   = $opts['grid_id'] ?? 'card-stack';
+function render_prompt_card(array $p, int $index = 0, array $opts = []): void {
     $clickable = $opts['clickable'] ?? true;
     $card_class = $clickable ? 'product-card prompt-card card' : 'product-card prompt-card';
+    $db_type = $p['prompt_type'] ?? 'secret';
+    $type    = prompt_resolve_type($db_type);
+    $ptype   = $type['ptype'];
+    $tags_arr = array_map('trim', explode(',', strtolower($p['tag'] ?? '')));
+    $blur_style = ($ptype === 'unreleased' && empty($p['is_unlocked'])) ? 'filter:blur(5px);transform:scale(1.05);' : '';
+    $is_unlocked = !empty($p['is_unlocked']);
+    $is_liked    = !empty($p['is_liked']);
+    ?>
+    <div class="<?= $card_class ?> skeleton"
+         data-index="<?= (int)$index ?>"
+         data-id="<?= (int)$p['id'] ?>"
+         data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
+         data-created="<?= htmlspecialchars($p['created_at'] ?? '') ?>"
+         data-image="<?= htmlspecialchars($p['image_path']) ?>"
+         data-title="<?= htmlspecialchars($p['title']) ?>"
+         data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
+         data-prompt-type="<?= htmlspecialchars($ptype) ?>"
+         data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
+         data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>"
+         data-saved="<?= !empty($p['is_saved']) ? 'true' : 'false' ?>"
+         data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
+         data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
+         data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
+         <?= $is_unlocked && !empty($p['prompt_text']) ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
+        <div class="card-image-wrap">
+            <img src="<?= htmlspecialchars($p['image_path']) ?>"
+                 class="skeleton-img"
+                 alt="<?= htmlspecialchars($p['title']) ?>"
+                 style="<?= $blur_style ?>"
+                 <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
+            <span class="card-badge <?= $type['cls'] ?>"><?= $type['label'] ?></span>
+            <?php if (!$is_unlocked): ?>
+                <div class="card-lock-icon" title="Locked"><i class="fa-solid fa-lock"></i></div>
+            <?php else: ?>
+                <div class="card-lock-icon unlocked" title="Unlocked"><i class="fa-solid fa-check"></i></div>
+            <?php endif; ?>
+        </div>
+        <div class="card-info">
+            <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
+            <div class="card-footer-row">
+                <div class="card-stats-col">
+                    <div class="card-stat-item card-like-display" data-liked="<?= $is_liked ? 'true' : 'false' ?>" data-prompt-id="<?= (int)$p['id'] ?>" title="Likes">
+                        <i class="fa-solid fa-heart <?= $is_liked ? 'liked-heart' : '' ?>"></i>
+                        <span class="like-count"><?= (int)($p['likes_count'] ?? 0) ?></span>
+                    </div>
+                    <div class="card-stat-item card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
+                        <i class="fa-regular fa-eye"></i>
+                        <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
+                    </div>
+                </div>
+                <div class="card-prompt-btn-wrap">
+                    <span class="card-prompt-btn">Prompt <svg class="prompt-btn-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+function render_prompt_grid(array $prompts, array $opts = []): void {
+    $grid_id   = $opts['grid_id'] ?? 'card-stack';
     ?>
     <div class="prompt-grid" id="<?= htmlspecialchars($grid_id) ?>">
     <?php if (count($prompts) === 0): ?>
         <p class="grid-empty-msg">No prompts here yet. Check back soon!</p>
     <?php else: foreach ($prompts as $index => $p):
-        $db_type = $p['prompt_type'] ?? 'secret';
-        $type    = prompt_resolve_type($db_type);
-        $ptype   = $type['ptype'];
-        $tags_arr = array_map('trim', explode(',', strtolower($p['tag'] ?? '')));
-        $blur_style = ($ptype === 'unreleased' && empty($p['is_unlocked'])) ? 'filter:blur(5px);transform:scale(1.05);' : '';
-        $is_unlocked = !empty($p['is_unlocked']);
-        $is_liked    = !empty($p['is_liked']);
-    ?>
-        <div class="<?= $card_class ?> skeleton"
-             data-index="<?= (int)$index ?>"
-             data-id="<?= (int)$p['id'] ?>"
-             data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
-             data-created="<?= htmlspecialchars($p['created_at'] ?? '') ?>"
-             data-image="<?= htmlspecialchars($p['image_path']) ?>"
-             data-title="<?= htmlspecialchars($p['title']) ?>"
-             data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
-             data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-             data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-             data-unlocked="<?= $is_unlocked ? 'true' : 'false' ?>"
-             data-saved="<?= !empty($p['is_saved']) ? 'true' : 'false' ?>"
-             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
-             data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
-             data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
-             <?= $is_unlocked ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
-            <div class="card-image-wrap">
-                <img src="<?= htmlspecialchars($p['image_path']) ?>"
-                     class="skeleton-img"
-                     alt="<?= htmlspecialchars($p['title']) ?>"
-                     style="<?= $blur_style ?>"
-                     <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
-                <span class="card-badge <?= $type['cls'] ?>"><?= $type['label'] ?></span>
-                <?php if (!$is_unlocked): ?>
-                    <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
-                <?php else: ?>
-                    <div class="card-lock-icon unlocked"><i class="fa-solid fa-check"></i></div>
-                <?php endif; ?>
-                <div class="card-overlay">
-                    <span class="quick-view-btn"><?= $is_unlocked ? 'View Prompt' : 'Tap to Unlock' ?> &rarr;</span>
-                </div>
-            </div>
-            <div class="card-info" style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; flex: 1 1 auto !important;">
-                <p class="card-title" style="min-height: 2.7em !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; line-height: 1.35 !important;"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-meta-row" style="display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; margin-top: auto !important;">
-                    <div class="card-like-display" data-liked="<?= $is_liked ? 'true' : 'false' ?>" data-prompt-id="<?= (int)$p['id'] ?>">
-                        <i class="fa-solid fa-heart <?= $is_liked ? 'liked-heart' : '' ?>"></i>
-                        <span class="like-count"><?= (int)($p['likes_count'] ?? 0) ?></span>
-                    </div>
-                    <div class="card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
-                        <i class="fa-regular fa-eye"></i>
-                        <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endforeach; endif; ?>
+        render_prompt_card($p, $index, $opts);
+    endforeach; endif; ?>
     </div>
     <?php
 }
@@ -192,11 +199,18 @@ function bindPromptCardClicks(selector, opts) {
     document.querySelectorAll(selector).forEach(function(card) {
         card.addEventListener('click', function(e) {
             if (e.target.closest('.card-like-display')) return;
-            if (opts.modalOnly) return;
-            var url = promptPageUrl(card);
-            document.body.style.transition = 'opacity 0.15s ease';
-            document.body.style.opacity = '0';
-            setTimeout(function() { window.location.href = url; }, 150);
+            if (e.target.closest('.card-prompt-btn')) {
+                if (opts.modalOnly) return;
+                var url = promptPageUrl(card);
+                document.body.style.transition = 'opacity 0.15s ease';
+                document.body.style.opacity = '0';
+                setTimeout(function() { window.location.href = url; }, 150);
+                return;
+            }
+            if (window.openPromptImagePreview) {
+                e.preventDefault();
+                window.openPromptImagePreview(card);
+            }
         });
     });
 }

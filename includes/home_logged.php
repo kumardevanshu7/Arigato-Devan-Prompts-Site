@@ -44,11 +44,7 @@ sort($secret_sub_tags);
         </a>
         <?php endif; ?>
 
-        <div class="home-logged-head">
-            <span class="home-logged-eyebrow">Fresh Drops</span>
-            <h1 class="home-logged-title">Unlock <em>the Magic</em></h1>
-            <p class="home-logged-sub">Secret, viral &amp; unreleased AI prompts — pick one and go viral</p>
-        </div>
+        <?php include __DIR__ . '/home_best_prompts_slider.php'; ?>
 
         <div class="home-logged-actions">
             <a href="gallery.php" class="home-gallery-cta">
@@ -80,6 +76,10 @@ sort($secret_sub_tags);
         else { $fptype = 'secret_code'; }
     ?>
     <div class="potd-section">
+        <div class="potd-header">
+            <span class="potd-eyebrow"><i class="fa-solid fa-star"></i> Today's Pick</span>
+            <h2 class="potd-heading">Prompt of the <em>Day</em></h2>
+        </div>
         <article class="potd-featured"
              data-id="<?= $featuredPrompt['id'] ?>"
              data-slug="<?= htmlspecialchars($featuredPrompt['slug'] ?? '') ?>"
@@ -128,6 +128,68 @@ sort($secret_sub_tags);
     </div>
     <?php endif; ?>
 
+    <style>
+    .page-home-logged .home-tag-filters {
+        display: flex !important;
+        gap: 10px !important;
+        padding: 10px 4px 12px !important;
+        margin-bottom: 24px !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .page-home-logged .home-tag-filters::-webkit-scrollbar {
+        display: none !important;
+    }
+    .page-home-logged .home-tag-filters .filter-pill {
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 38px !important;
+        padding: 0 20px !important;
+        border-radius: 999px !important;
+        font-size: 0.84rem !important;
+        font-weight: 500 !important;
+        line-height: 1 !important;
+        border: 1.5px solid rgba(200, 217, 230, 0.9) !important;
+        background: #ffffff !important;
+        color: var(--pal-teal, #567C8D) !important;
+        transform: none !important;
+        box-sizing: border-box !important;
+        cursor: pointer !important;
+        margin: 0 !important;
+        outline: none !important;
+        box-shadow: none !important;
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+    }
+    .page-home-logged .home-tag-filters .filter-pill:hover {
+        border-color: var(--pal-teal, #567C8D) !important;
+        color: var(--pal-navy, #2F4156) !important;
+        transform: none !important;
+    }
+    .page-home-logged .home-tag-filters .filter-pill.active {
+        background: var(--nogoda-gradient, linear-gradient(135deg, #F5709D 0%, #11FFC9 55%, #2FA6C6 100%)) !important;
+        border: 1.5px solid transparent !important;
+        color: var(--pal-navy, #2F4156) !important;
+        font-weight: 700 !important;
+        transform: none !important;
+        border-radius: 999px !important;
+        box-shadow: 0 4px 14px rgba(17, 255, 201, 0.25) !important;
+    }
+    @media (min-width: 769px) {
+        .page-home-logged .home-tag-filters {
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            max-width: 900px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow: visible !important;
+        }
+    }
+    </style>
     <div class="home-tag-filters">
         <button type="button" class="filter-pill tag-filter-btn active" data-tag="all">All</button>
         <?php foreach ($secret_sub_tags as $t): ?>
@@ -178,27 +240,26 @@ sort($secret_sub_tags);
                 <img src="<?= htmlspecialchars($p['image_path']) ?>" class="skeleton-img" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
                 <span class="card-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></span>
                 <?php if (!$p['is_unlocked']): ?>
-                    <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
+                    <div class="card-lock-icon" title="Locked"><i class="fa-solid fa-lock"></i></div>
                 <?php else: ?>
-                    <div class="card-lock-icon unlocked"><i class="fa-solid fa-check"></i></div>
+                    <div class="card-lock-icon unlocked" title="Unlocked"><i class="fa-solid fa-check"></i></div>
                 <?php endif; ?>
-                <div class="card-overlay">
-                    <span class="quick-view-btn">
-                        <?= $p['is_unlocked'] ? 'View Prompt' : 'Tap to Unlock' ?>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </span>
-                </div>
             </div>
-            <div class="card-info" style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; flex: 1 1 auto !important;">
-                <p class="card-title" style="min-height: 2.7em !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; line-height: 1.35 !important;"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-meta-row" style="display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; margin-top: auto !important;">
-                    <div class="card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>" data-prompt-id="<?= $p['id'] ?>">
-                        <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                        <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+            <div class="card-info">
+                <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
+                <div class="card-footer-row">
+                    <div class="card-stats-col">
+                        <div class="card-stat-item card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>" data-prompt-id="<?= $p['id'] ?>" title="Likes">
+                            <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
+                            <span class="like-count"><?= (int)$p['likes_count'] ?></span>
+                        </div>
+                        <div class="card-stat-item card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
+                        </div>
                     </div>
-                    <div class="card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
-                        <i class="fa-regular fa-eye"></i>
-                        <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
+                    <div class="card-prompt-btn-wrap">
+                        <span class="card-prompt-btn">Prompt <svg class="prompt-btn-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
                     </div>
                 </div>
             </div>
@@ -206,13 +267,7 @@ sort($secret_sub_tags);
         <?php endforeach; endif; ?>
     </div>
 
-    <div class="home-promo-banner">
-        <div>
-            <h2>Secret <em style="font-style:italic;color:var(--accent-warm);">Drops</em> are waiting...</h2>
-            <p>Exclusive reels you won't find anywhere else. Show some love to unlock them!</p>
-        </div>
-        <a href="unreleased.php" class="home-btn-primary"><i class="fa-solid fa-lock-open"></i> Unlock Drops</a>
-    </div>
+    <?php include __DIR__ . '/home_seo_section.php'; ?>
 </main>
 
 <script>

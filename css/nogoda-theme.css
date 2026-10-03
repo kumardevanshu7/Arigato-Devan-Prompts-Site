@@ -808,6 +808,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   border-color: transparent;
   color: var(--pal-navy);
   font-weight: 600;
+  transform: none !important;
 }
 
 .theme-nogoda .gal-tag-label,
@@ -1024,9 +1025,11 @@ body.page-prompt.theme-nogoda {
 
 .theme-nogoda .pp-wrap {
   flex: 1 0 auto;
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1240px;
   margin: 0 auto;
   padding: clamp(20px, 3vw, 36px) clamp(16px, 4vw, 40px) 48px;
+  box-sizing: border-box;
 }
 
 body.page-prompt .store-footer,
@@ -1326,12 +1329,14 @@ body.page-prompt .store-footer-inner,
 
 .theme-nogoda .pp-layout {
   display: flex;
-  gap: 36px;
+  gap: clamp(24px, 3.5vw, 40px);
   align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .theme-nogoda .pp-img-col {
-  width: 300px;
+  width: clamp(280px, 26vw, 340px);
   flex-shrink: 0;
   position: sticky;
   top: calc(var(--nav-sticky-offset) + 12px);
@@ -1390,21 +1395,37 @@ body.page-prompt .store-footer-inner,
   gap: 10px;
 }
 
-.theme-nogoda .pp-like-mini {
+.theme-nogoda .pp-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-nogoda .pp-like-mini,
+.theme-nogoda .pp-views-mini {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 11px;
+  padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(200, 217, 230, 0.32);
-  font-size: 0.72rem;
+  background: rgba(200, 217, 230, 0.35);
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--pal-teal);
+  color: var(--pal-teal, #567C8D);
+  border: 1px solid rgba(86, 124, 141, 0.16);
+  box-shadow: 0 1px 4px rgba(47, 65, 86, 0.04);
+  transition: all 0.2s ease;
 }
 
 .theme-nogoda .pp-like-mini i {
-  color: var(--nogoda-pink);
-  font-size: 0.68rem;
+  color: var(--nogoda-pink, #F5709D);
+  font-size: 0.7rem;
+}
+
+.theme-nogoda .pp-views-mini i {
+  color: var(--pal-teal, #567C8D);
+  font-size: 0.72rem;
 }
 
 .theme-nogoda .pp-title {
@@ -1441,7 +1462,7 @@ body.page-prompt .store-footer-inner,
 }
 
 .theme-nogoda .pp-like-mini { color: var(--pal-teal); font-size: 0.84rem; }
-.theme-nogoda .pp-info-col { flex: 1; min-width: 0; }
+.theme-nogoda .pp-info-col { flex: 1 1 0%; min-width: 0; width: 100%; box-sizing: border-box; }
 .theme-nogoda .pp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0; }
 
 /* Unlock card */
@@ -1454,6 +1475,8 @@ body.page-prompt .store-footer-inner,
   text-align: center;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 .theme-nogoda .pp-task-card::before {
   content: '';
@@ -1959,9 +1982,11 @@ body.page-prompt .store-footer-inner,
 }
 
 .theme-nogoda .pp-related {
-  margin-top: 32px;
+  margin-top: clamp(32px, 4vw, 48px);
   padding-top: 24px;
   border-top: 1px solid rgba(200, 217, 230, 0.85);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .theme-nogoda .pp-related h2 {
@@ -1975,8 +2000,10 @@ body.page-prompt .store-footer-inner,
 }
 .theme-nogoda .pp-rel-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 22px);
 }
 .theme-nogoda .pp-rel-card {
   border-radius: 16px;
@@ -2062,6 +2089,13 @@ body.page-prompt .store-footer-inner,
   box-shadow: var(--shadow-sm);
 }
 .theme-nogoda .sg-arr svg path { stroke: var(--pal-teal); }
+
+@media (max-width: 960px) {
+  .theme-nogoda .pp-rel-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
 
 /* ============================================================
    MOBILE
@@ -2201,7 +2235,8 @@ body.page-prompt .store-footer-inner,
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 4px;
+    padding: 6px 4px 6px;
+    align-items: center;
   }
   .home-tag-filters::-webkit-scrollbar,
   .theme-nogoda .gal-tag-scroll::-webkit-scrollbar,

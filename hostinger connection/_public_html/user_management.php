@@ -263,42 +263,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 <body class="no-site-cursor">
 <div id="sp"></div>
 <canvas id="pc"></canvas>
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="sideDrawer">
-  <div class="drawer-head"><div class="drawer-brand">Arigato Admin</div><div class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></div></div>
-  <div class="drawer-user">
-    <div class="d-av-ph2" id="d-letter">A</div>
-    <div><div class="d-uname" id="d-name">Admin</div><div class="d-role2">Admin</div></div>
-  </div>
-  <nav class="drawer-nav2">
-    <div class="d-sec2">Overview</div>
-    <a href="dashboard.php" class="d-link2"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="analytics.php" class="d-link2"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
-    <div class="d-sec2">Content</div>
-    <a href="upload_prompt.php" class="d-link2"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
-    <a href="manage_prompts.php" class="d-link2"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
-    <a href="prompt_links.php" class="d-link2"><i class="fa-solid fa-link"></i> Prompt Links</a>
-    <a href="potd_manager.php" class="d-link2"><i class="fa-solid fa-sun"></i> POTD Manager</a>
-    <a href="trending_settings.php" class="d-link2"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>
-    <a href="gallery_carousel_manager.php" class="d-link2"><i class="fa-solid fa-images"></i> Edit Gallery Carousel</a>
-    <div class="d-sec2">Blog</div>
-    <a href="blog_admin.php" class="d-link2"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
-    <a href="blog_create.php" class="d-link2"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
-    <div class="d-sec2">Community</div>
-    <a href="feedback_admin.php" class="d-link2"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
-    <div class="d-sec2">Happy Users</div>
-    <a href="happy_users_admin.php?tab=upload" class="d-link2"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Screenshots</a>
-    <a href="happy_users_admin.php?tab=manage" class="d-link2"><i class="fa-solid fa-images"></i> Manage Pics</a>
-    <div class="d-sec2 nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="d-link2 nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
-    <div class="d-sec2">Users</div>
-    <a href="user_management.php" class="d-link2 active"><i class="fa-solid fa-users"></i> Users</a>
-    <div class="d-sec2">Tools</div>
-    <a href="index.php" class="d-link2" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Site</a>
-  </nav>
-  <div class="drawer-bot"><a href="login.php?logout=1" class="d-out"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div>
-</div>
-
 <!-- MOBILE TOP BAR -->
 <div class="mob-topbar">
   <div class="mob-menu-btn" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></div>
@@ -306,53 +270,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
   <a href="index.php" class="mob-home-btn" target="_blank"><i class="fa-solid fa-house"></i> Site</a>
 </div>
 
-<aside class="sidebar">
-  <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
-  <div class="sb-admin">
-    <?php
-      $__sn = $_SESSION['username'] ?? 'Admin';
-      $__sa = $_SESSION['profile_image'] ?? '';
-      if(empty($__sa)){
-        try{
-          $__q=$pdo->prepare("SELECT username,avatar,profile_image FROM users WHERE id=? LIMIT 1");
-          $__q->execute([$_SESSION['user_id']??0]);
-          $__u=$__q->fetch(PDO::FETCH_ASSOC);
-          if($__u){$__sn=$__u['username']??$__sn;$__sa=$__u['profile_image']??$__u['avatar']??'';}
-        }catch(Exception $__e){}
-      }
-    ?>
-    <?php if(!empty($__sa)): ?><img src="<?= htmlspecialchars($__sa) ?>" class="sb-av" alt="">
-    <?php else: ?><div class="sb-av-ph"><?= strtoupper(substr($__sn,0,1)) ?></div><?php endif; ?>
-    <div><div class="sb-uname"><?= htmlspecialchars($__sn) ?></div><div class="sb-role">Administrator</div></div>
-  </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Overview</div>
-    <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
-    <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
-    <div class="sb-sec">Content</div>
-    <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
-    <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
-    <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
-    <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
-    <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
-    <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
-    <div class="sb-sec">Blog</div>
-    <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
-    <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
-    <div class="sb-sec">Community</div>
-    <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
-    <div class="sb-sec">Happy Users</div>
-    <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
-    <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
-    <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
-    <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-wand-magic-sparkles" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated AI Prompts</span></a>
-    <div class="sb-sec">Users</div>
-    <a href="user_management.php" class="sb-link active"><i class="fa-solid fa-users"></i> <span>Users</span></a>
-    <div class="sb-sec">Tools</div>
-    <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
-  </nav>
-  <div class="sb-bottom"><a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></div>
-</aside>
+<?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
 
 <main class="main">
   <div class="topbar">

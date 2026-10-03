@@ -337,6 +337,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Clicking anywhere other than Prompt button opens image preview
+      if (!e.target.closest(".card-prompt-btn")) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.openPromptImagePreview) {
+          window.openPromptImagePreview(card);
+        }
+        return;
+      }
+
       // Navigate to prompt page (gallery has its own click handler)
       const isGalleryPage = document.body.classList.contains('page-gallery');
       const isSavedPage = document.body.classList.contains('page-saved');

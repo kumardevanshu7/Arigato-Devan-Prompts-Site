@@ -247,7 +247,9 @@ body.page-category #navStickyWrap {
   margin-right: 0;
   padding-left: 4px;
   padding-right: 16px;
-  padding-bottom: 4px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  align-items: center;
 }
 
 .page-category .cat-tag-filters .filter-pill:first-child {

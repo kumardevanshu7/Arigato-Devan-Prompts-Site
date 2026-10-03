@@ -278,6 +278,50 @@ body.page-home {
   text-align: center;
 }
 
+.page-home-logged .potd-header {
+  text-align: center;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-home-logged .potd-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--pal-teal, #567C8D);
+}
+
+.page-home-logged .potd-eyebrow i {
+  color: #f59e0b;
+  font-size: 0.75rem;
+}
+
+.page-home-logged .potd-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.45rem, 4.5vw, 1.95rem);
+  font-weight: 800;
+  color: var(--pal-navy, #2F4156);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.page-home-logged .potd-heading em {
+  font-style: italic;
+  background: var(--nogoda-gradient-h, linear-gradient(90deg, #6D2D52, #F5709D, #11FFC9, #2FA6C6));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .page-home-logged .potd-featured {
   display: flex;
   flex-direction: column;
@@ -966,14 +1010,24 @@ body.page-home {
 @media (min-width: 769px) {
   /* ---- Logged-in home ---- */
   .page-home-logged .page-hero {
-    max-width: 1200px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 36px clamp(24px, 4vw, 48px) 28px !important;
+    padding: 32px clamp(20px, 3.5vw, 44px) 24px !important;
   }
 
   .page-home-logged .home-logged-shell {
-    max-width: 600px;
-    gap: 28px;
+    max-width: 100% !important;
+    width: 100%;
+    gap: 22px;
+  }
+
+  .page-home-logged .home-welcome,
+  .page-home-logged .home-drop-banner,
+  .page-home-logged .home-logged-actions {
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
   }
 
   .page-home-logged .home-logged-title {
@@ -1018,6 +1072,8 @@ body.page-home {
     flex-wrap: wrap;
     justify-content: center;
     overflow: visible;
+    padding: 6px 4px;
+    align-items: center;
   }
 
   .page-home-logged .prompt-card .card-title {
@@ -1403,8 +1459,9 @@ body.page-home {
     justify-content: flex-start;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 4px;
+    padding: 6px 4px 6px;
     margin-bottom: 24px;
+    align-items: center;
   }
 
   .page-home-logged .home-tag-filters::-webkit-scrollbar {
@@ -1413,6 +1470,11 @@ body.page-home {
 
   .page-home-logged .filter-pill {
     flex-shrink: 0;
+  }
+
+  .page-home-logged .filter-pill.active,
+  .page-home-logged .filter-pill:hover {
+    transform: none !important;
   }
 
   .page-home-logged .potd-section {

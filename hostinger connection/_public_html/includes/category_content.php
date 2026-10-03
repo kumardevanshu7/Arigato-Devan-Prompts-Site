@@ -13,20 +13,22 @@ $cat_nav_active  = $cat_nav_active ?? '';
 $cat_instruction = $cat_instruction ?? null;
 $cat_hide_hero   = !empty($cat_hide_hero);
 
-function render_cat_instruction_banner(array $instruction): void {
-    $compact = !isset($instruction['compact']) || $instruction['compact'] !== false;
-    $icon    = htmlspecialchars($instruction['icon'] ?? 'fa-heart');
-    $title   = $instruction['title'] ?? '';
-    ?>
-    <div class="cat-instruction-wrap cat-instruction-wrap--above-grid">
-        <div class="cat-instruction-banner<?= $compact ? ' cat-instruction-banner--compact' : '' ?>" role="note">
-            <span class="cat-instruction-icon" aria-hidden="true">
-                <i class="fa-solid <?= $icon ?>"></i>
-            </span>
-            <p class="cat-instruction-line"><?= htmlspecialchars($title) ?></p>
+if (!function_exists('render_cat_instruction_banner')) {
+    function render_cat_instruction_banner(array $instruction): void {
+        $compact = !isset($instruction['compact']) || $instruction['compact'] !== false;
+        $icon    = htmlspecialchars($instruction['icon'] ?? 'fa-heart');
+        $title   = $instruction['title'] ?? '';
+        ?>
+        <div class="cat-instruction-wrap cat-instruction-wrap--above-grid">
+            <div class="cat-instruction-banner<?= $compact ? ' cat-instruction-banner--compact' : '' ?>" role="note">
+                <span class="cat-instruction-icon" aria-hidden="true">
+                    <i class="fa-solid <?= $icon ?>"></i>
+                </span>
+                <p class="cat-instruction-line"><?= htmlspecialchars($title) ?></p>
+            </div>
         </div>
-    </div>
-    <?php
+        <?php
+    }
 }
 ?>
 <?php $nav_active = $cat_nav_active; include __DIR__ . '/site_nav.php'; ?>
@@ -76,6 +78,11 @@ function render_cat_instruction_banner(array $instruction): void {
 
         <?php render_prompt_grid($cat_prompts, ['grid_id' => 'card-stack']); ?>
     <?php endif; ?>
+
+    <?php
+    require_once __DIR__ . '/category_seo_renderer.php';
+    render_category_seo_section($cat_nav_active ?? '');
+    ?>
 </main>
 
 <script>

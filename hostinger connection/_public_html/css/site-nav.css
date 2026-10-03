@@ -369,12 +369,18 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   cursor: pointer;
 }
 
-.filter-pill:hover,
+.filter-pill:hover {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border-color: var(--btn-bg);
+  box-shadow: var(--shadow-sm);
+}
+
 .filter-pill.active {
   background: var(--btn-bg);
   color: var(--btn-text);
   border-color: var(--btn-bg);
-  transform: translateY(-2px);
+  transform: none;
   box-shadow: var(--shadow-sm);
 }
 

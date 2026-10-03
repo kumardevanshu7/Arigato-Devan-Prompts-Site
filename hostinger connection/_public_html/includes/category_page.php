@@ -44,6 +44,7 @@ $breadcrumb_name = $breadcrumb_name ?? ($cat_title . ' ' . $cat_title_em);
     <?php include_once __DIR__ . '/theme_head.php'; ?>
     <?php include_once __DIR__ . '/card_skeleton_assets.php'; ?>
     <link rel="stylesheet" href="css/category-pages.css?v=20260729">
+    <link rel="stylesheet" href="css/category-seo.css?v=20261002">
     <?php include_once __DIR__ . '/../gtag.php'; ?>
 </head>
 <body class="page-store theme-nogoda page-category<?= !empty($cat_instruction) ? ' has-cat-instruction' : '' ?>">

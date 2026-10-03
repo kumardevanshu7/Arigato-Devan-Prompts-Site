@@ -154,6 +154,49 @@ try {
     $sp_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
 } catch (Exception $e) {}
 
+// Fetch Main Page Cards for Best Prompts Slider (toggled in Manage Prompts and Curated Prompts)
+$main_page_cards = [];
+try {
+    // 1. Regular prompts with is_main_card = 1
+    $mc_prompts_stmt = $pdo->query("
+        SELECT id, title, prompt_type, image_path, tag, prompt_text, slug, about_prompt, description, best_works_in, 'regular' as source_type
+        FROM prompts
+        WHERE is_main_card = 1 AND (is_trial = 0 OR is_trial IS NULL)
+        ORDER BY id DESC
+    ");
+    $mc_prompts = $mc_prompts_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Curated prompts with is_main_card = 1
+    $mc_curated = [];
+    $chk_table = $pdo->prepare("SHOW TABLES LIKE 'curated_prompts'");
+    $chk_table->execute();
+    if ($chk_table->fetchColumn()) {
+        $mc_curated_stmt = $pdo->query("
+            SELECT id, title, category as prompt_type, thumbnail_image as image_path, tags as tag, prompt_text, slug, about_prompt, meta_description, 'both' as best_works_in, 'curated' as source_type
+            FROM curated_prompts
+            WHERE is_main_card = 1 AND is_visible = 1
+            ORDER BY id DESC
+        ");
+        $mc_curated = $mc_curated_stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $main_page_cards = array_merge($mc_prompts, $mc_curated);
+
+    // Smart fallback if admin hasn't toggled any cards yet
+    if (empty($main_page_cards)) {
+        $fb_stmt = $pdo->query("
+            SELECT id, title, prompt_type, image_path, tag, prompt_text, slug, about_prompt, description, best_works_in, 'regular' as source_type
+            FROM prompts
+            WHERE (is_trial = 0 OR is_trial IS NULL)
+            ORDER BY is_featured DESC, likes_count DESC, id DESC
+            LIMIT 5
+        ");
+        $main_page_cards = $fb_stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    $main_page_cards = [];
+}
+
 // Generate state token for CSRF if not exists
 ?>
 <!DOCTYPE html>
@@ -181,7 +224,7 @@ try {
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
         <?php include_once 'includes/theme_head.php'; ?>
         <?php include_once 'includes/card_skeleton_assets.php'; ?>
-    <link rel="stylesheet" href="css/home-page.css?v=20260914">
+    <link rel="stylesheet" href="css/home-page.css?v=20261003pillfix">
     
 
     <!-- Preload first 3 prompt images for faster perceived loading -->
@@ -275,7 +318,7 @@ try {
 
     <script>const isLoggedIn = <?= isset($_SESSION["user_id"]) ? "true" : "false" ?>;
 const isAdmin = <?= (isset($_SESSION["role"]) && $_SESSION["role"] === "admin") ? "true" : "false" ?>;</script>
-    <script defer src="script.js?v=20260796"></script>
+    <script defer src="script.js?v=20261003preview1"></script>
     <script>
         document.addEventListener('modalOpened', function(e) {
             const btn = document.getElementById('modal-save-btn');

@@ -109,3 +109,111 @@ function update_site_setting(string $key, string $value, ?PDO $pdo = null): bool
 
     return true;
 }
+
+/**
+ * Returns dynamic Social Links & Contact Configuration with fallback defaults.
+ */
+function get_contact_social_config(): array
+{
+    $raw = site_setting('contact_social_config', '');
+    if (!empty($raw)) {
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded) && isset($decoded['social_links']) && is_array($decoded['social_links'])) {
+            return $decoded;
+        }
+    }
+
+    $insta_url = site_setting('insta_url', 'https://www.instagram.com/arigato.devan/');
+    $insta_handle = site_setting('insta_handle', '@arigato.devan');
+
+    return [
+        'profile_name'       => 'Arigato Devan',
+        'profile_title'      => 'AI Prompt Creator & Digital Artist',
+        'profile_handle'     => $insta_handle,
+        'profile_handle_url' => $insta_url,
+        'contact_email'      => 'devansh.grow@gmail.com',
+        'response_time'      => 'Within 24 hours',
+        'social_links'       => [
+            [
+                'id'       => 'instagram',
+                'name'     => 'Instagram',
+                'icon'     => 'fa-brands fa-instagram',
+                'url'      => $insta_url,
+                'enabled'  => true,
+            ],
+            [
+                'id'       => 'email',
+                'name'     => 'Email',
+                'icon'     => 'fa-solid fa-envelope',
+                'url'      => 'mailto:devansh.grow@gmail.com',
+                'enabled'  => true,
+            ],
+            [
+                'id'       => 'gallery',
+                'name'     => 'Gallery',
+                'icon'     => 'fa-solid fa-images',
+                'url'      => 'gallery.php',
+                'enabled'  => true,
+            ],
+            [
+                'id'       => 'whatsapp',
+                'name'     => 'WhatsApp',
+                'icon'     => 'fa-brands fa-whatsapp',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'telegram',
+                'name'     => 'Telegram',
+                'icon'     => 'fa-brands fa-telegram',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'youtube',
+                'name'     => 'YouTube',
+                'icon'     => 'fa-brands fa-youtube',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'twitter',
+                'name'     => 'X (Twitter)',
+                'icon'     => 'fa-brands fa-x-twitter',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'pinterest',
+                'name'     => 'Pinterest',
+                'icon'     => 'fa-brands fa-pinterest-p',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'threads',
+                'name'     => 'Threads',
+                'icon'     => 'fa-brands fa-threads',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+            [
+                'id'       => 'discord',
+                'name'     => 'Discord',
+                'icon'     => 'fa-brands fa-discord',
+                'url'      => '',
+                'enabled'  => false,
+            ],
+        ],
+    ];
+}
+
+/**
+ * Saves contact & social links configuration.
+ */
+function save_contact_social_config(array $config, ?PDO $pdo = null): bool
+{
+    $json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return update_site_setting('contact_social_config', $json, $pdo);
+}
+

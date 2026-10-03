@@ -272,26 +272,29 @@ function render_gallery_prompt_cards(array $prompts): string {
                      style="<?= $blur_style ?>">
                 <span class="card-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></span>
                 <?php if (empty($p['is_unlocked'])): ?>
-                    <div class="card-lock-icon"><i class="fa-solid fa-lock"></i></div>
+                    <div class="card-lock-icon" title="Locked"><i class="fa-solid fa-lock"></i></div>
                 <?php else: ?>
-                    <div class="card-lock-icon unlocked"><i class="fa-solid fa-check"></i></div>
+                    <div class="card-lock-icon unlocked" title="Unlocked"><i class="fa-solid fa-check"></i></div>
                 <?php endif; ?>
-                <div class="card-overlay">
-                    <span class="quick-view-btn">View Prompt &rarr;</span>
-                </div>
             </div>
-            <div class="card-info" style="display: flex !important; flex-direction: column !important; justify-content: space-between !important; flex: 1 1 auto !important;">
-                <p class="card-title" style="min-height: 2.7em !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; line-height: 1.35 !important;"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-meta-row" style="display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; margin-top: auto !important;">
-                    <div class="card-like-display"
-                         data-liked="<?= !empty($p['is_liked']) ? 'true' : 'false' ?>"
-                         data-prompt-id="<?= (int) $p['id'] ?>">
-                        <i class="fa-solid fa-heart <?= !empty($p['is_liked']) ? 'liked-heart' : '' ?>"></i>
-                        <span class="like-count"><?= (int) ($p['likes_count'] ?? 0) ?></span>
+            <div class="card-info">
+                <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
+                <div class="card-footer-row">
+                    <div class="card-stats-col">
+                        <div class="card-stat-item card-like-display"
+                             data-liked="<?= !empty($p['is_liked']) ? 'true' : 'false' ?>"
+                             data-prompt-id="<?= (int) $p['id'] ?>"
+                             title="Likes">
+                            <i class="fa-solid fa-heart <?= !empty($p['is_liked']) ? 'liked-heart' : '' ?>"></i>
+                            <span class="like-count"><?= (int) ($p['likes_count'] ?? 0) ?></span>
+                        </div>
+                        <div class="card-stat-item card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count"><?= (int) ($p['view_count'] ?? 0) ?></span>
+                        </div>
                     </div>
-                    <div class="card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
-                        <i class="fa-regular fa-eye"></i>
-                        <span class="view-count"><?= (int) ($p['view_count'] ?? 0) ?></span>
+                    <div class="card-prompt-btn-wrap">
+                        <span class="card-prompt-btn">Prompt <svg class="prompt-btn-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
                     </div>
                 </div>
             </div>

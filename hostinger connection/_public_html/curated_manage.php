@@ -192,6 +192,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'toggl
     exit();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'toggle_main_card') {
+    $tid = (int)($_POST['tid'] ?? 0);
+    $cur = $pdo->prepare('SELECT is_main_card FROM curated_prompts WHERE id = ?');
+    $cur->execute([$tid]);
+    $new_val = ((int)$cur->fetchColumn() === 1) ? 0 : 1;
+    $pdo->prepare('UPDATE curated_prompts SET is_main_card = ? WHERE id = ?')->execute([$new_val, $tid]);
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true, 'success' => true, 'is_main_card' => $new_val]);
+    exit();
+}
+
 $prompts = [];
 if (nm_table_exists_manage($pdo, 'curated_prompts')) {
     try {
@@ -201,14 +212,69 @@ if (nm_table_exists_manage($pdo, 'curated_prompts')) {
     }
 }
 
+// Fetch existing platform tags & curated presets
+$suggested_tags = [];
+try {
+    $existing_tags_map = [];
+    $default_tags = [
+        'Couple', 'Romantic', 'Boys', 'Girls', 'Selfie', 'Aesthetic', 'Vintage', 'Solo',
+        'Travel', 'Cinematic', 'Creativity', 'Moody', 'Portrait', 'Urban', 'Fashion',
+        'Anime', 'Cyberpunk', 'Royal', 'Casual', 'Biker', 'Retro', 'Streetwear', 'Sunset', 'Neon'
+    ];
+    foreach ($default_tags as $dt) {
+        $key = mb_strtolower(trim($dt));
+        $existing_tags_map[$key] = ['label' => trim($dt), 'count' => 1];
+    }
+    if (nm_table_exists_manage($pdo, 'curated_prompts')) {
+        $cTags = $pdo->query("SELECT tags FROM curated_prompts WHERE tags IS NOT NULL AND tags != ''")->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($cTags as $cTagStr) {
+            foreach (explode(',', (string)$cTagStr) as $t) {
+                $t = trim($t);
+                if ($t === '') continue;
+                $k = mb_strtolower($t);
+                if (!isset($existing_tags_map[$k])) {
+                    $existing_tags_map[$k] = ['label' => $t, 'count' => 0];
+                }
+                $existing_tags_map[$k]['count'] += 10;
+            }
+        }
+    }
+    if (nm_table_exists_manage($pdo, 'prompts')) {
+        $pTags = $pdo->query("SELECT tag FROM prompts WHERE tag IS NOT NULL AND tag != ''")->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($pTags as $pTagStr) {
+            foreach (explode(',', (string)$pTagStr) as $t) {
+                $t = trim($t);
+                if ($t === '') continue;
+                $k = mb_strtolower($t);
+                if (!isset($existing_tags_map[$k])) {
+                    $existing_tags_map[$k] = ['label' => $t, 'count' => 0];
+                }
+                $existing_tags_map[$k]['count'] += 2;
+            }
+        }
+    }
+    uasort($existing_tags_map, function($a, $b) {
+        if ($b['count'] !== $a['count']) {
+            return $b['count'] <=> $a['count'];
+        }
+        return strcasecmp($a['label'], $b['label']);
+    });
+    $suggested_tags = array_values(array_map(function($item) {
+        return $item['label'];
+    }, $existing_tags_map));
+} catch (Exception $e) {
+    $suggested_tags = [];
+}
+
 $f_cat = strtolower(trim($_GET['cat'] ?? 'all'));
 $f_gpt = strtolower(trim($_GET['gpt'] ?? 'all'));
 $f_gem = strtolower(trim($_GET['gem'] ?? 'all'));
 $f_vis = strtolower(trim($_GET['vis'] ?? 'all'));
 $f_trial = strtolower(trim($_GET['trial'] ?? 'all'));
+$f_mc = strtolower(trim($_GET['mc'] ?? 'all'));
 $f_q   = trim($_GET['q'] ?? '');
 
-$filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gpt, $f_gem, $f_vis, $f_trial, $f_q) {
+$filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gpt, $f_gem, $f_vis, $f_trial, $f_mc, $f_q) {
     if ($f_cat !== 'all' && ($p['category'] ?? '') !== $f_cat) return false;
     if ($f_gpt === 'ok' && !empty($p['chatgpt_failed'])) return false;
     if ($f_gpt === 'failed' && empty($p['chatgpt_failed'])) return false;
@@ -218,6 +284,8 @@ $filtered = array_values(array_filter($prompts, function ($p) use ($f_cat, $f_gp
     if ($f_vis === 'hidden' && !empty($p['is_visible'])) return false;
     if ($f_trial === 'yes' && empty($p['is_trial'])) return false;
     if ($f_trial === 'no' && !empty($p['is_trial'])) return false;
+    if ($f_mc === 'yes' && empty($p['is_main_card'])) return false;
+    if ($f_mc === 'no' && !empty($p['is_main_card'])) return false;
     if ($f_q !== '') {
         $hay = strtolower(($p['title'] ?? '') . ' ' . ($p['tags'] ?? ''));
         if (strpos($hay, strtolower($f_q)) === false) return false;
@@ -358,6 +426,26 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 .tag-input{background:none;border:none;outline:none;color:var(--text);font-size:.85rem;flex:1;min-width:100px}
 .tag-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(245,112,157,.14);border-radius:8px;font-size:.76rem;font-weight:700;color:var(--soft);margin:2px 4px 2px 0}
 .tag-chip-x{cursor:pointer;opacity:.7}
+.tag-chip-x:hover{opacity:1}
+.hint-shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Existing & Suggested Tags Cloud */
+.existing-tags-section{margin-top:10px;background:rgba(20,20,25,0.65);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.existing-tags-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.existing-tags-title{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:inline-flex;align-items:center;gap:6px}
+.existing-tags-title i{color:var(--accent)}
+.existing-tags-tip{font-size:.68rem;color:var(--muted);font-weight:500}
+.existing-tags-cloud{display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto;padding-right:4px}
+.existing-tags-cloud::-webkit-scrollbar{width:4px}
+.existing-tags-cloud::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sug-tag-pill{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);color:#c5c5d0;padding:4px 10px;border-radius:8px;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .15s ease;user-select:none;line-height:1.3}
+.sug-tag-pill:hover{border-color:var(--accent);color:#fff;background:rgba(245,112,157,0.09);transform:translateY(-1px)}
+.sug-tag-pill.is-selected{background:rgba(245,112,157,0.18);border-color:var(--accent);color:var(--soft);font-weight:700;box-shadow:0 0 10px rgba(245,112,157,0.15)}
+.sug-tag-pill.is-selected .pill-icon{color:var(--soft)}
+.sug-tag-pill.is-disabled{opacity:0.45;cursor:not-allowed}
+.sug-tag-pill.is-disabled:hover{transform:none;border-color:var(--border);color:#c5c5d0;background:var(--surface-2)}
+.sug-tag-pill .pill-icon{font-size:.8rem;line-height:1;font-weight:800}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .file-zone{border:2px dashed var(--border);border-radius:14px;padding:18px 14px;text-align:center;color:var(--muted);font-size:.76rem;position:relative;background:var(--surface-2);min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .file-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -375,43 +463,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 </style>
 </head>
 <body>
-<aside class="sidebar">
-    <div class="sb-logo"><div class="sb-brand"><i class="fa-solid fa-shield-halved"></i> <span>Arigato Admin</span></div></div>
-    <nav class="sb-nav">
-      <div class="sb-sec">Overview</div>
-      <a href="dashboard.php" class="sb-link"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></a>
-      <a href="analytics.php" class="sb-link"><i class="fa-solid fa-chart-line" style="color:#d4f938;"></i> <span style="color:#d4f938; font-weight:700;">Analytics</span></a>
-      <div class="sb-sec">Content</div>
-      <a href="upload_prompt.php" class="sb-link"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
-      <a href="manage_prompts.php" class="sb-link"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
-      <a href="prompt_links.php" class="sb-link"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
-      <a href="potd_manager.php" class="sb-link"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
-      <a href="trending_settings.php" class="sb-link"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
-      <a href="gallery_carousel_manager.php" class="sb-link"><i class="fa-solid fa-images"></i> <span>Edit Gallery Carousel</span></a>
-      <div class="sb-sec">Blog</div>
-      <a href="blog_admin.php" class="sb-link"><i class="fa-solid fa-pen-nib" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Blog Admin</span></a>
-      <a href="blog_create.php" class="sb-link"><i class="fa-solid fa-plus" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">New Post</span></a>
-      <div class="sb-sec">Community</div>
-      <a href="feedback_admin.php" class="sb-link"><i class="fa-solid fa-comments" style="color:#fb923c;"></i> <span style="color:#fb923c; font-weight:700;">Feedback Manager</span></a>
-      <div class="sb-sec">Happy Users</div>
-      <a href="happy_users_admin.php?tab=upload" class="sb-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Screenshots</span></a>
-      <a href="happy_users_admin.php?tab=manage" class="sb-link"><i class="fa-solid fa-images"></i> <span>Manage Pics</span></a>
-      <div class="sb-sec nm-dash-brand">Curated AI Prompts</div>
-      <a href="curated_admin.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-upload" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Upload</span></a>
-      <a href="curated_manage.php" class="sb-link nm-dash-brand active"><i class="fa-solid fa-table-list" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Manage</span></a>
-      <a href="curated_links.php" class="sb-link nm-dash-brand"><i class="fa-solid fa-link" style="color:#e879f9;"></i> <span style="color:#e879f9; font-weight:700;">Curated — Links</span></a>
-      <div class="sb-sec">Users</div>
-      <a href="user_management.php" class="sb-link"><i class="fa-solid fa-users"></i> <span>Users</span></a>
-      <div class="sb-sec">Settings</div>
-      <a href="site_settings.php" class="sb-link"><i class="fa-solid fa-gear" style="color:#38bdf8;"></i> <span style="color:#38bdf8; font-weight:700;">Site Settings</span></a>
-      <div class="sb-sec">Tools</div>
-      <a href="curated_ai_prompts.php" class="sb-link" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Curated Page</span></a>
-      <a href="index.php" class="sb-link" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a>
-    </nav>
-    <div class="sb-bottom">
-      <a href="login.php?logout=1" class="sb-logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
-    </div>
-</aside>
+<?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
 
 <div class="main">
   <div class="head"><h1><i class="fa-solid fa-table-list"></i> Manage Prompts (<?= count($filtered) ?> / <?= count($prompts) ?>)</h1></div>
@@ -455,6 +507,23 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         </div>
         <input type="hidden" name="tags" id="tagsHidden" value="<?= htmlspecialchars($edit_row['tags'] ?? '') ?>">
         <p class="form-hint" id="tagHint">0 / 2 tags</p>
+
+        <?php if (!empty($suggested_tags)): ?>
+        <div class="existing-tags-section">
+          <div class="existing-tags-header">
+            <span class="existing-tags-title"><i class="fa-solid fa-tags"></i> Existing & Suggested Tags</span>
+            <span class="existing-tags-tip">Click to select (max 2)</span>
+          </div>
+          <div class="existing-tags-cloud" id="existingTagsCloud">
+            <?php foreach ($suggested_tags as $stag): ?>
+            <button type="button" class="sug-tag-pill" data-tag="<?= htmlspecialchars($stag, ENT_QUOTES) ?>">
+              <span class="pill-icon">+</span>
+              <span class="pill-text"><?= htmlspecialchars($stag) ?></span>
+            </button>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php endif; ?>
       </div>
 
       <div class="form-row">
@@ -585,6 +654,11 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
         <option value="visible" <?= $f_vis === 'visible' ? 'selected' : '' ?>>Visibility: Visible</option>
         <option value="hidden" <?= $f_vis === 'hidden' ? 'selected' : '' ?>>Visibility: Hidden</option>
       </select>
+      <select name="mc">
+        <option value="all" <?= $f_mc === 'all' ? 'selected' : '' ?>>Main Card: All</option>
+        <option value="yes" <?= $f_mc === 'yes' ? 'selected' : '' ?>>Main Card: In Slider</option>
+        <option value="no" <?= $f_mc === 'no' ? 'selected' : '' ?>>Main Card: Not in Slider</option>
+      </select>
       <div class="filters-actions">
         <button type="submit" class="btn"><i class="fa-solid fa-filter"></i>&nbsp;Apply</button>
         <a href="curated_manage.php" class="btn secondary">Reset</a>
@@ -594,7 +668,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       <div style="padding:30px;color:var(--muted)">No prompts uploaded yet.</div>
     <?php else: ?>
     <table class="list-table">
-      <thead><tr><th>Thumb</th><th>Title</th><th>Category</th><th>GPT</th><th>Gemini</th><th>Trial</th><th>Visible</th><th></th></tr></thead>
+      <thead><tr><th>Thumb</th><th>Title</th><th>Category</th><th>GPT</th><th>Gemini</th><th>Trial</th><th>Main Card</th><th>Visible</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($filtered as $p): ?>
         <tr>
@@ -602,11 +676,17 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
           <td style="font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
             <?= htmlspecialchars($p['title']) ?>
             <?= !empty($p['is_trial']) ? '<span class="trial-badge">TRIAL</span>' : '' ?>
+            <span id="cur-mc-badge-<?= (int)$p['id'] ?>" class="trial-badge" style="<?= !empty($p['is_main_card']) ? '' : 'display:none;' ?>background:rgba(52,211,153,0.18);color:#34d399;border-color:rgba(52,211,153,0.35)"><i class="fa-solid fa-bolt"></i> MAIN CARD</span>
           </td>
           <td><span class="cat-badge cat-<?= htmlspecialchars($p['category']) ?>"><?= htmlspecialchars(ucfirst($p['category'])) ?></span></td>
           <td><?= $p['chatgpt_failed'] ? '<span style="color:#fda4af;font-weight:700;font-size:.72rem">FAILED</span>' : '<i class="fa-solid fa-check" style="color:#34d399"></i>' ?></td>
           <td><?= $p['gemini_failed'] ? '<span style="color:#fda4af;font-weight:700;font-size:.72rem">FAILED</span>' : '<i class="fa-solid fa-check" style="color:#34d399"></i>' ?></td>
           <td><button type="button" class="btn-trial <?= !empty($p['is_trial']) ? 'active' : '' ?>" onclick="toggleTrial(<?= (int)$p['id'] ?>, this)"><?= !empty($p['is_trial']) ? 'TRIAL' : '+ Trial' ?></button></td>
+          <td>
+            <button type="button" id="cur-mc-btn-<?= (int)$p['id'] ?>" class="btn-trial <?= !empty($p['is_main_card']) ? 'active' : '' ?>" style="<?= !empty($p['is_main_card']) ? 'background:rgba(52,211,153,0.18);border-color:#34d399;color:#34d399;' : '' ?>" onclick="toggleCuratedMainCard(<?= (int)$p['id'] ?>, this)">
+              <i class="fa-solid fa-bolt"></i> <?= !empty($p['is_main_card']) ? 'Card ON' : '+ Card' ?>
+            </button>
+          </td>
           <td><input type="checkbox" class="toggle-vis" <?= $p['is_visible'] ? 'checked' : '' ?> onchange="toggleVis(<?= (int)$p['id'] ?>, this.checked)"></td>
           <td>
             <a href="curated_manage.php?edit=<?= (int) $p['id'] ?>" class="btn-edit<?= $edit_id === (int) $p['id'] ? ' active' : '' ?>" title="Edit prompt"><i class="fa-solid fa-pen"></i></a>
@@ -659,6 +739,33 @@ function toggleTrial(id, btn) {
   }).catch(function() {});
 }
 
+function toggleCuratedMainCard(id, btn) {
+  fetch('ajax_toggle_main_card.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'prompt_id=' + id + '&source=curated'
+  }).then(function(res) { return res.json(); }).then(function(data) {
+    if (data && data.success) {
+      var badge = document.getElementById('cur-mc-badge-' + id);
+      if (data.is_main_card) {
+        btn.classList.add('active');
+        btn.style.background = 'rgba(52,211,153,0.18)';
+        btn.style.borderColor = '#34d399';
+        btn.style.color = '#34d399';
+        btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Card ON';
+        if (badge) badge.style.display = 'inline-block';
+      } else {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.innerHTML = '<i class="fa-solid fa-bolt"></i> + Card';
+        if (badge) badge.style.display = 'none';
+      }
+    }
+  }).catch(function() {});
+}
+
 function updateAboutWordCount(el) {
   var val = el.value.trim();
   var words = val ? val.split(/\s+/).filter(Boolean) : [];
@@ -684,6 +791,75 @@ function updateAboutWordCount(el) {
   var tagChips = document.getElementById('tagChips');
   var tagsHidden = document.getElementById('tagsHidden');
   var tagHint = document.getElementById('tagHint');
+  var MAX_TAGS = 2;
+
+  function syncSugTagPills() {
+    var cloud = document.getElementById('existingTagsCloud');
+    if (!cloud) return;
+    var pills = cloud.querySelectorAll('.sug-tag-pill');
+    var lowerTags = tags.map(function(t) { return t.toLowerCase().trim(); });
+
+    pills.forEach(function(pill) {
+      var pTag = (pill.getAttribute('data-tag') || '').trim();
+      var isSelected = lowerTags.indexOf(pTag.toLowerCase()) !== -1;
+      var icon = pill.querySelector('.pill-icon');
+      if (isSelected) {
+        pill.classList.add('is-selected');
+        pill.classList.remove('is-disabled');
+        if (icon) icon.textContent = '✓';
+      } else {
+        pill.classList.remove('is-selected');
+        if (tags.length >= MAX_TAGS) {
+          pill.classList.add('is-disabled');
+        } else {
+          pill.classList.remove('is-disabled');
+        }
+        if (icon) icon.textContent = '+';
+      }
+    });
+  }
+
+  function filterSugTags() {
+    var cloud = document.getElementById('existingTagsCloud');
+    if (!cloud) return;
+    var query = (tagInput ? tagInput.value : '').toLowerCase().trim();
+    var pills = cloud.querySelectorAll('.sug-tag-pill');
+    pills.forEach(function(pill) {
+      var pTag = (pill.getAttribute('data-tag') || '').toLowerCase();
+      if (!query || pTag.indexOf(query) !== -1) {
+        pill.style.display = 'inline-flex';
+      } else {
+        pill.style.display = 'none';
+      }
+    });
+  }
+
+  function toggleTag(val) {
+    val = (val || '').trim().replace(/,/g, '');
+    if (!val) return;
+    var lowerTags = tags.map(function(t) { return t.toLowerCase(); });
+    var idx = lowerTags.indexOf(val.toLowerCase());
+    if (idx !== -1) {
+      tags.splice(idx, 1);
+      renderTags();
+    } else {
+      if (tags.length >= MAX_TAGS) {
+        tagHint.style.color = 'var(--soft)';
+        tagHint.textContent = 'Max ' + MAX_TAGS + ' tags allowed! Deselect one to add "' + val + '".';
+        tagHint.classList.add('hint-shake');
+        setTimeout(function() {
+          tagHint.classList.remove('hint-shake');
+          tagHint.style.color = '';
+          tagHint.textContent = tags.length + ' / ' + MAX_TAGS + ' tags';
+        }, 2500);
+        return;
+      }
+      tags.push(val);
+      if (tagInput) tagInput.value = '';
+      filterSugTags();
+      renderTags();
+    }
+  }
 
   function renderTags() {
     tagChips.innerHTML = '';
@@ -694,24 +870,32 @@ function updateAboutWordCount(el) {
       tagChips.appendChild(chip);
     });
     tagsHidden.value = tags.join(', ');
-    tagHint.textContent = tags.length + ' / 2 tags';
-    tagInput.style.display = tags.length >= 2 ? 'none' : '';
+    tagHint.textContent = tags.length + ' / ' + MAX_TAGS + ' tags';
+    if (tags.length >= MAX_TAGS) {
+      tagInput.style.display = 'none';
+    } else {
+      tagInput.style.display = '';
+      tagInput.placeholder = tags.length === 0 ? 'Type tag and press Enter' : 'Add one more...';
+    }
+    syncSugTagPills();
   }
 
   tagInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       var val = tagInput.value.trim().replace(/,/g, '');
-      if (val && tags.length < 2 && tags.indexOf(val) === -1) {
-        tags.push(val);
-        tagInput.value = '';
-        renderTags();
+      if (val) {
+        toggleTag(val);
       }
     }
     if (e.key === 'Backspace' && tagInput.value === '' && tags.length) {
       tags.pop();
       renderTags();
     }
+  });
+
+  tagInput.addEventListener('input', function() {
+    filterSugTags();
   });
 
   tagChips.addEventListener('click', function (e) {
@@ -721,6 +905,18 @@ function updateAboutWordCount(el) {
       renderTags();
     }
   });
+
+  var existingCloud = document.getElementById('existingTagsCloud');
+  if (existingCloud) {
+    existingCloud.addEventListener('click', function(e) {
+      var pill = e.target.closest('.sug-tag-pill');
+      if (pill) {
+        e.preventDefault();
+        var t = pill.getAttribute('data-tag');
+        toggleTag(t);
+      }
+    });
+  }
 
   document.getElementById('tagWrap').addEventListener('click', function () { tagInput.focus(); });
   renderTags();
