@@ -224,11 +224,12 @@ try {
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
         <?php include_once 'includes/theme_head.php'; ?>
         <?php include_once 'includes/card_skeleton_assets.php'; ?>
-    <link rel="stylesheet" href="css/home-page.css?v=20261003pillfix">
+    <link rel="stylesheet" href="css/home-page.css?v=<?= @filemtime(__DIR__ . '/css/home-page.css') ?: '20261004v1' ?>">
+    <link rel="stylesheet" href="css/home-hero-flow.css?v=<?= @filemtime(__DIR__ . '/css/home-hero-flow.css') ?: '20261004v1' ?>">
     
 
-    <!-- Preload first 3 prompt images for faster perceived loading -->
-    <?php if (isset($prompts) && is_array($prompts)) {
+    <!-- Preload first 3 prompt images only when logged-in grid is active to avoid unused preload warning -->
+    <?php if (isset($_SESSION['user_id']) && !isset($_GET['preview_flow']) && isset($prompts) && is_array($prompts)) {
         for ($i = 0; $i < min(3, count($prompts)); $i++) {
             $fp = $i === 0 ? ' fetchpriority="high"' : '';
             echo '<link rel="preload" as="image" href="' .
@@ -245,7 +246,7 @@ try {
 <?php $nav_active = 'home'; include 'includes/site_nav.php'; ?>
 <div class="nogoda-mesh" aria-hidden="true"></div>
 
-    <?php if (!isset($_SESSION["user_id"])): ?>
+    <?php if (!isset($_SESSION["user_id"]) || isset($_GET['preview_flow']) || isset($_GET['preview_hero'])): ?>
     <?php include 'includes/home_landing.php'; ?>
 
     <?php else: ?>

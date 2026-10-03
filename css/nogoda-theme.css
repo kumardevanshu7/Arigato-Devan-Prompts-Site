@@ -8,7 +8,7 @@
   --pal-navy:   #2F4156;
   --pal-teal:   #567C8D;
   --pal-sky:    #C8D9E6;
-  --pal-beige:  #F5EFEB;
+  --pal-beige:  #FFFFFF;
   --pal-white:  #FFFFFF;
 
   /* Nogoda — accents only (not page background) */
@@ -22,13 +22,20 @@
   --nav-sticky-offset: clamp(88px, 12vw, 104px);
 }
 
-/* ---- Global light base ---- */
-html.theme-nogoda,
+/* ---- Global light base for all pages ---- */
+html,
+body,
 body.theme-nogoda,
-body.page-store.theme-nogoda {
-  --bg:             var(--pal-beige);
-  --bg-card:        var(--pal-white);
-  --bg-hover:       var(--pal-sky);
+body.page-store,
+body.page-store.theme-nogoda,
+body.page-gallery,
+body.page-category,
+body.page-info,
+body.page-prompt,
+body.page-terms {
+  --bg:             #FFFFFF;
+  --bg-card:        #FFFFFF;
+  --bg-hover:       #F4F7FB;
   --text-primary:   var(--pal-navy);
   --text-secondary: var(--pal-teal);
   --text-muted:     rgba(47, 65, 86, 0.55);
@@ -41,7 +48,7 @@ body.page-store.theme-nogoda {
   --shadow-md:      0 8px 28px rgba(47, 65, 86, 0.12);
   --shadow-lg:      0 16px 48px rgba(47, 65, 86, 0.14);
 
-  background: var(--pal-beige) !important;
+  background: #FFFFFF !important;
   color: var(--pal-navy) !important;
 }
 
@@ -60,7 +67,7 @@ body.theme-nogoda #navStickyWrap {
   top: 0;
   z-index: 200;
   padding: 14px clamp(14px, 3vw, 28px) 10px;
-  background: var(--pal-beige);
+  background: #FFFFFF !important;
   transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -80,9 +87,9 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
   padding: 0 clamp(14px, 2.5vw, 22px);
   border-radius: 20px;
   border: 1px solid rgba(200, 217, 230, 0.95);
-  background: var(--pal-white);
+  background: #F4F7FB !important; /* Blue Mist per user instruction */
   box-shadow:
-    0 10px 40px rgba(47, 65, 86, 0.1),
+    0 10px 40px rgba(47, 65, 86, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.85) inset;
 }
 
@@ -960,7 +967,7 @@ body.theme-nogoda #navStickyWrap.nav-hidden {
 
 /* ---- Footer ---- */
 .theme-nogoda .store-footer {
-  background: var(--pal-white);
+  background: #FFFDF4 !important; /* Milk */
   border-top: 1px solid var(--pal-sky);
   padding: clamp(28px, 5vw, 40px) clamp(20px, 4vw, 80px);
   margin-top: auto;

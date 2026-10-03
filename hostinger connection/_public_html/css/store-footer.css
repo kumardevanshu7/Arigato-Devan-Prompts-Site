@@ -7,7 +7,7 @@
 .store-footer {
     position: relative !important;
     width: 100% !important;
-    background: #FFFFFF !important;
+    background: #FFFDF4 !important; /* Milk */
     border-top: 1px solid #C8D9E6 !important;
     box-sizing: border-box !important;
     overflow: hidden !important;

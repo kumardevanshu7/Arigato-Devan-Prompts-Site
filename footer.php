@@ -12,9 +12,9 @@ $footer_blog_ids = $footer_cfg['blog_ids'] ?? [];
 // Resolve dynamic 5 blogs if column type is blogs
 $resolved_blogs = resolve_footer_blog_links($footer_blog_ids, $pdo ?? null);
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars($site_base) ?>css/store-footer.css?v=20261002footerv5">
+<link rel="stylesheet" href="<?= htmlspecialchars($site_base) ?>css/store-footer.css?v=<?= @filemtime(__DIR__ . '/css/store-footer.css') ?: '20261004v1' ?>">
 <?php if (!empty($_SESSION['user_id'])): ?>
-<link rel="stylesheet" href="<?= htmlspecialchars($site_base) ?>css/logout-confirm.css?v=20260781">
+<link rel="stylesheet" href="<?= htmlspecialchars($site_base) ?>css/logout-confirm.css?v=<?= @filemtime(__DIR__ . '/css/logout-confirm.css') ?: '20261004v1' ?>">
 <?php endif; ?>
 
 <footer class="store-footer">

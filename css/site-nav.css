@@ -72,7 +72,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(248, 246, 242, 0.92);
+  background: #F4F7FB; /* Blue Mist */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);

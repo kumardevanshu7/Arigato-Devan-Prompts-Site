@@ -71,12 +71,12 @@ body.page-home {
 
 .home-testi-carousel::before {
   left: 0;
-  background: linear-gradient(90deg, var(--pal-beige, #F5EFEB) 0%, transparent 100%);
+  background: linear-gradient(90deg, var(--pal-beige, #FFFFFF) 0%, transparent 100%);
 }
 
 .home-testi-carousel::after {
   right: 0;
-  background: linear-gradient(270deg, var(--pal-beige, #F5EFEB) 0%, transparent 100%);
+  background: linear-gradient(270deg, var(--pal-beige, #FFFFFF) 0%, transparent 100%);
 }
 
 .home-testi-track {

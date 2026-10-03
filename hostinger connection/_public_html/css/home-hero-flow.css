@@ -1,0 +1,932 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ============================================================
+   ARIGATO DEVAN — VIVACHAT MINIMALIST SPLIT HERO
+   Customized per User Specifications:
+   - Page Background: Pure White (#FFFFFF)
+   - Font style from Pic 4 (Urbanist / Outfit light geometric)
+   - "NanoBanana": Tilted soft yellow capsule with multi-phase typewriter
+   - "ChatGPT": Tilted soft grey capsule with typewriter
+   - ZERO overlap between capsules and floating icon strip!
+   - 5 Circular Dock Icons: Circles stay static, icons float inside
+   - Action buttons: "Explore Prompts" and "Direct Prompts"
+   - Cards: 100% clean, ZERO double layer, edge-to-edge photo with "View Prompt ↗" centered at bottom
+   - Bottom pills: About Us, Contact Us, Privacy Policy, Terms & Conditions (NO site link)
+   ============================================================ */
+
+.viva-hero {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  background: #FFFFFF !important; /* Pure White */
+  overflow: hidden !important;
+}
+
+.page-home .viva-hero {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.viva-hero-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding-left: clamp(24px, 5.5vw, 84px) !important;
+  padding-right: 0 !important;
+  padding-top: clamp(20px, 3vh, 44px) !important;
+  padding-bottom: clamp(24px, 4vh, 56px) !important;
+  gap: clamp(20px, 3vw, 48px) !important;
+}
+
+/* ============================================================
+   LEFT SIDE: TYPOGRAPHY, BUTTONS, DOCK, PAGE LINKS
+   ============================================================ */
+.viva-left {
+  flex: 0 0 clamp(440px, 46vw, 620px) !important;
+  min-width: 320px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  z-index: 5 !important;
+  padding-right: 74px !important; /* Guaranteed space for icons strip — ZERO OVERLAP! */
+  box-sizing: border-box !important;
+}
+
+.viva-text-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 100%;
+}
+
+/* 4th Pic Inspired Clean Geometric Font */
+/* 4th Pic Inspired Clean Geometric Font */
+.viva-title {
+  font-family: 'Urbanist', 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+  font-size: clamp(2.6rem, 4.4vw, 4.2rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.03em !important;
+  color: #0f172a !important;
+  margin: 0 0 22px 0 !important;
+  text-transform: none !important;
+  max-width: 100%;
+}
+
+.viva-title-sub-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  font-weight: 400;
+  margin-top: 8px;
+  max-width: 100%;
+}
+
+.capsules-line-1,
+.capsules-line-2 {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+  min-height: 52px !important; /* Fixed container height — prevents lower content from shifting */
+}
+
+.viva-title-amp {
+  color: #64748b;
+  font-weight: 400;
+  margin: 0 2px;
+}
+
+/* Interactive Capsule: NanoBanana (Tilted Yellow Pill — Large Size Just Like Pic) */
+.badge-nano-banana {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #fef08a !important;
+  color: #1e1b4b !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  font-size: 0.82em !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  padding: 4px 22px 6px 22px !important;
+  border-radius: 9999px !important;
+  transform: rotate(-3deg) !important;
+  border: 1.5px solid rgba(234, 179, 8, 0.5) !important;
+  box-shadow: 0 6px 18px rgba(234, 179, 8, 0.28) !important;
+  vertical-align: middle !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, background 0.22s ease !important;
+  white-space: nowrap !important;
+  margin: 0 4px !important;
+  box-sizing: border-box !important;
+  min-height: 46px !important;
+}
+
+.badge-nano-banana:hover,
+.badge-nano-banana:active {
+  transform: rotate(0deg) scale(1.04) !important;
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.4) !important;
+}
+
+/* Interactive Capsule: ChatGPT (Tilted Soft Grey Pill — Large Size Just Like Pic) */
+.badge-chatgpt {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  font-size: 0.82em !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  padding: 4px 22px 6px 22px !important;
+  border-radius: 9999px !important;
+  transform: rotate(2deg) !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 6px 18px rgba(100, 116, 139, 0.18) !important;
+  vertical-align: middle !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, background 0.22s ease !important;
+  white-space: nowrap !important;
+  margin: 0 4px !important;
+  box-sizing: border-box !important;
+  min-height: 46px !important;
+}
+
+.badge-chatgpt:hover,
+.badge-chatgpt:active {
+  transform: rotate(0deg) scale(1.04) !important;
+  background: #e2e8f0 !important;
+  box-shadow: 0 8px 24px rgba(100, 116, 139, 0.26) !important;
+}
+
+/* Typing cursor indicator inside capsules */
+.capsule-text {
+  display: inline-block !important;
+  min-width: 14px !important;
+  min-height: 1em !important;
+  line-height: inherit !important;
+  white-space: nowrap !important;
+}
+
+.capsule-text:empty::before {
+  content: "\00a0";
+  visibility: hidden;
+  display: inline-block;
+}
+
+.viva-description {
+  font-family: 'Urbanist', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: clamp(1rem, 1.1vw, 1.14rem) !important;
+  line-height: 1.6 !important;
+  color: #64748b !important;
+  max-width: 440px !important;
+  margin: 0 0 34px 0 !important;
+  font-weight: 400 !important;
+  text-align: left !important;
+}
+
+.viva-description strong {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+/* Action Buttons */
+.viva-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 44px;
+}
+
+.viva-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 9999px;
+  font-family: 'Urbanist', 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.viva-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Dark Pill Button (Explore Prompts) */
+.viva-btn-dark {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+  padding: 12px 14px 12px 24px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
+}
+
+.viva-btn-dark:hover {
+  background: #1e293b;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.25);
+}
+
+.viva-btn-dark .viva-arrow-bubble {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  transition: transform 0.22s ease;
+}
+
+.viva-btn-dark:hover .viva-arrow-bubble {
+  transform: rotate(45deg);
+}
+
+/* Light Pill Button (Direct Prompts per user instruction) */
+.viva-btn-light {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  padding: 12px 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.viva-btn-light:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.viva-btn-light .viva-arrow-bubble {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: transform 0.22s ease;
+}
+
+.viva-btn-light:hover .viva-arrow-bubble {
+  transform: rotate(45deg);
+  color: #0f172a;
+}
+
+/* ============================================================
+   FLOATING DOCK: CIRCLES STAY FIXED, ICONS FLOAT INSIDE CIRCLES!
+   Per User Instruction:
+   "circle float nhi akren... circle ke ander icons circle ke ander float karen"
+   ============================================================ */
+.viva-icon-strip {
+  position: absolute;
+  right: 6px;
+  top: 44%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+}
+
+/* Static circular container — DOES NOT FLOAT */
+.viva-dock-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease;
+  user-select: none;
+  outline: none;
+}
+
+.viva-dock-icon:hover {
+  transform: scale(1.12);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+/* Icons inside the circles float gently in a circle */
+.viva-dock-icon i {
+  display: inline-block;
+  will-change: transform;
+  font-size: 0.92rem;
+}
+
+.dock-gallery i {
+  animation: vivaIconCirc1 3.6s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.dock-contact i {
+  animation: vivaIconCirc2 4.0s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.dock-insta i {
+  animation: vivaIconCirc1 4.4s ease-in-out infinite;
+  animation-delay: 1.0s;
+}
+
+.dock-like i {
+  animation: vivaIconCirc2 3.8s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+.dock-follow i {
+  animation: vivaIconCirc1 4.2s ease-in-out infinite;
+  animation-delay: 2.0s;
+}
+
+@keyframes vivaIconCirc1 {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(2px, -3px); }
+  50% { transform: translate(0px, -4px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+@keyframes vivaIconCirc2 {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(-2px, -2px); }
+  50% { transform: translate(0px, -4px); }
+  75% { transform: translate(2px, -3px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+/* Individual Icon Color Accents */
+.dock-gallery {
+  background: linear-gradient(135deg, #ccfbf1, #dcfce7);
+  color: #059669;
+}
+
+.dock-contact {
+  background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+  color: #0284c7;
+}
+
+.dock-insta {
+  background: linear-gradient(135deg, #fce7f3, #fed7aa);
+  color: #e1306c;
+}
+
+.dock-like {
+  background: linear-gradient(135deg, #ffe4e6, #fce7f3);
+  color: #e11d48;
+}
+
+.dock-follow {
+  background: linear-gradient(135deg, #fef3c7, #ede9fe);
+  color: #7c3aed;
+}
+
+/* ============================================================
+   BOTTOM BAR: IMPORTANT PAGE PILLS (Per 5th pic instruction)
+   ============================================================ */
+.viva-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.viva-page-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.viva-page-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-family: 'Urbanist', 'Outfit', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.viva-page-pill:hover {
+  transform: translateY(-2px);
+}
+
+/* 1. Light Pink (About Us) */
+.viva-page-links .viva-page-pill:nth-child(1),
+.viva-page-pill.pill-pink {
+  background: #fdf2f8 !important;
+  color: #9d174d !important;
+  border: 1px solid #fbcfe8 !important;
+}
+.viva-page-links .viva-page-pill:nth-child(1):hover,
+.viva-page-pill.pill-pink:hover {
+  background: #fce7f3 !important;
+  border-color: #f472b6 !important;
+  box-shadow: 0 6px 16px rgba(244, 114, 182, 0.24) !important;
+}
+
+/* 2. Light Green (Contact Us) */
+.viva-page-links .viva-page-pill:nth-child(2),
+.viva-page-pill.pill-green {
+  background: #f0fdf4 !important;
+  color: #166534 !important;
+  border: 1px solid #bbf7d0 !important;
+}
+.viva-page-links .viva-page-pill:nth-child(2):hover,
+.viva-page-pill.pill-green:hover {
+  background: #dcfce7 !important;
+  border-color: #4ade80 !important;
+  box-shadow: 0 6px 16px rgba(74, 222, 128, 0.24) !important;
+}
+
+/* 3. Light Yellow (Privacy Policy) */
+.viva-page-links .viva-page-pill:nth-child(3),
+.viva-page-pill.pill-yellow {
+  background: #fefce8 !important;
+  color: #854d0e !important;
+  border: 1px solid #fef08a !important;
+}
+.viva-page-links .viva-page-pill:nth-child(3):hover,
+.viva-page-pill.pill-yellow:hover {
+  background: #fef9c3 !important;
+  border-color: #facc15 !important;
+  box-shadow: 0 6px 16px rgba(250, 204, 21, 0.25) !important;
+}
+
+/* 4. Light Orange (Terms & Conditions) */
+.viva-page-links .viva-page-pill:nth-child(4),
+.viva-page-pill.pill-orange {
+  background: #fff7ed !important;
+  color: #9a3412 !important;
+  border: 1px solid #fed7aa !important;
+}
+.viva-page-links .viva-page-pill:nth-child(4):hover,
+.viva-page-pill.pill-orange:hover {
+  background: #ffedd5 !important;
+  border-color: #fb923c !important;
+  box-shadow: 0 6px 16px rgba(251, 146, 60, 0.24) !important;
+}
+
+/* ============================================================
+   RIGHT SIDE: DUAL MOVING FLOW (FULL RIGHT EDGE)
+   ============================================================ */
+.viva-right {
+  flex: 1 1 auto;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.viva-flow-stage {
+  display: flex;
+  gap: clamp(16px, 2.2vw, 24px);
+  height: clamp(620px, 78vh, 760px);
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 7%, black 93%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 7%, black 93%, transparent 100%);
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.viva-flow-stage:hover .viva-track {
+  animation-play-state: paused !important;
+}
+
+.viva-flow-col {
+  flex: 1 1 50%;
+  min-width: 250px;
+  max-width: 330px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Marquee Tracks */
+.viva-track {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.2vw, 24px);
+  width: 100%;
+  will-change: transform;
+}
+
+/* Col 1 scrolls UP */
+.viva-track-up {
+  animation: vivaMarqueeUp 30s linear infinite;
+}
+
+@keyframes vivaMarqueeUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+/* Col 2 scrolls DOWN */
+.viva-track-down {
+  animation: vivaMarqueeDown 34s linear infinite;
+}
+
+@keyframes vivaMarqueeDown {
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+/* ============================================================
+   CLEAN ROUNDED CARDS — ZERO DOUBLE LAYER! (Pic 2 & 3 Fix)
+   - Zero padding, zero outer dark container, zero extra borders
+   - Image extends 100% to the 26px rounded edge
+   - Sleek "View Prompt ↗" button centered at bottom
+   ============================================================ */
+.viva-card {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 9 / 13.8 !important;
+  border-radius: 26px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: 0 14px 32px -6px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+  display: block !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.32s ease !important;
+}
+
+.viva-card:hover {
+  transform: translateY(-4px) scale(1.015) !important;
+  box-shadow: 0 22px 46px -8px rgba(15, 23, 42, 0.24) !important;
+}
+
+.viva-card-img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 26px !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.viva-card:hover .viva-card-img {
+  transform: scale(1.05) !important;
+}
+
+.viva-card-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.58) 100%) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Bottom Center "View Prompt" Button */
+.viva-card-bottom-center {
+  position: absolute !important;
+  bottom: 18px !important;
+  left: 0 !important;
+  right: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 5 !important;
+}
+
+.viva-card-view-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 9px 20px !important;
+  border-radius: 9999px !important;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  font-family: 'Urbanist', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.viva-card-view-btn i {
+  font-size: 0.72rem !important;
+  transition: transform 0.2s ease !important;
+}
+
+.viva-card:hover .viva-card-view-btn {
+  background: #1e293b !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+.viva-card:hover .viva-card-view-btn i {
+  transform: translate(2px, -2px) !important;
+}
+
+/* ============================================================
+   POPUP MODALS (Like & Follow Community)
+   ============================================================ */
+.viva-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 4000 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  animation: vivaModalFade 0.22s ease-out;
+}
+
+@keyframes vivaModalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.viva-modal-box {
+  background: #ffffff !important;
+  border-radius: 24px !important;
+  padding: 32px 28px !important;
+  max-width: 440px !important;
+  width: 100% !important;
+  position: relative !important;
+  box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.28) !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  animation: vivaModalPop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes vivaModalPop {
+  from { transform: scale(0.92) translateY(8px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.viva-modal-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 18px !important;
+  background: #f1f5f9 !important;
+  border: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  font-size: 1.2rem !important;
+  color: #64748b !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease !important;
+}
+
+.viva-modal-close:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.viva-modal-icon-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 16px;
+}
+
+.modal-heart-badge {
+  background: linear-gradient(135deg, #ffe4e6, #fce7f3);
+  color: #e11d48;
+}
+
+.modal-follow-badge {
+  background: linear-gradient(135deg, #fef3c7, #ede9fe);
+  color: #7c3aed;
+}
+
+.viva-modal-title {
+  font-family: 'Urbanist', 'Outfit', sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin: 0 0 10px 0 !important;
+}
+
+.viva-modal-desc {
+  font-family: 'Urbanist', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.95rem !important;
+  line-height: 1.55 !important;
+  color: #64748b !important;
+  margin: 0 0 24px 0 !important;
+}
+
+.viva-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.viva-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.viva-modal-btn:hover {
+  transform: translateY(-1px);
+}
+
+.viva-modal-btn-insta {
+  background: linear-gradient(135deg, #e1306c, #fd1d1d, #f56040);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.3);
+}
+
+.viva-modal-btn-primary {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+/* ============================================================
+   SEO WRAPPER BELOW HERO
+   ============================================================ */
+.home-landing-seo-wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px clamp(16px, 4vw, 32px) 60px;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+@media (max-width: 1120px) {
+  .viva-left {
+    padding-right: 0 !important;
+  }
+  .viva-icon-strip {
+    position: static !important;
+    transform: none !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 14px !important;
+    margin: 8px auto 28px auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .viva-hero-container {
+    flex-direction: column;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    gap: 36px !important;
+  }
+
+  .viva-left {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-right: 0 !important;
+  }
+
+  .viva-title {
+    font-size: clamp(2.3rem, 7vw, 3.2rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .capsules-line-1,
+  .capsules-line-2 {
+    min-height: 48px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
+
+  .viva-icon-strip {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 8px auto 26px auto !important;
+  }
+
+  .viva-right {
+    width: 100% !important;
+  }
+
+  .viva-flow-stage {
+    height: 480px;
+  }
+
+  .viva-flow-col {
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 600px) {
+  .viva-title {
+    font-size: clamp(2.2rem, 7vw, 3.0rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .capsules-line-1,
+  .capsules-line-2 {
+    min-height: 46px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    gap: 8px !important;
+  }
+
+  .badge-nano-banana,
+  .badge-chatgpt {
+    padding: 4px 18px 6px 18px !important;
+    min-height: 42px !important;
+  }
+
+  .viva-actions {
+    width: 100%;
+  }
+
+  .viva-btn {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .viva-icon-strip {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 12px !important;
+    margin: 6px auto 24px auto !important;
+  }
+
+  .viva-flow-stage {
+    height: 440px;
+  }
+
+  .viva-page-links {
+    justify-content: center;
+    width: 100%;
+  }
+}

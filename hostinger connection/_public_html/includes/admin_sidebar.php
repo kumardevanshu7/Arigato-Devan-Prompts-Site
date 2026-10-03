@@ -407,6 +407,7 @@ $is_active = function(string $page, ?string $tab = null) use ($cur_script, $cur_
     <div class="sb-sec">Content</div>
     <a href="upload_prompt.php" class="sb-link<?= $is_active('upload_prompt.php') ?>"><i class="fa-solid fa-upload"></i> <span>Upload Prompt</span></a>
     <a href="manage_prompts.php" class="sb-link<?= ($cur_script === 'manage_prompts.php' || $cur_script === 'edit_prompt.php') ? ' active' : '' ?>"><i class="fa-solid fa-list-check"></i> <span>Manage Prompts</span></a>
+    <a href="home_card_flow.php" class="sb-link<?= $is_active('home_card_flow.php') ?>"><i class="fa-solid fa-arrows-up-down" style="color:#c084fc;"></i> <span style="color:#c084fc; font-weight:700;">Home Card Flow</span></a>
     <a href="prompt_links.php" class="sb-link<?= $is_active('prompt_links.php') ?>"><i class="fa-solid fa-link"></i> <span>Prompt Links</span></a>
     <a href="potd_manager.php" class="sb-link<?= $is_active('potd_manager.php') ?>"><i class="fa-solid fa-sun"></i> <span>POTD Manager</span></a>
     <a href="trending_settings.php" class="sb-link<?= $is_active('trending_settings.php') ?>"><i class="fa-solid fa-fire-flame-curved"></i> <span>Trending Settings</span></a>
@@ -475,6 +476,7 @@ $is_active = function(string $page, ?string $tab = null) use ($cur_script, $cur_
     <div class="d-sec">Content</div>
     <a href="upload_prompt.php" class="d-link<?= $is_active('upload_prompt.php') ?>"><i class="fa-solid fa-upload"></i> Upload Prompt</a>
     <a href="manage_prompts.php" class="d-link<?= ($cur_script === 'manage_prompts.php' || $cur_script === 'edit_prompt.php') ? ' active' : '' ?>"><i class="fa-solid fa-list-check"></i> Manage Prompts</a>
+    <a href="home_card_flow.php" class="d-link<?= $is_active('home_card_flow.php') ?>"><i class="fa-solid fa-arrows-up-down" style="color:#c084fc;"></i> <span style="color:#c084fc; font-weight:700;">Home Card Flow</span></a>
     <a href="prompt_links.php" class="d-link<?= $is_active('prompt_links.php') ?>"><i class="fa-solid fa-link"></i> Prompt Links</a>
     <a href="potd_manager.php" class="d-link<?= $is_active('potd_manager.php') ?>"><i class="fa-solid fa-sun"></i> POTD Manager</a>
     <a href="trending_settings.php" class="d-link<?= $is_active('trending_settings.php') ?>"><i class="fa-solid fa-fire-flame-curved"></i> Trending Settings</a>

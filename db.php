@@ -161,6 +161,18 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // Home Hero Card Flow table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS home_card_flow (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        prompt_id INT NOT NULL,
+        source_type VARCHAR(20) NOT NULL DEFAULT 'prompt',
+        column_pos ENUM('col1', 'col2') NOT NULL DEFAULT 'col1',
+        sort_order INT NOT NULL DEFAULT 0,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_flow_item (prompt_id, source_type, column_pos)
+    )");
+
     // How to Use Step Small Pics library
     $pdo->exec("CREATE TABLE IF NOT EXISTS step_small_pics (
         id INT AUTO_INCREMENT PRIMARY KEY,
