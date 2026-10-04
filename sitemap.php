@@ -54,6 +54,12 @@ $static_pages = [
         "lastmod"    => $today,
     ],
     [
+        "url"        => "/already_uploaded.php",
+        "priority"   => "0.8",
+        "changefreq" => "weekly",
+        "lastmod"    => $today,
+    ],
+    [
         "url"        => "/blogs.php",
         "priority"   => "0.8",
         "changefreq" => "daily",
@@ -85,12 +91,6 @@ $static_pages = [
     ],
     [
         "url"        => "/contact.php",
-        "priority"   => "0.5",
-        "changefreq" => "monthly",
-        "lastmod"    => $today,
-    ],
-    [
-        "url"        => "/feedback.php",
         "priority"   => "0.5",
         "changefreq" => "monthly",
         "lastmod"    => $today,

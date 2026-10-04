@@ -6,8 +6,14 @@
  * same authentication, unlock, SEO and related-prompt behaviour.
  */
 $slug = trim((string) ($_GET['slug'] ?? ''));
-if ($slug === '' || !preg_match('/^[a-z0-9][a-z0-9-]*$/i', $slug)) {
-    header('Location: ../../gallery.php');
+if ($slug === '') {
+    header('Location: ../../solo_prompts.php', true, 301);
+    exit;
+}
+if (!preg_match('/^[a-z0-9][a-z0-9-]*$/i', $slug)) {
+    http_response_code(404);
+    chdir(dirname(__DIR__, 2));
+    require __DIR__ . '/../../404.php';
     exit;
 }
 

@@ -13,6 +13,118 @@ $curPage = 'faq.php';
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260701">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is this site completely free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, 100% free for now! No subscriptions, no hidden charges. Enjoy unlimited access."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How often are new prompts added?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "New prompts are added every 2–3 days. Follow @arigato.devan on Instagram to get notified first!"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my data safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "100% safe. Only your name and email are collected — nothing else. Everything is secured through Google's own services."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a streak and how do I increase it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Your streak increases by 1 every day you log in. Miss a single day and it resets to zero. Stay consistent!"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Google login required?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not at all! You can browse and unlock prompts without logging in. But login unlocks extra benefits: save & like prompts, and unlock Unreleased prompts with just 20 taps instead of 90."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What prompt to give Gemini for couple photo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Specify realistic photography details such as: 'Cinematic 35mm portrait of a stylish young couple, natural smiling chemistry, golden hour backlighting, soft focal blur, authentic skin textures, 8k resolution'. You can copy full tested versions directly from our site."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How to create couple images with Gemini AI prompt generator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use our prompt collections as your generator template: choose your favorite mood (romantic, aesthetic cafe, festive, or travel), copy the formula, customize outfit colors or background location, and run in Google Gemini for instant high-quality results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a Secret Code prompt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Secret Code is a 6-letter code hidden inside an Instagram Reel. Drop a comment on the reel -> the code arrives in your DMs automatically via Auto-DM -> enter it on the site -> exclusive prompt unlocked!"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I unlock a Secret Code prompt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Step 1: Go to the Instagram Reel -> Step 2: Drop any comment -> Step 3: Code arrives in DMs via Auto-DM -> Step 4: Copy it -> Step 5: Paste in the Secret Code box on this site -> Prompt unlocked!"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are Unreleased prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "These are prompts that were created but never posted on Instagram — too experimental, too niche, or just didn't feel right for the feed. Instead of deleting them, they're shared here exclusively."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I unlock Unreleased prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No code needed here! Without login: 90 heart taps to unlock. With Google login: Just 20 taps. Simple!"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which AI tool should I use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gemini (Google) is the best — 90% of prompts are optimized for Gemini. It generates stunning, romantic visuals with far fewer restrictions. ChatGPT tends to block or water down couple content."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the prompt for a couple photo in Gemini & how to make one?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Gemini couple prompt is a detailed description specifying the couple's poses, outfits, facial expressions, and cinematic lighting. To make one, copy any prompt from our gallery, open Google Gemini, paste and generate."
+          }
+        }
+      ]
+    }
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info theme-nogoda">

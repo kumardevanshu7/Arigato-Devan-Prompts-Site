@@ -29,7 +29,11 @@ if (isset($_SESSION["user_id"])) {
 }
 
 $p = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$p) { header("Location: gallery.php"); exit(); }
+if (!$p) {
+    http_response_code(404);
+    require __DIR__ . '/404.php';
+    exit();
+}
 $id = (int)$p['id'];
 
 $db_type  = $p["prompt_type"] ?? "secret";

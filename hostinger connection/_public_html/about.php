@@ -29,6 +29,22 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
     <meta name="robots" content="index, follow">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260727">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "mainEntity": {
+        "@type": "Person",
+        "name": "Devan",
+        "url": "https://arigatodevan.com/about.php",
+        "image": "https://arigatodevan.com/landingpics/lan9.webp",
+        "description": "Creator of Arigato Devan, crafting and testing high-fidelity AI couple prompts for Gemini and ChatGPT.",
+        "sameAs": [
+          "https://www.instagram.com/arigato.devan/"
+        ]
+      }
+    }
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info theme-nogoda">

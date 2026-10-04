@@ -32,7 +32,11 @@ if ($slug !== '') {
     $stmt->execute([$id]);
 }
 $p = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$p) { header('Location: curated_ai_prompts.php'); exit(); }
+if (!$p) {
+    http_response_code(404);
+    require __DIR__ . '/404.php';
+    exit();
+}
 $id = (int) $p['id'];
 
 $is_legacy_route = basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'curated_prompt.php';

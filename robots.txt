@@ -13,7 +13,6 @@ Disallow: /upload_prompt.php
 Disallow: /upload_editor_image.php
 Disallow: /edit_prompt.php
 Disallow: /delete_prompt.php
-Disallow: /already_uploaded.php
 Disallow: /all_codes.php
 Disallow: /generate_sync_report.php
 Disallow: /webp_updater.php
@@ -44,7 +43,6 @@ Disallow: /onboarding.php
 Disallow: /signup.php
 Disallow: /user_data.php
 Disallow: /firebase_auth.php
-Disallow: /secret_code.php
 
 # Backend APIs, Actions & Endpoints
 Disallow: /db.php
@@ -84,4 +82,5 @@ User-agent: Googlebot
 Allow: /
 
 # Sitemap location
+Sitemap: https://arigatodevan.com/sitemap.xml
 Sitemap: https://arigatodevan.com/sitemap.php

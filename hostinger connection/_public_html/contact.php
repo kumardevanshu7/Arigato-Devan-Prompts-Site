@@ -22,6 +22,15 @@ $social_cfg = get_contact_social_config();
     <meta name="robots" content="index, follow">
     <?php include_once 'includes/theme_head.php'; ?>
     <link rel="stylesheet" href="css/info-pages.css?v=20260727">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contact Arigato Devan",
+      "url": "https://arigatodevan.com/contact.php",
+      "description": "Get in touch with Arigato Devan for prompt feedback, collaborations, or custom AI prompt inquiries."
+    }
+    </script>
     <?php include_once "gtag.php"; ?>
 </head>
 <body class="page-store page-info page-contact theme-nogoda">

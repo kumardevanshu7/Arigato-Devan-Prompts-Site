@@ -115,7 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['is_live_preview'])) 
     }
 
     if (!$blog) {
-        header("Location: blogs.php");
+        http_response_code(404);
+        require __DIR__ . '/404.php';
         exit();
     }
 }
