@@ -53,10 +53,7 @@ $resolved_blogs = resolve_footer_blog_links($footer_blog_ids, $pdo ?? null);
                     ?>
                     <li>
                         <a href="<?= htmlspecialchars($href) ?>" class="sf-link" target="<?= htmlspecialchars($target) ?>" <?= $rel ?>>
-                            <span><?= htmlspecialchars($lnk['title'] ?? '') ?></span>
-                            <?php if ($badge !== ''): ?>
-                                <span class="<?= $badge_class ?>"><?= htmlspecialchars($badge) ?></span>
-                            <?php endif; ?>
+                            <span><?= htmlspecialchars($lnk['title'] ?? '') ?></span><?php if ($badge !== ''): ?><span class="<?= $badge_class ?>"><?= htmlspecialchars($badge) ?></span><?php endif; ?>
                         </a>
                     </li>
                     <?php endforeach; ?>

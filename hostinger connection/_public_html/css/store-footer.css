@@ -93,9 +93,7 @@ body.page-prompt .store-footer-inner,
     line-height: 1.4 !important;
     text-align: left !important;
     width: 100% !important;
-    display: flex !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
+    display: block !important;
 }
 
 .sf-link {
@@ -104,13 +102,11 @@ body.page-prompt .store-footer-inner,
     color: #567C8D !important;
     text-decoration: none !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
+    display: inline-block !important;
+    line-height: 1.5 !important;
     text-align: left !important;
-    gap: 7px !important;
     max-width: 100% !important;
-    word-break: break-word !important;
+    word-break: normal !important;
 }
 
 .sf-link:hover {
@@ -123,9 +119,13 @@ body.page-prompt .store-footer-inner,
     border-radius: 4px !important;
 }
 
-/* Link Badge */
+/* Link Badge - glued inline next to text */
 .sf-badge {
-    font-size: 0.6rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: 1px !important;
+    margin-left: 6px !important;
+    font-size: 0.58rem !important;
     font-weight: 800 !important;
     letter-spacing: 0.04em !important;
     padding: 1px 6px !important;
@@ -136,6 +136,7 @@ body.page-prompt .store-footer-inner,
     white-space: nowrap !important;
     text-transform: uppercase !important;
     flex-shrink: 0 !important;
+    line-height: normal !important;
 }
 
 .sf-badge.sf-badge-gold {
@@ -369,14 +370,14 @@ body.page-prompt .store-footer-inner,
 
     .sf-links li {
         text-align: left !important;
-        justify-content: flex-start !important;
+        display: block !important;
     }
 
     .sf-link {
         font-size: 0.78rem !important;
-        line-height: 1.38 !important;
+        line-height: 1.45 !important;
         text-align: left !important;
-        justify-content: flex-start !important;
+        display: inline-block !important;
     }
 
     .sf-divider {

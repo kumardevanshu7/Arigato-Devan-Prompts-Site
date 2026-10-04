@@ -315,6 +315,47 @@ body.page-gallery {
   max-width: clamp(165px, 22vw, 215px) !important;
   scroll-snap-align: start !important;
   box-sizing: border-box !important;
+  container-type: inline-size;
+}
+
+@container (max-width: 178px) {
+  .gal-trending-scroll .prompt-card .card-footer-row,
+  .gal-trending-scroll .prompt-card .card-meta-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    padding-top: 4px !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-stats-col {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-stat-item {
+    font-size: 0.68rem !important;
+    gap: 4px !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-prompt-btn-wrap {
+    margin-left: 0 !important;
+    align-self: flex-start !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-prompt-btn {
+    align-self: flex-start !important;
+    padding: 4px 11px !important;
+    font-size: 0.66rem !important;
+  }
 }
 
 .trending-card {
@@ -824,6 +865,45 @@ body.page-gallery {
     flex: 0 0 clamp(145px, 44vw, 175px) !important;
     width: clamp(145px, 44vw, 175px) !important;
     max-width: clamp(145px, 44vw, 175px) !important;
+  }
+
+  /* Trending row shrunken cards layout fix: Prompt button moves below, stats stay on the left */
+  .gal-trending-scroll .prompt-card .card-footer-row,
+  .gal-trending-scroll .prompt-card .card-meta-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    padding-top: 4px !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-stats-col {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-stat-item {
+    font-size: 0.68rem !important;
+    gap: 4px !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-prompt-btn-wrap {
+    margin-left: 0 !important;
+    align-self: flex-start !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+  }
+
+  .gal-trending-scroll .prompt-card .card-prompt-btn {
+    align-self: flex-start !important;
+    padding: 4px 11px !important;
+    font-size: 0.66rem !important;
   }
 
   .gal-section-head h2 {

@@ -109,7 +109,7 @@ $gal_banner_slides = gallery_banner_slides();
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <?php include_once 'includes/theme_head.php'; ?>
-    <link rel="stylesheet" href="css/gallery-extras.css?v=20260903cardviews">
+    <link rel="stylesheet" href="css/gallery-extras.css?v=20261004trendrow">
     <?php include_once 'includes/card_skeleton_assets.php'; ?>
 
     <!-- Breadcrumb Schema -->
