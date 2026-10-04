@@ -29,6 +29,81 @@ function prompt_resolve_type(string $db_type): array {
     return ['ptype' => $ptype, 'label' => $tinfo['label'], 'cls' => $tinfo['cls']];
 }
 
+/**
+ * Curated 50 aesthetic light/pastel color palette.
+ * High luminance (>85%), soft and easy on eyes, high contrast with dark navy typography.
+ */
+function get_prompt_card_palette(): array {
+    return [
+        '#d4f938', // 1. Electric Lime (Handpicked hero reference)
+        '#d1fae5', // 2. Soft Mint
+        '#fed7aa', // 3. Pastel Peach
+        '#fce7f3', // 4. Blush Pink
+        '#e0f2fe', // 5. Baby Sky Blue
+        '#ede9fe', // 6. Pale Lavender
+        '#fef08a', // 7. Butter Yellow
+        '#fef3c7', // 8. Warm Cream
+        '#dcfce7', // 9. Fresh Pistachio
+        '#ffe4e6', // 10. Soft Coral
+        '#e0f7fa', // 11. Ice Blue
+        '#e8f5e9', // 12. Matcha Foam
+        '#f3e8ff', // 13. Lilac Mist
+        '#ffedd5', // 14. Apricot Cream
+        '#eafaf1', // 15. Honeydew Green
+        '#e0e7ff', // 16. Powder Periwinkle
+        '#f7fee7', // 17. Pale Lime Sorbet
+        '#faeed9', // 18. Soft Champagne
+        '#ccfbf1', // 19. Mint Sherbet
+        '#fbe7eb', // 20. Rose Quartz
+        '#e2e8e0', // 21. Light Sage
+        '#fffbeb', // 22. Vanilla Custard
+        '#e0f4f7', // 23. Pale Aqua
+        '#fae8ff', // 24. Muted Orchid
+        '#e6f0fa', // 25. Cloud Blue
+        '#fef2e2', // 26. Sunlit Almond
+        '#ecfccb', // 27. Fresh Celery
+        '#f5e6eb', // 28. Soft Mauve
+        '#effcd5', // 29. Pear Green
+        '#ffe8db', // 30. Sweet Melon
+        '#e9e5ff', // 31. Pale Iris
+        '#fdf2f8', // 32. Cotton Candy
+        '#fef9c3', // 33. Lemon Cream
+        '#e6faf5', // 34. Seafoam Glow
+        '#ffecd6', // 35. Pale Tangerine
+        '#ece8f5', // 36. Dusty Lavender
+        '#f6f3ea', // 37. Oat Milk
+        '#d1f4f0', // 38. Soft Turquoise
+        '#fde8ea', // 39. Strawberry Milk
+        '#e8edf2', // 40. Slate Frost
+        '#fcf1db', // 41. Golden Sand
+        '#e4f9cf', // 42. Spring Sprout
+        '#f1ebfc', // 43. Pale Violet
+        '#f5f0e8', // 44. Warm Linen
+        '#ddf4ff', // 45. Nordic Blue
+        '#ffe9e3', // 46. Blushed Salmon
+        '#e3fced', // 47. Spearmint
+        '#f5f3ff', // 48. Velvet Haze
+        '#e8f8f5', // 49. Frosty Jade
+        '#fff1f2', // 50. Blushing Rose
+    ];
+}
+
+/**
+ * Returns a randomized color from the 50-color palette.
+ * Colors are shuffled once per request and cycle sequentially
+ * so adjacent cards have different colors, and page refresh randomizes anew.
+ */
+function get_prompt_card_color(?int $index = null): string {
+    static $shuffled = null;
+    static $seq = 0;
+    if ($shuffled === null) {
+        $shuffled = get_prompt_card_palette();
+        shuffle($shuffled);
+    }
+    $idx = ($index !== null) ? $index : $seq++;
+    return $shuffled[$idx % count($shuffled)];
+}
+
 function render_prompt_card(array $p, int $index = 0, array $opts = []): void {
     $clickable = $opts['clickable'] ?? true;
     $extra_class = !empty($opts['extra_class']) ? ' ' . trim($opts['extra_class']) : '';
@@ -40,8 +115,10 @@ function render_prompt_card(array $p, int $index = 0, array $opts = []): void {
     $blur_style = ($ptype === 'unreleased' && empty($p['is_unlocked'])) ? 'filter:blur(5px);transform:scale(1.05);' : '';
     $is_unlocked = !empty($p['is_unlocked']);
     $is_liked    = !empty($p['is_liked']);
+    $card_bg     = $opts['bg_color'] ?? get_prompt_card_color();
     ?>
     <div class="<?= $card_class ?> skeleton"
+         style="--card-bg: <?= htmlspecialchars($card_bg) ?>; background-color: <?= htmlspecialchars($card_bg) ?> !important;"
          data-index="<?= (int)$index ?>"
          data-id="<?= (int)$p['id'] ?>"
          data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"

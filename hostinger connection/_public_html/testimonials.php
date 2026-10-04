@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__ . '/includes/session_bootstrap.php';
-require_once "db.php";
+header("HTTP/1.1 301 Moved Permanently");
+header("Location: feedback_shows.php");
+exit();
 
 // Fetch all approved testimonials
 $testimonials = [];

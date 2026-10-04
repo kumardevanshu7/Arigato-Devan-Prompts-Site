@@ -209,7 +209,6 @@ foreach ([$cover_portrait, $cover_landscape] as $cover_src) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars($blog["meta_title"] ?? $blog["title"]) ?> &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-<link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260914">
 <link rel="stylesheet" href="css/blog-magazine.css?v=20260903tables">
@@ -896,7 +895,7 @@ code.prompt-var-amber, span.prompt-var-amber,
 }
 
 body {
-    background-color: #f1f5f9 !important; /* Neutral light-gray base */
+    background-color: #ffffff !important; /* Clean White base */
     font-family: 'Inter', sans-serif !important;
     color: #1e293b !important;
     position: relative !important;
@@ -1021,7 +1020,7 @@ header .logo-text .blog-brand-suffix {
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
-/* Override style.min.css � keep arigato.blog visible on all mobile widths */
+/* Override style.min.css — keep arigato.blog visible on all mobile widths */
 header .logo-area .logo-text {
     display: block !important;
     visibility: visible !important;
@@ -1030,7 +1029,7 @@ header .logo-area .logo-text {
     min-width: 0 !important;
     overflow: visible !important;
 }
-/* logo circle avatar � css/blog-header-logo.css */
+/* logo circle avatar — css/blog-header-logo.css */
 header nav.nav-links {
     gap: 16px !important; /* Perfect spacious layout */
     border: none !important;

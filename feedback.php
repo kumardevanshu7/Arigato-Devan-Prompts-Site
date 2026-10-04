@@ -682,6 +682,9 @@ body {
         <a href="index.php" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> <span>Back to Home</span>
         </a>
+        <a href="feedback_shows.php" class="back-link" style="color:var(--ink2);margin-left:auto;">
+            <i class="fa-solid fa-star" style="color:#f59e0b;"></i> <span>What They Say?</span>
+        </a>
         <div class="section-label">
             <i class="fa-solid fa-comment-dots"></i>
             <span>Share Your Thoughts</span>
@@ -715,9 +718,14 @@ body {
                 Next feedback in 7 days
             </div>
             <br>
-            <a href="index.php" class="back-home-btn">
-                <i class="fa-solid fa-house"></i> Back to Home
-            </a>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+                <a href="index.php" class="back-home-btn">
+                    <i class="fa-solid fa-house"></i> Back to Home
+                </a>
+                <a href="feedback_shows.php" class="back-home-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <i class="fa-solid fa-star"></i> View Reviews
+                </a>
+            </div>
         </div>
 
         <?php elseif ($already_submitted): ?>
@@ -785,9 +793,14 @@ body {
             </div>
             <?php endif; ?>
 
-            <a href="index.php" class="back-home-btn">
-                <i class="fa-solid fa-house"></i> Back to Home
-            </a>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+                <a href="index.php" class="back-home-btn">
+                    <i class="fa-solid fa-house"></i> Back to Home
+                </a>
+                <a href="feedback_shows.php" class="back-home-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <i class="fa-solid fa-star"></i> View Reviews
+                </a>
+            </div>
         </div>
 
         <?php else: ?>

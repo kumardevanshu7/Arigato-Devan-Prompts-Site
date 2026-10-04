@@ -319,7 +319,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         z-index: 10 !important;
         width: 100% !important;
         margin-top: clamp(32px, 5vw, 60px) !important;
-        background: var(--pal-white, #FFFFFF) !important;
+        background: #FFFDF4 !important;
         border-top: 1px solid var(--pal-sky, #C8D9E6) !important;
         padding: clamp(28px, 5vw, 40px) clamp(20px, 4vw, 80px) calc(28px + env(safe-area-inset-bottom, 0px)) !important;
         box-sizing: border-box !important;
@@ -368,7 +368,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             margin-top: 36px !important;
             margin-bottom: 0 !important;
             padding: 32px 16px calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-            background: #FFFFFF !important;
+            background: #FFFDF4 !important;
             border-top: 1px solid var(--pal-sky, #C8D9E6) !important;
             clear: both !important;
             box-sizing: border-box !important;
@@ -648,6 +648,144 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     .pp-love-btn:active {
         transform: scale(0.92) !important;
     }
+
+    /* Guest User Auth Modal */
+    .pp-guest-modal-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(15, 23, 42, 0.55) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        z-index: 99999 !important;
+        display: none;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        animation: ppGuestFade 0.22s ease-out;
+    }
+    .pp-guest-modal-overlay.is-open {
+        display: flex !important;
+    }
+    @keyframes ppGuestFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .pp-guest-modal-box {
+        background: #ffffff !important;
+        border-radius: 24px !important;
+        padding: 32px 28px !important;
+        max-width: 420px !important;
+        width: 100% !important;
+        position: relative !important;
+        box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.28) !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+        border: 1px solid rgba(86, 124, 141, 0.2) !important;
+        animation: ppGuestPop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    @keyframes ppGuestPop {
+        from { transform: scale(0.92) translateY(10px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .pp-guest-modal-close {
+        position: absolute !important;
+        top: 14px !important;
+        right: 16px !important;
+        background: #f1f5f9 !important;
+        border: none !important;
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 50% !important;
+        font-size: 1.25rem !important;
+        color: #64748b !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        transition: all 0.2s ease !important;
+    }
+    .pp-guest-modal-close:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        transform: rotate(90deg);
+    }
+    .pp-guest-icon-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin: 0 auto 16px;
+        transition: all 0.3s ease;
+    }
+    .pp-guest-icon-badge.badge-like {
+        background: linear-gradient(135deg, #ffe4e6, #fce7f3);
+        color: #e11d48;
+        box-shadow: 0 8px 20px rgba(225, 29, 72, 0.2);
+    }
+    .pp-guest-icon-badge.badge-save {
+        background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+        color: #0284c7;
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
+    }
+    .pp-guest-title {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+        font-size: 1.3rem !important;
+        font-weight: 800 !important;
+        color: #2F4156 !important;
+        margin: 0 0 10px 0 !important;
+    }
+    .pp-guest-desc {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+        font-size: 0.92rem !important;
+        line-height: 1.55 !important;
+        color: #567C8D !important;
+        margin: 0 0 24px 0 !important;
+    }
+    .pp-guest-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .pp-guest-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px 20px;
+        border-radius: 9999px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        border: none;
+    }
+    .pp-guest-btn:hover {
+        transform: translateY(-1px);
+    }
+    .pp-guest-btn-primary {
+        background: #2F4156 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(47, 65, 86, 0.25) !important;
+    }
+    .pp-guest-btn-primary:hover {
+        background: #1e2c3a !important;
+        box-shadow: 0 6px 18px rgba(47, 65, 86, 0.35) !important;
+    }
+    .pp-guest-btn-secondary {
+        background: #f1f5f9 !important;
+        color: #64748b !important;
+    }
+    .pp-guest-btn-secondary:hover {
+        background: #e2e8f0 !important;
+        color: #334155 !important;
+    }
     </style>
     <?php include_once "gtag.php"; ?>
 </head>
@@ -710,7 +848,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 <!-- -- TASK SECTION (shown when locked) -- -->
                 <?php if (!$is_unlocked): ?>
 
-                <div id="pp-task" class="pp-task-card">
+                <div id="pp-task" class="pp-task-card google-anno-skip">
                     <?php if ($ptype === 'secret_code'): ?>
                         <div class="pp-task-icon"><i class="fa-solid fa-lock"></i></div>
                         <h3>Enter Secret Code</h3>
@@ -731,7 +869,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <?php else: ?>
                         <p>Tap the heart <strong>90 times</strong> to unlock — or <a href="login.php" style="font-weight:900;color:var(--primary-dark);">login</a> for just 20 taps!</p>
                         <?php endif; ?>
-                        <div class="pp-love-area">
+                        <div class="pp-love-area google-anno-skip">
                             <button id="pp-love-btn" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count">0</span> / <span id="pp-tap-total"><?= isset($_SESSION['user_id']) ? 20 : 90 ?></span></div>
@@ -751,7 +889,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <div class="pp-task-icon"><i class="fa-brands fa-instagram" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i></div>
                         <h3>Already on Instagram!</h3>
                         <p>This prompt has been shared on our Instagram. Tap the heart <strong>9 times</strong> to unlock it!</p>
-                        <div class="pp-love-area">
+                        <div class="pp-love-area google-anno-skip">
                             <button id="pp-love-btn-au" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-au" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-au">0</span> / 9</div>
@@ -762,7 +900,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <div class="pp-task-icon"><i class="fa-solid fa-heart"></i></div>
                         <h3>Show Some Love!</h3>
                         <p>Tap the heart <strong><?= $req_taps ?> times</strong> to unlock this prompt!</p>
-                        <div class="pp-love-area">
+                        <div class="pp-love-area google-anno-skip">
                             <button id="pp-love-btn-dir" class="pp-love-btn"><i class="fa-solid fa-heart"></i></button>
                             <div class="pp-progress-bar"><div class="pp-progress-fill" id="pp-progress-fill-dir" style="width:0%"></div></div>
                             <div class="pp-love-progress"><span id="pp-tap-count-dir">0</span> / <?= $req_taps ?></div>
@@ -798,7 +936,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                         <div class="pp-prompt-text" id="pp-prompt-text"><?= $is_unlocked ? htmlspecialchars($p['prompt_text']) : '' ?></div>
                     </div>
 
-                    <div class="pp-actions">
+                    <div class="pp-actions google-anno-skip">
                         <button type="button" class="pp-btn pp-copy-btn" id="pp-copy-btn"><i class="fa-solid fa-copy"></i> COPY</button>
                         <button type="button" class="pp-btn pp-save-btn" id="pp-save-btn" data-prompt-id="<?= $id ?>" data-saved="<?= $p['is_saved'] ? 'true' : 'false' ?>">
                             <i class="fa-solid fa-bookmark"></i> <span id="pp-save-label"><?= $p['is_saved'] ? 'SAVED' : 'SAVE' ?></span>
@@ -1389,7 +1527,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     if (saveBtn) {
         saveBtn.addEventListener('click', async function() {
             <?php if (!isset($_SESSION['user_id'])): ?>
-            window.location.href = 'login.php';
+            showGuestAuthModal('save');
             return;
             <?php endif; ?>
             const isSaved = this.dataset.saved === 'true';
@@ -1425,7 +1563,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     if (likeBtn) {
         likeBtn.addEventListener('click', async function() {
             <?php if (!isset($_SESSION['user_id'])): ?>
-            window.location.href = 'login.php';
+            showGuestAuthModal('like');
             return;
             <?php endif; ?>
             const fd = new FormData(); fd.append('prompt_id', promptId);
@@ -1454,7 +1592,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         if (!pid) return;
 
         <?php if (!isset($_SESSION['user_id'])): ?>
-        window.location.href = 'login.php';
+        showGuestAuthModal('like');
         return;
         <?php endif; ?>
 
@@ -1604,7 +1742,73 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
             <img id="stepPicModalImg" src="" alt="Sample step picture">
         </div>
     </div>
+    <!-- Guest User Auth Modal for Like & Save -->
+    <div id="pp-guest-modal" class="pp-guest-modal-overlay google-anno-skip" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true" onclick="closeGuestModal()">
+        <div class="pp-guest-modal-box" onclick="event.stopPropagation()">
+            <button type="button" class="pp-guest-modal-close" onclick="closeGuestModal()" aria-label="Close dialog">&times;</button>
+            <div class="pp-guest-icon-badge" id="pp-guest-icon-badge">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <h3 class="pp-guest-title" id="pp-guest-title">Show Some Love! ❤️✨</h3>
+            <p class="pp-guest-desc" id="pp-guest-desc">
+                Love this prompt? Sign in to like and support prompt creators, and sync your favorite prompts across all your devices!
+            </p>
+            <div class="pp-guest-actions">
+                <a href="login.php?redirect_to=<?= urlencode('prompt.php?id=' . $id) ?>" class="pp-guest-btn pp-guest-btn-primary" id="pp-guest-login-btn">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Sign In to Like ✨</span>
+                </a>
+                <button type="button" class="pp-guest-btn pp-guest-btn-secondary" onclick="closeGuestModal()">
+                    Maybe Later / Keep Exploring
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
+    function showGuestAuthModal(type) {
+        var modal = document.getElementById('pp-guest-modal');
+        if (!modal) return;
+        var badge = document.getElementById('pp-guest-icon-badge');
+        var title = document.getElementById('pp-guest-title');
+        var desc  = document.getElementById('pp-guest-desc');
+        var ctaBtn = document.getElementById('pp-guest-login-btn');
+
+        if (type === 'save') {
+            if (badge) {
+                badge.className = 'pp-guest-icon-badge badge-save';
+                badge.innerHTML = '<i class="fa-solid fa-bookmark"></i>';
+            }
+            if (title) title.innerHTML = 'Save Your Favorites! 🔖';
+            if (desc) desc.textContent = 'Sign in to bookmark this prompt so you can easily find and copy it anytime from your profile!';
+            if (ctaBtn) {
+                var span = ctaBtn.querySelector('span');
+                if (span) span.textContent = 'Sign In to Save ✨';
+            }
+        } else {
+            if (badge) {
+                badge.className = 'pp-guest-icon-badge badge-like';
+                badge.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            }
+            if (title) title.innerHTML = 'Show Some Love! ❤️✨';
+            if (desc) desc.textContent = 'Love this prompt? Sign in to like and support prompt creators, and sync your favorites across all devices!';
+            if (ctaBtn) {
+                var span = ctaBtn.querySelector('span');
+                if (span) span.textContent = 'Sign In to Like ✨';
+            }
+        }
+
+        modal.classList.add('is-open');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeGuestModal() {
+        var modal = document.getElementById('pp-guest-modal');
+        if (modal) {
+            modal.classList.remove('is-open');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
     function openStepPicModal(e, url) {
         if (e) e.preventDefault();
         var m = document.getElementById('stepPicModal');
@@ -1623,7 +1827,10 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         }
     }
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeStepPicModal();
+        if (e.key === 'Escape') {
+            closeStepPicModal();
+            closeGuestModal();
+        }
     });
     </script>
 </body>

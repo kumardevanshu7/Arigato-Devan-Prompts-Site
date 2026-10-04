@@ -73,22 +73,21 @@ function blog_list_cover_html(array $b, bool $wide = false): string {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blogs &ndash; Arigato Devan Prompts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-<link rel="stylesheet" href="css/nogoda-theme.css?v=20260741">
 <?php include_once 'includes/theme_head.php'; ?>
 <link rel="stylesheet" href="css/blog-splash-loading.css?v=20260914">
-<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
+<meta name="description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <!-- Open Graph & Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Arigato Devan Prompts">
-<meta property="og:title" content="Blogs � Arigato Devan Prompts">
-<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
+<meta property="og:title" content="Blogs &ndash; Arigato Devan Prompts">
+<meta property="og:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <meta property="og:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <meta property="og:url" content="https://arigatodevan.com/blogs.php">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blogs � Arigato Devan Prompts">
-<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan. ??">
+<meta name="twitter:title" content="Blogs &ndash; Arigato Devan Prompts">
+<meta name="twitter:description" content="Read the latest blogs on AI, couple content, and creative prompts from Arigato Devan.">
 <meta name="twitter:image" content="https://arigatodevan.com/landingpics/lan9.webp">
 <link rel="stylesheet" href="style.min.css?v=20260601">
 <style>
@@ -96,7 +95,7 @@ function blog_list_cover_html(array $b, bool $wide = false): string {
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 body {
-    background-color: #f1f5f9 !important; /* Neutral light-gray base */
+    background-color: #ffffff !important; /* Clean White base */
     font-family: 'Inter', sans-serif !important;
     color: #1e293b !important;
     margin: 0;
@@ -223,7 +222,7 @@ header .logo-text .blog-brand-suffix {
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
-/* Override style.min.css � keep arigato.blog visible on all mobile widths */
+/* Override style.min.css — keep arigato.blog visible on all mobile widths */
 header .logo-area .logo-text {
     display: block !important;
     visibility: visible !important;
@@ -232,7 +231,7 @@ header .logo-area .logo-text {
     min-width: 0 !important;
     overflow: visible !important;
 }
-/* logo circle avatar � css/blog-header-logo.css */
+/* logo circle avatar — css/blog-header-logo.css */
 header nav.nav-links {
     gap: 16px !important; /* Perfect spacious layout */
     border: none !important;

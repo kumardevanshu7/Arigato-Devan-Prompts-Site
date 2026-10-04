@@ -64,6 +64,7 @@ $admin_name = $admin_info['username'] ?? 'Admin';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="<?= (($_SERVER['HTTP_HOST'] ?? '') === 'localhost') ? '/Arigato%20Development%20Site/' : '/' ?>">
 <title>Feedback Manager — Arigato Admin</title>
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -262,6 +263,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
 <main class="main">
     <div class="topbar">
         <div class="tb-title"><i class="fa-solid fa-comments"></i> Feedback Manager</div>
+        <a href="feedback_shows.php" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:rgba(139,92,246,0.18);border:1px solid var(--border);border-radius:100px;color:var(--accent2);text-decoration:none;font-size:0.78rem;font-weight:700;"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Testimonials Page</a>
         <div class="tb-time"><i class="fa-regular fa-clock"></i> <?= date('D, d M Y | h:i A') ?> IST</div>
     </div>
 
@@ -275,7 +277,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
         <div class="scard s-green">
             <div class="sc-icon"><i class="fa-solid fa-eye"></i></div>
             <div class="sc-val"><?= $visible_fb ?></div>
-            <div class="sc-lbl">Shown on Homepage</div>
+            <div class="sc-lbl">Visible on Site</div>
         </div>
         <div class="scard s-yellow">
             <div class="sc-icon"><i class="fa-solid fa-star"></i></div>
@@ -304,7 +306,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:h
             in_array($gender, ['female','f']) => '<i class="fa-solid fa-venus gi-f"></i>',
             default                           => '<i class="fa-solid fa-genderless gi-a"></i>',
         };
-        $av_src = $fb['profile_image'] ?? $fb['avatar'] ?? '';
+        $av_src = !empty($fb['avatar']) ? $fb['avatar'] : (!empty($fb['profile_image']) ? $fb['profile_image'] : '');
         $uname  = htmlspecialchars($fb['username'] ?? 'Deleted User');
         $seed   = urlencode($fb['username'] ?? 'user');
         $fb_on  = (bool)$fb['show_on_homepage'];

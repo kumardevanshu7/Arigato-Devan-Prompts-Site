@@ -200,71 +200,12 @@ sort($secret_sub_tags);
     <div class="prompt-grid" id="card-stack">
         <?php if (count($prompts) === 0): ?>
             <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:60px 20px;">No content yet! Check back soon.</p>
-        <?php else: foreach ($prompts as $index => $p):
-            $db_type = $p['prompt_type'] ?? 'direct';
-            if ($db_type === 'insta_viral') { $ptype = 'insta_viral'; }
-            elseif ($db_type === 'unreleased') { $ptype = 'unreleased'; }
-            elseif ($db_type === 'already_uploaded') { $ptype = 'already_uploaded'; }
-            elseif ($db_type === 'solo') { $ptype = 'solo'; }
-            elseif ($db_type === 'direct') { $ptype = 'direct'; }
-            else { $ptype = 'secret_code'; }
-            $tags_arr = array_map('trim', explode(',', strtolower($p['tag'])));
-            $type_labels = [
-                'direct' => ['label' => 'DIRECT', 'cls' => 'dir'],
-                'secret_code' => ['label' => 'SECRET', 'cls' => 'scp'],
-                'unreleased' => ['label' => 'UNRELEASED', 'cls' => 'urp'],
-                'insta_viral' => ['label' => 'VIRAL', 'cls' => 'ivp'],
-                'already_uploaded' => ['label' => 'UPLOADED', 'cls' => 'aup'],
-                'solo' => ['label' => 'SOLO', 'cls' => 'sol'],
-            ];
-            $tinfo = $type_labels[$ptype] ?? $type_labels['direct'];
-            $blur_style = ($ptype === 'unreleased' && !$p['is_unlocked']) ? 'filter:blur(5px);transform:scale(1.05);' : '';
-        ?>
-        <div class="product-card prompt-card card skeleton"
-             data-index="<?= $index ?>"
-             data-id="<?= $p['id'] ?>"
-             data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
-             data-created="<?= htmlspecialchars($p['created_at'] ?? '') ?>"
-             data-image="<?= htmlspecialchars($p['image_path']) ?>"
-             data-title="<?= htmlspecialchars($p['title']) ?>"
-             data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
-             data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-             data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-             data-unlocked="<?= $p['is_unlocked'] ? 'true' : 'false' ?>"
-             data-saved="<?= !empty($p['is_saved']) ? 'true' : 'false' ?>"
-             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
-             data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
-             data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
-             <?= $p['is_unlocked'] ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
-            <div class="card-image-wrap">
-                <img src="<?= htmlspecialchars($p['image_path']) ?>" class="skeleton-img" alt="<?= htmlspecialchars($p['title']) ?>" style="<?= $blur_style ?>" <?= $index === 0 ? 'fetchpriority="high" loading="eager"' : ($index < 3 ? 'loading="eager"' : 'loading="lazy"') ?>>
-                <span class="card-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></span>
-                <?php if (!$p['is_unlocked']): ?>
-                    <div class="card-lock-icon" title="Locked"><i class="fa-solid fa-lock"></i></div>
-                <?php else: ?>
-                    <div class="card-lock-icon unlocked" title="Unlocked"><i class="fa-solid fa-check"></i></div>
-                <?php endif; ?>
-            </div>
-            <div class="card-info">
-                <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-footer-row">
-                    <div class="card-stats-col">
-                        <div class="card-stat-item card-like-display" data-liked="<?= $p['is_liked'] ? 'true' : 'false' ?>" data-prompt-id="<?= $p['id'] ?>" title="Likes">
-                            <i class="fa-solid fa-heart <?= $p['is_liked'] ? 'liked-heart' : '' ?>"></i>
-                            <span class="like-count"><?= (int)$p['likes_count'] ?></span>
-                        </div>
-                        <div class="card-stat-item card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
-                            <i class="fa-regular fa-eye"></i>
-                            <span class="view-count"><?= (int)($p['view_count'] ?? 0) ?></span>
-                        </div>
-                    </div>
-                    <div class="card-prompt-btn-wrap">
-                        <span class="card-prompt-btn">Prompt <svg class="prompt-btn-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php endforeach; endif; ?>
+        <?php else:
+            require_once __DIR__ . '/prompt_cards.php';
+            foreach ($prompts as $index => $p):
+                render_prompt_card($p, $index);
+            endforeach;
+        endif; ?>
     </div>
 
     <?php include __DIR__ . '/home_seo_section.php'; ?>

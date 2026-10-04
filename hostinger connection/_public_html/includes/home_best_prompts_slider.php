@@ -8,58 +8,10 @@ if (empty($main_page_cards)) {
     return;
 }
 require_once __DIR__ . '/../slug_helper.php';
+require_once __DIR__ . '/prompt_cards.php';
 
-// Curated 45+ aesthetic light/pastel color palette
-$light_palette = [
-    '#d4f938', // 1. Electric Lime (from reference screenshot)
-    '#d1fae5', // 2. Soft Mint
-    '#fed7aa', // 3. Pastel Peach
-    '#fce7f3', // 4. Blush Pink
-    '#e0f2fe', // 5. Baby Sky Blue
-    '#ede9fe', // 6. Pale Lavender
-    '#fef08a', // 7. Butter Yellow
-    '#fef3c7', // 8. Warm Cream
-    '#dcfce7', // 9. Fresh Pistachio
-    '#ffe4e6', // 10. Soft Coral
-    '#e0f7fa', // 11. Ice Blue
-    '#e8f5e9', // 12. Matcha Foam
-    '#f3e8ff', // 13. Lilac Mist
-    '#ffedd5', // 14. Apricot Cream
-    '#eafaf1', // 15. Honeydew Green
-    '#e0e7ff', // 16. Powder Periwinkle
-    '#f7fee7', // 17. Pale Lime Sorbet
-    '#faeed9', // 18. Soft Champagne
-    '#ccfbf1', // 19. Mint Sherbet
-    '#fbe7eb', // 20. Rose Quartz
-    '#e2e8e0', // 21. Light Sage
-    '#fffbeb', // 22. Vanilla Custard
-    '#e0f4f7', // 23. Pale Aqua
-    '#fae8ff', // 24. Muted Orchid
-    '#e6f0fa', // 25. Cloud Blue
-    '#fef2e2', // 26. Sunlit Almond
-    '#ecfccb', // 27. Fresh Celery
-    '#f5e6eb', // 28. Soft Mauve
-    '#effcd5', // 29. Pear Green
-    '#ffe8db', // 30. Sweet Melon
-    '#e9e5ff', // 31. Pale Iris
-    '#fdf2f8', // 32. Cotton Candy
-    '#fef9c3', // 33. Lemon Cream
-    '#e6faf5', // 34. Seafoam Glow
-    '#ffecd6', // 35. Pale Tangerine
-    '#ece8f5', // 36. Dusty Lavender
-    '#f6f3ea', // 37. Oat Milk
-    '#d1f4f0', // 38. Soft Turquoise
-    '#fde8ea', // 39. Strawberry Milk
-    '#e8edf2', // 40. Slate Frost
-    '#fcf1db', // 41. Golden Sand
-    '#e4f9cf', // 42. Spring Sprout
-    '#f1ebfc', // 43. Pale Violet
-    '#f5f0e8', // 44. Warm Linen
-    '#ddf4ff', // 45. Nordic Blue
-    '#ffe9e3', // 46. Blushed Salmon
-    '#e3fced', // 47. Spearmint
-    '#f5f3ff', // 48. Velvet Haze
-];
+// Curated 50 aesthetic light/pastel color palette
+$light_palette = get_prompt_card_palette();
 
 // Randomize color palette order on every page refresh
 shuffle($light_palette);

@@ -7,91 +7,117 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 $base = "https://arigatodevan.com";
 
+$today = date("Y-m-d");
+
 // Static pages — public only (no login required)
 $static_pages = [
     [
         "url"        => "/",
         "priority"   => "1.0",
         "changefreq" => "daily",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/gallery.php",
         "priority"   => "0.9",
         "changefreq" => "daily",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/curated_ai_prompts.php",
-        "priority"   => "0.8",
+        "priority"   => "0.85",
         "changefreq" => "weekly",
-        "lastmod"    => "2026-07-06",
+        "lastmod"    => $today,
+    ],
+    [
+        "url"        => "/solo_prompts.php",
+        "priority"   => "0.85",
+        "changefreq" => "weekly",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/unreleased.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/direct_prompts.php",
         "priority"   => "0.8",
         "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
+    ],
+    [
+        "url"        => "/secret_code.php",
+        "priority"   => "0.8",
+        "changefreq" => "weekly",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/blogs.php",
+        "priority"   => "0.8",
+        "changefreq" => "daily",
+        "lastmod"    => $today,
+    ],
+    [
+        "url"        => "/happy_users.php",
         "priority"   => "0.7",
         "changefreq" => "weekly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
+    ],
+    [
+        "url"        => "/feedback_shows.php",
+        "priority"   => "0.7",
+        "changefreq" => "weekly",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/faq.php",
-        "priority"   => "0.7",
+        "priority"   => "0.6",
         "changefreq" => "monthly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/about.php",
         "priority"   => "0.6",
         "changefreq" => "monthly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/contact.php",
         "priority"   => "0.5",
         "changefreq" => "monthly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
+    ],
+    [
+        "url"        => "/feedback.php",
+        "priority"   => "0.5",
+        "changefreq" => "monthly",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/progress.php",
         "priority"   => "0.5",
         "changefreq" => "monthly",
-        "lastmod"    => "2026-07-02",
-    ],
-    [
-        "url"        => "/testimonials.php",
-        "priority"   => "0.5",
-        "changefreq" => "monthly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/privacy.php",
         "priority"   => "0.3",
         "changefreq" => "yearly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/terms.php",
-        "priority"   => "0.2",
+        "priority"   => "0.3",
         "changefreq" => "yearly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
     [
         "url"        => "/disclaimer.php",
-        "priority"   => "0.2",
+        "priority"   => "0.3",
         "changefreq" => "yearly",
-        "lastmod"    => "2026-07-02",
+        "lastmod"    => $today,
     ],
 ];
 

@@ -146,6 +146,7 @@ function get_default_footer_config(): array
                 'title' => 'Community & Connect',
                 'links' => [
                     ['title' => 'User Feedback', 'url' => 'feedback.php', 'badge' => '', 'target' => '_self'],
+                    ['title' => 'Feedback Shows', 'url' => 'feedback_shows.php', 'badge' => '', 'target' => '_self'],
                     ['title' => 'Contact Us', 'url' => 'contact.php', 'badge' => '', 'target' => '_self'],
                     ['title' => 'FAQ', 'url' => 'faq.php', 'badge' => '', 'target' => '_self'],
                     ['title' => 'About Us', 'url' => 'about.php', 'badge' => '', 'target' => '_self'],
@@ -216,6 +217,8 @@ function get_available_site_pages_for_footer(): array
         ['title' => 'Already Uploaded Prompts', 'url' => 'already_uploaded.php', 'cat' => 'Prompts'],
         ['title' => 'Blog Magazine Hub', 'url' => 'blogs.php', 'cat' => 'Content'],
         ['title' => 'Happy Users (Wall of Love)', 'url' => 'happy_users.php', 'cat' => 'Trust'],
+        ['title' => 'Guest Testimonials', 'url' => 'feedback_shows.php', 'cat' => 'Trust'],
+        ['title' => 'Feedback Shows', 'url' => 'feedback_shows.php', 'cat' => 'Trust'],
         ['title' => 'About Us', 'url' => 'about.php', 'cat' => 'Info'],
         ['title' => 'Contact Us', 'url' => 'contact.php', 'cat' => 'Support'],
         ['title' => 'FAQ', 'url' => 'faq.php', 'cat' => 'Support'],

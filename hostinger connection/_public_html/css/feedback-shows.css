@@ -1,0 +1,345 @@
+/* ============================================================
+   ARIGATO DEVAN — GUEST TESTIMONIALS (WHAT THEY SAY?)
+   Framer-inspired aesthetic card stack matching mockup
+   ============================================================ */
+
+.page-feedback-shows {
+    background: #FFFFFF !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.fbs-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(30px, 5vw, 60px) 20px 80px;
+    box-sizing: border-box;
+    flex: 1 0 auto;
+    overflow: hidden;
+}
+
+/* Background Decorative Accents (From Reference Mockup) */
+.fbs-bg-accents {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.fbs-dot-grid {
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
+    background-size: 10px 10px;
+    opacity: 0.35;
+}
+
+.fbs-dots-tl { top: 20px; left: 24px; }
+.fbs-dots-tr { top: 20px; right: 24px; }
+.fbs-dots-bl { bottom: 40px; left: 24px; }
+.fbs-dots-br { bottom: 40px; right: 24px; }
+
+/* Subtle Abstract Circles */
+.fbs-circle-bg {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(86, 124, 141, 0.08);
+    pointer-events: none;
+}
+.fbs-circle-1 {
+    width: 440px;
+    height: 440px;
+    top: -100px;
+    right: -120px;
+}
+.fbs-circle-2 {
+    width: 520px;
+    height: 520px;
+    bottom: -150px;
+    left: -150px;
+}
+
+/* Header Section */
+.fbs-hero {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto clamp(36px, 6vw, 54px);
+}
+
+.fbs-script-eyebrow {
+    display: inline-block;
+    font-family: 'Kaushan Script', 'Caveat', cursive;
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    color: #f59e0b; /* Golden Yellow from Mockup */
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+    transform: rotate(-1deg);
+    line-height: 1.2;
+}
+
+.fbs-heading {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: clamp(2.3rem, 5.5vw, 3.4rem);
+    font-weight: 900;
+    color: #1e293b;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    margin: 0 0 12px 0;
+}
+
+.fbs-sub {
+    font-size: clamp(0.92rem, 2vw, 1.05rem);
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 auto 20px;
+    max-width: 480px;
+    font-weight: 500;
+}
+
+.fbs-cta-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fbs-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #242b35 0%, #0d1219 100%);
+    color: #ffffff !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(13, 18, 25, 0.22);
+    transition: all 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.fbs-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13, 18, 25, 0.32);
+    color: #ffffff !important;
+}
+
+/* Vertical Stack of Testimonial Cards */
+.fbs-stack {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 3.5vw, 32px);
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 10px 4px;
+    box-sizing: border-box;
+}
+
+/* Individual Card (Staggered Rotation & Pastel Alternation) */
+.fbs-card {
+    position: relative;
+    border-radius: 24px;
+    padding: clamp(20px, 3.5vw, 26px) clamp(20px, 4vw, 28px);
+    box-shadow: 0 8px 24px -4px rgba(47, 65, 86, 0.08), 0 2px 6px rgba(47, 65, 86, 0.04);
+    box-sizing: border-box;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: default;
+}
+
+/* Mint Green Cards (Cards 1, 3, 5...) */
+.fbs-card--mint {
+    background: #D8F7D8; /* Aesthetic pastel mint from reference photo */
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* Pure White Cards (Cards 2, 4, 6...) */
+.fbs-card--white {
+    background: #FFFFFF;
+    border: 1px solid rgba(86, 124, 141, 0.16);
+}
+
+/* Organic Playful Tilt Angles from Mockup */
+.fbs-card:nth-child(4n+1) {
+    transform: rotate(-1.5deg);
+}
+.fbs-card:nth-child(4n+2) {
+    transform: rotate(1.4deg);
+}
+.fbs-card:nth-child(4n+3) {
+    transform: rotate(-1.2deg);
+}
+.fbs-card:nth-child(4n) {
+    transform: rotate(1.1deg);
+}
+
+.fbs-card:hover {
+    transform: rotate(0deg) translateY(-5px) scale(1.02) !important;
+    box-shadow: 0 18px 40px -6px rgba(47, 65, 86, 0.16), 0 4px 12px rgba(47, 65, 86, 0.06);
+}
+
+/* Card Header Row */
+.fbs-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.fbs-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.fbs-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    background: #E2E8F0;
+}
+
+.fbs-avatar-ph {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #2F4156 0%, #567C8D 100%);
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.fbs-user-text {
+    min-width: 0;
+}
+
+.fbs-user-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fbs-user-sub {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+/* Rating Pill Badge (White Pill with 5 Gold Stars) */
+.fbs-rating-pill {
+    background: #FFFFFF;
+    border-radius: 999px;
+    padding: 5px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.fbs-star {
+    color: #f59e0b; /* Vivid Amber Gold */
+    font-size: 0.78rem;
+}
+
+/* Card Quote Body */
+.fbs-quote {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.94rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #334155;
+    margin: 14px 0 0 0;
+    word-break: break-word;
+}
+
+/* Empty State */
+.fbs-empty {
+    text-align: center;
+    padding: 60px 24px;
+    background: #FFFFFF;
+    border: 1px dashed rgba(86, 124, 141, 0.3);
+    border-radius: 24px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.fbs-empty i {
+    font-size: 2.8rem;
+    color: #f59e0b;
+    margin-bottom: 14px;
+}
+
+.fbs-empty h3 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.fbs-empty p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .fbs-container {
+        padding: 24px 14px 60px;
+    }
+    .fbs-heading {
+        font-size: 2.1rem;
+    }
+    .fbs-script-eyebrow {
+        font-size: 1.5rem;
+    }
+    .fbs-card {
+        padding: 18px 18px;
+        border-radius: 20px;
+    }
+    .fbs-card:nth-child(odd),
+    .fbs-card:nth-child(even) {
+        transform: none !important; /* Keep mobile cards straight for perfect swipe & touch readability */
+    }
+    .fbs-avatar,
+    .fbs-avatar-ph {
+        width: 42px;
+        height: 42px;
+    }
+    .fbs-user-name {
+        font-size: 0.96rem;
+    }
+    .fbs-quote {
+        font-size: 0.9rem;
+    }
+}

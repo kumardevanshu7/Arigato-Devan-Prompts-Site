@@ -117,7 +117,7 @@ if (empty($col2_cards) || count($col2_cards) < 3) {
             </div>
 
             <!-- Floating Vertical Icon Strip (5 Circles Fixed in Place, Icons Float Inside) -->
-            <div class="viva-icon-strip" aria-label="Quick Actions">
+            <div class="viva-icon-strip google-anno-skip" aria-label="Quick Actions">
                 <!-- 1. Gallery Icon -->
                 <a href="gallery.php" class="viva-dock-icon dock-gallery" title="Explore Gallery">
                     <i class="fa-solid fa-images"></i>
@@ -213,7 +213,7 @@ if (empty($col2_cards) || count($col2_cards) < 3) {
 </section>
 
 <!-- Like Prompt Popup Modal -->
-<div id="viva-like-modal" class="viva-modal-overlay" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="vivaLikeTitle">
+<div id="viva-like-modal" class="viva-modal-overlay google-anno-skip" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="vivaLikeTitle">
     <div class="viva-modal-box">
         <button type="button" class="viva-modal-close" onclick="closeVivaModal('viva-like-modal')" aria-label="Close modal">&times;</button>
         <div class="viva-modal-icon-badge modal-heart-badge">
@@ -237,7 +237,7 @@ if (empty($col2_cards) || count($col2_cards) < 3) {
 </div>
 
 <!-- Follow Community Popup Modal -->
-<div id="viva-follow-modal" class="viva-modal-overlay" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="vivaFollowTitle">
+<div id="viva-follow-modal" class="viva-modal-overlay google-anno-skip" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="vivaFollowTitle">
     <div class="viva-modal-box">
         <button type="button" class="viva-modal-close" onclick="closeVivaModal('viva-follow-modal')" aria-label="Close modal">&times;</button>
         <div class="viva-modal-icon-badge modal-follow-badge">

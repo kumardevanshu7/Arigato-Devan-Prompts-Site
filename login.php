@@ -19,7 +19,11 @@ if (isset($_GET["logout"])) {
 
 // Redirect if already logged in
 if (isset($_SESSION["user_id"])) {
-    header("Location: index.php");
+    $redirect = !empty($_GET['redirect_to']) ? $_GET['redirect_to'] : 'index.php';
+    if (preg_match('#^(https?:)?//#i', $redirect) || strpos($redirect, "\n") !== false || strpos($redirect, "\r") !== false) {
+        $redirect = 'index.php';
+    }
+    header("Location: " . $redirect);
     exit();
 }
 $error = $_SESSION["error_msg"] ?? "";
@@ -779,7 +783,13 @@ unset($_SESSION["error_msg"]);
 
                     const data = await response.json();
                     if(data.success) {
-                        window.location.href = 'index.php'; // PHP session created, go to home
+                        const urlParams = new URLSearchParams(window.location.search);
+                        let redirectTo = urlParams.get('redirect_to');
+                        if (redirectTo && !redirectTo.startsWith('//') && !redirectTo.includes('://')) {
+                            window.location.href = redirectTo;
+                        } else {
+                            window.location.href = 'index.php'; // PHP session created, go to home
+                        }
                     } else {
                         alert("Login error: " + data.error);
                         loginBtn.innerHTML = '<i class="fa-brands fa-google" style="font-size:20px;margin-right:8px;"></i> Continue with Google';

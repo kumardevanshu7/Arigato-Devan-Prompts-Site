@@ -237,69 +237,12 @@ function gallery_fetch_prompts(PDO $pdo, ?int $user_id, array $opts = []): array
 }
 
 function render_gallery_prompt_cards(array $prompts): string {
-    if (!function_exists('prompt_resolve_type')) {
+    if (!function_exists('render_prompt_card')) {
         require_once __DIR__ . '/prompt_cards.php';
     }
     ob_start();
-    foreach ($prompts as $p) {
-        $db_type  = $p['prompt_type'] ?? 'secret';
-        $type     = prompt_resolve_type($db_type);
-        $ptype    = $type['ptype'];
-        $tinfo    = ['label' => $type['label'], 'cls' => $type['cls']];
-        $tags_arr = array_map('trim', explode(',', strtolower($p['tag'] ?? '')));
-        $blur_style = ($ptype === 'unreleased' && empty($p['is_unlocked'])) ? 'filter:blur(5px);transform:scale(1.05);' : '';
-        ?>
-        <div class="product-card prompt-card skeleton"
-             data-id="<?= (int) $p['id'] ?>"
-             data-slug="<?= htmlspecialchars($p['slug'] ?? '') ?>"
-             data-created="<?= htmlspecialchars($p['created_at'] ?? '') ?>"
-             data-image="<?= htmlspecialchars($p['image_path']) ?>"
-             data-title="<?= htmlspecialchars($p['title']) ?>"
-             data-reel="<?= htmlspecialchars($p['reel_link'] ?? '') ?>"
-             data-unlocked="<?= !empty($p['is_unlocked']) ? 'true' : 'false' ?>"
-             data-saved="<?= !empty($p['is_saved']) ? 'true' : 'false' ?>"
-             data-prompt-type="<?= htmlspecialchars($ptype) ?>"
-             data-tags="<?= htmlspecialchars(implode(',', $tags_arr)) ?>"
-             data-best-works-in="<?= htmlspecialchars($p['best_works_in'] ?? '') ?>"
-             data-asset-title="<?= htmlspecialchars($p['asset_title'] ?? '') ?>"
-             data-asset-images="<?= htmlspecialchars($p['asset_images'] ?? '[]') ?>"
-             <?= !empty($p['is_unlocked']) ? 'data-prompt-text="' . htmlspecialchars($p['prompt_text']) . '"' : '' ?>>
-            <div class="card-image-wrap">
-                <img loading="lazy"
-                     src="<?= htmlspecialchars($p['image_path']) ?>"
-                     class="skeleton-img"
-                     alt="<?= htmlspecialchars($p['title']) ?>"
-                     style="<?= $blur_style ?>">
-                <span class="card-badge <?= $tinfo['cls'] ?>"><?= $tinfo['label'] ?></span>
-                <?php if (empty($p['is_unlocked'])): ?>
-                    <div class="card-lock-icon" title="Locked"><i class="fa-solid fa-lock"></i></div>
-                <?php else: ?>
-                    <div class="card-lock-icon unlocked" title="Unlocked"><i class="fa-solid fa-check"></i></div>
-                <?php endif; ?>
-            </div>
-            <div class="card-info">
-                <p class="card-title"><?= htmlspecialchars($p['title']) ?></p>
-                <div class="card-footer-row">
-                    <div class="card-stats-col">
-                        <div class="card-stat-item card-like-display"
-                             data-liked="<?= !empty($p['is_liked']) ? 'true' : 'false' ?>"
-                             data-prompt-id="<?= (int) $p['id'] ?>"
-                             title="Likes">
-                            <i class="fa-solid fa-heart <?= !empty($p['is_liked']) ? 'liked-heart' : '' ?>"></i>
-                            <span class="like-count"><?= (int) ($p['likes_count'] ?? 0) ?></span>
-                        </div>
-                        <div class="card-stat-item card-views-display" title="<?= (int)($p['view_count'] ?? 0) ?> views">
-                            <i class="fa-regular fa-eye"></i>
-                            <span class="view-count"><?= (int) ($p['view_count'] ?? 0) ?></span>
-                        </div>
-                    </div>
-                    <div class="card-prompt-btn-wrap">
-                        <span class="card-prompt-btn">Prompt <svg class="prompt-btn-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php
+    foreach ($prompts as $index => $p) {
+        render_prompt_card($p, $index);
     }
     return (string) ob_get_clean();
 }
