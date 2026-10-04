@@ -116,6 +116,19 @@ if (empty($col2_cards) || count($col2_cards) < 3) {
                 </div>
             </div>
 
+            <!-- Bottom Row: Important Page Links (Light Pink, Green, Yellow, Orange Pastels) -->
+            <div class="viva-bottom-bar">
+                <div class="viva-page-links">
+                    <a href="about.php" class="viva-page-pill pill-pink">About Us</a>
+                    <a href="contact.php" class="viva-page-pill pill-green">Contact Us</a>
+                    <a href="privacy.php" class="viva-page-pill pill-yellow">Privacy Policy</a>
+                    <a href="terms.php" class="viva-page-pill pill-orange">Terms &amp; Conditions</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FLOWING CARDS AREA (Icons + Cards grouped together) -->
+        <div class="viva-right" aria-label="Live prompt preview showcase">
             <!-- Floating Vertical Icon Strip (5 Circles Fixed in Place, Icons Float Inside) -->
             <div class="viva-icon-strip google-anno-skip" aria-label="Quick Actions">
                 <!-- 1. Gallery Icon -->
@@ -144,19 +157,6 @@ if (empty($col2_cards) || count($col2_cards) < 3) {
                 </button>
             </div>
 
-            <!-- Bottom Row: Important Page Links (Light Pink, Green, Yellow, Orange Pastels) -->
-            <div class="viva-bottom-bar">
-                <div class="viva-page-links">
-                    <a href="about.php" class="viva-page-pill pill-pink">About Us</a>
-                    <a href="contact.php" class="viva-page-pill pill-green">Contact Us</a>
-                    <a href="privacy.php" class="viva-page-pill pill-yellow">Privacy Policy</a>
-                    <a href="terms.php" class="viva-page-pill pill-orange">Terms &amp; Conditions</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT FLOWING CARDS AREA -->
-        <div class="viva-right" aria-label="Live prompt preview showcase">
             <div class="viva-flow-stage">
                 <!-- COLUMN 1: Flows UPWARD -->
                 <div class="viva-flow-col viva-col-up">

@@ -37,24 +37,24 @@
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: clamp(24px, 5.5vw, 84px) !important;
-  padding-right: 0 !important;
+  padding-left: clamp(24px, 4vw, 72px) !important;
+  padding-right: clamp(32px, 3.2vw, 56px) !important;
   padding-top: clamp(20px, 3vh, 44px) !important;
   padding-bottom: clamp(24px, 4vh, 56px) !important;
-  gap: clamp(20px, 3vw, 48px) !important;
+  gap: clamp(20px, 2.5vw, 48px) !important;
 }
 
 /* ============================================================
-   LEFT SIDE: TYPOGRAPHY, BUTTONS, DOCK, PAGE LINKS
+   LEFT SIDE: TYPOGRAPHY, BUTTONS, PAGE LINKS
    ============================================================ */
 .viva-left {
-  flex: 0 0 clamp(440px, 46vw, 620px) !important;
+  flex: 0 1 clamp(440px, 34vw, 560px) !important;
   min-width: 320px !important;
   display: flex !important;
   flex-direction: column !important;
   position: relative !important;
   z-index: 5 !important;
-  padding-right: 74px !important; /* Guaranteed space for icons strip — ZERO OVERLAP! */
+  padding-right: 0 !important;
   box-sizing: border-box !important;
 }
 
@@ -67,10 +67,9 @@
 }
 
 /* 4th Pic Inspired Clean Geometric Font */
-/* 4th Pic Inspired Clean Geometric Font */
 .viva-title {
   font-family: 'Urbanist', 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-  font-size: clamp(2.6rem, 4.4vw, 4.2rem) !important;
+  font-size: clamp(2.2rem, 3.2vw, 3.6rem) !important;
   font-weight: 400 !important;
   line-height: 1.2 !important;
   letter-spacing: -0.03em !important;
@@ -304,14 +303,14 @@
    "circle float nhi akren... circle ke ander icons circle ke ander float karen"
    ============================================================ */
 .viva-icon-strip {
-  position: absolute;
-  right: 6px;
-  top: 44%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  z-index: 10 !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Static circular container — DOES NOT FLOAT */
@@ -508,23 +507,27 @@
    RIGHT SIDE: DUAL MOVING FLOW (FULL RIGHT EDGE)
    ============================================================ */
 .viva-right {
-  flex: 1 1 auto;
-  min-width: 0;
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  overflow: visible !important;
 }
 
 .viva-flow-stage {
-  display: flex;
-  gap: clamp(16px, 2.2vw, 24px);
-  height: clamp(620px, 78vh, 760px);
-  overflow: hidden;
-  position: relative;
+  display: flex !important;
+  gap: clamp(16px, 2vw, 24px) !important;
+  height: clamp(620px, 78vh, 760px) !important;
+  overflow: hidden !important;
+  position: relative !important;
   mask-image: linear-gradient(to bottom, transparent 0%, black 7%, black 93%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 7%, black 93%, transparent 100%);
-  padding: 10px 0;
-  box-sizing: border-box;
+  padding: 10px 0 !important;
+  box-sizing: border-box !important;
 }
 
 .viva-flow-stage:hover .viva-track {
@@ -532,11 +535,11 @@
 }
 
 .viva-flow-col {
-  flex: 1 1 50%;
-  min-width: 250px;
-  max-width: 330px;
-  position: relative;
-  overflow: hidden;
+  width: clamp(270px, 22vw, 420px) !important;
+  flex: 0 0 clamp(270px, 22vw, 420px) !important;
+  min-width: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 /* Marquee Tracks */
@@ -822,27 +825,40 @@
    RESPONSIVE BREAKPOINTS
    ============================================================ */
 @media (max-width: 1120px) {
+  .viva-hero-container {
+    padding-left: clamp(16px, 2.5vw, 24px) !important;
+    padding-right: clamp(20px, 2.5vw, 32px) !important;
+    gap: clamp(14px, 2vw, 24px) !important;
+  }
+
   .viva-left {
+    flex: 0 1 clamp(320px, 34vw, 380px) !important;
+    min-width: 280px !important;
     padding-right: 0 !important;
   }
-  .viva-icon-strip {
-    position: static !important;
-    transform: none !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
+
+  .viva-right {
     gap: 14px !important;
-    margin: 8px auto 28px auto !important;
+    margin-left: auto !important;
+  }
+
+  .viva-flow-stage {
+    gap: 14px !important;
+  }
+
+  .viva-flow-col {
+    width: clamp(220px, 24vw, 300px) !important;
+    flex: 0 0 clamp(220px, 24vw, 300px) !important;
+    min-width: 0 !important;
   }
 }
 
 @media (max-width: 900px) {
   .viva-hero-container {
-    flex-direction: column;
+    flex-direction: column !important;
     padding-left: 20px !important;
     padding-right: 20px !important;
-    gap: 36px !important;
+    gap: 32px !important;
   }
 
   .viva-left {
@@ -864,23 +880,33 @@
     white-space: nowrap !important;
   }
 
+  .viva-right {
+    flex-direction: column !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    align-items: center !important;
+    gap: 16px !important;
+  }
+
   .viva-icon-strip {
+    flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    margin: 8px auto 26px auto !important;
-  }
-
-  .viva-right {
-    width: 100% !important;
+    gap: 14px !important;
+    margin: 4px auto 16px auto !important;
   }
 
   .viva-flow-stage {
-    height: 480px;
+    height: 480px !important;
+    width: 100% !important;
+    justify-content: center !important;
   }
 
   .viva-flow-col {
-    min-width: 160px;
+    width: clamp(160px, 45vw, 240px) !important;
+    flex: 1 1 0 !important;
+    min-width: 150px !important;
   }
 }
 
@@ -918,11 +944,11 @@
     align-items: center !important;
     width: 100% !important;
     gap: 12px !important;
-    margin: 6px auto 24px auto !important;
+    margin: 4px auto 14px auto !important;
   }
 
   .viva-flow-stage {
-    height: 440px;
+    height: 440px !important;
   }
 
   .viva-page-links {
@@ -930,3 +956,66 @@
     width: 100%;
   }
 }
+
+/* ============================================================
+   LARGE SCREEN OPTIMIZATION (1400px+)
+   Icons & Cards grouped snug together on the right.
+   Suitable breathing space from the scrollbar!
+   ============================================================ */
+@media (min-width: 1400px) {
+  .viva-hero-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: clamp(40px, 4vw, 80px) !important;
+    padding-right: clamp(36px, 3vw, 56px) !important;
+    gap: clamp(24px, 2.5vw, 48px) !important;
+  }
+
+  .viva-left {
+    flex: 0 1 clamp(480px, 32vw, 580px) !important;
+    padding-right: 0 !important;
+  }
+
+  .viva-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+    gap: clamp(18px, 1.8vw, 24px) !important;
+  }
+
+  .viva-flow-stage {
+    height: clamp(720px, 80vh, 880px) !important;
+  }
+
+  .viva-flow-col {
+    width: clamp(340px, 22vw, 440px) !important;
+    flex: 0 0 clamp(340px, 22vw, 440px) !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .viva-hero-container {
+    padding-left: clamp(48px, 4.5vw, 96px) !important;
+    padding-right: clamp(44px, 3.5vw, 64px) !important;
+  }
+
+  .viva-left {
+    flex: 0 1 clamp(520px, 28vw, 620px) !important;
+    padding-right: 0 !important;
+  }
+
+  .viva-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+  }
+
+  .viva-flow-col {
+    width: clamp(380px, 22vw, 460px) !important;
+    flex: 0 0 clamp(380px, 22vw, 460px) !important;
+  }
+}
+
+

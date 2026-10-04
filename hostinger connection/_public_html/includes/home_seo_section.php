@@ -340,15 +340,29 @@
 
     .ad-cat-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 24px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    @media (max-width: 1100px) {
+        .ad-cat-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 20px !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .ad-cat-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+        }
     }
 
     .ad-cat-box {
         background: var(--bg-card, #ffffff);
         border: 1.5px solid rgba(47, 65, 86, 0.1);
         border-radius: 22px;
-        padding: 30px 26px;
+        padding: 26px 20px;
         box-shadow: 0 6px 22px rgba(47, 65, 86, 0.04);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;

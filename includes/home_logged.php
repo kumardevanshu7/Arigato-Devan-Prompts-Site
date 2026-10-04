@@ -183,10 +183,18 @@ sort($secret_sub_tags);
         .page-home-logged .home-tag-filters {
             justify-content: center !important;
             flex-wrap: wrap !important;
-            max-width: 900px !important;
+            max-width: 1400px !important;
             margin-left: auto !important;
             margin-right: auto !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
             overflow: visible !important;
+        }
+    }
+    @media (min-width: 1200px) {
+        .page-home-logged .home-tag-filters {
+            padding-left: 40px !important;
+            padding-right: 40px !important;
         }
     }
     </style>
