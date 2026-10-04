@@ -57,7 +57,7 @@ require_once "db.php";
             <li>To <strong>track your streak</strong> and display your profile across the site</li>
             <li>To improve site content and user experience through aggregate analytics</li>
         </ul>
-        <p>We do <strong>not</strong> sell, rent, or share your personal data with any third party for commercial purposes.</p>
+        <p>We do <strong>not</strong> sell, rent, or trade your personal data. We only share necessary technical data with trusted service providers (such as Google and Cloudflare) strictly to operate, authenticate, secure, and improve our website as described in the sections below.</p>
 
         <h2>3. Google Sign-In &amp; Firebase Authentication</h2>
         <p>We use <strong>Firebase Authentication</strong> (by Google LLC) for secure login via Google OAuth 2.0. We request only your basic profile — name and email. We do <strong>not</strong> access your Google Drive, Gmail, contacts, or any other Google services.</p>
@@ -75,6 +75,7 @@ require_once "db.php";
 
         <h2>5. Google AdSense &amp; Advertising</h2>
         <p>We may use <strong>Google AdSense</strong> to display advertisements on our site. Google AdSense uses cookies to serve ads based on your prior visits to this and other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the Internet.</p>
+        <p>To learn more about how Google uses information from sites or apps that use their services, please review <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses information from sites or apps that use our services</a>.</p>
         <p>You may opt out of personalised advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ad Settings</a> or <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">aboutads.info</a>.</p>
 
         <h2>6. Cloudflare</h2>

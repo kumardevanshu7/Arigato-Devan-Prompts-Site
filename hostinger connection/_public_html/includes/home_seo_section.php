@@ -710,7 +710,7 @@
 
         <div class="ad-compare-card solution">
             <div class="ad-card-badge"><i class="fa-solid fa-circle-check"></i> The Arigato Devan Standard</div>
-            <h3>Engineered for 100% Photorealistic Realism</h3>
+            <h3>Engineered for High-Fidelity Photorealism</h3>
             <p class="card-intro">
                 Every prompt on Arigato Devan is written like a professional film director's shot script — featuring explicit negative constraints, dual-subject facial anchors, and optical camera physics.
             </p>
@@ -806,6 +806,10 @@
                 </tbody>
             </table>
         </div>
+        <p style="margin:14px auto 0;max-width:850px;font-size:0.78rem;color:var(--text-secondary,#567C8D);line-height:1.5;text-align:center;">
+            <i class="fa-solid fa-circle-info" style="color:var(--pal-teal,#567C8D);margin-right:4px;"></i>
+            <em>* Note: Ratings are editorial evaluations based on hands-on prompt testing across 50+ benchmark generations conducted by Arigato Devan Studio.</em>
+        </p>
     </div>
 
     <!-- 4. Categories Deep Dive (4 Visual Modern Boxes) -->

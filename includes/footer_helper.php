@@ -120,10 +120,10 @@ function get_default_footer_config(): array
                 'links' => [
                     ['title' => 'Prompt Gallery', 'url' => 'gallery.php', 'badge' => '', 'target' => '_self'],
                     ['title' => 'Secret Code Prompts', 'url' => 'secret_code.php', 'badge' => '', 'target' => '_self'],
-                    ['title' => 'SOLO Prompts', 'url' => 'solo_prompts.php', 'badge' => 'HOT', 'target' => '_self'],
+                    ['title' => 'SOLO Prompts', 'url' => 'solo_prompts.php', 'badge' => 'NEW', 'target' => '_self'],
                     ['title' => 'Unreleased Prompts', 'url' => 'unreleased.php', 'badge' => '', 'target' => '_self'],
                     ['title' => 'Direct Prompts', 'url' => 'direct_prompts.php', 'badge' => '', 'target' => '_self'],
-                    ['title' => 'Curated AI Prompts', 'url' => 'curated_ai_prompts.php', 'badge' => 'PRO', 'target' => '_self'],
+                    ['title' => 'Curated AI Prompts', 'url' => 'curated_ai_prompts.php', 'badge' => 'FEATURED', 'target' => '_self'],
                 ]
             ],
             [
@@ -186,6 +186,23 @@ function get_footer_config(): array
                 }
             }
             $decoded['social_links'] = $final_soc;
+
+            // Policy filter: automatically sanitize sensitive/pro badges
+            foreach ($decoded['columns'] as &$col) {
+                if (!empty($col['links'])) {
+                    foreach ($col['links'] as &$lnk) {
+                        if (isset($lnk['badge'])) {
+                            if (strcasecmp($lnk['badge'], 'HOT') === 0) {
+                                $lnk['badge'] = 'NEW';
+                            } elseif (strcasecmp($lnk['badge'], 'PRO') === 0) {
+                                $lnk['badge'] = 'FEATURED';
+                            }
+                        }
+                    }
+                }
+            }
+            unset($col, $lnk);
+
             $cached = $decoded;
             return $cached;
         }

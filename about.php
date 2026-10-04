@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/settings_helper.php';
 
 $social_cfg = get_contact_social_config();
 $total_prompts = (int)$pdo->query("SELECT COUNT(*) FROM prompts")->fetchColumn();
-$total_followers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total_users = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $total_unlocks = (int)$pdo->query("SELECT COUNT(*) FROM unlocked_prompts")->fetchColumn();
 $total_copies = (int)$pdo->query("SELECT COALESCE(SUM(copy_count),0) FROM prompts")->fetchColumn();
 $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts")->fetchColumn();
@@ -105,7 +105,7 @@ $total_views = (int)$pdo->query("SELECT COALESCE(SUM(view_count),0) FROM prompts
         <div class="about-stats-row">
             <div class="about-stat"><div class="stat-num"><?= $total_prompts ?>+</div><div class="stat-label">Prompts</div></div>
             <div class="about-stat"><div class="stat-num"><?= $total_unlocks ?>+</div><div class="stat-label">Unlocks</div></div>
-            <div class="about-stat"><div class="stat-num"><?= $total_followers ?>+</div><div class="stat-label">Followers</div></div>
+            <div class="about-stat"><div class="stat-num"><?= $total_users ?>+</div><div class="stat-label">Users</div></div>
             <div class="about-stat"><div class="stat-num"><?= $total_copies ?>+</div><div class="stat-label">Copies</div></div>
             <div class="about-stat"><div class="stat-num"><?= $total_views ?>+</div><div class="stat-label">Views</div></div>
         </div>

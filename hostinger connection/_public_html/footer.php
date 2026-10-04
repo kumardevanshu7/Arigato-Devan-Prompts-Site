@@ -45,7 +45,7 @@ $resolved_blogs = resolve_footer_blog_links($footer_blog_ids, $pdo ?? null);
                         $rel = ($target === '_blank') ? 'rel="noopener"' : '';
                         $badge = trim((string)($lnk['badge'] ?? ''));
                         $badge_class = 'sf-badge';
-                        if (stripos($badge, 'pro') !== false) {
+                        if (stripos($badge, 'pro') !== false || stripos($badge, 'featured') !== false) {
                             $badge_class .= ' sf-badge-gold';
                         } elseif (stripos($badge, 'love') !== false || stripos($badge, '17k') !== false) {
                             $badge_class .= ' sf-badge-teal';
