@@ -316,6 +316,13 @@ try {
                 "ALTER TABLE prompts ADD COLUMN is_trending TINYINT(1) NOT NULL DEFAULT 0",
                 "ALTER TABLE prompts ADD COLUMN trending_order INT NOT NULL DEFAULT 0",
                 "ALTER TABLE prompts ADD COLUMN meta_keywords VARCHAR(500) DEFAULT ''",
+                "ALTER TABLE prompts ADD COLUMN description TEXT DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN about_prompt TEXT DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN how_to_use LONGTEXT DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN extra_prompts LONGTEXT DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN is_trial TINYINT(1) NOT NULL DEFAULT 0",
+                "ALTER TABLE prompts ADD COLUMN solo_before_image VARCHAR(255) DEFAULT NULL",
+                "ALTER TABLE prompts ADD COLUMN solo_examples LONGTEXT DEFAULT NULL",
             ];
             foreach ($prompt_alters as $sql) {
                 try { $pdo->exec($sql); } catch (PDOException $e) {}

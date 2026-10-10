@@ -220,15 +220,48 @@ sort($secret_sub_tags);
 </main>
 
 <script>
-document.querySelectorAll('.tag-filter-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tag-filter-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        var tag = btn.dataset.tag;
-        document.querySelectorAll('#card-stack .prompt-card').forEach(function(card) {
-            var cardTags = (card.dataset.tags || '').split(',').map(function(t) { return t.trim(); });
-            card.style.display = (tag === 'all' || cardTags.includes(tag)) ? '' : 'none';
+(function() {
+    function initHomeFilters() {
+        var filterBtns = document.querySelectorAll('.tag-filter-btn');
+        var cards = document.querySelectorAll('#card-stack .prompt-card');
+        if (!filterBtns.length || !cards.length) return;
+
+        function norm(s) {
+            return (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        function applyFilter(selectedTag) {
+            var target = norm(selectedTag || 'all');
+            filterBtns.forEach(function(b) {
+                b.classList.toggle('active', norm(b.dataset.tag || 'all') === target);
+            });
+            cards.forEach(function(card) {
+                var cardTags = (card.dataset.tags || '').split(',').map(norm).filter(Boolean);
+                var isMatch = (target === 'all' || cardTags.indexOf(target) !== -1);
+                if (isMatch) {
+                    card.classList.remove('is-tag-hidden');
+                    card.removeAttribute('hidden');
+                    card.style.removeProperty('display');
+                } else {
+                    card.classList.add('is-tag-hidden');
+                    card.setAttribute('hidden', '');
+                    card.style.setProperty('display', 'none', 'important');
+                }
+            });
+        }
+
+        filterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                applyFilter(btn.dataset.tag || 'all');
+            });
         });
-    });
-});
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHomeFilters);
+    } else {
+        initHomeFilters();
+    }
+})();
 </script>

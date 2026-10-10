@@ -1,0 +1,16 @@
+[
+    {
+        "id": "nano_banana",
+        "name": "Nano Banana AI",
+        "type": "nano_banana",
+        "icon": "fa-solid fa-banana",
+        "is_fixed": true
+    },
+    {
+        "id": "chatgpt",
+        "name": "ChatGPT",
+        "type": "chatgpt",
+        "icon": "fa-solid fa-robot",
+        "is_fixed": true
+    }
+]

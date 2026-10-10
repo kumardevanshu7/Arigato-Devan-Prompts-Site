@@ -77,6 +77,11 @@ if (!function_exists('render_cat_instruction_banner')) {
         <?php endif; ?>
 
         <?php render_prompt_grid($cat_prompts, ['grid_id' => 'card-stack']); ?>
+        <div id="cat-filter-empty" class="grid-empty-msg" style="display:none;padding:50px 20px;text-align:center;">
+            <div class="grid-empty-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+            <h2>No prompts found</h2>
+            <p>No prompts in this section match the selected tag.</p>
+        </div>
     <?php endif; ?>
 
     <?php
@@ -87,18 +92,86 @@ if (!function_exists('render_cat_instruction_banner')) {
 
 <script>
 <?= prompt_page_url_js() ?>
-document.addEventListener('DOMContentLoaded', function() {
-    bindPromptCardClicks('.prompt-grid .prompt-card');
-    document.querySelectorAll('.cat-filter-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.cat-filter-btn').forEach(function(b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            var tag = btn.dataset.tag;
-            document.querySelectorAll('#card-stack .prompt-card').forEach(function(card) {
-                var tags = (card.dataset.tags || '').split(',').map(function(t) { return t.trim(); });
-                card.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
+(function() {
+    function initCatFilters() {
+        bindPromptCardClicks('.prompt-grid .prompt-card');
+
+        var filterBtns = document.querySelectorAll('.cat-filter-btn');
+        var cards = document.querySelectorAll('#card-stack .prompt-card');
+        var emptyMsg = document.getElementById('cat-filter-empty');
+        if (!filterBtns.length) return;
+
+        function norm(s) {
+            return (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        function applyFilter(selectedTag, updateHistory) {
+            var target = norm(selectedTag || 'all');
+            var matchedCount = 0;
+
+            filterBtns.forEach(function(b) {
+                var bTag = norm(b.dataset.tag || 'all');
+                b.classList.toggle('active', bTag === target);
+            });
+
+            cards.forEach(function(card) {
+                var cardTags = (card.dataset.tags || '').split(',').map(norm).filter(Boolean);
+                var isMatch = (target === 'all' || cardTags.indexOf(target) !== -1);
+
+                if (isMatch) {
+                    card.classList.remove('is-tag-hidden');
+                    card.removeAttribute('hidden');
+                    card.style.removeProperty('display');
+                    matchedCount++;
+                } else {
+                    card.classList.add('is-tag-hidden');
+                    card.setAttribute('hidden', '');
+                    card.style.setProperty('display', 'none', 'important');
+                }
+            });
+
+            if (emptyMsg) {
+                emptyMsg.style.display = (matchedCount === 0) ? 'block' : 'none';
+            }
+
+            if (updateHistory) {
+                try {
+                    var u = new URL(window.location.href);
+                    if (target === 'all') {
+                        u.searchParams.delete('tag');
+                    } else {
+                        u.searchParams.set('tag', target);
+                    }
+                    window.history.replaceState({ catTag: target }, '', u.pathname + u.search + u.hash);
+                } catch(e) {}
+            }
+        }
+
+        filterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var tag = btn.dataset.tag || 'all';
+                applyFilter(tag, true);
             });
         });
-    });
-});
+
+        try {
+            var urlParam = new URLSearchParams(window.location.search).get('tag');
+            if (urlParam) {
+                applyFilter(urlParam, false);
+            }
+        } catch(e) {}
+
+        window.addEventListener('popstate', function() {
+            var urlParam = new URLSearchParams(window.location.search).get('tag') || 'all';
+            applyFilter(urlParam, false);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCatFilters);
+    } else {
+        initCatFilters();
+    }
+})();
 </script>

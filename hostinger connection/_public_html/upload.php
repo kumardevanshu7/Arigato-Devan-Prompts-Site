@@ -108,7 +108,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $reel_link = trim($_POST["reel_link"] ?? "");
     $prompt_type = trim($_POST["prompt_type"] ?? "secret"); // secret, unreleased, already_uploaded, direct, solo
     $bwi_raw = trim($_POST["best_works_in"] ?? "");
-    $best_works_in = in_array($bwi_raw, ["nano_banana", "chatgpt"]) ? $bwi_raw : null;
+    $best_works_in = null;
+    if ($bwi_raw !== "") {
+        $bwi_clean = strip_tags($bwi_raw);
+        if (mb_strlen($bwi_clean) > 100) {
+            $bwi_clean = mb_substr($bwi_clean, 0, 100);
+        }
+        $best_works_in = $bwi_clean !== "" ? $bwi_clean : null;
+    }
     $has_assets = isset($_POST["has_assets"]) && $_POST["has_assets"] === "1";
     $asset_title = $has_assets ? trim($_POST["asset_title"] ?? "") : null;
     $asset_images_json = null;
@@ -119,8 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $about_prompt = trim($_POST["about_prompt"] ?? "");
     if ($about_prompt !== "") {
         $about_words = preg_split('/\s+/u', $about_prompt, -1, PREG_SPLIT_NO_EMPTY);
-        if (count($about_words) > 200) {
-            $about_prompt = implode(' ', array_slice($about_words, 0, 200));
+        if (count($about_words) > 500) {
+            $about_prompt = implode(' ', array_slice($about_words, 0, 500));
         }
     }
     require_once __DIR__ . '/includes/step_pics_helper.php';

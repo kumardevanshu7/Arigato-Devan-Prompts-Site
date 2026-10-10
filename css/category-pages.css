@@ -171,6 +171,14 @@ body.page-category #navStickyWrap {
     width: 100%;
   }
 
+  .page-category .prompt-card.is-tag-hidden,
+  .page-category .product-card.is-tag-hidden,
+  .page-category .prompt-card[hidden],
+  .page-category .product-card[hidden] {
+    display: none !important;
+  }
+
+
   .page-category .prompt-card .card-info {
     padding: 12px 12px 14px !important;
     gap: 10px !important;
@@ -267,6 +275,14 @@ body.page-category #navStickyWrap {
 .page-category .cat-main .prompt-grid {
   gap: var(--pg-gap, clamp(18px, 2.2vw, 26px));
 }
+
+.page-category .prompt-card.is-tag-hidden,
+.page-category .product-card.is-tag-hidden,
+.page-category .prompt-card[hidden],
+.page-category .product-card[hidden] {
+  display: none !important;
+}
+
 
 .page-category .prompt-card .card-title {
   margin-bottom: 0 !important;

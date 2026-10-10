@@ -80,12 +80,46 @@ textarea.form-input{resize:vertical;min-height:100px}
 #tag-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .tag-sug{padding:3px 10px;border:1px solid var(--border2);border-radius:100px;font-size:.68rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;background:transparent}
 .tag-sug:hover{border-color:var(--accent);color:var(--accent2);background:rgba(139,92,246,0.07)}
-/* BWI SELECTOR */
-.bwi-selector{display:flex;gap:10px;flex-wrap:wrap}
-.bwi-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:10px 20px;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.85rem;transition:all .2s;color:var(--muted);background:rgba(15,13,30,0.6)}
+/* BWI SELECTOR & CUSTOM PILLS */
+.bwi-selector{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bwi-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:10px 18px;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.85rem;transition:all .2s;color:var(--muted);background:rgba(15,13,30,0.6);user-select:none;position:relative}
 .bwi-btn input[type=radio]{display:none}
-.bwi-banana-opt.bwi-selected{background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.35);box-shadow:0 0 0 2px rgba(251,191,36,0.08)}
-.bwi-chatgpt-opt.bwi-selected{background:rgba(74,222,128,0.08);color:var(--green);border-color:rgba(74,222,128,0.3);box-shadow:0 0 0 2px rgba(74,222,128,0.06)}
+.bwi-banana-opt.bwi-selected{background:rgba(251,191,36,0.12);color:var(--yellow);border-color:rgba(251,191,36,0.45);box-shadow:0 0 0 2px rgba(251,191,36,0.1),0 0 14px rgba(251,191,36,0.15)}
+.bwi-chatgpt-opt.bwi-selected{background:rgba(74,222,128,0.1);color:var(--green);border-color:rgba(74,222,128,0.4);box-shadow:0 0 0 2px rgba(74,222,128,0.08),0 0 14px rgba(74,222,128,0.15)}
+.bwi-gemini-opt.bwi-selected{background:linear-gradient(135deg,rgba(59,130,246,0.18) 0%,rgba(139,92,246,0.18) 100%);color:#60a5fa;border-color:rgba(96,165,250,0.55);box-shadow:0 0 0 2px rgba(96,165,250,0.15),0 0 16px rgba(59,130,246,0.25)}
+.bwi-gemini-opt.bwi-selected i{color:#93c5fd}
+.bwi-del-btn{margin-left:6px;font-size:.85rem;line-height:1;color:rgba(255,255,255,0.35);padding:2px 4px;border-radius:4px;transition:all .15s;cursor:pointer}
+.bwi-del-btn:hover{color:#ef4444;background:rgba(239,68,68,0.15)}
+.bwi-add-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed rgba(139,92,246,0.45);border-radius:12px;padding:10px 18px;cursor:pointer;font-family:var(--font);font-weight:800;font-size:.84rem;color:#c4b5fd;background:rgba(139,92,246,0.06);transition:all .2s}
+.bwi-add-btn:hover{border-color:#a78bfa;background:rgba(139,92,246,0.16);color:#fff;transform:translateY(-1px)}
+/* BWI MODAL */
+.bwi-modal-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;animation:bwiFadeIn .18s ease-out}
+@keyframes bwiFadeIn{from{opacity:0}to{opacity:1}}
+.bwi-modal-box{background:#131127;border:1px solid rgba(139,92,246,0.3);border-radius:20px;width:100%;max-width:440px;box-shadow:0 20px 50px rgba(0,0,0,0.6),0 0 30px rgba(139,92,246,0.15);overflow:hidden}
+.bwi-modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.bwi-modal-title{font-size:1.02rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+.bwi-modal-title i{color:#a78bfa}
+.bwi-modal-close{background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:1.4rem;cursor:pointer;padding:0;line-height:1}
+.bwi-modal-close:hover{color:#fff}
+.bwi-modal-body{padding:22px}
+.bwi-type-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bwi-type-card{border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;position:relative;transition:all .2s;background:rgba(255,255,255,0.03)}
+.bwi-type-card:hover{border-color:rgba(255,255,255,0.3);transform:translateY(-2px)}
+.bwi-type-card .bwi-type-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.bwi-type-gemini .bwi-type-icon{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.35)}
+.bwi-type-chatgpt .bwi-type-icon{background:#10a37f;color:#fff;box-shadow:0 4px 12px rgba(16,163,127,0.35)}
+.bwi-type-card .bwi-type-info strong{display:block;font-size:.88rem;color:#fff;font-weight:800}
+.bwi-type-card .bwi-type-info span{display:block;font-size:.7rem;color:rgba(255,255,255,0.5)}
+.bwi-type-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:transparent;transition:all .2s}
+.bwi-type-gemini.active{border-color:#60a5fa;background:linear-gradient(135deg,rgba(59,130,246,0.18),rgba(139,92,246,0.18));box-shadow:0 0 16px rgba(59,130,246,0.3)}
+.bwi-type-gemini.active .bwi-type-check{background:#3b82f6;color:#fff}
+.bwi-type-chatgpt.active{border-color:#4ade80;background:rgba(74,222,128,0.12);box-shadow:0 0 16px rgba(74,222,128,0.25)}
+.bwi-type-chatgpt.active .bwi-type-check{background:#22c55e;color:#fff}
+.bwi-modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.15)}
+.bwi-btn-cancel{background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:rgba(255,255,255,0.7);padding:9px 16px;font-weight:700;font-size:.84rem;cursor:pointer;transition:all .2s}
+.bwi-btn-cancel:hover{background:rgba(255,255,255,0.06);color:#fff}
+.bwi-btn-save{background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:10px;color:#fff;padding:9px 20px;font-weight:800;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(124,58,237,0.35);transition:all .2s}
+.bwi-btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,58,237,0.5)}
 /* UNLOCK CODE */
 #unlock-code-group{background:rgba(248,113,113,0.04);border:1px solid rgba(248,113,113,0.15);border-radius:12px;padding:14px;margin-bottom:18px}
 #unlock-code-group .form-label{color:var(--red)}
@@ -262,15 +296,72 @@ body::before, body::after { display: none !important; background-image: none !im
     <!-- BEST WORKS IN -->
     <div class="card">
       <div class="section-label"><i class="fa-solid fa-robot"></i> Best Works In</div>
-      <div class="bwi-selector">
-        <label class="bwi-btn bwi-banana-opt" onclick="setBwi('nano_banana',this)">
-          <input type="radio" name="best_works_in" value="nano_banana">
-          <i class="fa-solid fa-banana"></i> Nano Banana AI
+      <div class="bwi-selector" id="bwiSelector">
+        <?php
+        require_once __DIR__ . '/includes/bwi_helper.php';
+        $bwi_models = get_bwi_models();
+        foreach ($bwi_models as $m):
+            $m_id = $m['id'] ?? '';
+            $m_name = $m['name'] ?? '';
+            $m_type = $m['type'] ?? 'gemini';
+            $opt_class = match($m_type) {
+                'nano_banana' => 'bwi-banana-opt',
+                'chatgpt'     => 'bwi-chatgpt-opt',
+                default       => 'bwi-gemini-opt',
+            };
+            $m_icon = $m['icon'] ?? ($m_type === 'chatgpt' ? 'fa-solid fa-robot' : 'fa-solid fa-wand-magic-sparkles');
+            $is_fixed = !empty($m['is_fixed']);
+        ?>
+        <label class="bwi-btn <?= $opt_class ?>" onclick="setBwi('<?= htmlspecialchars($m_id) ?>',this)" data-id="<?= htmlspecialchars($m_id) ?>">
+          <input type="radio" name="best_works_in" value="<?= htmlspecialchars($m_id) ?>">
+          <i class="<?= htmlspecialchars($m_icon) ?>"></i> <?= htmlspecialchars($m_name) ?>
+          <?php if (!$is_fixed): ?>
+          <span class="bwi-del-btn" onclick="deleteBwi('<?= htmlspecialchars($m_id) ?>', event)" title="Delete model">&times;</span>
+          <?php endif; ?>
         </label>
-        <label class="bwi-btn bwi-chatgpt-opt" onclick="setBwi('chatgpt',this)">
-          <input type="radio" name="best_works_in" value="chatgpt">
-          <i class="fa-solid fa-robot"></i> ChatGPT
-        </label>
+        <?php endforeach; ?>
+        <button type="button" class="bwi-add-btn" onclick="openBwiModal()"><i class="fa-solid fa-plus"></i> Add Model</button>
+      </div>
+    </div>
+
+    <!-- BWI ADD MODEL MODAL -->
+    <div id="bwiModal" class="bwi-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeBwiModal()">
+      <div class="bwi-modal-box">
+        <div class="bwi-modal-header">
+          <div class="bwi-modal-title"><i class="fa-solid fa-cube"></i> Add AI Model Pill</div>
+          <button type="button" class="bwi-modal-close" onclick="closeBwiModal()">&times;</button>
+        </div>
+        <div class="bwi-modal-body">
+          <label class="form-label" style="font-size:.85rem;margin-bottom:6px;">Model Name</label>
+          <input type="text" id="bwiNewName" class="form-input" placeholder="e.g. Gemini 1.5, Midjourney, Flux" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();saveNewBwiModel();}">
+
+          <label class="form-label" style="font-size:.85rem;margin:16px 0 8px 0;">Select Pill Theme / Color</label>
+          <div class="bwi-type-picker">
+            <div class="bwi-type-card bwi-type-gemini active" onclick="selectBwiType('gemini', this)">
+              <div class="bwi-type-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+              <div class="bwi-type-info">
+                <strong>Gemini Pill</strong>
+                <span>Blue &amp; Indigo Glow</span>
+              </div>
+              <div class="bwi-type-check"><i class="fa-solid fa-check"></i></div>
+            </div>
+
+            <div class="bwi-type-card bwi-type-chatgpt" onclick="selectBwiType('chatgpt', this)">
+              <div class="bwi-type-icon"><i class="fa-solid fa-robot"></i></div>
+              <div class="bwi-type-info">
+                <strong>ChatGPT Pill</strong>
+                <span>Emerald Green Glow</span>
+              </div>
+              <div class="bwi-type-check"><i class="fa-solid fa-check"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="bwi-modal-footer">
+          <button type="button" class="bwi-btn-cancel" onclick="closeBwiModal()">Cancel</button>
+          <button type="button" class="bwi-btn-save" id="bwiSaveBtn" onclick="saveNewBwiModel()">
+            <i class="fa-solid fa-plus"></i> Add &amp; Select Pill
+          </button>
+        </div>
       </div>
     </div>
 
@@ -408,9 +499,9 @@ body::before, body::after { display: none !important; background-image: none !im
     <div class="card">
       <div class="section-label"><i class="fa-solid fa-magnifying-glass-chart"></i> About &amp; SEO (applies to all prompt types)</div>
       <div class="form-group">
-        <label class="form-label">About This Prompt <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— shown on the prompt page (max 200 words)</span></label>
-        <textarea name="about_prompt" id="about-prompt-input" class="form-input" rows="6" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
-        <div style="font-size:.72rem;color:var(--muted);font-weight:700;margin-top:6px"><span id="about-word-count">0</span> / 200 words</div>
+        <label class="form-label">About This Prompt <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— shown on the prompt page (max 500 words)</span></label>
+        <textarea name="about_prompt" id="about-prompt-input" class="form-input" rows="6" maxlength="5000" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);font-weight:700;margin-top:6px"><span id="about-word-count">0</span> / 500 words</div>
       </div>
       <div class="form-group">
         <label class="form-label">SEO Description <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">— shows in Google search results (max 160 chars)</span></label>
@@ -644,8 +735,114 @@ function removeEP(num){
   updateEpAddBtn();
 }
 function setBwi(val,el){
+  const radio = el.querySelector('input[type=radio]');
+  if(el.classList.contains('bwi-selected') && radio.checked){
+    el.classList.remove('bwi-selected');
+    radio.checked = false;
+    return;
+  }
   document.querySelectorAll('.bwi-btn').forEach(b=>b.classList.remove('bwi-selected'));
-  el.classList.add('bwi-selected');el.querySelector('input[type=radio]').checked=true;
+  el.classList.add('bwi-selected');
+  if(radio) radio.checked = true;
+}
+
+let selectedBwiType = 'gemini';
+
+function selectBwiType(type, el) {
+  selectedBwiType = type;
+  document.querySelectorAll('.bwi-type-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function openBwiModal() {
+  document.getElementById('bwiNewName').value = '';
+  selectBwiType('gemini', document.querySelector('.bwi-type-gemini'));
+  document.getElementById('bwiModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('bwiNewName').focus(), 50);
+}
+
+function closeBwiModal() {
+  document.getElementById('bwiModal').style.display = 'none';
+}
+
+function saveNewBwiModel() {
+  const nameInput = document.getElementById('bwiNewName');
+  const name = nameInput.value.trim();
+  if (!name) {
+    alert('Please enter an AI model name.');
+    nameInput.focus();
+    return;
+  }
+  const saveBtn = document.getElementById('bwiSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+
+  const fd = new FormData();
+  fd.append('action', 'add');
+  fd.append('name', name);
+  fd.append('type', selectedBwiType);
+
+  fetch('ajax_bwi_model.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(res => {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add &amp; Select Pill';
+      if (res && res.success && res.model) {
+        const m = res.model;
+        const selector = document.getElementById('bwiSelector');
+        const addBtn = selector.querySelector('.bwi-add-btn');
+
+        let existing = selector.querySelector(`[data-id="${m.id}"]`);
+        if (!existing) {
+          const optClass = m.type === 'chatgpt' ? 'bwi-chatgpt-opt' : (m.type === 'nano_banana' ? 'bwi-banana-opt' : 'bwi-gemini-opt');
+          const label = document.createElement('label');
+          label.className = `bwi-btn ${optClass}`;
+          label.setAttribute('data-id', m.id);
+          label.onclick = function() { setBwi(m.id, this); };
+          label.innerHTML = `
+            <input type="radio" name="best_works_in" value="${m.id}">
+            <i class="${m.icon}"></i> ${m.name}
+            <span class="bwi-del-btn" onclick="deleteBwi('${m.id}', event)" title="Delete model">&times;</span>
+          `;
+          selector.insertBefore(label, addBtn);
+          existing = label;
+        }
+
+        setBwi(m.id, existing);
+        closeBwiModal();
+      } else {
+        alert(res.message || 'Could not add model.');
+      }
+    })
+    .catch(err => {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add &amp; Select Pill';
+      alert('Error adding model: ' + err.message);
+    });
+}
+
+function deleteBwi(id, e) {
+  e.stopPropagation();
+  e.preventDefault();
+  if (!confirm('Are you sure you want to remove this model pill from the list?')) return;
+
+  const fd = new FormData();
+  fd.append('action', 'delete');
+  fd.append('id', id);
+
+  fetch('ajax_bwi_model.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success) {
+        const pill = document.querySelector(`.bwi-btn[data-id="${id}"]`);
+        if (pill) {
+          pill.remove();
+        }
+      } else {
+        alert(res.message || 'Cannot delete model.');
+      }
+    })
+    .catch(err => alert('Error: ' + err.message));
 }
 function toggleAssets(cb){document.getElementById('assets-fields').style.display=cb.checked?'block':'none';}
 function handleAssetFiles(input){
@@ -738,12 +935,12 @@ function updateAboutWordCount(el){
   const countEl=document.getElementById('about-word-count');
   if(!countEl||!el)return;
   let words=(el.value||'').trim().split(/\s+/).filter(Boolean);
-  if(words.length>200){
-    el.value=words.slice(0,200).join(' ');
-    words=words.slice(0,200);
+  if(words.length>500){
+    el.value=words.slice(0,500).join(' ');
+    words=words.slice(0,500);
   }
   countEl.textContent=words.length;
-  countEl.style.color=words.length>=200?'var(--red)':'';
+  countEl.style.color=words.length>=500?'var(--red)':'';
 }
 function handleTextareaPasteClean(e) {
   var text = (e.clipboardData || window.clipboardData).getData('text');

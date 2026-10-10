@@ -798,9 +798,9 @@ input[type="radio"].cat-radio { display: none; }
             </div>
 
             <div class="form-row">
-                <label class="form-label">About This Prompt <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">— editorial note (max 200 words)</span></label>
-                <textarea name="about_prompt" id="aboutPromptInput" class="form-textarea" rows="5" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
-                <p class="tag-hint" id="aboutWordCount">0 / 200 words</p>
+                <label class="form-label">About This Prompt <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">— editorial note (max 500 words)</span></label>
+                <textarea name="about_prompt" id="aboutPromptInput" class="form-textarea" rows="5" maxlength="5000" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"></textarea>
+                <p class="tag-hint" id="aboutWordCount">0 / 500 words</p>
             </div>
 
             <div class="form-row">
@@ -1108,8 +1108,8 @@ function updateAboutWordCount(el) {
     var count = words.length;
     var hint = document.getElementById('aboutWordCount');
     if (hint) {
-        hint.textContent = count + ' / 200 words' + (count > 200 ? ' (exceeds limit, will be trimmed to 200)' : '');
-        hint.style.color = count > 200 ? '#f87171' : 'var(--muted)';
+        hint.textContent = count + ' / 500 words' + (count > 500 ? ' (exceeds limit, will be trimmed to 500)' : '');
+        hint.style.color = count > 500 ? '#f87171' : 'var(--muted)';
     }
 }
 

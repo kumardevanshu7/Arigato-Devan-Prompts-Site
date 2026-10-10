@@ -170,6 +170,33 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     </script>
     <?php include_once 'includes/theme_head.php'; ?>
     <style>
+    /* About prompt badge & subtitle hint */
+    .pp-about h2 {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 8px 0 !important;
+    }
+    .pp-about-badge {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #ef4444;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .pp-about-hint {
+        font-family: inherit;
+        font-style: italic;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--pal-teal, #567c8d);
+        margin: 0 0 22px 0 !important;
+        line-height: 1.5;
+        letter-spacing: 0.01em;
+        display: block;
+    }
+
     /* Clickable Keyword Filter Capsules */
     .pp-about-kw {
         margin-top: 16px;
@@ -920,15 +947,19 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
                 <div id="pp-content" class="pp-content-section" <?= !$is_unlocked ? 'style="display:none;"' : '' ?>>
                     <div class="pp-prompt-head">
                         <span class="pp-prompt-label"><i class="fa-solid fa-scroll"></i> THE PROMPT:</span>
-                        <?php if (!empty($p['best_works_in'])): ?>
-                        <span class="pp-bwi-badge <?= $p['best_works_in'] === 'nano_banana' ? 'pp-bwi-nano' : 'pp-bwi-chatgpt' ?>">
-                            <?php if ($p['best_works_in'] === 'nano_banana'): ?>
-                                <i class="fa-solid fa-banana"></i> Best in Nano Banana
-                            <?php else: ?>
-                                <i class="fa-solid fa-robot"></i> Best in ChatGPT
-                            <?php endif; ?>
+                        <?php 
+                        if (!empty($p['best_works_in'])) {
+                            require_once __DIR__ . '/includes/bwi_helper.php';
+                            $bwi_info = parse_bwi_display($p['best_works_in']);
+                            if ($bwi_info):
+                        ?>
+                        <span class="pp-bwi-badge <?= htmlspecialchars($bwi_info['badge_class']) ?>">
+                            <i class="<?= htmlspecialchars($bwi_info['icon']) ?>"></i> <?= htmlspecialchars($bwi_info['label']) ?>
                         </span>
-                        <?php endif; ?>
+                        <?php 
+                            endif;
+                        } 
+                        ?>
                     </div>
 
                     <div class="pp-code-block">
@@ -1065,7 +1096,8 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         <?php if ($about_prompt_raw !== '' || $meta_desc_raw !== '' || !empty($pp_kw_list)): ?>
         <section class="pp-about" aria-label="About this prompt">
             <?php if ($about_prompt_raw !== ''): ?>
-            <h2>About this prompt</h2>
+            <h2>About this prompt <span class="pp-about-badge">(This is not the prompt)</span></h2>
+            <p class="pp-about-hint"><em>(Upar hearts ko click karne ke baad aayega prompt, naaki ye about wala prompt hai... buddy!)</em></p>
             <p class="pp-about-body"><?= nl2br(htmlspecialchars($about_prompt_raw)) ?></p>
             <?php endif; ?>
             <?php if ($meta_desc_raw !== ''): ?>
@@ -1565,22 +1597,31 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
     // -- LIKE (Main Prompt) --
     const likeBtn = document.getElementById('pp-like-btn');
     if (likeBtn) {
+        let isLiking = false;
         likeBtn.addEventListener('click', async function() {
             <?php if (!isset($_SESSION['user_id'])): ?>
             showGuestAuthModal('like');
             return;
             <?php endif; ?>
-            const fd = new FormData(); fd.append('prompt_id', promptId);
-            const res = await fetch('like.php', { method: 'POST', body: fd }).then(r => r.json());
-            if (res.success) {
-                const isLiked = res.action === 'liked';
-                this.classList.toggle('is-liked', isLiked);
-                document.getElementById('pp-like-icon').classList.toggle('liked-heart', isLiked);
-                document.getElementById('pp-like-count').textContent = res.likes_count;
-                document.getElementById('pp-like-count-mini').textContent = res.likes_count;
-                if (isLiked) {
-                    spawnFloatingHearts(this, 5);
+            if (isLiking) return;
+            isLiking = true;
+            try {
+                const fd = new FormData(); fd.append('prompt_id', promptId);
+                const res = await fetch('like.php', { method: 'POST', body: fd }).then(r => r.json());
+                if (res.success) {
+                    const isLiked = res.action === 'liked';
+                    this.classList.toggle('is-liked', isLiked);
+                    document.getElementById('pp-like-icon').classList.toggle('liked-heart', isLiked);
+                    document.getElementById('pp-like-count').textContent = res.likes_count;
+                    document.getElementById('pp-like-count-mini').textContent = res.likes_count;
+                    if (isLiked) {
+                        spawnFloatingHearts(this, 5);
+                    }
                 }
+            } catch (err) {
+                console.error('Like error:', err);
+            } finally {
+                isLiking = false;
             }
         });
     }

@@ -31,6 +31,15 @@
   display: none !important;
 }
 
+/* Hidden state for filter-pills & search filtering */
+.product-card.prompt-card.is-tag-hidden,
+.prompt-card.is-tag-hidden,
+.product-card.prompt-card[hidden],
+.prompt-card[hidden] {
+  display: none !important;
+}
+
+
 .product-card.prompt-card:hover,
 .prompt-card:hover {
   transform: translateY(-5px) !important;

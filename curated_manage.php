@@ -532,9 +532,9 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
       </div>
 
       <div class="form-row">
-        <label class="form-label" for="about_prompt">About This Prompt <span style="font-weight:400;color:var(--muted)">(optional — editorial note, max 200 words)</span></label>
-        <textarea id="about_prompt" name="about_prompt" class="form-textarea" rows="5" maxlength="2500" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"><?= htmlspecialchars($edit_row['about_prompt'] ?? '') ?></textarea>
-        <p class="form-hint" id="aboutWordCount"><?= str_word_count(strip_tags($edit_row['about_prompt'] ?? '')) ?> / 200 words</p>
+        <label class="form-label" for="about_prompt">About This Prompt <span style="font-weight:400;color:var(--muted)">(optional — editorial note, max 500 words)</span></label>
+        <textarea id="about_prompt" name="about_prompt" class="form-textarea" rows="5" maxlength="5000" placeholder="Write a natural editorial note about this prompt — what it does, who it is for, and how to use it." oninput="updateAboutWordCount(this)"><?= htmlspecialchars($edit_row['about_prompt'] ?? '') ?></textarea>
+        <p class="form-hint" id="aboutWordCount"><?= str_word_count(strip_tags($edit_row['about_prompt'] ?? '')) ?> / 500 words</p>
       </div>
 
       <div class="form-row">
@@ -774,12 +774,12 @@ function toggleCuratedMainCard(id, btn) {
 function updateAboutWordCount(el) {
   var val = el.value.trim();
   var words = val ? val.split(/\s+/).filter(Boolean) : [];
-  if (words.length > 200) {
-    words = words.slice(0, 200);
+  if (words.length > 500) {
+    words = words.slice(0, 500);
     el.value = words.join(' ');
   }
   var cnt = document.getElementById('aboutWordCount');
-  if (cnt) cnt.textContent = words.length + ' / 200 words';
+  if (cnt) cnt.textContent = words.length + ' / 500 words';
 }
 
 <?php if ($edit_row): ?>

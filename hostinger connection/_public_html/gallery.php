@@ -444,10 +444,18 @@ function promptPageUrl(card) {
         var visible = 0;
         cards.forEach(function(card) {
             var match = !q || (card.dataset.title||'').toLowerCase().includes(q) || (card.dataset.tags||'').toLowerCase().includes(q);
-            card.style.display = match ? '' : 'none';
-            if (match) visible++;
+            if (match) {
+                card.classList.remove('is-tag-hidden');
+                card.removeAttribute('hidden');
+                card.style.removeProperty('display');
+                visible++;
+            } else {
+                card.classList.add('is-tag-hidden');
+                card.setAttribute('hidden', '');
+                card.style.setProperty('display', 'none', 'important');
+            }
         });
-        if (q && visible > 0 && countBadge) {
+        if (q && countBadge) {
             countBadge.textContent = visible;
         }
     }
