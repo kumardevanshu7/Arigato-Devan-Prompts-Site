@@ -146,18 +146,24 @@ if (!function_exists('get_library_step_pics')) {
                 $params[] = '%' . $search . '%';
                 $params[] = '%' . $search . '%';
             }
-            $sql .= " ORDER BY times_used DESC, id DESC LIMIT 100";
+            $sql .= " ORDER BY times_used DESC, id DESC LIMIT 200";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Filter out any broken files
+            // Filter out broken image files; keep text-only steps
             $valid = [];
             $base_dir = dirname(__DIR__);
             foreach ($rows as $r) {
-                $full = $base_dir . '/' . ltrim($r['image_path'], '/');
-                if (file_exists($full)) {
+                $img = trim((string)($r['image_path'] ?? ''));
+                $txt = trim((string)($r['point_text'] ?? ''));
+                if ($img !== '') {
+                    $full = $base_dir . '/' . ltrim($img, '/');
+                    if (file_exists($full)) {
+                        $valid[] = $r;
+                    }
+                } elseif ($txt !== '') {
                     $valid[] = $r;
                 }
             }
@@ -172,7 +178,9 @@ if (!function_exists('record_step_pic_usage')) {
     function record_step_pic_usage(string $image_path, ?string $point_text = null, ?PDO $pdo = null): void
     {
         $image_path = trim($image_path);
-        if ($image_path === '') return;
+        $clean_text = trim((string)$point_text);
+
+        if ($image_path === '' && $clean_text === '') return;
 
         if ($pdo === null) {
             global $pdo;
@@ -180,19 +188,67 @@ if (!function_exists('record_step_pic_usage')) {
         if (!$pdo) return;
 
         try {
-            $clean_text = trim((string)$point_text);
-            $stmt = $pdo->prepare("SELECT id FROM step_small_pics WHERE image_path = ? LIMIT 1");
-            $stmt->execute([$image_path]);
-            $id = $stmt->fetchColumn();
+            if ($image_path !== '') {
+                $stmt = $pdo->prepare("SELECT id FROM step_small_pics WHERE image_path = ? LIMIT 1");
+                $stmt->execute([$image_path]);
+                $id = $stmt->fetchColumn();
 
-            if ($id) {
-                $upd = $pdo->prepare("UPDATE step_small_pics SET times_used = times_used + 1, point_text = CASE WHEN (point_text IS NULL OR point_text = '') AND ? <> '' THEN ? ELSE point_text END WHERE id = ?");
-                $upd->execute([$clean_text, $clean_text, $id]);
+                if ($id) {
+                    $upd = $pdo->prepare("UPDATE step_small_pics SET times_used = times_used + 1, point_text = CASE WHEN (point_text IS NULL OR point_text = '') AND ? <> '' THEN ? ELSE point_text END WHERE id = ?");
+                    $upd->execute([$clean_text, $clean_text, $id]);
+                } else {
+                    $ins = $pdo->prepare("INSERT INTO step_small_pics (image_path, point_text, times_used) VALUES (?, ?, 1)");
+                    $ins->execute([$image_path, $clean_text !== '' ? $clean_text : null]);
+                }
             } else {
-                $ins = $pdo->prepare("INSERT INTO step_small_pics (image_path, point_text, times_used) VALUES (?, ?, 1)");
-                $ins->execute([$image_path, $clean_text !== '' ? $clean_text : null]);
+                // Text-only step
+                $stmt = $pdo->prepare("SELECT id FROM step_small_pics WHERE (image_path IS NULL OR image_path = '') AND point_text = ? LIMIT 1");
+                $stmt->execute([$clean_text]);
+                $id = $stmt->fetchColumn();
+
+                if ($id) {
+                    $upd = $pdo->prepare("UPDATE step_small_pics SET times_used = times_used + 1 WHERE id = ?");
+                    $upd->execute([$id]);
+                } else {
+                    $ins = $pdo->prepare("INSERT INTO step_small_pics (image_path, point_text, times_used) VALUES ('', ?, 1)");
+                    $ins->execute([$clean_text]);
+                }
             }
         } catch (Exception $e) {
+        }
+    }
+}
+
+if (!function_exists('sync_steps_to_library')) {
+    function sync_steps_to_library(?PDO $pdo = null): int
+    {
+        if ($pdo === null) {
+            global $pdo;
+        }
+        if (!$pdo) return 0;
+
+        try {
+            $stmt = $pdo->query("SELECT how_to_use FROM prompts WHERE how_to_use IS NOT NULL AND how_to_use != ''");
+            $count = 0;
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $steps = parse_how_to_use_steps($row['how_to_use']);
+                foreach ($steps as $st) {
+                    $text = trim($st['text'] ?? '');
+                    $imgs = $st['images'] ?? [];
+                    if (!empty($imgs)) {
+                        foreach ($imgs as $img) {
+                            record_step_pic_usage($img, $text, $pdo);
+                            $count++;
+                        }
+                    } elseif ($text !== '') {
+                        record_step_pic_usage('', $text, $pdo);
+                        $count++;
+                    }
+                }
+            }
+            return $count;
+        } catch (Exception $e) {
+            return 0;
         }
     }
 }

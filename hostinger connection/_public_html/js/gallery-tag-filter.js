@@ -118,6 +118,37 @@
           grid.innerHTML = '<p class="grid-empty-msg" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--pal-teal,#567c8d);">No prompts for this tag yet.</p>';
         }
         afterCardsUpdate(data.total, data.empty);
+
+        // Dynamically update section H1 and hero-label
+        var h1El = document.querySelector('.gal-all-prompts-titles h1');
+        if (h1El && data.h1) {
+          h1El.innerHTML = data.h1;
+        }
+        var labelEl = document.querySelector('.gal-all-prompts-titles .hero-label');
+        if (labelEl && data.hero_label) {
+          labelEl.textContent = data.hero_label;
+        }
+
+        // Dynamically update or toggle tag collection intro
+        var introEl = document.getElementById('gal-collection-intro');
+        if (data.intro && data.intro.trim() !== '') {
+          if (!introEl) {
+            introEl = document.createElement('p');
+            introEl.className = 'gal-collection-intro';
+            introEl.id = 'gal-collection-intro';
+            var headEl = document.querySelector('.gal-all-prompts-head');
+            if (headEl && headEl.parentNode) {
+              headEl.parentNode.insertBefore(introEl, headEl.nextSibling);
+            }
+          }
+          if (introEl) {
+            introEl.textContent = data.intro;
+            introEl.style.display = '';
+          }
+        } else if (introEl) {
+          introEl.style.display = 'none';
+        }
+
         var section = document.getElementById('card-stack');
         if (section) {
           section.scrollIntoView({ behavior: 'smooth', block: 'start' });

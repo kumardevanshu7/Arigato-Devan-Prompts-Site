@@ -12,5 +12,12 @@
         "type": "chatgpt",
         "icon": "fa-solid fa-robot",
         "is_fixed": true
+    },
+    {
+        "id": "gemini:fsddgfd",
+        "name": "fsddgfd",
+        "type": "gemini",
+        "icon": "fa-solid fa-wand-magic-sparkles",
+        "is_fixed": false
     }
 ]

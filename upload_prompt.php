@@ -312,13 +312,13 @@ body::before, body::after { display: none !important; background-image: none !im
             $m_icon = $m['icon'] ?? ($m_type === 'chatgpt' ? 'fa-solid fa-robot' : 'fa-solid fa-wand-magic-sparkles');
             $is_fixed = !empty($m['is_fixed']);
         ?>
-        <label class="bwi-btn <?= $opt_class ?>" onclick="setBwi('<?= htmlspecialchars($m_id) ?>',this)" data-id="<?= htmlspecialchars($m_id) ?>">
+        <div class="bwi-btn <?= $opt_class ?>" onclick="setBwi('<?= htmlspecialchars($m_id) ?>',this)" data-id="<?= htmlspecialchars($m_id) ?>">
           <input type="radio" name="best_works_in" value="<?= htmlspecialchars($m_id) ?>">
           <i class="<?= htmlspecialchars($m_icon) ?>"></i> <?= htmlspecialchars($m_name) ?>
           <?php if (!$is_fixed): ?>
           <span class="bwi-del-btn" onclick="deleteBwi('<?= htmlspecialchars($m_id) ?>', event)" title="Delete model">&times;</span>
           <?php endif; ?>
-        </label>
+        </div>
         <?php endforeach; ?>
         <button type="button" class="bwi-add-btn" onclick="openBwiModal()"><i class="fa-solid fa-plus"></i> Add Model</button>
       </div>
@@ -734,16 +734,18 @@ function removeEP(num){
   }
   updateEpAddBtn();
 }
-function setBwi(val,el){
+function setBwi(val, el){
+  if (!el) return;
   const radio = el.querySelector('input[type=radio]');
-  if(el.classList.contains('bwi-selected') && radio.checked){
+  const isAlreadySelected = el.classList.contains('bwi-selected');
+  if (isAlreadySelected) {
     el.classList.remove('bwi-selected');
-    radio.checked = false;
+    if (radio) radio.checked = false;
     return;
   }
-  document.querySelectorAll('.bwi-btn').forEach(b=>b.classList.remove('bwi-selected'));
+  document.querySelectorAll('.bwi-btn').forEach(b => b.classList.remove('bwi-selected'));
   el.classList.add('bwi-selected');
-  if(radio) radio.checked = true;
+  if (radio) radio.checked = true;
 }
 
 let selectedBwiType = 'gemini';
@@ -795,17 +797,17 @@ function saveNewBwiModel() {
         let existing = selector.querySelector(`[data-id="${m.id}"]`);
         if (!existing) {
           const optClass = m.type === 'chatgpt' ? 'bwi-chatgpt-opt' : (m.type === 'nano_banana' ? 'bwi-banana-opt' : 'bwi-gemini-opt');
-          const label = document.createElement('label');
-          label.className = `bwi-btn ${optClass}`;
-          label.setAttribute('data-id', m.id);
-          label.onclick = function() { setBwi(m.id, this); };
-          label.innerHTML = `
+          const pill = document.createElement('div');
+          pill.className = `bwi-btn ${optClass}`;
+          pill.setAttribute('data-id', m.id);
+          pill.onclick = function() { setBwi(m.id, this); };
+          pill.innerHTML = `
             <input type="radio" name="best_works_in" value="${m.id}">
             <i class="${m.icon}"></i> ${m.name}
             <span class="bwi-del-btn" onclick="deleteBwi('${m.id}', event)" title="Delete model">&times;</span>
           `;
-          selector.insertBefore(label, addBtn);
-          existing = label;
+          selector.insertBefore(pill, addBtn);
+          existing = pill;
         }
 
         setBwi(m.id, existing);
@@ -1098,9 +1100,9 @@ function renderPreviousPics(pics) {
   if (!pics || pics.length === 0) {
     grid.innerHTML = `
       <div style="padding:40px 20px;text-align:center;color:var(--muted);">
-        <i class="fa-solid fa-images" style="font-size:2rem;margin-bottom:10px;opacity:0.4;"></i>
-        <div style="font-weight:700;">No previous step pictures found.</div>
-        <p style="font-size:0.8rem;margin:6px 0 0 0;">Upload sample pictures in any step, and they will automatically show up here for instant reuse!</p>
+        <i class="fa-solid fa-layer-group" style="font-size:2rem;margin-bottom:10px;opacity:0.4;"></i>
+        <div style="font-weight:700;">No previous steps or pictures found.</div>
+        <p style="font-size:0.8rem;margin:6px 0 0 0;">Add steps or sample pictures to any prompt, and they will automatically show up here for instant reuse!</p>
       </div>
     `;
     return;
@@ -1108,27 +1110,89 @@ function renderPreviousPics(pics) {
 
   var html = '';
   pics.forEach(p => {
-    var pt = p.point_text ? p.point_text : '(No text recorded)';
-    var escPt = pt.replace(/"/g, '&quot;');
+    var hasImg = p.image_path && p.image_path.trim() !== '';
+    var pt = p.point_text ? p.point_text : (hasImg ? '(No text recorded)' : '(Empty step)');
+    var escPt = pt.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    var imgHtml = hasImg 
+      ? `<img src="${p.image_path}" style="width:62px;height:62px;border-radius:10px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.1);flex-shrink:0;">`
+      : `<div style="width:62px;height:62px;border-radius:10px;background:rgba(56,189,248,0.12);border:1.5px dashed rgba(56,189,248,0.3);display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:1.3rem;flex-shrink:0;" title="Text-only step"><i class="fa-solid fa-align-left"></i></div>`;
+
+    var badgeHtml = hasImg 
+      ? `<span style="font-size:0.68rem;padding:2px 7px;border-radius:4px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:700;">Pic &amp; Text</span>`
+      : `<span style="font-size:0.68rem;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,0.15);color:#38bdf8;font-weight:700;">Text Only</span>`;
+
+    var actionsHtml = '';
+    if (hasImg) {
+      actionsHtml = `
+        <button type="button" onclick="selectPreviousPic('${p.image_path}', '${escPt}', true)" style="padding:6px 12px;background:#38bdf8;color:#0f172a;font-weight:700;font-size:0.75rem;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;" title="Insert this pic and auto-fill point text">
+          <i class="fa-solid fa-check-double"></i> Use Pic &amp; Text
+        </button>
+        <button type="button" onclick="selectPreviousPic('${p.image_path}', '', false)" style="padding:5px 12px;background:rgba(255,255,255,0.08);color:var(--text);font-weight:600;font-size:0.72rem;border-radius:7px;border:1px solid var(--border);cursor:pointer;white-space:nowrap;" title="Insert only this pic without changing text">
+          Use Pic Only
+        </button>
+      `;
+    } else {
+      actionsHtml = `
+        <button type="button" onclick="selectPreviousPic('', '${escPt}', true)" style="padding:6px 12px;background:#38bdf8;color:#0f172a;font-weight:700;font-size:0.75rem;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;" title="Use this sentence for this step">
+          <i class="fa-solid fa-check"></i> Use Text
+        </button>
+      `;
+    }
+
     html += `
-      <div class="prev-pic-card" style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;">
-        <img src="${p.image_path}" style="width:62px;height:62px;border-radius:10px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.1);flex-shrink:0;">
+      <div class="prev-pic-card" id="step-lib-item-${p.id}" style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;position:relative;">
+        ${imgHtml}
         <div style="flex:1;min-width:0;">
-          <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;" title="${escPt}">${pt}</div>
-          <div style="font-size:0.72rem;color:var(--muted);"><i class="fa-solid fa-repeat"></i> Used ${p.times_used} times</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            ${badgeHtml}
+            <span style="font-size:0.72rem;color:var(--muted);"><i class="fa-solid fa-repeat"></i> Used ${p.times_used} times</span>
+          </div>
+          <div style="font-size:0.84rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;" title="${escPt}">${pt}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-          <button type="button" onclick="selectPreviousPic('${p.image_path}', '${escPt}', true)" style="padding:6px 12px;background:#38bdf8;color:#0f172a;font-weight:700;font-size:0.75rem;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;" title="Insert this pic and auto-fill point text">
-            <i class="fa-solid fa-check-double"></i> Use Pic &amp; Text
-          </button>
-          <button type="button" onclick="selectPreviousPic('${p.image_path}', '', false)" style="padding:5px 12px;background:rgba(255,255,255,0.08);color:var(--text);font-weight:600;font-size:0.72rem;border-radius:7px;border:1px solid var(--border);cursor:pointer;white-space:nowrap;" title="Insert only this pic without changing text">
-            Use Pic Only
-          </button>
+          ${actionsHtml}
         </div>
+        <button type="button" onclick="deleteStepItem(${p.id}, event)" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#ef4444;width:30px;height:30px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;transition:all 0.15s ease;" title="Delete this item from library">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
       </div>
     `;
   });
   grid.innerHTML = html;
+}
+
+function deleteStepItem(id, ev) {
+  if (ev) ev.stopPropagation();
+  if (!confirm('Are you sure you want to remove this item from the library?')) return;
+  var card = document.getElementById('step-lib-item-' + id);
+  if (card) card.style.opacity = '0.35';
+
+  var fd = new FormData();
+  fd.append('action', 'delete');
+  fd.append('id', id);
+
+  fetch('ajax_step_pic.php', {
+    method: 'POST',
+    body: fd
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      if (card) card.remove();
+      var remaining = document.querySelectorAll('.prev-pic-card');
+      if (remaining.length === 0) {
+        var s = document.getElementById('prevPicSearchInput');
+        loadPreviousPicsList(s ? s.value : '');
+      }
+    } else {
+      alert(res.message || 'Could not delete item.');
+      if (card) card.style.opacity = '1';
+    }
+  })
+  .catch(() => {
+    alert('Network error while deleting.');
+    if (card) card.style.opacity = '1';
+  });
 }
 
 function selectPreviousPic(imagePath, pointText, fillText) {
@@ -1136,7 +1200,7 @@ function selectPreviousPic(imagePath, pointText, fillText) {
   var row = document.querySelector(`.how-step-row[data-step-idx="${currentModalStepIdx}"]`);
   if (!row) return;
 
-  if (fillText && pointText && pointText !== '(No text recorded)') {
+  if (fillText && pointText && pointText !== '(No text recorded)' && pointText !== '(Empty step)') {
     var ta = row.querySelector('.how-step-input');
     if (ta) {
       ta.value = pointText;
@@ -1144,7 +1208,9 @@ function selectPreviousPic(imagePath, pointText, fillText) {
     }
   }
 
-  appendStepPicBox(currentModalStepIdx, imagePath);
+  if (imagePath && imagePath.trim() !== '') {
+    appendStepPicBox(currentModalStepIdx, imagePath.trim());
+  }
   closePreviousPicsModal();
 }
 
@@ -1172,7 +1238,7 @@ function addHowStep(val = '', images = []) {
         <i class="fa-solid fa-plus"></i> Add Sample Pic
       </button>
       <button type="button" class="btn-reuse-step-pic" onclick="openPreviousPicsModal(${idx})" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.35);color:#38bdf8;font-size:0.75rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.15s ease;margin-left:auto;">
-        <i class="fa-solid fa-clock-rotate-left"></i> Previous pics use karo
+        <i class="fa-solid fa-clock-rotate-left"></i> Previous steps / pics use karo
       </button>
     </div>
   `;
@@ -1236,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="position:relative;background:#1e293b;border:1px solid #334155;border-radius:16px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);overflow:hidden;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #334155;background:rgba(0,0,0,0.2);">
       <div style="font-weight:800;font-size:0.95rem;color:#f8fafc;display:flex;align-items:center;gap:8px;">
-        <i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8;"></i> Previous Step Pics Library
+        <i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8;"></i> Previous Steps &amp; Pics Library
       </div>
       <button type="button" onclick="closePreviousPicsModal()" style="background:none;border:none;color:#94a3b8;font-size:1.4rem;cursor:pointer;line-height:1;" aria-label="Close">&times;</button>
     </div>
@@ -1244,7 +1310,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="padding:14px 20px;border-bottom:1px solid #334155;background:rgba(0,0,0,0.1);">
       <div style="position:relative;">
         <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#64748b;font-size:0.85rem;"></i>
-        <input type="text" id="prevPicSearchInput" placeholder="Search by point text..." style="width:100%;padding:9px 12px 9px 36px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:0.82rem;box-sizing:border-box;" oninput="loadPreviousPicsList(this.value)">
+        <input type="text" id="prevPicSearchInput" placeholder="Search by step sentence or picture..." style="width:100%;padding:9px 12px 9px 36px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:0.82rem;box-sizing:border-box;" oninput="loadPreviousPicsList(this.value)">
       </div>
     </div>
 

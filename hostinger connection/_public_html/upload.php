@@ -145,6 +145,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     }
                 }
             }
+            if (empty($s_imgs) && $s_text !== '') {
+                record_step_pic_usage('', $s_text, $pdo);
+            }
             if ($s_text !== "" || !empty($s_imgs)) {
                 $how_to_use_arr[] = [
                     'text'   => $s_text,

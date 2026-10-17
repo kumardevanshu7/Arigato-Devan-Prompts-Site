@@ -55,21 +55,47 @@ $total         = $gal_data['total'];
 $total_pages   = $gal_data['total_pages'];
 $tag_filter    = $gal_data['tag_filter'];
 
+require_once __DIR__ . '/includes/tag_descriptions_helper.php';
+
 // Only curated collections with results are indexable; every other ?tag= value
 // is a thin duplicate of the full gallery.
 $gal_seo       = gallery_seo_meta($tag_filter);
 $gal_is_tagged = ($tag_filter !== '' && $tag_filter !== 'all');
 $gal_indexable = (!$gal_is_tagged && $search_query === '') || ($gal_seo !== null && $total > 0);
 
+// Determine tag intro text (checks tag_descriptions table first, fallbacks to gallery_seo_collections)
+$gal_intro_text = '';
+if ($gal_is_tagged) {
+    $gal_intro_text = get_tag_description($pdo, $tag_filter) ?? ($gal_seo['intro'] ?? '');
+} elseif ($gal_seo && !empty($gal_seo['intro'])) {
+    $gal_intro_text = $gal_seo['intro'];
+}
+
+$gal_h1_text = '';
+if ($search_query !== '') {
+    $gal_h1_text = 'Prompts for <em>&ldquo;' . htmlspecialchars($search_query) . '&rdquo;</em>';
+} elseif ($gal_seo && !empty($gal_seo['h1'])) {
+    $gal_h1_text = $gal_seo['h1'];
+} elseif ($gal_is_tagged) {
+    $gal_h1_text = htmlspecialchars(ucwords(str_replace(['-', '_'], ' ', $tag_filter))) . ' Prompts <em>for AI</em>';
+} else {
+    $gal_h1_text = 'All AI Couple Prompts <em>Gallery</em>';
+}
+
+$gal_hero_label = $search_query !== '' ? 'Search Results' : ($gal_is_tagged ? 'Prompt Collection' : 'Curated Prompt Collection');
+
 if ($is_ajax_cards) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
-        'ok'    => true,
-        'html'  => render_gallery_prompt_cards($prompts),
-        'total' => $total,
-        'tag'   => $tag_filter ?: 'all',
-        'q'     => $search_query,
-        'empty' => count($prompts) === 0,
+        'ok'         => true,
+        'html'       => render_gallery_prompt_cards($prompts),
+        'total'      => $total,
+        'tag'        => $tag_filter ?: 'all',
+        'q'          => $search_query,
+        'empty'      => count($prompts) === 0,
+        'h1'         => $gal_h1_text,
+        'hero_label' => $gal_hero_label,
+        'intro'      => $gal_intro_text,
     ]);
     exit;
 }
@@ -94,8 +120,8 @@ $gal_banner_slides = gallery_banner_slides();
     <?php
     $gal_title = $search_query !== ''
         ? 'Search: ' . htmlspecialchars($search_query) . ' &mdash; AI Prompts Gallery'
-        : ($gal_seo['title'] ?? 'All AI Couple Prompts Gallery &mdash; Arigato Devan');
-    $gal_desc  = $gal_seo['desc']  ?? 'Browse every AI couple prompt in one place &mdash; romantic, candid, traditional and festival looks for Gemini AI and ChatGPT. Save, unlock &amp; share your favourites.';
+        : ($gal_seo['title'] ?? ($gal_is_tagged ? htmlspecialchars(ucwords(str_replace(['-', '_'], ' ', $tag_filter))) . ' AI Couple Prompts | Arigato Devan' : 'All AI Couple Prompts Gallery &mdash; Arigato Devan'));
+    $gal_desc  = $gal_seo['desc']  ?? ($gal_intro_text ?: 'Browse every AI couple prompt in one place &mdash; romantic, candid, traditional and festival looks for Gemini AI and ChatGPT. Save, unlock &amp; share your favourites.');
     ?>
     <title><?= $gal_title ?></title>
     <meta name="description" content="<?= $gal_desc ?>">
@@ -219,22 +245,15 @@ $gal_banner_slides = gallery_banner_slides();
         <div class="gal-all-prompts-section">
         <div class="gal-all-prompts-head">
             <div class="gal-all-prompts-titles">
-                <?php if ($search_query !== ''): ?>
-                    <p class="hero-label">Search Results</p>
-                    <h1>Prompts for <em>&ldquo;<?= htmlspecialchars($search_query) ?>&rdquo;</em></h1>
-                <?php else: ?>
-                    <p class="hero-label"><?= $gal_seo ? 'Prompt Collection' : 'Curated Prompt Collection' ?></p>
-                    <h1><?= $gal_seo['h1'] ?? 'All AI Couple Prompts <em>Gallery</em>' ?></h1>
-                <?php endif; ?>
+                <p class="hero-label"><?= htmlspecialchars($gal_hero_label) ?></p>
+                <h1><?= $gal_h1_text ?></h1>
             </div>
             <div class="gal-all-prompts-stat">
                 <span class="page-hero-num" id="gallery-count-badge"><?= $total ?></span>
                 <span class="page-hero-label">prompts</span>
             </div>
         </div>
-        <?php if ($gal_seo && $search_query === ''): ?>
-            <p class="gal-collection-intro"><?= $gal_seo['intro'] ?></p>
-        <?php endif; ?>
+        <p class="gal-collection-intro" id="gal-collection-intro" style="<?= ($gal_intro_text !== '' && $search_query === '') ? '' : 'display:none;' ?>"><?= htmlspecialchars($gal_intro_text) ?></p>
         </div>
 
         <!-- Card Grid -->

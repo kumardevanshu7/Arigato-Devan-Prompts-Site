@@ -26,9 +26,39 @@ if ($action === 'upload') {
 }
 
 if ($action === 'list') {
+    // If table has no text-only steps yet, run sync once to populate existing prompt sentences
+    try {
+        $hasTextSteps = (int)$pdo->query("SELECT COUNT(*) FROM step_small_pics WHERE image_path IS NULL OR image_path = ''")->fetchColumn();
+        if ($hasTextSteps === 0) {
+            sync_steps_to_library($pdo);
+        }
+    } catch (Exception $e) {}
+
     $q = trim((string)($_GET['q'] ?? ''));
     $pics = get_library_step_pics($pdo, $q);
     echo json_encode(['success' => true, 'pics' => $pics]);
+    exit;
+}
+
+if ($action === 'delete') {
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid ID.']);
+        exit;
+    }
+    try {
+        $stmt = $pdo->prepare("DELETE FROM step_small_pics WHERE id = ?");
+        $stmt->execute([$id]);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'sync') {
+    $count = sync_steps_to_library($pdo);
+    echo json_encode(['success' => true, 'synced' => $count]);
     exit;
 }
 

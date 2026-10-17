@@ -197,6 +197,45 @@ sort($secret_sub_tags);
             padding-right: 40px !important;
         }
     }
+    .home-explore-more-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 36px auto 28px auto;
+        width: 100%;
+        max-width: 1400px;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+    .home-explore-more-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 13px 36px;
+        background: linear-gradient(135deg, #F5709D, #11FFC9);
+        color: #1a2238 !important;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        border-radius: 9999px;
+        text-decoration: none !important;
+        box-shadow: 0 8px 24px rgba(245, 112, 157, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .home-explore-more-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(17, 255, 201, 0.35);
+        color: #1a2238 !important;
+    }
+    .home-explore-more-btn i {
+        transition: transform 0.2s ease;
+        font-size: 0.9rem;
+    }
+    .home-explore-more-btn:hover i {
+        transform: translateX(4px);
+    }
     </style>
     <div class="home-tag-filters">
         <button type="button" class="filter-pill tag-filter-btn active" data-tag="all">All</button>
@@ -210,11 +249,20 @@ sort($secret_sub_tags);
             <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:60px 20px;">No content yet! Check back soon.</p>
         <?php else:
             require_once __DIR__ . '/prompt_cards.php';
-            foreach ($prompts as $index => $p):
+            $display_prompts = array_slice($prompts, 0, 25);
+            foreach ($display_prompts as $index => $p):
                 render_prompt_card($p, $index);
             endforeach;
         endif; ?>
     </div>
+
+    <?php if (count($prompts) > 0): ?>
+    <div class="home-explore-more-wrap">
+        <a href="gallery.php" class="home-explore-more-btn">
+            Explore more <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+    <?php endif; ?>
 
     <?php include __DIR__ . '/home_seo_section.php'; ?>
 </main>
