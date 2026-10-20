@@ -462,6 +462,7 @@ $site_static_pages = [
     ['key' => 'contact', 'title' => 'Contact Us', 'url' => 'https://arigatodevan.com/contact.php', 'icon' => 'fa-solid fa-envelope', 'cat' => 'Info'],
     ['key' => 'faq', 'title' => 'FAQ', 'url' => 'https://arigatodevan.com/faq.php', 'icon' => 'fa-solid fa-circle-question', 'cat' => 'Support'],
     ['key' => 'feedback', 'title' => 'Feedback', 'url' => 'https://arigatodevan.com/feedback.php', 'icon' => 'fa-solid fa-comment-dots', 'cat' => 'Support'],
+    ['key' => 'feedback_shows', 'title' => 'Feedback Shows', 'url' => 'https://arigatodevan.com/feedback_shows.php', 'icon' => 'fa-solid fa-comments', 'cat' => 'Community'],
     ['key' => 'happy_users', 'title' => 'Happy Users (Wall of Love)', 'url' => 'https://arigatodevan.com/happy_users.php', 'icon' => 'fa-solid fa-face-smile-beam', 'cat' => 'Trust'],
     ['key' => 'privacy', 'title' => 'Privacy Policy', 'url' => 'https://arigatodevan.com/privacy.php', 'icon' => 'fa-solid fa-shield-halved', 'cat' => 'Legal'],
     ['key' => 'disclaimer', 'title' => 'Disclaimer', 'url' => 'https://arigatodevan.com/disclaimer.php', 'icon' => 'fa-solid fa-triangle-exclamation', 'cat' => 'Legal'],
@@ -4900,8 +4901,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                         <div class="nd-gsc-locked-wrap">
                                             <span class="nd-gsc-badge-already <?= $att > 1 ? 'nd-gsc-badge-2nd-indexed' : '' ?>">
                                                 <i class="fa-solid fa-circle-check" <?= $att > 1 ? 'style="color:#059669;"' : '' ?>></i>
-                                                <span class="nd-gsc-label-full"><?= $att > 1 ? "Indexed ({$ord} Try)" : 'Already Indexed' ?></span>
-                                                <span class="nd-gsc-label-short"><?= $att > 1 ? "{$ord} Try" : 'Indexed' ?></span>
+                                                <span class="nd-gsc-label-full"><?= $att > 1 ? "{$ord} Time DONE" : 'Already Indexed' ?></span>
+                                                <span class="nd-gsc-label-short"><?= $att > 1 ? "{$ord} DONE" : 'Indexed' ?></span>
                                             </span>
                                             <div class="nd-gsc-timestamp">
                                                 <i class="fa-regular fa-calendar-check"></i> <?= htmlspecialchars($item['gsc_date_formatted']) ?>
@@ -4931,7 +4932,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                                             </div>
                                             <div class="nd-gsc-verify-actions">
                                                 <button type="button" class="nd-gsc-btn-indexed" onclick="markGscStatus('<?= $i_id ?>', 'already_indexed_<?= $att ?>', <?= $att ?>, this, '<?= $i_type ?>')" title="Yes, page is indexed in Google">
-                                                    <i class="fa-solid fa-check"></i> <?= $att > 1 ? "Indexed ({$ord} Try)" : 'Indexed' ?>
+                                                    <i class="fa-solid fa-check"></i> <?= $att > 1 ? "{$ord} Time DONE" : 'Indexed' ?>
                                                 </button>
                                                 <button type="button" class="nd-gsc-btn-notindexed" onclick="markGscStatus('<?= $i_id ?>', 'retry_needed', <?= $att ?>, this, '<?= $i_type ?>')" title="No, page is not indexed -> move to next try">
                                                     <i class="fa-solid fa-xmark"></i> Not Indexed
@@ -6419,8 +6420,8 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                     const isMulti = curAtt > 1;
                     const badgeClass = isMulti ? 'nd-gsc-badge-already nd-gsc-badge-2nd-indexed' : 'nd-gsc-badge-already';
                     const iconStyle = isMulti ? 'style="color:#059669;"' : '';
-                    const fullLabel = isMulti ? `Indexed (${ord} Try)` : 'Already Indexed';
-                    const shortLabel = isMulti ? `${ord} Try` : 'Indexed';
+                    const fullLabel = isMulti ? `${ord} Time DONE` : 'Already Indexed';
+                    const shortLabel = isMulti ? `${ord} DONE` : 'Indexed';
 
                     cell.innerHTML = `
                         <div class="nd-gsc-locked-wrap">
@@ -6437,7 +6438,7 @@ $admin_avatar = $_SESSION["profile_image"] ?? "toplogo/logo01.webp";
                 } else if (res.is_verify_mode === true) {
                     const promptQ = curAtt > 1 ? `${ord} Try: Is it indexed?` : '4d passed: Is it indexed?';
                     const idxAction = `already_indexed_${curAtt}`;
-                    const idxLabel = curAtt > 1 ? `Indexed (${ord} Try)` : 'Indexed';
+                    const idxLabel = curAtt > 1 ? `${ord} Time DONE` : 'Indexed';
                     cell.innerHTML = `
                         <div class="nd-gsc-verify-box">
                             <div class="nd-gsc-verify-label">
