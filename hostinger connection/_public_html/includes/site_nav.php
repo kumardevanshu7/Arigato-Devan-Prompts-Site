@@ -108,23 +108,23 @@ if (isset($pdo)) {
                     <div class="gal-dropdown-menu">
                         <a href="<?= $nb('secret_code.php') ?>">
                             <i class="fa-solid fa-lock"></i> Secret Code Reels
-                            <?= empty($nav_counts['secret_code']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'secret_code.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                            <?= ($curPage === 'secret_code.php') ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                         <a href="<?= $nb('unreleased.php') ?>">
                             <i class="fa-solid fa-star"></i> Unreleased Reels
-                            <?= empty($nav_counts['unreleased']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'unreleased.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                            <?= ($curPage === 'unreleased.php') ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                         <a href="<?= $nb('already_uploaded.php') ?>">
                             <i class="bx bx-history"></i> Already Uploaded
-                            <?= empty($nav_counts['already_uploaded']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'already_uploaded.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                            <?= ($curPage === 'already_uploaded.php') ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                         <a href="<?= $nb('direct_prompts.php') ?>">
                             <i class="fa-solid fa-hand-pointer"></i> Direct Prompts
-                            <?= empty($nav_counts['direct']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'direct_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                            <?= ($curPage === 'direct_prompts.php') ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                         <a href="<?= $nb('solo_prompts.php') ?>">
                             <i class="fa-solid fa-user"></i> Solo Prompts
-                            <?= empty($nav_counts['solo']) ? '<span class="dd-pill soon">SOON</span>' : ($curPage === 'solo_prompts.php' ? '<span class="dd-pill">ACTIVE</span>' : '') ?>
+                            <?= ($curPage === 'solo_prompts.php') ? '<span class="dd-pill">ACTIVE</span>' : '' ?>
                         </a>
                         <a href="<?= $nb('curated_ai_prompts.php') ?>" class="gal-nm-link">
                             <i class="fa-solid fa-wand-magic-sparkles nm-gradient-icon"></i> <span class="nm-gradient-text">Curated AI Prompts</span>

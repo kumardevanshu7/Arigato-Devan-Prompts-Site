@@ -6,9 +6,9 @@
 $err_code    = $err_code ?? '404';
 $err_title   = $err_title ?? 'Page Not Found';
 $err_badge   = $err_badge ?? 'Error 404 — Not Found';
-$err_heading = $err_heading ?? 'Oops! Page Nahi Mila!';
-$err_desc    = $err_desc ?? 'Lagta hai yeh page apna rasta bhool gaya...<br>Koi baat nahi — wapas chalte hain!';
-$err_bubble  = $err_bubble ?? 'Yaar... yeh page toh ghoom gaya!';
+$err_heading = $err_heading ?? 'Oops! Page Not Found';
+$err_desc    = $err_desc ?? 'The page you are looking for does not exist or has been moved.<br>Let us get you back on track!';
+$err_bubble  = $err_bubble ?? 'Looks like this page took a wrong turn!';
 $err_badge_class = ($err_code === '500') ? ' err-badge--500' : '';
 ?>
 <!DOCTYPE html>

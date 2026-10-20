@@ -1097,7 +1097,7 @@ $is_local = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'], tr
         <section class="pp-about" aria-label="About this prompt">
             <?php if ($about_prompt_raw !== ''): ?>
             <h2>About this prompt <span class="pp-about-badge">(This is not the prompt)</span></h2>
-            <p class="pp-about-hint"><em>(Upar hearts ko click karne ke baad aayega prompt, naaki ye about wala prompt hai... buddy!)</em></p>
+            <p class="pp-about-hint"><em>(Tap the hearts above to unlock the actual prompt. This section is just an overview.)</em></p>
             <p class="pp-about-body"><?= nl2br(htmlspecialchars($about_prompt_raw)) ?></p>
             <?php endif; ?>
             <?php if ($meta_desc_raw !== ''): ?>

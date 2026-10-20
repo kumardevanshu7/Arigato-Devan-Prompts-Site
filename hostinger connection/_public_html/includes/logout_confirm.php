@@ -18,8 +18,8 @@ $logout_pic = $site_base . 'logout-pic/logout-cute-pic-arigato-prompt-devan.webp
                  height="220"
                  loading="lazy">
         </div>
-        <h2 class="logout-confirm-title" id="logoutConfirmTitle">Mat jao, mujhe chhor ke?</h2>
-        <p class="logout-confirm-sub">Tumhare bina prompts akeli reh jayengi...</p>
+        <h2 class="logout-confirm-title" id="logoutConfirmTitle">Leaving so soon?</h2>
+        <p class="logout-confirm-sub">Your favorite prompts will miss you...</p>
         <div class="logout-confirm-actions">
             <button type="button" class="logout-confirm-stay" id="logoutConfirmStay">
                 <i class="fa-solid fa-heart"></i> Stay Logged In

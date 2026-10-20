@@ -4,8 +4,8 @@ http_response_code(500);
 $err_code    = '500';
 $err_title   = 'Server Error';
 $err_badge   = 'Error 500 — Server Error';
-$err_heading = 'Arre! Server Thoda Ruk Gaya!';
-$err_desc    = 'Kuch technical glitch ho gayi...<br>Thodi der baad try karo ya home pe chalo! <i class="fa-solid fa-screwdriver-wrench"></i>';
-$err_bubble  = 'Server ne thoda break le liya hai...';
+$err_heading = 'Internal Server Error';
+$err_desc    = 'Something went wrong on our end.<br>Please try again in a moment or head back home! <i class="fa-solid fa-screwdriver-wrench"></i>';
+$err_bubble  = 'Our server is taking a quick breath...';
 
 require __DIR__ . '/includes/error_page_shell.php';
